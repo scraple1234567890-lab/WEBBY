@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="description" content="A clean, modern website starter." />
+    <title>StarSpell Studio</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="header" role="banner">
+      <nav class="nav container" aria-label="Primary">
+        <a class="brand" href="#top" aria-label="Home">
+          <span class="brandMark" aria-hidden="true">✦</span>
+          <span class="brandText">StarSpell Studio</span>
+        </a>
+
+        <button class="iconBtn navToggle" id="navToggle" aria-expanded="false" aria-controls="navLinks">
+          <span class="srOnly">Open menu</span>
+          <span class="hamburger" aria-hidden="true"></span>
+        </button>
+
+        <div class="navLinks" id="navLinks">
+          <a href="#work">Work</a>
+          <a href="#features">Features</a>
+          <a href="#gallery">Gallery</a>
+          <a href="#contact">Contact</a>
+
+          <button class="btn ghost" id="themeToggle" type="button" aria-label="Toggle dark mode">
+            <span aria-hidden="true">☾</span>
+            <span class="btnText">Theme</span>
+          </button>
+
+          <a class="btn primary" href="#contact">Get started</a>
+        </div>
+      </nav>
+    </header>
+
+    <main id="main">
+      <!-- HERO -->
+      <section id="top" class="hero">
+        <div class="container heroGrid">
+          <div class="heroCopy">
+            <p class="kicker">Build fast • Look sharp • Stay accessible</p>
+            <h1>
+              A sleek website starter
+              <span class="accent">that doesn’t fight you</span>.
+            </h1>
+            <p class="lead">
+              Responsive layout, mobile navigation, dark mode, and a clean design system. Drop your content in and ship.
+            </p>
+
+            <div class="heroCtas">
+              <a class="btn primary" href="#work">See sections</a>
+              <a class="btn" href="#contact">Contact</a>
+            </div>
+
+            <div class="heroMeta" role="list">
+              <div class="metaCard" role="listitem">
+                <span class="metaBig">0</span>
+                <span class="metaSmall">frameworks required</span>
+              </div>
+              <div class="metaCard" role="listitem">
+                <span class="metaBig">100%</span>
+                <span class="metaSmall">responsive</span>
+              </div>
+              <div class="metaCard" role="listitem">
+                <span class="metaBig">A11y</span>
+                <span class="metaSmall">friendly</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="heroArt" aria-hidden="true">
+            <div class="orb o1"></div>
+            <div class="orb o2"></div>
+            <div class="card">
+              <div class="cardTop">
+                <span class="pill">New</span>
+                <span class="pill">Dark mode</span>
+                <span class="pill">Mobile menu</span>
+              </div>
+              <div class="cardBody">
+                <div class="fakeLine w90"></div>
+                <div class="fakeLine w70"></div>
+                <div class="fakeLine w60"></div>
+                <div class="fakeGrid">
+                  <div class="tile"></div><div class="tile"></div><div class="tile"></div>
+                  <div class="tile"></div><div class="tile"></div><div class="tile"></div>
+                </div>
+              </div>
+              <div class="cardBottom">
+                <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- WORK -->
+      <section id="work" class="section">
+        <div class="container">
+          <div class="sectionHead">
+            <h2>What this starter includes</h2>
+            <p class="muted">
+              A practical set of sections you can keep, delete, or rearrange. Like LEGO, but for pixels 🧱✨
+            </p>
+          </div>
+
+          <div class="grid3">
+            <article class="feature">
+              <h3>Sticky navigation</h3>
+              <p>Keyboard-friendly, mobile-ready menu with accessible toggles.</p>
+              <ul class="checklist">
+                <li>Skip link</li>
+                <li>ARIA attributes</li>
+                <li>Smooth scrolling</li>
+              </ul>
+            </article>
+
+            <article class="feature">
+              <h3>Design tokens</h3>
+              <p>Colors, spacing, and shadows via CSS variables for quick theme edits.</p>
+              <ul class="checklist">
+                <li>Light + dark</li>
+                <li>Consistent type scale</li>
+                <li>Reusable buttons</li>
+              </ul>
+            </article>
+
+            <article class="feature">
+              <h3>Contact section</h3>
+              <p>Client-side validation and a “mailto” fallback for easy setup.</p>
+              <ul class="checklist">
+                <li>Inline errors</li>
+                <li>No backend required</li>
+                <li>Easy to wire later</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- FEATURES -->
+      <section id="features" class="section alt">
+        <div class="container">
+          <div class="split">
+            <div>
+              <h2>Make it yours in minutes</h2>
+              <p class="muted">
+                Replace the branding, swap the copy, drop in your images. If you want multi-page, just duplicate
+                <code>index.html</code> and update links.
+              </p>
+
+              <div class="callouts">
+                <div class="callout">
+                  <h3>Fast edits</h3>
+                  <p>Change <code>:root</code> variables once, and the whole site updates.</p>
+                </div>
+                <div class="callout">
+                  <h3>Production-friendly</h3>
+                  <p>No build tools required. Works on any static host.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="stats">
+              <div class="stat">
+                <span class="statNum">3</span>
+                <span class="statLabel">core files</span>
+              </div>
+              <div class="stat">
+                <span class="statNum">1</span>
+                <span class="statLabel">layout system</span>
+              </div>
+              <div class="stat">
+                <span class="statNum">∞</span>
+                <span class="statLabel">customizations</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- GALLERY -->
+      <section id="gallery" class="section">
+        <div class="container">
+          <div class="sectionHead">
+            <h2>Gallery</h2>
+            <p class="muted">Replace these placeholders with your screenshots, art, products, or photos.</p>
+          </div>
+
+          <div class="gallery">
+            <figure class="shot">
+              <div class="shotImg" data-label="Project A"></div>
+              <figcaption>Project A</figcaption>
+            </figure>
+            <figure class="shot">
+              <div class="shotImg" data-label="Project B"></div>
+              <figcaption>Project B</figcaption>
+            </figure>
+            <figure class="shot">
+              <div class="shotImg" data-label="Project C"></div>
+              <figcaption>Project C</figcaption>
+            </figure>
+            <figure class="shot">
+              <div class="shotImg" data-label="Project D"></div>
+              <figcaption>Project D</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTACT -->
+      <section id="contact" class="section alt">
+        <div class="container">
+          <div class="sectionHead">
+            <h2>Contact</h2>
+            <p class="muted">This form validates in-browser. You can wire it to a backend later.</p>
+          </div>
+
+          <div class="contactGrid">
+            <div class="contactCard">
+              <h3>Send a message</h3>
+
+              <form id="contactForm" novalidate>
+                <div class="field">
+                  <label for="name">Name</label>
+                  <input id="name" name="name" type="text" autocomplete="name" required minlength="2" />
+                  <p class="error" data-for="name" aria-live="polite"></p>
+                </div>
+
+                <div class="field">
+                  <label for="email">Email</label>
+                  <input id="email" name="email" type="email" autocomplete="email" required />
+                  <p class="error" data-for="email" aria-live="polite"></p>
+                </div>
+
+                <div class="field">
+                  <label for="message">Message</label>
+                  <textarea id="message" name="message" rows="5" required minlength="10"></textarea>
+                  <p class="error" data-for="message" aria-live="polite"></p>
+                </div>
+
+                <div class="actions">
+                  <button class="btn primary" type="submit">Send</button>
+                  <a class="btn ghost" id="mailtoFallback" href="#">Use email app</a>
+                </div>
+
+                <p class="muted small" id="formStatus" aria-live="polite"></p>
+              </form>
+            </div>
+
+            <aside class="contactAside">
+              <div class="asideCard">
+                <h3>Quick info</h3>
+                <ul class="infoList">
+                  <li><span class="dotIcon" aria-hidden="true"></span> Typical reply: 1–2 days</li>
+                  <li><span class="dotIcon" aria-hidden="true"></span> Best for: collabs, commissions, questions</li>
+                  <li><span class="dotIcon" aria-hidden="true"></span> Timezone: America/Chicago</li>
+                </ul>
+              </div>
+
+              <div class="asideCard">
+                <h3>Social</h3>
+                <p class="muted small">Add your links here.</p>
+                <div class="socialRow">
+                  <a href="#" class="chip">YouTube</a>
+                  <a href="#" class="chip">Instagram</a>
+                  <a href="#" class="chip">GitHub</a>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footerRow">
+        <p class="muted small">© <span id="year"></span> StarSpell Studio. All rights reserved.</p>
+        <a class="muted small" href="#top">Back to top ↑</a>
+      </div>
+    </footer>
+
+    <script src="./script.js" defer></script>
+  </body>
+</html>
