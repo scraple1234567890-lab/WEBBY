@@ -2,30 +2,12 @@
   const root = document.documentElement;
   const navToggle = document.getElementById("navToggle");
   const navLinks = document.getElementById("navLinks");
-  const themeToggle = document.getElementById("themeToggle");
 
   const yearEl = document.getElementById("year");
   if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
-  // Theme
-  const savedTheme = localStorage.getItem("theme");
-  if (savedTheme === "light" || savedTheme === "dark") {
-    root.setAttribute("data-theme", savedTheme);
-  } else {
-    // Default to dark, but respect OS preference if you want:
-    // const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
-    // root.setAttribute("data-theme", prefersLight ? "light" : "dark");
-    root.setAttribute("data-theme", "dark");
-  }
-
-  function toggleTheme() {
-    const current = root.getAttribute("data-theme") || "dark";
-    const next = current === "dark" ? "light" : "dark";
-    root.setAttribute("data-theme", next);
-    localStorage.setItem("theme", next);
-  }
-
-  themeToggle?.addEventListener("click", toggleTheme);
+  // Set a consistent theme (no toggle needed for this landing page)
+  root.setAttribute("data-theme", "light");
 
   // Mobile nav
   function setNavOpen(open) {
