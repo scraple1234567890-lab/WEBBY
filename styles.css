@@ -467,18 +467,11 @@ h1 {
   box-shadow: var(--shadow);
 }
 .shotImg {
+  width: 100%;
   height: 160px;
-  display: grid;
-  place-items: center;
-  color: color-mix(in srgb, var(--text) 60%, transparent);
-  font-weight: 800;
-  letter-spacing: 0.6px;
-  background:
-    radial-gradient(380px 140px at 15% 10%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 60%),
-    radial-gradient(340px 160px at 80% 0%, color-mix(in srgb, var(--accent2) 14%, transparent), transparent 60%),
-    color-mix(in srgb, var(--panel2) 70%, transparent);
+  object-fit: cover;
+  display: block;
 }
-.shotImg::before { content: attr(data-label); }
 .shot figcaption {
   padding: 12px 14px;
   color: var(--muted);
