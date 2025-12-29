@@ -440,7 +440,12 @@ h1 {
 .small { font-size: 0.92rem; }
 
 /* Quiz layout */
-.quizPage { background-position: center top, 50% 0%; }
+.quizPage {
+  --panel: rgba(255, 255, 255, 0.12);
+  --panel2: rgba(255, 255, 255, 0.18);
+  --border: rgba(255, 255, 255, 0.3);
+  background-position: center top, 50% 0%;
+}
 .quizHeroGrid {
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.9fr);
