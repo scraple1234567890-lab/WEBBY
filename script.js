@@ -3,6 +3,9 @@
   const navToggle = document.getElementById("navToggle");
   const navLinks = document.getElementById("navLinks");
   const loreFeeds = Array.from(document.querySelectorAll("[data-lore-feed]"));
+  const loreComposerForm = document.getElementById("loreComposerForm");
+  const loreComposerStatus = document.getElementById("loreComposerStatus");
+  const LOCAL_LORE_KEY = "userLorePosts";
 
   const loreAuthors = ["Archivist Mira", "Keeper Iden", "Cantor Lysa", "Essence Steward", "Field Mentor Ryn", "Constellation Scribe Ixa"];
   const loreSchools = ["Touch", "Sight", "Sound", "Essence", "Cross-House", "Archival Wing"];
@@ -99,6 +102,43 @@
     };
   }
 
+  function setFieldError(fieldName, message) {
+    const el = document.querySelector(`.error[data-for="${fieldName}"]`);
+    if (el) el.textContent = message || "";
+  }
+
+  function loadUserLorePosts() {
+    try {
+      const stored = localStorage.getItem(LOCAL_LORE_KEY);
+      const parsed = stored ? JSON.parse(stored) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (err) {
+      console.warn("Unable to read saved lore posts", err);
+      return [];
+    }
+  }
+
+  function saveUserLorePosts(posts) {
+    try {
+      localStorage.setItem(LOCAL_LORE_KEY, JSON.stringify(posts.slice(0, 200)));
+    } catch (err) {
+      console.warn("Unable to save lore posts", err);
+    }
+  }
+
+  function normalizePosts(posts) {
+    return Array.isArray(posts)
+      ? posts
+          .map((post) => {
+            if (!post?.createdAt) return null;
+            const createdAt = new Date(post.createdAt);
+            if (Number.isNaN(createdAt.getTime())) return null;
+            return { ...post, createdAt };
+          })
+          .filter(Boolean)
+      : [];
+  }
+
   // Lore board rendering
   async function renderLoreBoards() {
     if (!loreFeeds.length) return;
@@ -118,19 +158,11 @@
       if (!response.ok) throw new Error(`Request failed: ${response.status}`);
       const posts = await response.json();
 
-      const normalized = Array.isArray(posts)
-        ? posts
-            .map((post) => {
-              if (!post?.createdAt) return null;
-              const createdAt = new Date(post.createdAt);
-              if (Number.isNaN(createdAt.getTime())) return null;
-              return { ...post, createdAt };
-            })
-            .filter(Boolean)
-            .sort((a, b) => b.createdAt - a.createdAt)
-        : [];
+      const normalized = normalizePosts(posts);
+      const userPosts = normalizePosts(loadUserLorePosts());
 
-      const feedPosts = [createVisitLorePost(), ...normalized];
+      const combined = [...userPosts, ...normalized].sort((a, b) => b.createdAt - a.createdAt);
+      const feedPosts = combined.length ? combined : [createVisitLorePost()];
 
       const renderToFeed = (feed, postsToRender) => {
         const limitAttr = Number(feed.getAttribute("data-limit"));
@@ -175,37 +207,122 @@
       loreFeeds.forEach((feed) => renderToFeed(feed, feedPosts));
     } catch (err) {
       console.error(err);
-      const fallbackPost = createVisitLorePost();
-      loreFeeds.forEach((feed) => {
-        feed.innerHTML = "";
-        const notice = document.createElement("p");
-        notice.className = "muted";
-        notice.textContent = "The quill is resting. Sharing the freshest whispered note instead.";
-        feed.appendChild(notice);
-        const card = document.createElement("article");
-        card.className = "post";
-        const top = document.createElement("div");
-        top.className = "postTop";
-        const author = document.createElement("span");
-        author.className = "postAuthor";
-        author.textContent = fallbackPost.author || "Unknown scribe";
-        const meta = document.createElement("span");
-        meta.className = "postMeta";
-        meta.textContent = `${fallbackPost.school || "Unknown hall"} • ${fallbackPost.createdAt.toLocaleString(undefined, {
-          dateStyle: "medium",
-          timeStyle: "short",
-        })}`;
-        top.append(author, meta);
-        const body = document.createElement("p");
-        body.className = "postBody";
-        body.textContent = fallbackPost.text;
-        card.append(top, body);
-        feed.appendChild(card);
-      });
+      const userPosts = normalizePosts(loadUserLorePosts());
+      if (userPosts.length) {
+        loreFeeds.forEach((feed) => {
+          feed.innerHTML = "";
+          userPosts.forEach((post) => {
+            const card = document.createElement("article");
+            card.className = "post";
+            const top = document.createElement("div");
+            top.className = "postTop";
+            const author = document.createElement("span");
+            author.className = "postAuthor";
+            author.textContent = post.author || "Unknown scribe";
+            const meta = document.createElement("span");
+            meta.className = "postMeta";
+            const date = post.createdAt?.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }) || "Unknown time";
+            meta.textContent = `${post.school || "Unknown hall"} • ${date}`;
+            top.append(author, meta);
+            const body = document.createElement("p");
+            body.className = "postBody";
+            body.textContent = post.text || "A missing scrap of parchment.";
+            card.append(top, body);
+            feed.appendChild(card);
+          });
+        });
+      } else {
+        const fallbackPost = createVisitLorePost();
+        loreFeeds.forEach((feed) => {
+          feed.innerHTML = "";
+          const notice = document.createElement("p");
+          notice.className = "muted";
+          notice.textContent = "The quill is resting. Sharing the freshest whispered note instead.";
+          feed.appendChild(notice);
+          const card = document.createElement("article");
+          card.className = "post";
+          const top = document.createElement("div");
+          top.className = "postTop";
+          const author = document.createElement("span");
+          author.className = "postAuthor";
+          author.textContent = fallbackPost.author || "Unknown scribe";
+          const meta = document.createElement("span");
+          meta.className = "postMeta";
+          meta.textContent = `${fallbackPost.school || "Unknown hall"} • ${fallbackPost.createdAt.toLocaleString(undefined, {
+            dateStyle: "medium",
+            timeStyle: "short",
+          })}`;
+          top.append(author, meta);
+          const body = document.createElement("p");
+          body.className = "postBody";
+          body.textContent = fallbackPost.text;
+          card.append(top, body);
+          feed.appendChild(card);
+        });
+      }
     }
   }
 
   renderLoreBoards();
+
+  // Lore composer (archive page only)
+  if (loreComposerForm) {
+    const nameInput = loreComposerForm.querySelector("#loreName");
+    const schoolInput = loreComposerForm.querySelector("#loreSchool");
+    const messageInput = loreComposerForm.querySelector("#loreMessage");
+
+    const clearComposerErrors = () => {
+      setFieldError("loreName", "");
+      setFieldError("loreSchool", "");
+      setFieldError("loreMessage", "");
+    };
+
+    loreComposerForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      clearComposerErrors();
+      if (loreComposerStatus) loreComposerStatus.textContent = "";
+
+      const name = nameInput?.value.trim() || "";
+      const school = schoolInput?.value.trim() || "";
+      const message = messageInput?.value.trim() || "";
+
+      let ok = true;
+      if (name.length < 2) {
+        setFieldError("loreName", "Please enter a name (at least 2 characters).");
+        ok = false;
+      }
+      if (!school) {
+        setFieldError("loreSchool", "Choose a school or hall.");
+        ok = false;
+      }
+      if (message.length < 12) {
+        setFieldError("loreMessage", "Share at least 12 characters so others can follow your note.");
+        ok = false;
+      }
+
+      if (!ok) return;
+
+      const newPost = {
+        id: `user-${Date.now()}`,
+        author: name,
+        school,
+        createdAt: new Date().toISOString(),
+        text: message,
+      };
+
+      const existing = loadUserLorePosts();
+      saveUserLorePosts([newPost, ...existing]);
+
+      loreComposerForm.reset();
+      if (loreComposerStatus) loreComposerStatus.textContent = "Posted! Your note now appears in the board on this device.";
+      renderLoreBoards();
+    });
+
+    loreComposerForm.addEventListener("reset", () => {
+      clearComposerErrors();
+      if (loreComposerStatus) loreComposerStatus.textContent = "";
+    });
+  }
 
   // Quiz (sorting ritual page only)
   const quizForm = document.getElementById("schoolQuiz");
@@ -331,11 +448,6 @@
   const statusEl = document.getElementById("formStatus");
   const mailtoFallback = document.getElementById("mailtoFallback");
 
-  function setError(fieldName, message) {
-    const el = document.querySelector(`.error[data-for="${fieldName}"]`);
-    if (el) el.textContent = message || "";
-  }
-
   function validateEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
@@ -355,23 +467,23 @@
     const email = form.email.value.trim();
     const message = form.message.value.trim();
 
-    setError("name", "");
-    setError("email", "");
-    setError("message", "");
+    setFieldError("name", "");
+    setFieldError("email", "");
+    setFieldError("message", "");
     if (statusEl) statusEl.textContent = "";
 
     let ok = true;
 
     if (name.length < 2) {
-      setError("name", "Please enter your name (at least 2 characters).");
+      setFieldError("name", "Please enter your name (at least 2 characters).");
       ok = false;
     }
     if (!validateEmail(email)) {
-      setError("email", "Please enter a valid email address.");
+      setFieldError("email", "Please enter a valid email address.");
       ok = false;
     }
     if (message.length < 10) {
-      setError("message", "Please write a message (at least 10 characters).");
+      setFieldError("message", "Please write a message (at least 10 characters).");
       ok = false;
     }
 

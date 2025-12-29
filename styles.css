@@ -832,6 +832,36 @@ h1 {
   position: relative;
   z-index: 1;
 }
+.composerGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+.composerCopy h2 { margin-bottom: 8px; }
+.composerCard {
+  border: 1px solid var(--border);
+  border-radius: var(--radius2);
+  padding: 18px;
+  background: color-mix(in srgb, var(--panel) 86%, transparent);
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 8px;
+}
+.composerCard .actions { margin-top: 6px; }
+.composerCard select {
+  width: 100%;
+  padding: 12px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--panel2) 70%, transparent);
+  color: var(--text);
+  outline: none;
+}
+.composerCard select:focus {
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 20%, transparent);
+}
 .contactGrid {
   display: grid;
   grid-template-columns: 1fr;
