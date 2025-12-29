@@ -237,15 +237,15 @@ header, main, footer {
   box-shadow: 0 12px 28px color-mix(in srgb, var(--accent) 20%, transparent);
 }
 .btn.heroCta {
-  border-color: color-mix(in srgb, #8b5cf6 55%, var(--border));
+  border-color: color-mix(in srgb, #5b35c4 70%, var(--border));
   background:
-    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.12), transparent 38%),
-    radial-gradient(circle at 80% 70%, rgba(140, 214, 255, 0.18), transparent 38%),
-    linear-gradient(135deg, #b66cf2, #7cd1ff 35%, #f19bff 70%, #8f5fe8);
-  color: #130825;
+    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1), transparent 38%),
+    radial-gradient(circle at 80% 70%, rgba(107, 205, 255, 0.14), transparent 38%),
+    linear-gradient(135deg, #5b35c4, #7a4de1 35%, #3a8bff 75%, #1f6bd1);
+  color: #f4edff;
   font-weight: 800;
   letter-spacing: 0.4px;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35), 0 0 0 1px color-mix(in srgb, #8b5cf6 35%, transparent);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35), 0 0 0 1px color-mix(in srgb, #4c2fb0 40%, transparent);
   position: relative;
   overflow: hidden;
 }
@@ -475,7 +475,13 @@ h1 {
   --panel: #170f2d;
   --panel2: #20173b;
   --border: #3a2b5d;
+  background-image:
+    linear-gradient(135deg, rgba(10, 6, 22, 0.72), rgba(6, 6, 14, 0.6)),
+    url("./assets/images/Image_202512081305.jpeg");
+  background-repeat: no-repeat;
+  background-size: cover, cover;
   background-position: center top, 50% 0%;
+  background-blend-mode: screen, normal;
 }
 .quizHeroGrid {
   display: grid;
@@ -640,7 +646,7 @@ h1 {
               linear-gradient(145deg, color-mix(in srgb, var(--panel2) 94%, var(--panel) 10%), color-mix(in srgb, var(--panel) 94%, var(--panel2) 10%));
   box-shadow: 0 18px 42px rgba(0, 0, 0, 0.34);
   min-height: 48px;
-  color: #2f184f;
+  color: #ffffff;
   font-size: 1.05rem;
   line-height: 1.6;
   letter-spacing: 0.15px;
@@ -649,18 +655,18 @@ h1 {
 .quizResult h4 {
   margin: 0 0 8px;
   font-size: 1.35rem;
-  color: #1c0c33;
+  color: #ffffff;
   font-weight: 800;
 }
 .quizResult .muted {
   margin: 0;
-  color: #41265f;
+  color: #ffffff;
   font-size: 1.05rem;
 }
 .quizResult .resultDetail {
   margin: 0 0 6px;
   font-family: var(--display);
-  color: #2a1445;
+  color: #ffffff;
   letter-spacing: 0.35px;
   font-size: 1.12rem;
   font-weight: 700;
