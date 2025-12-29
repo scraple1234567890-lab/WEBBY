@@ -450,9 +450,12 @@ h1 {
 }
 .quizHeroGrid {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.9fr);
+  grid-template-columns: 1fr;
   gap: 18px;
   align-items: start;
+}
+.quizPage .lead {
+  color: color-mix(in srgb, var(--text) 88%, var(--muted) 12%);
 }
 .quizHeroCard {
   border: 1px solid color-mix(in srgb, var(--border) 90%, var(--accent) 20%);
