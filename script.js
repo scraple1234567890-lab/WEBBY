@@ -33,6 +33,118 @@
     if (e.key === "Escape") setNavOpen(false);
   });
 
+  // Tabs
+  const tabButtons = Array.from(document.querySelectorAll(".pillTab"));
+  const tabPanels = Array.from(document.querySelectorAll(".tabPanel"));
+
+  function activateTab(id) {
+    tabButtons.forEach((btn) => {
+      const isActive = btn.dataset.target === id;
+      btn.classList.toggle("active", isActive);
+      btn.setAttribute("aria-selected", String(isActive));
+      btn.setAttribute("tabindex", isActive ? "0" : "-1");
+    });
+
+    tabPanels.forEach((panel) => {
+      const isActive = panel.id === id;
+      panel.classList.toggle("active", isActive);
+      panel.setAttribute("aria-hidden", String(!isActive));
+    });
+  }
+
+  tabButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const target = button.dataset.target;
+      if (target) activateTab(target);
+    });
+  });
+  const defaultTab = tabButtons.find((btn) => btn.classList.contains("active"))?.dataset.target;
+  if (defaultTab) activateTab(defaultTab);
+
+  // Quiz
+  const quizForm = document.getElementById("schoolQuiz");
+  const quizResult = document.getElementById("quizResult");
+  const quizStatus = document.getElementById("quizStatus");
+  const schoolCopy = {
+    touch: {
+      name: "Chamber of Touch",
+      description: "You trust the world you can hold. Craft, build, and protect—your magic strengthens every ward and tool.",
+    },
+    sight: {
+      name: "Observatory of Sight",
+      description: "You map the unseen. Patterns, sigils, and constellations bend toward your precise gaze and luminous focus.",
+    },
+    sound: {
+      name: "Choir of Sound",
+      description: "You feel rhythm in everything. From dragon lullabies to storm songs, resonance guides your most potent spells.",
+    },
+    essence: {
+      name: "House of Essence",
+      description: "You read the air itself. Fragrance, flavor, and memory weave your craft, coaxing calm and vivid futures.",
+    },
+  };
+
+  function clearQuizFeedback() {
+    quizResult?.replaceChildren();
+    if (quizStatus) quizStatus.textContent = "";
+    quizForm?.querySelectorAll(".quizQuestion").forEach((field) => field.classList.remove("hasError"));
+  }
+
+  quizForm?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (!quizForm) return;
+
+    clearQuizFeedback();
+
+    const formData = new FormData(quizForm);
+    const counts = { touch: 0, sight: 0, sound: 0, essence: 0 };
+    let valid = true;
+
+    quizForm.querySelectorAll(".quizQuestion").forEach((field) => {
+      const question = field.getAttribute("data-question");
+      const choice = question ? formData.get(question) : null;
+      if (!choice) {
+        valid = false;
+        field.classList.add("hasError");
+      } else {
+        if (choice in counts) {
+          counts[choice] += 1;
+        }
+      }
+    });
+
+    if (!valid) {
+      if (quizStatus) quizStatus.textContent = "Answer each prompt to complete the ritual.";
+      return;
+    }
+
+    const entries = Object.entries(counts);
+    const highest = Math.max(...entries.map(([, value]) => value));
+    const winners = entries.filter(([, value]) => value === highest).map(([key]) => key);
+    const schoolKey = winners[0];
+    const school = schoolCopy[schoolKey];
+
+    if (quizResult && school) {
+      const title = document.createElement("h4");
+      title.textContent = `${school.name} awaits you.`;
+
+      const body = document.createElement("p");
+      body.className = "muted";
+      body.textContent = school.description;
+
+      const scoreLine = document.createElement("p");
+      scoreLine.className = "muted small";
+      scoreLine.textContent = `Attunement: Touch ${counts.touch} • Sight ${counts.sight} • Sound ${counts.sound} • Essence ${counts.essence}`;
+
+      quizResult.replaceChildren(title, body, scoreLine);
+      if (quizStatus) quizStatus.textContent = "✨ The stars hum in agreement.";
+    }
+  });
+
+  quizForm?.addEventListener("reset", () => {
+    clearQuizFeedback();
+  });
+
   // Contact form validation + mailto fallback
   const form = document.getElementById("contactForm");
   const statusEl = document.getElementById("formStatus");
