@@ -145,5 +145,12 @@
     "school": "Sound",
     "createdAt": "2025-12-29T14:58:05.552Z",
     "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
+  },
+  {
+    "id": "post-22",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2025-12-29T15:43:40.020Z",
+    "text": "Sound mages recorded the library's quiet and play it back during storms to steady readers."
   }
 ]
