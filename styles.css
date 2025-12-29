@@ -421,6 +421,7 @@ h1 {
 .muted { color: var(--muted); }
 .small { font-size: 0.92rem; }
 
+ codex/create-magical-quiz-for-school-sorting-jqta9a
 /* Quiz layout */
 .quizPage {
   background-position: center top, 50% 0%;
@@ -483,10 +484,83 @@ h1 {
   gap: 8px;
 }
 .choiceGrid label {
+
+/* Tabs + quiz */
+.tabWrap {
+  border: 1px solid var(--border);
+  border-radius: var(--radius2);
+  padding: 14px;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--panel) 82%, transparent), color-mix(in srgb, var(--panel2) 68%, transparent));
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(8px);
+}
+.tabList {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.pillTab {
+  border: 1px solid color-mix(in srgb, var(--border) 75%, var(--accent) 25%);
+  background: linear-gradient(120deg, color-mix(in srgb, var(--panel) 80%, transparent), color-mix(in srgb, var(--panel2) 80%, transparent));
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+  transition: transform 120ms ease, box-shadow 200ms ease, border-color 120ms ease;
+}
+.pillTab:hover { transform: translateY(-1px); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.36); }
+.pillTab:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 40%, transparent); outline-offset: 3px; }
+.pillTab.active {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  background: linear-gradient(120deg, color-mix(in srgb, var(--accent3) 60%, transparent), color-mix(in srgb, var(--accent2) 60%, transparent));
+}
+.tabPanels { position: relative; }
+.tabPanel { display: none; }
+.tabPanel.active { display: block; }
+
+.quizCard {
+  border: 1px solid color-mix(in srgb, var(--border) 80%, var(--accent2) 20%);
+  border-radius: var(--radius2);
+  padding: 18px;
+  background: radial-gradient(480px 340px at 12% 10%, color-mix(in srgb, var(--accent3) 14%, transparent), transparent 60%),
+              radial-gradient(520px 320px at 88% 30%, color-mix(in srgb, var(--accent2) 14%, transparent), transparent 60%),
+              color-mix(in srgb, var(--panel) 90%, transparent);
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 14px;
+}
+.quizIntro h3 { margin: 6px 0; }
+.quizForm { display: grid; gap: 14px; }
+.quizGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+.quizQuestion {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  background: color-mix(in srgb, var(--panel2) 80%, transparent);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.26);
+  display: grid;
+  gap: 10px;
+}
+.quizQuestion legend {
+  font-weight: 700;
+  color: var(--text);
+  padding-bottom: 6px;
+}
+.quizQuestion label {
+ main
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 10px;
   align-items: center;
+ codex/create-magical-quiz-for-school-sorting-jqta9a
   padding: 10px;
   border-radius: 12px;
   border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
@@ -496,6 +570,17 @@ h1 {
 .choiceGrid input[type="radio"] { accent-color: var(--accent3); }
 .choiceGrid label:hover { border-color: color-mix(in srgb, var(--accent2) 40%, var(--border)); }
 .questionCard.hasError { border-color: color-mix(in srgb, #ff8aa1 70%, var(--border)); }
+
+  padding: 8px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: color-mix(in srgb, var(--panel) 70%, transparent);
+  cursor: pointer;
+}
+.quizQuestion input[type="radio"] { accent-color: var(--accent3); }
+.quizQuestion label:hover { border-color: color-mix(in srgb, var(--accent2) 40%, var(--border)); }
+.quizQuestion.hasError { border-color: color-mix(in srgb, #ff8aa1 70%, var(--border)); }
+ main
 
 .quizActions {
   display: flex;
@@ -515,6 +600,7 @@ h1 {
 .quizResult h4 { margin: 0 0 8px; font-size: 1.1rem; }
 .quizResult .muted { margin: 0; }
 
+ codex/create-magical-quiz-for-school-sorting-jqta9a
 .quizAside {
   position: sticky;
   top: 90px;
@@ -522,6 +608,12 @@ h1 {
 .schoolDeck {
   display: grid;
   gap: 10px;
+
+.schoolsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+ main
 }
 .schoolCard {
   border: 1px solid var(--border);
