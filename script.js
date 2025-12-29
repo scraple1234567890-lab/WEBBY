@@ -33,6 +33,8 @@
     if (e.key === "Escape") setNavOpen(false);
   });
 
+ codex/create-magical-quiz-for-school-sorting-jqta9a
+
   // Tabs
   const tabButtons = Array.from(document.querySelectorAll(".pillTab"));
   const tabPanels = Array.from(document.querySelectorAll(".tabPanel"));
@@ -61,6 +63,7 @@
   const defaultTab = tabButtons.find((btn) => btn.classList.contains("active"))?.dataset.target;
   if (defaultTab) activateTab(defaultTab);
 
+ main
   // Quiz
   const quizForm = document.getElementById("schoolQuiz");
   const quizResult = document.getElementById("quizResult");
@@ -85,9 +88,23 @@
   };
 
   function clearQuizFeedback() {
+ codex/create-magical-quiz-for-school-sorting-jqta9a
+    if (quizResult) {
+      quizResult.replaceChildren();
+      const title = document.createElement("h4");
+      title.textContent = "Awaiting your answers";
+      const body = document.createElement("p");
+      body.className = "muted";
+      body.textContent = "Complete all prompts to hear the academy's verdict.";
+      quizResult.append(title, body);
+    }
+    if (quizStatus) quizStatus.textContent = "";
+    quizForm?.querySelectorAll(".questionCard").forEach((field) => field.classList.remove("hasError"));
+
     quizResult?.replaceChildren();
     if (quizStatus) quizStatus.textContent = "";
     quizForm?.querySelectorAll(".quizQuestion").forEach((field) => field.classList.remove("hasError"));
+ main
   }
 
   quizForm?.addEventListener("submit", (e) => {
@@ -100,7 +117,11 @@
     const counts = { touch: 0, sight: 0, sound: 0, essence: 0 };
     let valid = true;
 
+ codex/create-magical-quiz-for-school-sorting-jqta9a
+    quizForm.querySelectorAll(".questionCard").forEach((field) => {
+
     quizForm.querySelectorAll(".quizQuestion").forEach((field) => {
+ main
       const question = field.getAttribute("data-question");
       const choice = question ? formData.get(question) : null;
       if (!choice) {
@@ -145,6 +166,13 @@
     clearQuizFeedback();
   });
 
+ codex/create-magical-quiz-for-school-sorting-jqta9a
+  if (quizResult && quizForm) {
+    clearQuizFeedback();
+  }
+
+
+ main
   // Contact form validation + mailto fallback
   const form = document.getElementById("contactForm");
   const statusEl = document.getElementById("formStatus");

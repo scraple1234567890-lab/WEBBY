@@ -421,6 +421,70 @@ h1 {
 .muted { color: var(--muted); }
 .small { font-size: 0.92rem; }
 
+ codex/create-magical-quiz-for-school-sorting-jqta9a
+/* Quiz layout */
+.quizPage {
+  background-position: center top, 50% 0%;
+}
+.quizHeroGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.9fr);
+  gap: 18px;
+  align-items: start;
+}
+.quizHeroCard {
+  border: 1px solid var(--border);
+  border-radius: var(--radius2);
+  padding: 18px;
+  background: color-mix(in srgb, var(--panel) 88%, transparent);
+  box-shadow: var(--shadow);
+}
+.steps {
+  margin: 8px 0 0;
+  padding-left: 16px;
+  color: var(--muted);
+  display: grid;
+  gap: 8px;
+}
+.quizLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+.column { display: grid; gap: 14px; }
+.questionList { display: grid; gap: 12px; }
+.questionCard {
+  border: 1px solid var(--border);
+  border-radius: var(--radius2);
+  padding: 14px;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--panel) 90%, transparent), color-mix(in srgb, var(--panel2) 75%, transparent));
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.3);
+}
+.questionHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.questionNumber {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(120deg, color-mix(in srgb, var(--accent3) 60%, transparent), color-mix(in srgb, var(--accent2) 60%, transparent));
+  border: 1px solid color-mix(in srgb, var(--border) 70%, var(--accent) 30%);
+  font-weight: 800;
+  color: var(--text);
+}
+.choiceGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 8px;
+}
+.choiceGrid label {
+
 /* Tabs + quiz */
 .tabWrap {
   border: 1px solid var(--border);
@@ -491,10 +555,22 @@ h1 {
   padding-bottom: 6px;
 }
 .quizQuestion label {
+ main
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 10px;
   align-items: center;
+ codex/create-magical-quiz-for-school-sorting-jqta9a
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  background: color-mix(in srgb, var(--panel) 70%, transparent);
+  cursor: pointer;
+}
+.choiceGrid input[type="radio"] { accent-color: var(--accent3); }
+.choiceGrid label:hover { border-color: color-mix(in srgb, var(--accent2) 40%, var(--border)); }
+.questionCard.hasError { border-color: color-mix(in srgb, #ff8aa1 70%, var(--border)); }
+
   padding: 8px;
   border-radius: 12px;
   border: 1px solid transparent;
@@ -504,6 +580,7 @@ h1 {
 .quizQuestion input[type="radio"] { accent-color: var(--accent3); }
 .quizQuestion label:hover { border-color: color-mix(in srgb, var(--accent2) 40%, var(--border)); }
 .quizQuestion.hasError { border-color: color-mix(in srgb, #ff8aa1 70%, var(--border)); }
+ main
 
 .quizActions {
   display: flex;
@@ -523,10 +600,20 @@ h1 {
 .quizResult h4 { margin: 0 0 8px; font-size: 1.1rem; }
 .quizResult .muted { margin: 0; }
 
+ codex/create-magical-quiz-for-school-sorting-jqta9a
+.quizAside {
+  position: sticky;
+  top: 90px;
+}
+.schoolDeck {
+  display: grid;
+  gap: 10px;
+
 .schoolsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 12px;
+ main
 }
 .schoolCard {
   border: 1px solid var(--border);
@@ -751,6 +838,9 @@ input:focus, textarea:focus {
   .tile.wide { grid-column: span 6; }
   .tile.tall { grid-column: span 3; }
   .contactGrid { grid-template-columns: 1fr; }
+  .quizHeroGrid { grid-template-columns: 1fr; }
+  .quizLayout { grid-template-columns: 1fr; }
+  .quizAside { position: static; }
 }
 
 @media (max-width: 760px) {
