@@ -39,6 +39,9 @@
   const quizStatus = document.getElementById("quizStatus");
 
   if (quizForm && quizResult) {
+    const scoreLabel = (counts) =>
+      `Attunement: Touch ${counts.touch} • Sight ${counts.sight} • Sound ${counts.sound} • Essence ${counts.essence}`;
+
     const schoolCopy = {
       touch: {
         name: "Chamber of Touch",
@@ -104,19 +107,28 @@
       const school = schoolCopy[schoolKey];
 
       if (school) {
+        const isTie = winners.length > 1;
+        const winningNames = winners.map((key) => schoolCopy[key]?.name || key);
+
         const title = document.createElement("h4");
-        title.textContent = `${school.name} awaits you.`;
+        title.textContent = isTie ? `A balanced attunement` : `${school.name} awaits you.`;
 
         const body = document.createElement("p");
         body.className = "muted";
-        body.textContent = school.description;
+        body.textContent = isTie
+          ? `Your answers resonate with ${winningNames.join(" and ")}. Lean into whichever calling stirs you most.`
+          : school.description;
 
         const scoreLine = document.createElement("p");
         scoreLine.className = "muted small";
-        scoreLine.textContent = `Attunement: Touch ${counts.touch} • Sight ${counts.sight} • Sound ${counts.sound} • Essence ${counts.essence}`;
+        scoreLine.textContent = scoreLabel(counts);
 
         quizResult.replaceChildren(title, body, scoreLine);
-        if (quizStatus) quizStatus.textContent = "✨ The stars hum in agreement.";
+
+        if (quizStatus) {
+          const headline = isTie ? `Best matches: ${winningNames.join(" or ")}` : `Best match: ${school.name}`;
+          quizStatus.textContent = `${headline}. ${scoreLabel(counts)}.`;
+        }
       }
     });
 
