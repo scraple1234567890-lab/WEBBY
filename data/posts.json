@@ -1,0 +1,23 @@
+[
+  {
+    "id": "seed-1",
+    "author": "Archivist Mira",
+    "school": "Sight",
+    "createdAt": "2024-12-01T08:00:00.000Z",
+    "text": "A prism left in the observatory focused moonlight into a perfect star map—no one touched the lenses." 
+  },
+  {
+    "id": "seed-2",
+    "author": "Keeper Iden",
+    "school": "Touch",
+    "createdAt": "2024-12-03T10:30:00.000Z",
+    "text": "Wards around the south gate hum warmer tonight; someone strengthened them with palm-pressed sigils." 
+  },
+  {
+    "id": "seed-3",
+    "author": "Cantor Lysa",
+    "school": "Sound",
+    "createdAt": "2024-12-05T06:15:00.000Z",
+    "text": "The choir tested a new resonance; the stone corridors now carry whispers like copper bells." 
+  }
+]
