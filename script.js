@@ -2,6 +2,7 @@
   const root = document.documentElement;
   const navToggle = document.getElementById("navToggle");
   const navLinks = document.getElementById("navLinks");
+  const postFeed = document.getElementById("postFeed");
 
   const yearEl = document.getElementById("year");
   if (yearEl) yearEl.textContent = String(new Date().getFullYear());
@@ -32,6 +33,69 @@
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") setNavOpen(false);
   });
+
+  // Lore board rendering
+  async function renderLoreBoard() {
+    if (!postFeed) return;
+
+    const setMessage = (message) => {
+      postFeed.innerHTML = "";
+      const p = document.createElement("p");
+      p.className = "muted";
+      p.textContent = message;
+      postFeed.appendChild(p);
+    };
+
+    try {
+      const response = await fetch("./data/posts.json", { cache: "no-store" });
+      if (!response.ok) throw new Error(`Request failed: ${response.status}`);
+      const posts = await response.json();
+
+      if (!Array.isArray(posts) || posts.length === 0) {
+        setMessage("No notices on the board yet. Check back after the daily quill writes again.");
+        return;
+      }
+
+      const sorted = posts
+        .filter((post) => post?.createdAt)
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 20);
+
+      postFeed.innerHTML = "";
+
+      sorted.forEach((post) => {
+        const card = document.createElement("article");
+        card.className = "post";
+
+        const top = document.createElement("div");
+        top.className = "postTop";
+
+        const author = document.createElement("span");
+        author.className = "postAuthor";
+        author.textContent = post.author || "Unknown scribe";
+
+        const meta = document.createElement("span");
+        meta.className = "postMeta";
+        const school = post.school || "Unknown hall";
+        const date = post.createdAt ? new Date(post.createdAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }) : "Unknown time";
+        meta.textContent = `${school} • ${date}`;
+
+        top.append(author, meta);
+
+        const body = document.createElement("p");
+        body.className = "postBody";
+        body.textContent = post.text || "A missing scrap of parchment.";
+
+        card.append(top, body);
+        postFeed.appendChild(card);
+      });
+    } catch (err) {
+      console.error(err);
+      setMessage("The quill is resting. Unable to fetch the Lore Board right now.");
+    }
+  }
+
+  renderLoreBoard();
 
   // Quiz (sorting ritual page only)
   const quizForm = document.getElementById("schoolQuiz");

@@ -1,0 +1,36 @@
+name: Daily lore post
+
+on:
+  schedule:
+    # Runs at 05:15 UTC daily
+    - cron: "15 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Add lore post
+        run: node scripts/add_post.js
+
+      - name: Commit changes
+        run: |
+          git config user.name "Lore Bot"
+          git config user.email "lorebot@example.com"
+          git add data/posts.json
+          git commit -m "chore: add daily lore post" || echo "No changes to commit"
+
+      - name: Push changes
+        if: success()
+        run: git push
