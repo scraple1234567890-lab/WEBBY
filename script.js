@@ -33,6 +33,102 @@
     if (e.key === "Escape") setNavOpen(false);
   });
 
+  // Quiz
+  const quizForm = document.getElementById("schoolQuiz");
+  const quizResult = document.getElementById("quizResult");
+  const quizStatus = document.getElementById("quizStatus");
+  const schoolCopy = {
+    touch: {
+      name: "Chamber of Touch",
+      description: "You trust the world you can hold. Craft, build, and protect—your magic strengthens every ward and tool.",
+    },
+    sight: {
+      name: "Observatory of Sight",
+      description: "You map the unseen. Patterns, sigils, and constellations bend toward your precise gaze and luminous focus.",
+    },
+    sound: {
+      name: "Choir of Sound",
+      description: "You feel rhythm in everything. From dragon lullabies to storm songs, resonance guides your most potent spells.",
+    },
+    essence: {
+      name: "House of Essence",
+      description: "You read the air itself. Fragrance, flavor, and memory weave your craft, coaxing calm and vivid futures.",
+    },
+  };
+
+  function clearQuizFeedback() {
+    if (quizResult) {
+      quizResult.replaceChildren();
+      const title = document.createElement("h4");
+      title.textContent = "Awaiting your answers";
+      const body = document.createElement("p");
+      body.className = "muted";
+      body.textContent = "Complete all prompts to hear the academy's verdict.";
+      quizResult.append(title, body);
+    }
+    if (quizStatus) quizStatus.textContent = "";
+    quizForm?.querySelectorAll(".questionCard").forEach((field) => field.classList.remove("hasError"));
+  }
+
+  quizForm?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (!quizForm) return;
+
+    clearQuizFeedback();
+
+    const formData = new FormData(quizForm);
+    const counts = { touch: 0, sight: 0, sound: 0, essence: 0 };
+    let valid = true;
+
+    quizForm.querySelectorAll(".questionCard").forEach((field) => {
+      const question = field.getAttribute("data-question");
+      const choice = question ? formData.get(question) : null;
+      if (!choice) {
+        valid = false;
+        field.classList.add("hasError");
+      } else {
+        if (choice in counts) {
+          counts[choice] += 1;
+        }
+      }
+    });
+
+    if (!valid) {
+      if (quizStatus) quizStatus.textContent = "Answer each prompt to complete the ritual.";
+      return;
+    }
+
+    const entries = Object.entries(counts);
+    const highest = Math.max(...entries.map(([, value]) => value));
+    const winners = entries.filter(([, value]) => value === highest).map(([key]) => key);
+    const schoolKey = winners[0];
+    const school = schoolCopy[schoolKey];
+
+    if (quizResult && school) {
+      const title = document.createElement("h4");
+      title.textContent = `${school.name} awaits you.`;
+
+      const body = document.createElement("p");
+      body.className = "muted";
+      body.textContent = school.description;
+
+      const scoreLine = document.createElement("p");
+      scoreLine.className = "muted small";
+      scoreLine.textContent = `Attunement: Touch ${counts.touch} • Sight ${counts.sight} • Sound ${counts.sound} • Essence ${counts.essence}`;
+
+      quizResult.replaceChildren(title, body, scoreLine);
+      if (quizStatus) quizStatus.textContent = "✨ The stars hum in agreement.";
+    }
+  });
+
+  quizForm?.addEventListener("reset", () => {
+    clearQuizFeedback();
+  });
+
+  if (quizResult && quizForm) {
+    clearQuizFeedback();
+  }
+
   // Contact form validation + mailto fallback
   const form = document.getElementById("contactForm");
   const statusEl = document.getElementById("formStatus");
