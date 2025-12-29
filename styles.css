@@ -236,6 +236,30 @@ header, main, footer {
   background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 72%, var(--panel) 28%), color-mix(in srgb, var(--accent2) 62%, var(--panel2) 38%));
   box-shadow: 0 12px 28px color-mix(in srgb, var(--accent) 20%, transparent);
 }
+.btn.heroCta {
+  border-color: color-mix(in srgb, #8b5cf6 55%, var(--border));
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.12), transparent 38%),
+    radial-gradient(circle at 80% 70%, rgba(140, 214, 255, 0.18), transparent 38%),
+    linear-gradient(135deg, #b66cf2, #7cd1ff 35%, #f19bff 70%, #8f5fe8);
+  color: #130825;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35), 0 0 0 1px color-mix(in srgb, #8b5cf6 35%, transparent);
+  position: relative;
+  overflow: hidden;
+}
+.btn.heroCta::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0));
+  mix-blend-mode: screen;
+  opacity: 0.8;
+  transition: transform 160ms ease, opacity 160ms ease;
+}
+.btn.heroCta:hover::after { transform: translateX(6px); opacity: 1; }
+.btn.heroCta:focus-visible { outline: 3px solid color-mix(in srgb, #8b5cf6 45%, transparent); outline-offset: 4px; }
 .btn.ghost {
   background: color-mix(in srgb, var(--panel) 92%, var(--panel2) 8%);
   border-color: color-mix(in srgb, var(--border) 85%, var(--accent2) 15%);
@@ -298,15 +322,20 @@ h1 {
 }
 .lead {
   font-size: 1.02rem;
-  color: var(--muted);
   margin: 0 0 18px;
 }
 .whisper {
   margin: 0;
-  color: var(--muted);
   font-size: 1.2rem;
   letter-spacing: 3px;
   text-transform: uppercase;
+}
+.landing .whisper,
+.landing .lead {
+  color: #5c2f84;
+}
+.landing .lead {
+  font-size: 1.08rem;
 }
 .actionRow {
   display: flex;
@@ -856,6 +885,14 @@ input:focus, textarea:focus {
 .footer {
   border-top: 1px solid var(--border);
   padding: 22px 0;
+}
+.quizPage .footer {
+  background: linear-gradient(180deg, #160a2d, #120826 70%, #0e071f);
+  border-top-color: #2f1d53;
+}
+.quizPage .footerRow p,
+.quizPage .footerRow a {
+  color: color-mix(in srgb, #d4c7f7 82%, #5c2f84);
 }
 .footerRow {
   display: flex;
