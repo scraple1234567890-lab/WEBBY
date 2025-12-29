@@ -53,7 +53,9 @@
     return `mailto:you@example.com?subject=${subject}&body=${body}`;
   }
 
-  form?.addEventListener("submit", (e) => {
+  const submitBtn = form?.querySelector('button[type="submit"]');
+
+  form?.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const name = form.name.value.trim();
@@ -88,8 +90,34 @@
       return;
     }
 
-    // No backend included. This is where you'd POST to your server.
-    if (statusEl) statusEl.textContent = "Looks good! Use the email fallback, or wire this to a backend endpoint.";
-    form.reset();
+    if (statusEl) statusEl.textContent = "Sending your message...";
+    submitBtn?.setAttribute("disabled", "true");
+
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("message", message);
+
+    try {
+      const response = await fetch("https://formspree.io/f/meeqrlol", {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        const errorMsg = data?.errors?.[0]?.message || "Something went wrong. Please try again.";
+        throw new Error(errorMsg);
+      }
+
+      if (statusEl) statusEl.textContent = "Thanks! Your message has been sent.";
+      form.reset();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unable to send your message right now.";
+      if (statusEl) statusEl.textContent = `${message} Try the email fallback if the issue persists.`;
+    } finally {
+      submitBtn?.removeAttribute("disabled");
+    }
   });
 })();
