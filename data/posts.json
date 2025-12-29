@@ -75,5 +75,12 @@
     "school": "Sight",
     "createdAt": "2025-12-29T09:00:05.540Z",
     "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
+  },
+  {
+    "id": "post-12",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2025-12-29T09:54:57.966Z",
+    "text": "Sound mages recorded the library's quiet and play it back during storms to steady readers."
   }
 ]
