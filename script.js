@@ -39,25 +39,34 @@
   const quizStatus = document.getElementById("quizStatus");
 
   if (quizForm && quizResult) {
-    const scoreLabel = (counts) =>
-      `Attunement: Touch ${counts.touch} • Sight ${counts.sight} • Sound ${counts.sound} • Essence ${counts.essence}`;
-
     const schoolCopy = {
       touch: {
         name: "Chamber of Touch",
-        description: "You trust the world you can hold. Craft, build, and protect—your magic strengthens every ward and tool.",
+        fit: "Your choices favored texture, warmth, and the certainty of things held in hand. You steady spells by feeling their shape and making them tangible.",
+        invitation:
+          "Within the Chamber of Touch you'll learn shield-weaving, tactile sigils, and restorative crafts—building wards and tools that pulse with your intent.",
+        status: "You lead with grounding sensation and craft, anchoring magic through touch.",
       },
       sight: {
         name: "Observatory of Sight",
-        description: "You map the unseen. Patterns, sigils, and constellations bend toward your precise gaze and luminous focus.",
+        fit: "You read meaning in diagrams, glints, and constellations. Patterns reveal themselves quickly to you, and you navigate by the stories light tells.",
+        invitation:
+          "The Observatory of Sight will refine your focus through star charts, illusion wards, and mapwork of ley lines—teaching you to draw the unseen into view.",
+        status: "You lead with a precise gaze, mapping possibilities before others sense them.",
       },
       sound: {
         name: "Choir of Sound",
-        description: "You feel rhythm in everything. From dragon lullabies to storm songs, resonance guides your most potent spells.",
+        fit: "Vibration, cadence, and harmony guide your focus. You listen between words and tune your magic like an instrument until everything resonates.",
+        invitation:
+          "The Choir of Sound pairs you with conductors who teach resonance spells, storm-calming chorales, and voice-bound wards that answer your rhythm.",
+        status: "You lead with resonance and cadence, coaxing harmony from every element.",
       },
       essence: {
         name: "House of Essence",
-        description: "You read the air itself. Fragrance, flavor, and memory weave your craft, coaxing calm and vivid futures.",
+        fit: "Memory and mood speak to you through aroma and flavor. You notice the way scent changes a room and trace emotion through what lingers in the air.",
+        invitation:
+          "Within the House of Essence you'll study aromatic divination, healing brews, and atmosphere-shaping rituals that braid memory into every casting.",
+        status: "You lead with memory-rich essences, shaping spells through taste and scent.",
       },
     };
 
@@ -111,23 +120,27 @@
         const winningNames = winners.map((key) => schoolCopy[key]?.name || key);
 
         const title = document.createElement("h4");
-        title.textContent = isTie ? `A balanced attunement` : `${school.name} awaits you.`;
+        title.textContent = isTie ? `A braided attunement` : `${school.name} awaits you.`;
 
         const body = document.createElement("p");
-        body.className = "muted";
+        body.className = "resultDetail";
         body.textContent = isTie
-          ? `Your answers resonate with ${winningNames.join(" and ")}. Lean into whichever calling stirs you most.`
-          : school.description;
+          ? `Your answers resonate with ${winningNames.join(" and ")}. Multiple senses are calling—follow the one that sparks the clearest curiosity today.`
+          : school.fit;
 
-        const scoreLine = document.createElement("p");
-        scoreLine.className = "muted small";
-        scoreLine.textContent = scoreLabel(counts);
+        const detail = document.createElement("p");
+        detail.className = "muted";
+        detail.textContent = isTie
+          ? "Explore the wings that echo your favorite senses; mentors will help you weave them into a singular craft."
+          : school.invitation;
 
-        quizResult.replaceChildren(title, body, scoreLine);
+        quizResult.replaceChildren(title, body, detail);
 
         if (quizStatus) {
-          const headline = isTie ? `Best matches: ${winningNames.join(" or ")}` : `Best match: ${school.name}`;
-          quizStatus.textContent = `${headline}. ${scoreLabel(counts)}.`;
+          const headline = isTie
+            ? `You harmonize with ${winningNames.join(" or ")}.`
+            : `${school.name}: ${school.status}`;
+          quizStatus.textContent = headline;
         }
       }
     });
