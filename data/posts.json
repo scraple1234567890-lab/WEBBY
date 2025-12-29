@@ -82,5 +82,12 @@
     "school": "Smell/Taste",
     "createdAt": "2025-12-29T09:54:57.966Z",
     "text": "Sound mages recorded the library's quiet and play it back during storms to steady readers."
+  },
+  {
+    "id": "post-13",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2025-12-29T10:49:26.954Z",
+    "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
   }
 ]
