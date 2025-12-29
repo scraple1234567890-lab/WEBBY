@@ -24,11 +24,7 @@
         </button>
 
         <div class="navLinks" id="navLinks">
- codex/create-magical-quiz-for-school-sorting-jqta9a
           <a href="./quiz.html" target="_blank" rel="noopener">Sorting quiz</a>
-
-          <a href="#quiz">Sorting quiz</a>
- main
           <a href="#contact">Send an owl</a>
           <a class="btn primary" href="#contact">Plan a visit</a>
         </div>
@@ -43,156 +39,45 @@
             <p class="kicker">StarSpell Academy</p>
             <h1>StarSpell Academy</h1>
             <p class="whisper">Scholarship. Sorcery. Starlight.</p>
+            <p class="lead">Journey through spellcraft with scholars who honor the senses. Visit our halls, meet mentors, and plan your path under the stars.</p>
+
+            <div class="actionRow">
+              <a class="btn primary" href="#contact">Plan a visit</a>
+              <a class="btn ghost" href="./quiz.html" target="_blank" rel="noopener">Take the sorting quiz</a>
+              <a class="textLink" href="#contact">Send an owl</a>
+            </div>
           </div>
         </div>
       </section>
 
-      <!-- QUIZ -->
-      <section id="quiz" class="section">
+      <section class="section alt">
         <div class="container">
           <div class="sectionHead">
-            <h2>Attune your senses</h2>
-            <p class="muted">Follow the thread of your intuition and discover which of our four magical schools calls to you.</p>
+            <h2>Discover our houses</h2>
+            <p class="muted">Each hall of study nurtures a different sense of magic. Explore their callings, then step into the full ritual on the sorting quiz page.</p>
           </div>
 
-          <div class="tabWrap">
-            <div class="tabList" role="tablist" aria-label="Magic school discovery">
-              <button class="pillTab active" role="tab" aria-selected="true" aria-controls="quizPanel" id="quizTab" data-target="quizPanel">
-                ✧ Sorting Ritual
-              </button>
-              <button class="pillTab" role="tab" aria-selected="false" aria-controls="schoolsPanel" id="schoolsTab" data-target="schoolsPanel">
-                ☄︎ About the Schools
-              </button>
-            </div>
-
-            <div class="tabPanels">
-              <div class="tabPanel active" id="quizPanel" role="tabpanel" aria-labelledby="quizTab">
-                <div class="quizCard">
-                  <div class="quizIntro">
-                    <p class="kicker">10 enchanted prompts</p>
-                    <h3>Whisper your choices</h3>
-                    <p class="muted">Choose the option that feels most like you for each moment. The academy's star-scribes will tally your resonance.</p>
-                  </div>
-
-                  <form id="schoolQuiz" class="quizForm">
-                    <div class="quizGrid">
-                      <fieldset class="quizQuestion" data-question="q1">
-                        <legend>When you step beneath moonlit clouds, what stirs you first?</legend>
-                        <label><input type="radio" name="q1" value="touch" /> The hush of night air on skin</label>
-                        <label><input type="radio" name="q1" value="sight" /> The silver outline of every leaf</label>
-                        <label><input type="radio" name="q1" value="sound" /> Crickets weaving secret songs</label>
-                        <label><input type="radio" name="q1" value="essence" /> The crisp scent of rain arriving</label>
-                      </fieldset>
-
-                      <fieldset class="quizQuestion" data-question="q2">
-                        <legend>A relic hums in your palm. How do you read it?</legend>
-                        <label><input type="radio" name="q2" value="touch" /> Trace the grooves and warmth</label>
-                        <label><input type="radio" name="q2" value="sight" /> Decode the shimmer of runes</label>
-                        <label><input type="radio" name="q2" value="sound" /> Listen for the pitch of its pulse</label>
-                        <label><input type="radio" name="q2" value="essence" /> Inhale the spice of old incense</label>
-                      </fieldset>
-
-                      <fieldset class="quizQuestion" data-question="q3">
-                        <legend>Your favorite spell feels successful when…</legend>
-                        <label><input type="radio" name="q3" value="touch" /> It vibrates steady in your hands</label>
-                        <label><input type="radio" name="q3" value="sight" /> Light blooms in perfect patterns</label>
-                        <label><input type="radio" name="q3" value="sound" /> Its chant locks into harmony</label>
-                        <label><input type="radio" name="q3" value="essence" /> The air tastes of citrus and clove</label>
-                      </fieldset>
-
-                      <fieldset class="quizQuestion" data-question="q4">
-                        <legend>In the library, you seek…</legend>
-                        <label><input type="radio" name="q4" value="touch" /> Textures of vellum and bone</label>
-                        <label><input type="radio" name="q4" value="sight" /> Illuminated diagrams and maps</label>
-                        <label><input type="radio" name="q4" value="sound" /> Quiet corridors of turning pages</label>
-                        <label><input type="radio" name="q4" value="essence" /> The aroma of old tea and ink</label>
-                      </fieldset>
-
-                      <fieldset class="quizQuestion" data-question="q5">
-                        <legend>Which portal feels most welcoming?</legend>
-                        <label><input type="radio" name="q5" value="touch" /> A doorway wrapped in soft moss</label>
-                        <label><input type="radio" name="q5" value="sight" /> An archway of prisms and light</label>
-                        <label><input type="radio" name="q5" value="sound" /> A gate singing a low chord</label>
-                        <label><input type="radio" name="q5" value="essence" /> A threshold scented with spice</label>
-                      </fieldset>
-
-                      <fieldset class="quizQuestion" data-question="q6">
-                        <legend>How do you calm a startled dragonlet?</legend>
-                        <label><input type="radio" name="q6" value="touch" /> Stroke its scales, slow and sure</label>
-                        <label><input type="radio" name="q6" value="sight" /> Show a glimmering bauble to focus it</label>
-                        <label><input type="radio" name="q6" value="sound" /> Hum a gentle lullaby</label>
-                        <label><input type="radio" name="q6" value="essence" /> Offer smoky-sweet fruits</label>
-                      </fieldset>
-
-                      <fieldset class="quizQuestion" data-question="q7">
-                        <legend>In the alchemy lab, you trust…</legend>
-                        <label><input type="radio" name="q7" value="touch" /> The weight and heat of flasks</label>
-                        <label><input type="radio" name="q7" value="sight" /> The hue shift at the boiling point</label>
-                        <label><input type="radio" name="q7" value="sound" /> The crackle of perfect reactions</label>
-                        <label><input type="radio" name="q7" value="essence" /> The scent of herbs aligning</label>
-                      </fieldset>
-
-                      <fieldset class="quizQuestion" data-question="q8">
-                        <legend>Your familiar sends a message. You notice…</legend>
-                        <label><input type="radio" name="q8" value="touch" /> The warmth of their paw against yours</label>
-                        <label><input type="radio" name="q8" value="sight" /> Patterns traced in the dust</label>
-                        <label><input type="radio" name="q8" value="sound" /> Subtle chirps between words</label>
-                        <label><input type="radio" name="q8" value="essence" /> The smell of pine on their fur</label>
-                      </fieldset>
-
-                      <fieldset class="quizQuestion" data-question="q9">
-                        <legend>When guiding novices, you emphasize…</legend>
-                        <label><input type="radio" name="q9" value="touch" /> Grounding breaths and posture</label>
-                        <label><input type="radio" name="q9" value="sight" /> Visualizing sigils with precision</label>
-                        <label><input type="radio" name="q9" value="sound" /> Keeping rhythm with the incantation</label>
-                        <label><input type="radio" name="q9" value="essence" /> Brewing tea to set the mood</label>
-                      </fieldset>
-
-                      <fieldset class="quizQuestion" data-question="q10">
-                        <legend>Choose your ritual focus.</legend>
-                        <label><input type="radio" name="q10" value="touch" /> A meteorite stone that thrumms</label>
-                        <label><input type="radio" name="q10" value="sight" /> A lens that reveals hidden colors</label>
-                        <label><input type="radio" name="q10" value="sound" /> A bell tuned to the auroras</label>
-                        <label><input type="radio" name="q10" value="essence" /> A vial of honeyed starlight</label>
-                      </fieldset>
-                    </div>
-
-                    <div class="quizActions">
-                      <button type="submit" class="btn primary">Reveal my school</button>
-                      <button type="reset" class="textLink" id="quizReset">Clear my choices</button>
-                      <p class="muted small" id="quizStatus" aria-live="polite"></p>
-                    </div>
-                  </form>
-
-                  <div id="quizResult" class="quizResult" aria-live="polite"></div>
-                </div>
-              </div>
-
-              <div class="tabPanel" id="schoolsPanel" role="tabpanel" aria-labelledby="schoolsTab">
-                <div class="schoolsGrid">
-                  <article class="schoolCard">
-                    <p class="sigil">Touch</p>
-                    <h3>Chamber of Touch</h3>
-                    <p class="muted">Artisans of force and craft, channeling magic through palm, pulse, and pressure. They build wards, weave armor, and carve spells into stone.</p>
-                  </article>
-                  <article class="schoolCard">
-                    <p class="sigil">Sight</p>
-                    <h3>Observatory of Sight</h3>
-                    <p class="muted">Seers and cartographers of light. They map ley lines, decode constellations, and paint portals with impeccable focus.</p>
-                  </article>
-                  <article class="schoolCard">
-                    <p class="sigil">Sound</p>
-                    <h3>Choir of Sound</h3>
-                    <p class="muted">Conductors of resonance. Their melodies soothe dragons, their rhythms steady storms, and every echo carries intention.</p>
-                  </article>
-                  <article class="schoolCard">
-                    <p class="sigil">Taste / Smell</p>
-                    <h3>House of Essence</h3>
-                    <p class="muted">Keepers of memory and mood. They brew histories into teas, scent wards for calm, and read futures in spice and smoke.</p>
-                  </article>
-                </div>
-              </div>
-            </div>
+          <div class="schoolsGrid">
+            <article class="schoolCard">
+              <p class="sigil">Touch</p>
+              <h3>Chamber of Touch</h3>
+              <p class="muted">Artisans of force and craft, channeling magic through palm, pulse, and pressure. They build wards, weave armor, and carve spells into stone.</p>
+            </article>
+            <article class="schoolCard">
+              <p class="sigil">Sight</p>
+              <h3>Observatory of Sight</h3>
+              <p class="muted">Seers and cartographers of light. They map ley lines, decode constellations, and paint portals with impeccable focus.</p>
+            </article>
+            <article class="schoolCard">
+              <p class="sigil">Sound</p>
+              <h3>Choir of Sound</h3>
+              <p class="muted">Conductors of resonance. Their melodies soothe dragons, their rhythms steady storms, and every echo carries intention.</p>
+            </article>
+            <article class="schoolCard">
+              <p class="sigil">Taste / Smell</p>
+              <h3>House of Essence</h3>
+              <p class="muted">Keepers of memory and mood. They brew histories into teas, scent wards for calm, and read futures in spice and smoke.</p>
+            </article>
           </div>
         </div>
       </section>
