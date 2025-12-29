@@ -441,16 +441,21 @@ h1 {
 
 /* Quiz layout */
 .quizPage {
-  --panel: rgba(255, 255, 255, 0.12);
-  --panel2: rgba(255, 255, 255, 0.18);
-  --border: rgba(255, 255, 255, 0.3);
+  --text: #e2dcf3;
+  --muted: #b9adc9;
+  --panel: #170f2d;
+  --panel2: #20173b;
+  --border: #3a2b5d;
   background-position: center top, 50% 0%;
 }
 .quizHeroGrid {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.9fr);
+  grid-template-columns: 1fr;
   gap: 18px;
   align-items: start;
+}
+.quizPage .lead {
+  color: color-mix(in srgb, var(--text) 88%, var(--muted) 12%);
 }
 .quizHeroCard {
   border: 1px solid color-mix(in srgb, var(--border) 90%, var(--accent) 20%);
