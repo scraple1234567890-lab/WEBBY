@@ -8,12 +8,21 @@ const PORT = process.env.PORT || 3000;
 const DATA_PATH = path.join(__dirname, "data", "posts.json");
 const PUBLIC_DIR = __dirname;
 const MAX_POSTS = 500;
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
+
+function addCors(res) {
+  Object.entries(CORS_HEADERS).forEach(([key, value]) => res.setHeader(key, value));
+}
 
 function readPosts() {
   try {
     const raw = fs.readFileSync(DATA_PATH, "utf8");
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    return normalizeStoredPosts(parsed);
   } catch (err) {
     if (err.code !== "ENOENT") {
       console.error("Unable to read posts file:", err);
@@ -29,6 +38,7 @@ function writePosts(posts) {
 }
 
 function respondJson(res, status, payload) {
+  addCors(res);
   res.writeHead(status, {
     "Content-Type": "application/json",
     "Cache-Control": "no-store",
@@ -37,6 +47,7 @@ function respondJson(res, status, payload) {
 }
 
 function respondText(res, status, message) {
+  addCors(res);
   res.writeHead(status, {
     "Content-Type": "text/plain; charset=utf-8",
     "Cache-Control": "no-store",
@@ -66,6 +77,33 @@ function nextId(existing) {
   return `user-${now}-${suffix}`;
 }
 
+function normalizeStoredPosts(value) {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .map((post) => {
+      if (!post) return null;
+      const createdAt = new Date(post.createdAt);
+      if (Number.isNaN(createdAt.getTime())) return null;
+
+      const id = String(post.id || "").trim();
+      const author = String(post.author || "").trim();
+      const school = String(post.school || "").trim();
+      const text = String(post.text || "").trim();
+
+      if (!author || !school || !text) return null;
+
+      return {
+        id: id || `imported-${createdAt.getTime()}`,
+        author,
+        school,
+        createdAt: createdAt.toISOString(),
+        text,
+      };
+    })
+    .filter(Boolean);
+}
+
 function parseJsonBody(req) {
   return new Promise((resolve, reject) => {
     let data = "";
@@ -91,6 +129,16 @@ function parseJsonBody(req) {
 async function handleApi(req, res, url) {
   if (url.pathname !== "/api/posts") return false;
 
+  if (req.method === "OPTIONS") {
+    addCors(res);
+    res.writeHead(204, {
+      "Access-Control-Max-Age": "600",
+      "Cache-Control": "no-store",
+    });
+    res.end();
+    return true;
+  }
+
   if (req.method === "GET") {
     const posts = readPosts().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     respondJson(res, 200, posts);
@@ -109,7 +157,9 @@ async function handleApi(req, res, url) {
         createdAt: new Date().toISOString(),
       };
 
-      const updated = [savedPost, ...posts].slice(0, MAX_POSTS);
+      const updated = [savedPost, ...posts]
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, MAX_POSTS);
       writePosts(updated);
 
       respondJson(res, 201, savedPost);
