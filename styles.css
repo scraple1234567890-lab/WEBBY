@@ -86,6 +86,63 @@ body::after {
   z-index: 1;
 }
 
+/* Lore archive page should be opaque for readability */
+body.lorePage {
+  --bg: #0c0820;
+  --panel: #140d29;
+  --panel2: #1b1236;
+  --border: #2f2450;
+  --shadow: 0 18px 42px rgba(0, 0, 0, 0.38);
+  background-color: var(--bg);
+  background-image: none;
+}
+body.lorePage::before,
+body.lorePage::after { display: none; }
+.lorePage .header {
+  backdrop-filter: none;
+  background: #120c26;
+  border-bottom-color: var(--border);
+}
+.lorePage .section { background: var(--bg); }
+.lorePage .section.alt {
+  background: #160e2e;
+  border-top-color: var(--border);
+  border-bottom-color: var(--border);
+}
+.lorePage .section.alt::before { content: none; }
+.lorePage .sectionHead h2,
+.lorePage .loreHeroNote,
+.lorePage .composerCard,
+.lorePage .post {
+  background: var(--panel);
+  border-color: var(--border);
+  box-shadow: var(--shadow);
+}
+.lorePage .composerCard select,
+.lorePage .composerCard input,
+.lorePage .composerCard textarea {
+  background: var(--panel2);
+  border-color: var(--border);
+}
+.lorePage .btn {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--panel2) 86%, var(--panel) 14%),
+    color-mix(in srgb, var(--panel) 86%, var(--panel2) 14%)
+  );
+  border-color: var(--border);
+  box-shadow: var(--shadow);
+}
+.lorePage .btn.primary {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent) 52%, var(--panel) 48%),
+    color-mix(in srgb, var(--accent2) 52%, var(--panel2) 48%)
+  );
+  border-color: color-mix(in srgb, var(--accent) 44%, var(--border));
+}
+.lorePage .post::after { opacity: 0.1; }
+
 a { color: inherit; text-decoration: none; }
 code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
 img {
