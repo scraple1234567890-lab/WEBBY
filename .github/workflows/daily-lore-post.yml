@@ -2,8 +2,8 @@ name: Daily lore post
 
 on:
   schedule:
-    # Runs at 05:15 UTC daily
-    - cron: "15 5 * * *"
+    # Runs every 5 minutes (cron times are in UTC)
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 permissions:
