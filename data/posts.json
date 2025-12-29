@@ -152,5 +152,12 @@
     "school": "Sight",
     "createdAt": "2025-12-29T15:43:40.020Z",
     "text": "Sound mages recorded the library's quiet and play it back during storms to steady readers."
+  },
+  {
+    "id": "post-23",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2025-12-29T15:56:06.393Z",
+    "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
   }
 ]
