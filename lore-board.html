@@ -56,6 +56,61 @@
         </div>
       </section>
 
+      <section class="section loreComposer" aria-labelledby="lore-compose-heading">
+        <div class="container composerGrid">
+          <div class="composerCopy">
+            <p class="kicker">Add your own whisper</p>
+            <h2 id="lore-compose-heading">Pin a post to the Lore Board</h2>
+            <p class="muted">
+              Share a short note from your visit. Posts you write here are saved on this device and show up when you view
+              the board again.
+            </p>
+          </div>
+
+          <form id="loreComposerForm" class="composerCard" novalidate>
+            <div class="field">
+              <label for="loreName">Your name</label>
+              <input id="loreName" name="loreName" type="text" minlength="2" required placeholder="e.g., Archivist Mira" />
+              <p class="error" data-for="loreName" aria-live="polite"></p>
+            </div>
+
+            <div class="field">
+              <label for="loreSchool">School or hall</label>
+              <select id="loreSchool" name="loreSchool" required>
+                <option value="">Choose a school</option>
+                <option value="Touch">Chamber of Touch</option>
+                <option value="Sight">Observatory of Sight</option>
+                <option value="Sound">Choir of Sound</option>
+                <option value="Essence">House of Essence</option>
+                <option value="Cross-House">Cross-House</option>
+                <option value="Archival Wing">Archival Wing</option>
+              </select>
+              <p class="error" data-for="loreSchool" aria-live="polite"></p>
+            </div>
+
+            <div class="field">
+              <label for="loreMessage">Your post</label>
+              <textarea
+                id="loreMessage"
+                name="loreMessage"
+                rows="4"
+                minlength="12"
+                required
+                placeholder="What rumor or discovery are you sharing?"
+              ></textarea>
+              <p class="error" data-for="loreMessage" aria-live="polite"></p>
+            </div>
+
+            <div class="actions">
+              <button class="btn primary" type="submit">Post to the Lore Board</button>
+              <button class="btn ghost" type="reset">Clear</button>
+            </div>
+
+            <p class="muted small" id="loreComposerStatus" aria-live="polite"></p>
+          </form>
+        </div>
+      </section>
+
       <section id="board" class="section alt loreArchive">
         <div class="container">
           <div class="sectionHead">
