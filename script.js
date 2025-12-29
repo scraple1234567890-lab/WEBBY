@@ -6,6 +6,8 @@
   const loreComposerForm = document.getElementById("loreComposerForm");
   const loreComposerStatus = document.getElementById("loreComposerStatus");
   const LOCAL_LORE_KEY = "userLorePosts";
+  const POSTS_API_URL = "/api/posts";
+  const DATA_POSTS_URL = "./data/posts.json";
 
   const loreAuthors = ["Archivist Mira", "Keeper Iden", "Cantor Lysa", "Essence Steward", "Field Mentor Ryn", "Constellation Scribe Ixa"];
   const loreSchools = ["Touch", "Sight", "Sound", "Essence", "Cross-House", "Archival Wing"];
@@ -139,6 +141,38 @@
       : [];
   }
 
+  async function fetchPostsFromEndpoint(url) {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error(`Request failed: ${response.status}`);
+    }
+    const posts = await response.json();
+    return normalizePosts(posts);
+  }
+
+  async function loadLorePosts() {
+    try {
+      const posts = await fetchPostsFromEndpoint(POSTS_API_URL);
+      if (posts.length) {
+        return { posts, source: "api" };
+      }
+    } catch (err) {
+      console.warn("Unable to fetch shared posts from API", err);
+    }
+
+    try {
+      const posts = await fetchPostsFromEndpoint(DATA_POSTS_URL);
+      if (posts.length) {
+        return { posts, source: "file" };
+      }
+    } catch (err) {
+      console.warn("Unable to fetch shared posts from file", err);
+    }
+
+    const drafts = normalizePosts(loadUserLorePosts()).map((post) => ({ ...post, localOnly: true }));
+    return { posts: drafts, source: "local" };
+  }
+
   // Lore board rendering
   async function renderLoreBoards() {
     if (!loreFeeds.length) return;
@@ -154,15 +188,8 @@
     loreFeeds.forEach((feed) => setMessage(feed, "Fetching today’s notices..."));
 
     try {
-      const response = await fetch("./data/posts.json", { cache: "no-store" });
-      if (!response.ok) throw new Error(`Request failed: ${response.status}`);
-      const posts = await response.json();
-
-      const normalized = normalizePosts(posts);
-      const userPosts = normalizePosts(loadUserLorePosts());
-
-      const combined = [...userPosts, ...normalized].sort((a, b) => b.createdAt - a.createdAt);
-      const feedPosts = combined.length ? combined : [createVisitLorePost()];
+      const { posts, source } = await loadLorePosts();
+      const feedPosts = posts.length ? posts.sort((a, b) => b.createdAt - a.createdAt) : [createVisitLorePost()];
 
       const renderToFeed = (feed, postsToRender) => {
         const limitAttr = Number(feed.getAttribute("data-limit"));
@@ -191,7 +218,8 @@
           meta.className = "postMeta";
           const school = post.school || "Unknown hall";
           const date = post.createdAt?.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }) || "Unknown time";
-          meta.textContent = `${school} • ${date}`;
+          const scope = post.localOnly || source === "local" ? " • Saved on this device" : "";
+          meta.textContent = `${school} • ${date}${scope}`;
 
           top.append(author, meta);
 
@@ -207,63 +235,66 @@
       loreFeeds.forEach((feed) => renderToFeed(feed, feedPosts));
     } catch (err) {
       console.error(err);
-      const userPosts = normalizePosts(loadUserLorePosts());
-      if (userPosts.length) {
-        loreFeeds.forEach((feed) => {
-          feed.innerHTML = "";
-          userPosts.forEach((post) => {
-            const card = document.createElement("article");
-            card.className = "post";
-            const top = document.createElement("div");
-            top.className = "postTop";
-            const author = document.createElement("span");
-            author.className = "postAuthor";
-            author.textContent = post.author || "Unknown scribe";
-            const meta = document.createElement("span");
-            meta.className = "postMeta";
-            const date = post.createdAt?.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }) || "Unknown time";
-            meta.textContent = `${post.school || "Unknown hall"} • ${date}`;
-            top.append(author, meta);
-            const body = document.createElement("p");
-            body.className = "postBody";
-            body.textContent = post.text || "A missing scrap of parchment.";
-            card.append(top, body);
-            feed.appendChild(card);
-          });
-        });
-      } else {
-        const fallbackPost = createVisitLorePost();
-        loreFeeds.forEach((feed) => {
-          feed.innerHTML = "";
-          const notice = document.createElement("p");
-          notice.className = "muted";
-          notice.textContent = "The quill is resting. Sharing the freshest whispered note instead.";
-          feed.appendChild(notice);
-          const card = document.createElement("article");
-          card.className = "post";
-          const top = document.createElement("div");
-          top.className = "postTop";
-          const author = document.createElement("span");
-          author.className = "postAuthor";
-          author.textContent = fallbackPost.author || "Unknown scribe";
-          const meta = document.createElement("span");
-          meta.className = "postMeta";
-          meta.textContent = `${fallbackPost.school || "Unknown hall"} • ${fallbackPost.createdAt.toLocaleString(undefined, {
-            dateStyle: "medium",
-            timeStyle: "short",
-          })}`;
-          top.append(author, meta);
-          const body = document.createElement("p");
-          body.className = "postBody";
-          body.textContent = fallbackPost.text;
-          card.append(top, body);
-          feed.appendChild(card);
-        });
-      }
+      const fallbackPost = createVisitLorePost();
+      loreFeeds.forEach((feed) => {
+        feed.innerHTML = "";
+        const notice = document.createElement("p");
+        notice.className = "muted";
+        notice.textContent = "The quill is resting. Sharing the freshest whispered note instead.";
+        feed.appendChild(notice);
+        const card = document.createElement("article");
+        card.className = "post";
+        const top = document.createElement("div");
+        top.className = "postTop";
+        const author = document.createElement("span");
+        author.className = "postAuthor";
+        author.textContent = fallbackPost.author || "Unknown scribe";
+        const meta = document.createElement("span");
+        meta.className = "postMeta";
+        meta.textContent = `${fallbackPost.school || "Unknown hall"} • ${fallbackPost.createdAt.toLocaleString(undefined, {
+          dateStyle: "medium",
+          timeStyle: "short",
+        })}`;
+        top.append(author, meta);
+        const body = document.createElement("p");
+        body.className = "postBody";
+        body.textContent = fallbackPost.text;
+        card.append(top, body);
+        feed.appendChild(card);
+      });
     }
   }
 
   renderLoreBoards();
+
+  async function publishSharedLorePost(submission) {
+    try {
+      const response = await fetch(POSTS_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(submission),
+      });
+
+      if (!response.ok) {
+        const message = await response.text();
+        throw new Error(message || `Request failed: ${response.status}`);
+      }
+
+      const saved = await response.json();
+      return { post: saved, shared: true };
+    } catch (err) {
+      console.warn("Unable to publish to shared board, saving locally instead", err);
+      const localPost = {
+        ...submission,
+        id: `local-${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        localOnly: true,
+      };
+      const existing = loadUserLorePosts();
+      saveUserLorePosts([localPost, ...existing]);
+      return { post: localPost, shared: false };
+    }
+  }
 
   // Lore composer (archive page only)
   if (loreComposerForm) {
@@ -277,7 +308,7 @@
       setFieldError("loreMessage", "");
     };
 
-    loreComposerForm.addEventListener("submit", (e) => {
+    loreComposerForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       clearComposerErrors();
       if (loreComposerStatus) loreComposerStatus.textContent = "";
@@ -302,19 +333,21 @@
 
       if (!ok) return;
 
-      const newPost = {
-        id: `user-${Date.now()}`,
+      const submission = {
         author: name,
         school,
-        createdAt: new Date().toISOString(),
         text: message,
       };
 
-      const existing = loadUserLorePosts();
-      saveUserLorePosts([newPost, ...existing]);
+      if (loreComposerStatus) loreComposerStatus.textContent = "Posting your note to the shared board...";
+      const result = await publishSharedLorePost(submission);
 
       loreComposerForm.reset();
-      if (loreComposerStatus) loreComposerStatus.textContent = "Posted! Your note now appears in the board on this device.";
+      if (loreComposerStatus) {
+        loreComposerStatus.textContent = result.shared
+          ? "Posted! Your note now appears on the Lore Board for everyone."
+          : "Saved locally while the shared board is unavailable. It currently appears only on this device.";
+      }
       renderLoreBoards();
     });
 
