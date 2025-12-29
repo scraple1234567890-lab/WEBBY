@@ -271,5 +271,12 @@
     "school": "Touch",
     "createdAt": "2025-12-29T22:40:15.700Z",
     "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
+  },
+  {
+    "id": "post-40",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2025-12-29T22:52:07.925Z",
+    "text": "Touch mentors added braille runes to the dueling circle; the floor thrums when your stance is true."
   }
 ]
