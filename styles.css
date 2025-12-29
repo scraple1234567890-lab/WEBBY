@@ -464,6 +464,27 @@ h1 {
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.24);
   text-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
 }
+.loreHero {
+  padding-top: 92px;
+  padding-bottom: 32px;
+}
+.loreHeroContent {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr);
+  gap: 22px;
+  align-items: center;
+}
+.loreHero .actionRow { justify-content: flex-start; }
+.loreHeroNote {
+  border: 1px solid color-mix(in srgb, var(--border) 80%, var(--accent) 10%);
+  border-radius: var(--radius2);
+  background: linear-gradient(140deg, color-mix(in srgb, var(--panel) 90%, #0d0820 10%), color-mix(in srgb, var(--panel2) 94%, #08061a 6%));
+  box-shadow: var(--shadow);
+  padding: 16px 18px;
+}
+.loreArchive .sectionHead {
+  margin-bottom: 28px;
+}
 .muted { color: var(--muted); }
 .quizPage .muted { color: color-mix(in srgb, var(--text) 70%, var(--muted) 30%); }
 .small { font-size: 0.92rem; }
@@ -914,14 +935,32 @@ input:focus, textarea:focus {
   margin-top: 14px;
 }
 .post {
-  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--border) 82%, rgba(255, 255, 255, 0.18));
   border-radius: var(--radius2);
-  background: linear-gradient(145deg, color-mix(in srgb, var(--panel) 92%, var(--panel2) 12%), color-mix(in srgb, var(--panel2) 90%, var(--panel) 10%));
-  box-shadow: var(--shadow);
-  padding: 14px;
+  background: linear-gradient(150deg, color-mix(in srgb, var(--panel) 94%, #05030f 6%), color-mix(in srgb, var(--panel2) 96%, #08051a 4%));
+  box-shadow: var(--shadow), 0 12px 40px rgba(0, 0, 0, 0.28);
+  padding: 16px;
   display: grid;
   gap: 8px;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(4px) saturate(0.92);
+  isolation: isolate;
+}
+.post::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(700px 400px at 12% 18%, color-mix(in srgb, var(--accent3) 12%, transparent), transparent 46%),
+    radial-gradient(600px 420px at 86% 30%, color-mix(in srgb, var(--accent2) 10%, transparent), transparent 48%);
+  opacity: 0.24;
+}
+.post > * {
+  position: relative;
+  z-index: 1;
 }
 .postTop {
   display: flex;
@@ -941,7 +980,7 @@ input:focus, textarea:focus {
 }
 .postBody {
   margin: 0;
-  color: color-mix(in srgb, var(--text) 92%, var(--muted) 8%);
+  color: color-mix(in srgb, var(--text) 94%, var(--muted) 6%);
   line-height: 1.6;
 }
 
@@ -956,6 +995,7 @@ input:focus, textarea:focus {
   .quizHeroGrid { grid-template-columns: 1fr; }
   .quizLayout { grid-template-columns: 1fr; }
   .quizAside { position: static; }
+  .loreHeroContent { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 760px) {
