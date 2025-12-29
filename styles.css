@@ -597,6 +597,12 @@ h1 {
   flex-wrap: wrap;
 }
 .quizActions .btn { flex: 0 0 auto; }
+.quizActions #quizStatus {
+  color: #2c0f55;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
 .quizResult {
   border-radius: var(--radius);
   border: 1px solid color-mix(in srgb, var(--border) 85%, var(--accent) 25%);
