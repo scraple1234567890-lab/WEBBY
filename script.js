@@ -4,6 +4,49 @@
   const navLinks = document.getElementById("navLinks");
   const loreFeeds = Array.from(document.querySelectorAll("[data-lore-feed]"));
 
+  const loreAuthors = ["Archivist Mira", "Keeper Iden", "Cantor Lysa", "Essence Steward", "Field Mentor Ryn", "Constellation Scribe Ixa"];
+  const loreSchools = ["Touch", "Sight", "Sound", "Essence", "Cross-House", "Archival Wing"];
+  const loreEvents = [
+    {
+      moment: "before dawn drills on the east battlements",
+      incident: "a stray sigil sparked against the frost",
+      detail: "the pattern matched an unfinished star map tucked under the rail.",
+    },
+    {
+      moment: "during a midnight patrol",
+      incident: "an unmarked lantern kept relighting itself in the rain",
+      detail: "each flare sang the first bar of an old choir cadence.",
+    },
+    {
+      moment: "at the third bell in the infirmary hallway",
+      incident: "fresh ward chalk appeared over the door hinges",
+      detail: "it smelled faintly of cinnamon ink—warm, precise, and protective.",
+    },
+    {
+      moment: "while the observatory shutters were closed",
+      incident: "light still traced the constellation of the Serpent Choir",
+      detail: "no lenses were open; the glow echoed against copper pipes like a breath.",
+    },
+    {
+      moment: "right after curfew checks",
+      incident: "the southern wind carried pages of a practice journal into the courtyard",
+      detail: "every page was stamped with thumbprints of salt and juniper oil.",
+    },
+    {
+      moment: "as the refectory fires dimmed",
+      incident: "a quiet humming rose from the speaking tubes",
+      detail: "it harmonized with heartbeats, then faded when listeners steadied their breaths.",
+    },
+  ];
+  const loreReactions = [
+    "Students nearby felt the air tighten, then soften, as if invited to listen.",
+    "Mentors traced the echoes and logged the finding for tonight's roundtable.",
+    "Apprentices chalked the outline to study, noting the cadence never repeated twice.",
+    "The hall monitors sealed the note under glass, convinced it was purposeful.",
+    "Someone left a brass compass beside it, suggesting the act was deliberate, not accidental.",
+    "The sensation lingered long after, like warmth left in stone steps.",
+  ];
+
   const yearEl = document.getElementById("year");
   if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
@@ -33,6 +76,28 @@
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") setNavOpen(false);
   });
+
+  function pickRandom(list) {
+    return list[Math.floor(Math.random() * list.length)];
+  }
+
+  function createVisitLorePost() {
+    const createdAt = new Date();
+    const author = pickRandom(loreAuthors);
+    const school = pickRandom(loreSchools);
+    const event = pickRandom(loreEvents);
+    const reaction = pickRandom(loreReactions);
+
+    const text = `During ${event.moment}, ${event.incident}; ${event.detail} ${reaction}`;
+
+    return {
+      id: `visit-${createdAt.getTime()}-${Math.floor(Math.random() * 100000)}`,
+      author,
+      school,
+      createdAt,
+      text,
+    };
+  }
 
   // Lore board rendering
   async function renderLoreBoards() {
@@ -65,15 +130,12 @@
             .sort((a, b) => b.createdAt - a.createdAt)
         : [];
 
-      if (!normalized.length) {
-        loreFeeds.forEach((feed) => setMessage(feed, "No notices on the board yet. Check back after the daily quill writes again."));
-        return;
-      }
+      const feedPosts = [createVisitLorePost(), ...normalized];
 
-      loreFeeds.forEach((feed) => {
+      const renderToFeed = (feed, postsToRender) => {
         const limitAttr = Number(feed.getAttribute("data-limit"));
-        const limit = Number.isFinite(limitAttr) && limitAttr > 0 ? limitAttr : normalized.length;
-        const selection = normalized.slice(0, limit);
+        const limit = Number.isFinite(limitAttr) && limitAttr > 0 ? limitAttr : postsToRender.length;
+        const selection = postsToRender.slice(0, limit);
 
         if (!selection.length) {
           setMessage(feed, "No notices on the board yet. Check back after the daily quill writes again.");
@@ -108,10 +170,38 @@
           card.append(top, body);
           feed.appendChild(card);
         });
-      });
+      };
+
+      loreFeeds.forEach((feed) => renderToFeed(feed, feedPosts));
     } catch (err) {
       console.error(err);
-      loreFeeds.forEach((feed) => setMessage(feed, "The quill is resting. Unable to fetch the Lore Board right now."));
+      const fallbackPost = createVisitLorePost();
+      loreFeeds.forEach((feed) => {
+        feed.innerHTML = "";
+        const notice = document.createElement("p");
+        notice.className = "muted";
+        notice.textContent = "The quill is resting. Sharing the freshest whispered note instead.";
+        feed.appendChild(notice);
+        const card = document.createElement("article");
+        card.className = "post";
+        const top = document.createElement("div");
+        top.className = "postTop";
+        const author = document.createElement("span");
+        author.className = "postAuthor";
+        author.textContent = fallbackPost.author || "Unknown scribe";
+        const meta = document.createElement("span");
+        meta.className = "postMeta";
+        meta.textContent = `${fallbackPost.school || "Unknown hall"} • ${fallbackPost.createdAt.toLocaleString(undefined, {
+          dateStyle: "medium",
+          timeStyle: "short",
+        })}`;
+        top.append(author, meta);
+        const body = document.createElement("p");
+        body.className = "postBody";
+        body.textContent = fallbackPost.text;
+        card.append(top, body);
+        feed.appendChild(card);
+      });
     }
   }
 
