@@ -2,7 +2,7 @@
   const root = document.documentElement;
   const navToggle = document.getElementById("navToggle");
   const navLinks = document.getElementById("navLinks");
-  const postFeed = document.getElementById("postFeed");
+  const loreFeeds = Array.from(document.querySelectorAll("[data-lore-feed]"));
 
   const yearEl = document.getElementById("year");
   if (yearEl) yearEl.textContent = String(new Date().getFullYear());
@@ -35,67 +35,87 @@
   });
 
   // Lore board rendering
-  async function renderLoreBoard() {
-    if (!postFeed) return;
+  async function renderLoreBoards() {
+    if (!loreFeeds.length) return;
 
-    const setMessage = (message) => {
-      postFeed.innerHTML = "";
+    const setMessage = (feed, message) => {
+      feed.innerHTML = "";
       const p = document.createElement("p");
       p.className = "muted";
       p.textContent = message;
-      postFeed.appendChild(p);
+      feed.appendChild(p);
     };
+
+    loreFeeds.forEach((feed) => setMessage(feed, "Fetching today’s notices..."));
 
     try {
       const response = await fetch("./data/posts.json", { cache: "no-store" });
       if (!response.ok) throw new Error(`Request failed: ${response.status}`);
       const posts = await response.json();
 
-      if (!Array.isArray(posts) || posts.length === 0) {
-        setMessage("No notices on the board yet. Check back after the daily quill writes again.");
+      const normalized = Array.isArray(posts)
+        ? posts
+            .map((post) => {
+              if (!post?.createdAt) return null;
+              const createdAt = new Date(post.createdAt);
+              if (Number.isNaN(createdAt.getTime())) return null;
+              return { ...post, createdAt };
+            })
+            .filter(Boolean)
+            .sort((a, b) => b.createdAt - a.createdAt)
+        : [];
+
+      if (!normalized.length) {
+        loreFeeds.forEach((feed) => setMessage(feed, "No notices on the board yet. Check back after the daily quill writes again."));
         return;
       }
 
-      const sorted = posts
-        .filter((post) => post?.createdAt)
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .slice(0, 20);
+      loreFeeds.forEach((feed) => {
+        const limitAttr = Number(feed.getAttribute("data-limit"));
+        const limit = Number.isFinite(limitAttr) && limitAttr > 0 ? limitAttr : normalized.length;
+        const selection = normalized.slice(0, limit);
 
-      postFeed.innerHTML = "";
+        if (!selection.length) {
+          setMessage(feed, "No notices on the board yet. Check back after the daily quill writes again.");
+          return;
+        }
 
-      sorted.forEach((post) => {
-        const card = document.createElement("article");
-        card.className = "post";
+        feed.innerHTML = "";
 
-        const top = document.createElement("div");
-        top.className = "postTop";
+        selection.forEach((post) => {
+          const card = document.createElement("article");
+          card.className = "post";
 
-        const author = document.createElement("span");
-        author.className = "postAuthor";
-        author.textContent = post.author || "Unknown scribe";
+          const top = document.createElement("div");
+          top.className = "postTop";
 
-        const meta = document.createElement("span");
-        meta.className = "postMeta";
-        const school = post.school || "Unknown hall";
-        const date = post.createdAt ? new Date(post.createdAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }) : "Unknown time";
-        meta.textContent = `${school} • ${date}`;
+          const author = document.createElement("span");
+          author.className = "postAuthor";
+          author.textContent = post.author || "Unknown scribe";
 
-        top.append(author, meta);
+          const meta = document.createElement("span");
+          meta.className = "postMeta";
+          const school = post.school || "Unknown hall";
+          const date = post.createdAt?.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }) || "Unknown time";
+          meta.textContent = `${school} • ${date}`;
 
-        const body = document.createElement("p");
-        body.className = "postBody";
-        body.textContent = post.text || "A missing scrap of parchment.";
+          top.append(author, meta);
 
-        card.append(top, body);
-        postFeed.appendChild(card);
+          const body = document.createElement("p");
+          body.className = "postBody";
+          body.textContent = post.text || "A missing scrap of parchment.";
+
+          card.append(top, body);
+          feed.appendChild(card);
+        });
       });
     } catch (err) {
       console.error(err);
-      setMessage("The quill is resting. Unable to fetch the Lore Board right now.");
+      loreFeeds.forEach((feed) => setMessage(feed, "The quill is resting. Unable to fetch the Lore Board right now."));
     }
   }
 
-  renderLoreBoard();
+  renderLoreBoards();
 
   // Quiz (sorting ritual page only)
   const quizForm = document.getElementById("schoolQuiz");
