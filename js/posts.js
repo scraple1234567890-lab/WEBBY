@@ -122,16 +122,20 @@ async function handleSubmit(event) {
   setFormEnabled(false);
   setStatus("");
 
-  const { error } = await supabase.from("posts").insert([{ user_id: currentUser.id, content: trimmedText }]);
+  const { error, data } = await supabase
+    .from("posts")
+    .insert([{ user_id: currentUser.id, content: trimmedText }])
+    .select("id")
+    .single();
 
-  if (error) {
+  if (error || !data?.id) {
     console.error("Error creating post", error);
     setStatus("Could not create post. Please try again.", "error");
   } else {
     if (postContentInput) {
       postContentInput.value = "";
     }
-    setStatus("Post created!", "success");
+    setStatus("Post created! Your entry should appear below once loaded.", "success");
     await loadPosts();
   }
 
