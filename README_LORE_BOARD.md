@@ -24,4 +24,3 @@ This serves the site for local development (static content only).
 
 ### Viewing the feed
 - Open the homepage and scroll or jump to `#board` to see “The Lore Board” section. The newest 20 posts render there, newest first, with a graceful message if fetching fails.
-- Visit `./lore-board.html` for the extended archive view, which lists more of the most recent posts (also newest first).

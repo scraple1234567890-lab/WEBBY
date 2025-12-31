@@ -236,7 +236,7 @@ async function handleLogin(event) {
   updateAuthVisibility(true, typeof email === "string" ? email : "your account");
   loginForm.reset();
   setTimeout(() => {
-    window.location.assign("./lore-board.html");
+    window.location.assign("./posts.html");
   }, LOGIN_REDIRECT_DELAY_MS);
 }
 
