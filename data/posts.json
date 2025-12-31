@@ -775,5 +775,12 @@
     "school": "Touch",
     "createdAt": "2025-12-31T17:48:52.534Z",
     "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
+  },
+  {
+    "id": "post-112",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2025-12-31T17:56:24.801Z",
+    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
   }
 ]
