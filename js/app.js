@@ -45,6 +45,14 @@ function setLoginButtonState(isLoading) {
   loginSubmitButton.textContent = isLoading ? "Logging in..." : defaultText;
 }
 
+function setLogoutButtonState(isLoading) {
+  if (!(logoutButton instanceof HTMLButtonElement)) return;
+  const defaultText = logoutButton.dataset.defaultText || logoutButton.textContent || "Log out";
+  logoutButton.dataset.defaultText = defaultText;
+  logoutButton.disabled = isLoading;
+  logoutButton.textContent = isLoading ? "Logging out..." : defaultText;
+}
+
 function toggleComposer(enabled) {
   if (postForm) {
     postForm.style.display = enabled ? "grid" : "none";
@@ -252,7 +260,26 @@ async function handleSignup(event) {
 }
 
 async function handleLogout() {
-  await supabase.auth.signOut();
+  setStatus(authStatus, "Signing you out...");
+  setStatus(postStatus, "");
+  setStatus(postError, "");
+  setLogoutButtonState(true);
+
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    setStatus(authStatus, error.message || "Unable to sign out. Please try again.", "error");
+    setLogoutButtonState(false);
+    return;
+  }
+
+  currentSession = null;
+  redirectingAfterLogin = false;
+  updateAuthVisibility(false);
+  setStatus(authStatus, "Signed out. You can log in again anytime.");
+  setLogoutButtonState(false);
+  postForm?.reset();
+  postBodyInput && (postBodyInput.value = "");
+  renderPosts([]);
 }
 
 async function handlePostSubmit(event) {
