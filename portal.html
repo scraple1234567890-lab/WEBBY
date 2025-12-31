@@ -14,10 +14,10 @@
 
     <header class="header" role="banner">
       <nav class="nav container" aria-label="Primary">
-        <a class="brand" href="./index.html" aria-label="Home">
-          <span class="brandMark" aria-hidden="true">✦</span>
-          <span class="brandText">StarSpell Academy</span>
-        </a>
+          <a class="brand" href="./index.html" aria-label="Home">
+            <span class="brandMark" aria-hidden="true">✦</span>
+            <span class="brandText">StarSpell Academy</span>
+          </a>
 
         <button class="iconBtn navToggle" id="navToggle" aria-expanded="false" aria-controls="navLinks">
           <span class="srOnly">Open menu</span>
@@ -28,6 +28,7 @@
           <a href="./quiz.html">Sorting quiz</a>
           <a href="./lore-board.html">Community Posts</a>
           <a href="./index.html#contact">Send an owl</a>
+          <button id="logoutBtn" class="btn ghost" type="button" style="display: none">Log out</button>
           <a class="btn primary magentaGlow" href="./portal.html" aria-current="page" data-auth-target="login-cta">Open the login portal</a>
         </div>
       </nav>
@@ -67,7 +68,6 @@
 
           <div class="actions" style="grid-column: 1 / -1; display: flex; gap: 10px; flex-wrap: wrap;">
             <p id="authStatus" class="muted small" aria-live="polite" style="flex: 1 1 auto">Checking your session...</p>
-            <button id="logoutBtn" class="btn ghost" type="button" style="display: none">Log out</button>
           </div>
         </div>
       </section>
