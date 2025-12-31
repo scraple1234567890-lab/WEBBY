@@ -55,7 +55,10 @@
             <p class="muted small">Already have an account? <a href="./login.html">Go to the login page.</a></p>
           </div>
 
-          <p id="authStatus" class="muted small" aria-live="polite" style="grid-column: 1 / -1">Checking your session...</p>
+          <div class="actions" style="grid-column: 1 / -1; display: flex; gap: 10px; flex-wrap: wrap;">
+            <p id="authStatus" class="muted small" aria-live="polite" style="flex: 1 1 auto">Checking your session...</p>
+            <button id="logoutBtn" class="btn ghost" type="button" style="display: none">Log out</button>
+          </div>
         </div>
       </section>
 
@@ -64,10 +67,30 @@
           <div class="sectionHead">
             <p class="kicker">Lore Board</p>
             <h2>Recent shared posts</h2>
-            <p class="muted">Browse the latest notes after you sign in.</p>
+            <p class="muted">Browse the latest notes and add your own once signed in.</p>
           </div>
-          <div class="postFeed" id="supabaseFeed" aria-live="polite">
-            <p class="muted">Loading posts...</p>
+          <div class="postGrid">
+            <article class="card" id="postComposerCard">
+              <h3>Share a post</h3>
+              <p class="muted small" id="postGuestNotice">Log in to post a note to the board.</p>
+              <form id="postForm" class="postForm" style="display: none">
+                <label class="field">
+                  <span>Your post</span>
+                  <textarea id="postBody" name="body" rows="4" maxlength="2000" required placeholder="What do you want to share?"></textarea>
+                </label>
+                <p id="postError" class="error small" aria-live="polite"></p>
+                <div class="actions">
+                  <button class="btn primary" type="submit">Post</button>
+                </div>
+                <p id="postStatus" class="muted small" aria-live="polite"></p>
+              </form>
+            </article>
+
+            <div>
+              <div class="postFeed" id="supabaseFeed" aria-live="polite">
+                <p class="muted">Loading posts...</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>

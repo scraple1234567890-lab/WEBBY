@@ -2,10 +2,18 @@ import { supabase } from "./supabaseClient.js";
 
 const loginForm = document.getElementById("loginForm");
 const signupForm = document.getElementById("signupForm");
+const logoutButton = document.getElementById("logoutBtn");
 const authStatus = document.getElementById("authStatus");
 const feed = document.getElementById("supabaseFeed");
+const postForm = document.getElementById("postForm");
+const postBodyInput = document.getElementById("postBody");
+const postStatus = document.getElementById("postStatus");
+const postError = document.getElementById("postError");
+const postGuestNotice = document.getElementById("postGuestNotice");
+const postComposerCard = document.getElementById("postComposerCard");
 
 let currentSession = null;
+let postsChannel = null;
 
 function escapeHtml(input) {
   const div = document.createElement("div");
@@ -19,17 +27,41 @@ function setStatus(element, message, tone = "muted") {
   element.className = `${tone} small`;
 }
 
+function toggleComposer(enabled) {
+  if (postForm) {
+    postForm.style.display = enabled ? "grid" : "none";
+  }
+  if (postGuestNotice) {
+    postGuestNotice.style.display = enabled ? "none" : "block";
+  }
+  if (postComposerCard) {
+    postComposerCard.classList.toggle("isDisabled", !enabled);
+  }
+}
+
+function toggleLogout(show) {
+  if (!logoutButton) return;
+  logoutButton.style.display = show ? "inline-flex" : "none";
+}
+
 async function fetchPosts() {
   const { data, error } = await supabase
     .from("posts")
-    .select("id, created_at, user_id, content")
-    .order("created_at", { ascending: false });
+    .select("id, created_at, user_id, body")
+    .order("created_at", { ascending: false })
+    .limit(50);
 
   if (error) {
     throw error;
   }
 
   return data || [];
+}
+
+function formatDate(value) {
+  const date = value ? new Date(value) : null;
+  if (!date || Number.isNaN(date.getTime())) return "Unknown time";
+  return date.toLocaleString();
 }
 
 function renderPosts(posts) {
@@ -48,10 +80,30 @@ function renderPosts(posts) {
   posts.forEach((post) => {
     const card = document.createElement("article");
     card.className = "card";
-    card.innerHTML = `
-      <p class="muted small">${new Date(post.created_at).toLocaleString()}</p>
-      <p>${escapeHtml(post.content)}</p>
-    `;
+    card.dataset.id = post.id;
+
+    const meta = document.createElement("p");
+    meta.className = "muted small postMetaRow";
+    meta.textContent = formatDate(post.created_at);
+
+    const body = document.createElement("p");
+    body.innerHTML = escapeHtml(post.body || "");
+
+    card.append(meta, body);
+
+    if (currentSession?.user?.id && post.user_id === currentSession.user.id) {
+      const actions = document.createElement("div");
+      actions.className = "postActions";
+      const deleteBtn = document.createElement("button");
+      deleteBtn.type = "button";
+      deleteBtn.className = "btn ghost small";
+      deleteBtn.textContent = "Delete";
+      deleteBtn.dataset.action = "delete";
+      deleteBtn.dataset.id = post.id;
+      actions.appendChild(deleteBtn);
+      card.appendChild(actions);
+    }
+
     feed.appendChild(card);
   });
 }
@@ -113,13 +165,66 @@ async function handleSignup(event) {
   signupForm.reset();
 }
 
+async function handleLogout() {
+  await supabase.auth.signOut();
+}
+
+async function handlePostSubmit(event) {
+  event.preventDefault();
+  if (!postForm || !postBodyInput) return;
+  setStatus(postError, "");
+  setStatus(postStatus, "Publishing your post...");
+
+  const body = postBodyInput.value.trim();
+  if (!body) {
+    setStatus(postError, "Please write something before posting.", "error");
+    setStatus(postStatus, "");
+    return;
+  }
+  if (body.length > 2000) {
+    setStatus(postError, "Post must be 2000 characters or fewer.", "error");
+    setStatus(postStatus, "");
+    return;
+  }
+
+  const { error } = await supabase.from("posts").insert({ body });
+
+  if (error) {
+    setStatus(postError, error.message, "error");
+    setStatus(postStatus, "");
+    return;
+  }
+
+  setStatus(postStatus, "Posted! Refreshing the feed...");
+  postBodyInput.value = "";
+  await refreshPosts();
+  setStatus(postStatus, "Your post is live.");
+}
+
+async function handleDelete(id) {
+  if (!id) return;
+  setStatus(postStatus, "Removing post...");
+  const { error } = await supabase.from("posts").delete().eq("id", id);
+  if (error) {
+    setStatus(postError, error.message, "error");
+    setStatus(postStatus, "");
+    return;
+  }
+  await refreshPosts();
+  setStatus(postStatus, "Post removed.");
+}
+
 async function loadSession() {
   const { data } = await supabase.auth.getSession();
   currentSession = data.session;
   if (currentSession) {
     setStatus(authStatus, `Logged in as ${currentSession.user.email}`);
+    toggleComposer(true);
+    toggleLogout(true);
   } else {
     setStatus(authStatus, "You are browsing as a guest.");
+    toggleComposer(false);
+    toggleLogout(false);
   }
   refreshPosts();
 }
@@ -129,23 +234,53 @@ function initAuthListeners() {
     currentSession = session;
     if (event === "SIGNED_OUT") {
       setStatus(authStatus, "Signed out.");
+      toggleComposer(false);
+      toggleLogout(false);
     }
     if (event === "SIGNED_IN") {
       setStatus(authStatus, `Logged in as ${session?.user?.email || "member"}.`);
+      toggleComposer(true);
+      toggleLogout(true);
     }
     refreshPosts();
   });
 }
 
+function subscribeToPosts() {
+  if (!feed) return;
+  if (postsChannel) return;
+  postsChannel = supabase
+    .channel("public:posts")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "posts" },
+      () => {
+        refreshPosts();
+      },
+    )
+    .subscribe();
+}
+
 function bindEvents() {
   loginForm?.addEventListener("submit", handleLogin);
   signupForm?.addEventListener("submit", handleSignup);
+  logoutButton?.addEventListener("click", handleLogout);
+  postForm?.addEventListener("submit", handlePostSubmit);
+
+  feed?.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    if (target.dataset.action === "delete" && target.dataset.id) {
+      handleDelete(target.dataset.id);
+    }
+  });
 }
 
 function init() {
   bindEvents();
   initAuthListeners();
   loadSession();
+  subscribeToPosts();
 }
 
 init();
