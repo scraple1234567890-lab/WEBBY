@@ -23,6 +23,13 @@
         align-items: flex-end;
         gap: 1rem;
       }
+      .postComposerHeader {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
     </style>
   </head>
   <body>
@@ -56,11 +63,21 @@
             <p class="kicker">Share your thoughts</p>
             <h1>Posts</h1>
           </div>
-          <p id="must-login" class="muted" aria-live="polite">You must be logged in to post.</p>
+          <div class="actions" style="gap: 0.5rem; align-items: center;">
+            <p id="must-login" class="muted" aria-live="polite" style="margin: 0">You must be logged in to post.</p>
+            <button id="share-post-btn" class="btn primary" type="button" aria-expanded="false">Share a post</button>
+          </div>
         </div>
 
-        <section class="card">
-          <form class="postForm" id="new-post-form" style="display: none">
+        <section class="card" id="composer-card" hidden>
+          <div class="postComposerHeader">
+            <div>
+              <p class="kicker">Share a post</p>
+              <p class="muted small">Write a short note for the Lore Board. (2000 characters max)</p>
+            </div>
+            <button class="btn ghost" type="button" id="close-composer">Close</button>
+          </div>
+          <form class="postForm" id="new-post-form">
             <label for="post-content" class="muted small">What would you like to share?</label>
             <textarea id="post-content" name="content" rows="4" maxlength="2000" required></textarea>
             <div class="actions">
@@ -70,8 +87,12 @@
           </form>
         </section>
 
-        <section aria-live="polite">
-          <h2 class="srOnly">Recent posts</h2>
+        <section aria-live="polite" class="card">
+          <div class="sectionHead">
+            <p class="kicker">Lore Board</p>
+            <h2>Recent posts</h2>
+            <p class="muted">See the newest Lore Board notes as soon as they are shared.</p>
+          </div>
           <div id="posts" class="postFeed"></div>
         </section>
       </div>

@@ -6,6 +6,9 @@ const postStatus = document.getElementById("post-status");
 const postsContainer = document.getElementById("posts");
 const mustLogin = document.getElementById("must-login");
 const submitButton = document.getElementById("post-submit");
+const shareButton = document.getElementById("share-post-btn");
+const composerCard = document.getElementById("composer-card");
+const closeComposerButton = document.getElementById("close-composer");
 
 let currentUser = null;
 let redirectTimeout = null;
@@ -22,12 +25,41 @@ function setFormEnabled(enabled) {
   submitButton.textContent = enabled ? "Post" : "Posting...";
 }
 
+function setShareButtonEnabled(enabled) {
+  if (!(shareButton instanceof HTMLButtonElement)) return;
+  shareButton.disabled = !enabled;
+  shareButton.setAttribute("aria-expanded", enabled ? shareButton.getAttribute("aria-expanded") || "false" : "false");
+}
+
+function openComposer() {
+  if (!(composerCard instanceof HTMLElement)) return;
+  composerCard.hidden = false;
+  if (shareButton instanceof HTMLButtonElement) {
+    shareButton.setAttribute("aria-expanded", "true");
+  }
+  if (postContentInput) {
+    postContentInput.focus();
+  }
+}
+
+function closeComposer() {
+  if (!(composerCard instanceof HTMLElement)) return;
+  composerCard.hidden = true;
+  if (shareButton instanceof HTMLButtonElement) {
+    shareButton.setAttribute("aria-expanded", "false");
+  }
+}
+
 function toggleAuthUI(isLoggedIn) {
   if (postForm) {
     postForm.style.display = isLoggedIn ? "grid" : "none";
   }
   if (mustLogin) {
     mustLogin.style.display = isLoggedIn ? "none" : "block";
+  }
+  setShareButtonEnabled(isLoggedIn);
+  if (!isLoggedIn) {
+    closeComposer();
   }
 }
 
@@ -128,6 +160,7 @@ async function handleSubmit(event) {
       postContentInput.value = "";
     }
     setStatus("Post created! Your entry should appear below once loaded.", "success");
+    closeComposer();
     await loadPosts();
   }
 
@@ -192,6 +225,19 @@ async function init() {
 
   if (postForm) {
     postForm.addEventListener("submit", handleSubmit);
+  }
+  if (shareButton) {
+    shareButton.addEventListener("click", () => {
+      if (shareButton.disabled) return;
+      if (composerCard?.hidden) {
+        openComposer();
+      } else {
+        closeComposer();
+      }
+    });
+  }
+  if (closeComposerButton) {
+    closeComposerButton.addEventListener("click", closeComposer);
   }
 
   supabase.auth.onAuthStateChange(async (_event, session) => {
