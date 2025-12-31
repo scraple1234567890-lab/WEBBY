@@ -698,5 +698,12 @@
     "school": "Sound",
     "createdAt": "2025-12-31T11:53:16.476Z",
     "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
+  },
+  {
+    "id": "post-101",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2025-12-31T13:44:46.151Z",
+    "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
   }
 ]
