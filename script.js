@@ -74,7 +74,9 @@
   // Close menu after clicking a link (mobile)
   navLinks?.addEventListener("click", (e) => {
     const target = e.target;
-    if (target && target.tagName === "A" && navLinks.classList.contains("open")) {
+    if (target && target instanceof HTMLElement && navLinks.classList.contains("open")) {
+      const isNavAction = target.tagName === "A" || target.tagName === "BUTTON";
+      if (!isNavAction) return;
       setNavOpen(false);
     }
   });
