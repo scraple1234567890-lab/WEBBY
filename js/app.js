@@ -11,6 +11,8 @@ const postStatus = document.getElementById("postStatus");
 const postError = document.getElementById("postError");
 const postGuestNotice = document.getElementById("postGuestNotice");
 const postComposerCard = document.getElementById("postComposerCard");
+const loginButtons = Array.from(document.querySelectorAll('[data-auth-target="login-cta"]'));
+const LOGIN_STATE_KEY = "auth:isLoggedIn";
 
 let currentSession = null;
 let postsChannel = null;
@@ -42,6 +44,35 @@ function toggleComposer(enabled) {
 function toggleLogout(show) {
   if (!logoutButton) return;
   logoutButton.style.display = show ? "inline-flex" : "none";
+}
+
+function toggleLoginButtons(show) {
+  loginButtons.forEach((button) => {
+    if (!(button instanceof HTMLElement)) return;
+    if (!button.dataset.defaultDisplay) {
+      button.dataset.defaultDisplay = button.style.display || "";
+    }
+    button.style.display = show ? button.dataset.defaultDisplay : "none";
+  });
+}
+
+function setLoginStateFlag(isLoggedIn) {
+  try {
+    if (isLoggedIn) {
+      localStorage.setItem(LOGIN_STATE_KEY, "true");
+    } else {
+      localStorage.removeItem(LOGIN_STATE_KEY);
+    }
+  } catch (error) {
+    console.warn("Unable to persist auth visibility state", error);
+  }
+}
+
+function updateAuthVisibility(isLoggedIn) {
+  toggleComposer(isLoggedIn);
+  toggleLogout(isLoggedIn);
+  toggleLoginButtons(!isLoggedIn);
+  setLoginStateFlag(isLoggedIn);
 }
 
 async function fetchPosts() {
@@ -219,12 +250,10 @@ async function loadSession() {
   currentSession = data.session;
   if (currentSession) {
     setStatus(authStatus, `Logged in as ${currentSession.user.email}`);
-    toggleComposer(true);
-    toggleLogout(true);
+    updateAuthVisibility(true);
   } else {
     setStatus(authStatus, "You are browsing as a guest.");
-    toggleComposer(false);
-    toggleLogout(false);
+    updateAuthVisibility(false);
   }
   refreshPosts();
 }
@@ -234,13 +263,11 @@ function initAuthListeners() {
     currentSession = session;
     if (event === "SIGNED_OUT") {
       setStatus(authStatus, "Signed out.");
-      toggleComposer(false);
-      toggleLogout(false);
+      updateAuthVisibility(false);
     }
     if (event === "SIGNED_IN") {
       setStatus(authStatus, `Logged in as ${session?.user?.email || "member"}.`);
-      toggleComposer(true);
-      toggleLogout(true);
+      updateAuthVisibility(true);
     }
     refreshPosts();
   });
