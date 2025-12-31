@@ -705,5 +705,12 @@
     "school": "Sight",
     "createdAt": "2025-12-31T13:44:46.151Z",
     "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
+  },
+  {
+    "id": "post-102",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2025-12-31T13:57:42.156Z",
+    "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
   }
 ]
