@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>StarSpell Academy | Posts</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      .post-content {
+        white-space: pre-wrap;
+      }
+      .postLayout {
+        display: grid;
+        gap: 1.5rem;
+      }
+      .postForm {
+        display: grid;
+        gap: 1rem;
+      }
+      .postHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="header" role="banner">
+      <nav class="nav container" aria-label="Primary">
+        <a class="brand" href="./index.html" aria-label="Home">
+          <span class="brandText">StarSpell Academy</span>
+        </a>
+
+        <button class="iconBtn navToggle" id="navToggle" aria-expanded="false" aria-controls="navLinks">
+          <span class="srOnly">Open menu</span>
+          <span class="hamburger" aria-hidden="true"></span>
+        </button>
+
+        <div class="navLinks" id="navLinks">
+          <a href="./quiz.html">Sorting quiz</a>
+          <a href="./lore-board.html">Community Posts</a>
+          <a href="./portal.html" data-auth-target="login-cta">Login portal</a>
+          <a href="./posts.html" aria-current="page">Posts</a>
+        </div>
+      </nav>
+    </header>
+
+    <main id="main" class="section">
+      <div class="container postLayout">
+        <div class="postHeader">
+          <div>
+            <p class="kicker">Share your thoughts</p>
+            <h1>Posts</h1>
+          </div>
+          <p id="must-login" class="muted" aria-live="polite">You must be logged in to post.</p>
+        </div>
+
+        <section class="card">
+          <form class="postForm" id="post-form" style="display: none">
+            <label for="post-content" class="muted small">What would you like to share?</label>
+            <textarea id="post-content" name="content" rows="4" maxlength="2000" required></textarea>
+            <div class="actions">
+              <button type="submit" class="btn primary" id="post-submit">Post</button>
+            </div>
+            <p id="post-status" class="muted small" aria-live="polite"></p>
+          </form>
+        </section>
+
+        <section aria-live="polite">
+          <h2 class="srOnly">Recent posts</h2>
+          <div id="posts" class="postFeed"></div>
+        </section>
+      </div>
+    </main>
+
+    <script src="./script.js" defer></script>
+    <script type="module" src="./js/posts.js"></script>
+  </body>
+</html>
