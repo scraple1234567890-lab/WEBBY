@@ -1,176 +1,23 @@
 #!/usr/bin/env node
 const http = require("http");
-const fs = require("fs");
 const path = require("path");
 const { URL } = require("url");
 
 const PORT = process.env.PORT || 3000;
-const DATA_PATH = path.join(__dirname, "data", "posts.json");
 const PUBLIC_DIR = __dirname;
-const MAX_POSTS = 500;
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+  "Access-Control-Allow-Methods": "GET,OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
 };
 
-function addCors(res) {
-  Object.entries(CORS_HEADERS).forEach(([key, value]) => res.setHeader(key, value));
-}
-
-function readPosts() {
-  try {
-    const raw = fs.readFileSync(DATA_PATH, "utf8");
-    const parsed = JSON.parse(raw);
-    return normalizeStoredPosts(parsed);
-  } catch (err) {
-    if (err.code !== "ENOENT") {
-      console.error("Unable to read posts file:", err);
-    }
-    return [];
-  }
-}
-
-function writePosts(posts) {
-  const safe = JSON.stringify(posts, null, 2);
-  fs.mkdirSync(path.dirname(DATA_PATH), { recursive: true });
-  fs.writeFileSync(DATA_PATH, `${safe}\n`, "utf8");
-}
-
-function respondJson(res, status, payload) {
-  addCors(res);
-  res.writeHead(status, {
-    "Content-Type": "application/json",
-    "Cache-Control": "no-store",
-  });
-  res.end(JSON.stringify(payload));
-}
-
 function respondText(res, status, message) {
-  addCors(res);
+  Object.entries(CORS_HEADERS).forEach(([key, value]) => res.setHeader(key, value));
   res.writeHead(status, {
     "Content-Type": "text/plain; charset=utf-8",
     "Cache-Control": "no-store",
   });
   res.end(message);
-}
-
-function sanitizePostFields({ author, school, text }) {
-  const cleanAuthor = String(author || "").trim();
-  const cleanSchool = String(school || "").trim();
-  const cleanText = String(text || "").trim();
-
-  if (cleanAuthor.length < 2) throw new Error("Author must be at least 2 characters.");
-  if (!cleanSchool) throw new Error("School is required.");
-  if (cleanText.length < 12) throw new Error("Post must be at least 12 characters.");
-
-  return {
-    author: cleanAuthor.slice(0, 120),
-    school: cleanSchool.slice(0, 80),
-    text: cleanText.slice(0, 1200),
-  };
-}
-
-function nextId(existing) {
-  const now = Date.now();
-  const suffix = Math.floor(Math.random() * 100000);
-  return `user-${now}-${suffix}`;
-}
-
-function normalizeStoredPosts(value) {
-  if (!Array.isArray(value)) return [];
-
-  return value
-    .map((post) => {
-      if (!post) return null;
-      const createdAt = new Date(post.createdAt);
-      if (Number.isNaN(createdAt.getTime())) return null;
-
-      const id = String(post.id || "").trim();
-      const author = String(post.author || "").trim();
-      const school = String(post.school || "").trim();
-      const text = String(post.text || "").trim();
-
-      if (!author || !school || !text) return null;
-
-      return {
-        id: id || `imported-${createdAt.getTime()}`,
-        author,
-        school,
-        createdAt: createdAt.toISOString(),
-        text,
-      };
-    })
-    .filter(Boolean);
-}
-
-function parseJsonBody(req) {
-  return new Promise((resolve, reject) => {
-    let data = "";
-    req.on("data", (chunk) => {
-      data += chunk;
-      if (data.length > 20000) {
-        reject(new Error("Payload too large."));
-        req.destroy();
-      }
-    });
-    req.on("end", () => {
-      try {
-        const parsed = data ? JSON.parse(data) : {};
-        resolve(parsed);
-      } catch (err) {
-        reject(new Error("Invalid JSON payload."));
-      }
-    });
-    req.on("error", reject);
-  });
-}
-
-async function handleApi(req, res, url) {
-  if (url.pathname !== "/api/posts") return false;
-
-  if (req.method === "OPTIONS") {
-    addCors(res);
-    res.writeHead(204, {
-      "Access-Control-Max-Age": "600",
-      "Cache-Control": "no-store",
-    });
-    res.end();
-    return true;
-  }
-
-  if (req.method === "GET") {
-    const posts = readPosts().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    respondJson(res, 200, posts);
-    return true;
-  }
-
-  if (req.method === "POST") {
-    try {
-      const body = await parseJsonBody(req);
-      const sanitized = sanitizePostFields(body);
-
-      const posts = readPosts();
-      const savedPost = {
-        ...sanitized,
-        id: nextId(posts),
-        createdAt: new Date().toISOString(),
-      };
-
-      const updated = [savedPost, ...posts]
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .slice(0, MAX_POSTS);
-      writePosts(updated);
-
-      respondJson(res, 201, savedPost);
-    } catch (err) {
-      respondText(res, 400, err.message || "Unable to save post.");
-    }
-    return true;
-  }
-
-  respondText(res, 405, "Method not allowed.");
-  return true;
 }
 
 const CONTENT_TYPES = {
@@ -194,27 +41,26 @@ function serveStatic(req, res, url) {
     return;
   }
 
-  fs.stat(filePath, (err, stats) => {
-    if (err || !stats.isFile()) {
+  try {
+    const stats = require("fs").statSync(filePath);
+    if (!stats.isFile()) {
       respondText(res, 404, "Not found");
       return;
     }
-
     const ext = path.extname(filePath);
     const contentType = CONTENT_TYPES[ext] || "application/octet-stream";
     res.writeHead(200, { "Content-Type": contentType });
-    fs.createReadStream(filePath).pipe(res);
-  });
+    require("fs").createReadStream(filePath).pipe(res);
+  } catch (err) {
+    respondText(res, 404, "Not found");
+  }
 }
 
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
 
   try {
-    const handled = await handleApi(req, res, url);
-    if (!handled) {
-      serveStatic(req, res, url);
-    }
+    serveStatic(req, res, url);
   } catch (err) {
     console.error("Unhandled server error:", err);
     respondText(res, 500, "Internal server error");

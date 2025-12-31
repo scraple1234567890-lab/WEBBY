@@ -8,6 +8,7 @@ const mustLogin = document.getElementById("must-login");
 const submitButton = document.getElementById("post-submit");
 
 let currentUser = null;
+let redirectTimeout = null;
 
 function setStatus(message, tone = "muted") {
   if (!postStatus) return;
@@ -73,36 +74,27 @@ async function loadPosts() {
     postsContainer.innerHTML = "<p class=\"muted\">Loading posts...</p>";
   }
 
-  const { data, error } = await supabase
-    .from("posts")
-    .select("id, content, created_at")
-    .order("created_at", { ascending: false })
-    .limit(50);
+  try {
+    const { data, error } = await supabase
+      .from("posts")
+      .select("id, content, created_at")
+      .order("created_at", { ascending: false })
+      .limit(50);
 
-  if (error) {
+    if (error) {
+      throw error;
+    }
+
+    renderPosts(data || []);
+  } catch (error) {
     console.error("Error fetching posts", error);
     if (postsContainer) {
       postsContainer.innerHTML = "";
       const errorMessage = document.createElement("p");
       errorMessage.className = "error";
-      errorMessage.textContent = "Unable to load posts right now.";
+      errorMessage.textContent = `Error loading posts: ${error?.message || "Unknown error"}`;
       postsContainer.appendChild(errorMessage);
     }
-    return;
-  }
-
-  renderPosts(data || []);
-}
-
-async function refreshAuthUI() {
-  const { data, error } = await supabase.auth.getUser();
-  if (error) {
-    console.error("Error checking auth status", error);
-  }
-  currentUser = data?.user ?? null;
-  toggleAuthUI(Boolean(currentUser));
-  if (!currentUser) {
-    setStatus("");
   }
 }
 
@@ -142,16 +134,75 @@ async function handleSubmit(event) {
   setFormEnabled(true);
 }
 
-function init() {
-  refreshAuthUI();
-  loadPosts();
+function showLoginRequired(message = "You must be logged in to view and post.") {
+  toggleAuthUI(false);
+  setStatus("");
+
+  if (redirectTimeout) {
+    clearTimeout(redirectTimeout);
+  }
+
+  if (postsContainer) {
+    postsContainer.innerHTML = "";
+    const notice = document.createElement("p");
+    notice.className = "muted";
+    notice.textContent = message;
+    postsContainer.appendChild(notice);
+  }
+
+  redirectTimeout = window.setTimeout(() => {
+    window.location.assign("./portal.html");
+  }, 1000);
+}
+
+async function refreshAuthUI() {
+  try {
+    const { data, error } = await supabase.auth.getSession();
+    if (error) {
+      throw error;
+    }
+
+    currentUser = data?.session?.user ?? null;
+    toggleAuthUI(Boolean(currentUser));
+
+    if (!currentUser) {
+      showLoginRequired();
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error checking auth status", error);
+    if (postsContainer) {
+      postsContainer.innerHTML = "";
+      const errorMessage = document.createElement("p");
+      errorMessage.className = "error";
+      errorMessage.textContent = `Error checking login: ${error?.message || "Unknown error"}`;
+      postsContainer.appendChild(errorMessage);
+    }
+    return false;
+  }
+}
+
+async function init() {
+  const isLoggedIn = await refreshAuthUI();
+  if (isLoggedIn) {
+    await loadPosts();
+  }
 
   if (postForm) {
     postForm.addEventListener("submit", handleSubmit);
   }
 
-  supabase.auth.onAuthStateChange(async () => {
-    await refreshAuthUI();
+  supabase.auth.onAuthStateChange(async (_event, session) => {
+    currentUser = session?.user ?? null;
+    toggleAuthUI(Boolean(currentUser));
+
+    if (!currentUser) {
+      showLoginRequired();
+      return;
+    }
+
     await loadPosts();
   });
 }
