@@ -5,6 +5,7 @@ const signupForm = document.getElementById("signupForm");
 const logoutButton = document.getElementById("logoutBtn");
 const authStatus = document.getElementById("authStatus");
 const loginError = document.getElementById("loginError");
+const loginSuccess = document.getElementById("loginSuccess");
 const feed = document.getElementById("supabaseFeed");
 const postForm = document.getElementById("postForm");
 const postBodyInput = document.getElementById("postBody");
@@ -16,10 +17,13 @@ const loginButtons = Array.from(document.querySelectorAll('[data-auth-target="lo
 const authSuccessMessage = document.getElementById("authSuccessMessage");
 const loginCard = loginForm?.closest(".card");
 const signupCard = signupForm?.closest(".card");
+const loginSubmitButton = loginForm?.querySelector('button[type="submit"]');
 const LOGIN_STATE_KEY = "auth:isLoggedIn";
+const LOGIN_REDIRECT_DELAY_MS = 1000;
 
 let currentSession = null;
 let postsChannel = null;
+let redirectingAfterLogin = false;
 
 function escapeHtml(input) {
   const div = document.createElement("div");
@@ -31,6 +35,14 @@ function setStatus(element, message, tone = "muted") {
   if (!element) return;
   element.textContent = message || "";
   element.className = `${tone} small`;
+}
+
+function setLoginButtonState(isLoading) {
+  if (!(loginSubmitButton instanceof HTMLButtonElement)) return;
+  const defaultText = loginSubmitButton.dataset.defaultText || loginSubmitButton.textContent || "Log in";
+  loginSubmitButton.dataset.defaultText = defaultText;
+  loginSubmitButton.disabled = isLoading;
+  loginSubmitButton.textContent = isLoading ? "Logging in..." : defaultText;
 }
 
 function toggleComposer(enabled) {
@@ -91,10 +103,14 @@ function setLoginStateFlag(isLoggedIn) {
 }
 
 function updateAuthVisibility(isLoggedIn, email = "") {
+  if (!isLoggedIn) {
+    redirectingAfterLogin = false;
+  }
+  const shouldShowAuthCards = !isLoggedIn || redirectingAfterLogin;
   toggleComposer(isLoggedIn);
   toggleLogout(isLoggedIn);
   toggleLoginButtons(!isLoggedIn);
-  toggleAuthCards(!isLoggedIn);
+  toggleAuthCards(shouldShowAuthCards);
   toggleAuthSuccess(isLoggedIn, email);
   setLoginStateFlag(isLoggedIn);
 }
@@ -190,19 +206,30 @@ async function handleLogin(event) {
   const password = formData.get("password");
 
   setStatus(loginError, "");
+  setStatus(loginSuccess, "");
   setStatus(authStatus, "Signing in...");
+  setLoginButtonState(true);
 
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) {
-    setStatus(loginError, error.message, "error");
+    setStatus(loginSuccess, "");
+    setStatus(loginError, error.message || "Login failed.", "error");
     setStatus(authStatus, "Sign-in failed. Please try again.", "error");
+    setLoginButtonState(false);
     return;
   }
 
+  const successMessage = "Login successful. Redirecting...";
+
   setStatus(loginError, "");
-  setStatus(authStatus, "Signed in.");
+  setStatus(loginSuccess, successMessage, "success");
+  setStatus(authStatus, successMessage, "success");
+  redirectingAfterLogin = true;
   updateAuthVisibility(true, typeof email === "string" ? email : "your account");
   loginForm.reset();
+  setTimeout(() => {
+    window.location.assign("./lore-board.html");
+  }, LOGIN_REDIRECT_DELAY_MS);
 }
 
 async function handleSignup(event) {
