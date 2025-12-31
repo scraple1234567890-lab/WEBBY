@@ -299,16 +299,42 @@ header, main, footer {
   background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 72%, var(--panel) 28%), color-mix(in srgb, var(--accent2) 62%, var(--panel2) 38%));
   box-shadow: 0 12px 28px color-mix(in srgb, var(--accent) 20%, transparent);
 }
-.btn.heroCta {
-  border-color: color-mix(in srgb, #5b35c4 70%, var(--border));
+.btn.magentaGlow {
+  position: relative;
+  border-color: color-mix(in srgb, #ff4fd8 70%, #5a1a78 30%);
   background:
-    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1), transparent 38%),
-    radial-gradient(circle at 80% 70%, rgba(107, 205, 255, 0.14), transparent 38%),
-    linear-gradient(135deg, #5b35c4, #7a4de1 35%, #3a8bff 75%, #1f6bd1);
-  color: #f4edff;
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.14), transparent 45%),
+    radial-gradient(circle at 72% 80%, rgba(255, 255, 255, 0.12), transparent 46%),
+    linear-gradient(135deg, #ff5ad1, #ff2aa8 40%, #f00086 76%, #b3008d);
+  box-shadow:
+    0 18px 46px rgba(255, 42, 168, 0.28),
+    0 0 0 1px color-mix(in srgb, #ff5ad1 24%, transparent),
+    inset 0 0 18px rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  color: #fff5ff;
+}
+.btn.magentaGlow::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: 999px;
+  background: radial-gradient(180px 120px at 18% 20%, rgba(255, 255, 255, 0.14), transparent 60%);
+  mix-blend-mode: screen;
+  opacity: 0.8;
+  transition: transform 200ms ease, opacity 200ms ease;
+}
+.btn.magentaGlow:hover::after { transform: translateX(6px); opacity: 1; }
+.btn.magentaGlow:focus-visible { outline: 3px solid color-mix(in srgb, #ff5ad1 60%, transparent); outline-offset: 4px; }
+.btn.heroCta {
+  border-color: color-mix(in srgb, #ff5ad1 70%, #5a1a78 30%);
+  background:
+    radial-gradient(circle at 18% 24%, rgba(255, 255, 255, 0.15), transparent 42%),
+    radial-gradient(circle at 82% 72%, rgba(255, 255, 255, 0.12), transparent 44%),
+    linear-gradient(135deg, #ff5ad1, #ff2aa8 38%, #f00086 72%, #b3008d);
+  color: #fff5ff;
   font-weight: 800;
   letter-spacing: 0.4px;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35), 0 0 0 1px color-mix(in srgb, #4c2fb0 40%, transparent);
+  box-shadow: 0 18px 44px rgba(255, 42, 168, 0.3), 0 0 0 1px color-mix(in srgb, #ff5ad1 28%, transparent);
   position: relative;
   overflow: hidden;
 }
@@ -316,13 +342,13 @@ header, main, footer {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(120deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0));
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0));
   mix-blend-mode: screen;
-  opacity: 0.8;
+  opacity: 0.9;
   transition: transform 160ms ease, opacity 160ms ease;
 }
-.btn.heroCta:hover::after { transform: translateX(6px); opacity: 1; }
-.btn.heroCta:focus-visible { outline: 3px solid color-mix(in srgb, #8b5cf6 45%, transparent); outline-offset: 4px; }
+.btn.heroCta:hover::after { transform: translateX(8px); opacity: 1; }
+.btn.heroCta:focus-visible { outline: 3px solid color-mix(in srgb, #ff5ad1 55%, transparent); outline-offset: 4px; }
 .btn.ghost {
   background: color-mix(in srgb, var(--panel) 92%, var(--panel2) 8%);
   border-color: color-mix(in srgb, var(--border) 85%, var(--accent2) 15%);

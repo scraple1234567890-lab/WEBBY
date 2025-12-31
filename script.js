@@ -476,32 +476,18 @@
     clearQuizFeedback();
   }
 
-  // Contact form validation + mailto fallback
+  // Contact form validation
   const form = document.getElementById("contactForm");
   const statusEl = document.getElementById("formStatus");
-  const mailtoFallback = document.getElementById("mailtoFallback");
-
-  function validateEmail(email) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  }
-
-  function buildMailto(name, email, message) {
-    const subject = encodeURIComponent(`Website message from ${name}`);
-    const body = encodeURIComponent(`From: ${name} <${email}>\n\n${message}`);
-    return `mailto:you@example.com?subject=${subject}&body=${body}`;
-  }
-
   const submitBtn = form?.querySelector('button[type="submit"]');
 
   form?.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const name = form.name.value.trim();
-    const email = form.email.value.trim();
     const message = form.message.value.trim();
 
     setFieldError("name", "");
-    setFieldError("email", "");
     setFieldError("message", "");
     if (statusEl) statusEl.textContent = "";
 
@@ -511,20 +497,13 @@
       setFieldError("name", "Please enter your name (at least 2 characters).");
       ok = false;
     }
-    if (!validateEmail(email)) {
-      setFieldError("email", "Please enter a valid email address.");
-      ok = false;
-    }
     if (message.length < 10) {
       setFieldError("message", "Please write a message (at least 10 characters).");
       ok = false;
     }
 
-    const mailto = buildMailto(name || "Someone", email || "unknown", message || "");
-    if (mailtoFallback) mailtoFallback.setAttribute("href", mailto);
-
     if (!ok) {
-      if (statusEl) statusEl.textContent = "Fix the highlighted fields, or use the email fallback.";
+      if (statusEl) statusEl.textContent = "Please fix the highlighted fields.";
       return;
     }
 
@@ -533,7 +512,6 @@
 
     const formData = new FormData();
     formData.append("name", name);
-    formData.append("email", email);
     formData.append("message", message);
 
     try {
@@ -553,7 +531,7 @@
       form.reset();
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unable to send your message right now.";
-      if (statusEl) statusEl.textContent = `${message} Try the email fallback if the issue persists.`;
+      if (statusEl) statusEl.textContent = message;
     } finally {
       submitBtn?.removeAttribute("disabled");
     }
