@@ -2,12 +2,7 @@ import { supabase } from "./supabaseClient.js";
 
 const loginForm = document.getElementById("loginForm");
 const signupForm = document.getElementById("signupForm");
-const logoutButton = document.getElementById("logoutButton");
 const authStatus = document.getElementById("authStatus");
-const postForm = document.getElementById("postForm");
-const postContent = document.getElementById("postContent");
-const composer = document.getElementById("composerCard");
-const composerStatus = document.getElementById("composerStatus");
 const feed = document.getElementById("supabaseFeed");
 
 let currentSession = null;
@@ -22,12 +17,6 @@ function setStatus(element, message, tone = "muted") {
   if (!element) return;
   element.textContent = message || "";
   element.className = `${tone} small`;
-}
-
-function toggleComposer(session) {
-  if (!composer) return;
-  const show = Boolean(session?.user);
-  composer.hidden = !show;
 }
 
 async function fetchPosts() {
@@ -124,47 +113,9 @@ async function handleSignup(event) {
   signupForm.reset();
 }
 
-async function handleLogout() {
-  setStatus(authStatus, "Signing out...");
-  const { error } = await supabase.auth.signOut();
-  if (error) {
-    setStatus(authStatus, error.message, "error");
-    return;
-  }
-
-  setStatus(authStatus, "Signed out.");
-}
-
-async function handlePost(event) {
-  event.preventDefault();
-  if (!currentSession?.user || !postContent) return;
-  const content = postContent.value.trim();
-  if (!content) {
-    setStatus(composerStatus, "Please enter something to share.", "error");
-    return;
-  }
-
-  setStatus(composerStatus, "Posting...");
-
-  const { error } = await supabase.from("posts").insert({
-    user_id: currentSession.user.id,
-    content,
-  });
-
-  if (error) {
-    setStatus(composerStatus, error.message, "error");
-    return;
-  }
-
-  setStatus(composerStatus, "Posted!");
-  postForm?.reset();
-  refreshPosts();
-}
-
 async function loadSession() {
   const { data } = await supabase.auth.getSession();
   currentSession = data.session;
-  toggleComposer(currentSession);
   if (currentSession) {
     setStatus(authStatus, `Logged in as ${currentSession.user.email}`);
   } else {
@@ -176,7 +127,6 @@ async function loadSession() {
 function initAuthListeners() {
   supabase.auth.onAuthStateChange((event, session) => {
     currentSession = session;
-    toggleComposer(session);
     if (event === "SIGNED_OUT") {
       setStatus(authStatus, "Signed out.");
     }
@@ -190,8 +140,6 @@ function initAuthListeners() {
 function bindEvents() {
   loginForm?.addEventListener("submit", handleLogin);
   signupForm?.addEventListener("submit", handleSignup);
-  logoutButton?.addEventListener("click", handleLogout);
-  postForm?.addEventListener("submit", handlePost);
 }
 
 function init() {

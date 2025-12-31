@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="description" content="StarSpell Academy — create your account to join the Lore Board community." />
-    <title>StarSpell Academy — Sign up</title>
+    <meta name="description" content="StarSpell Academy — log in to your account to view the Lore Board." />
+    <title>StarSpell Academy — Login</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
 
@@ -37,22 +37,22 @@
       <section class="section">
         <div class="container authGrid">
           <div class="card">
-            <h3>Sign up</h3>
-            <p class="muted">Create your StarSpell account to join the Lore Board community.</p>
-            <form id="signupForm">
+            <h3>Log in</h3>
+            <p class="muted">Return to your StarSpell account to see the latest Lore Board notes.</p>
+            <form id="loginForm">
               <div class="field">
-                <label for="signupEmail">Email</label>
-                <input id="signupEmail" name="email" type="email" autocomplete="email" required />
+                <label for="loginEmail">Email</label>
+                <input id="loginEmail" name="email" type="email" autocomplete="email" required />
               </div>
               <div class="field">
-                <label for="signupPassword">Password</label>
-                <input id="signupPassword" name="password" type="password" autocomplete="new-password" required />
+                <label for="loginPassword">Password</label>
+                <input id="loginPassword" name="password" type="password" autocomplete="current-password" required />
               </div>
               <div class="actions">
-                <button class="btn secondary" type="submit">Create account</button>
+                <button class="btn primary" type="submit">Log in</button>
               </div>
             </form>
-            <p class="muted small">Already have an account? <a href="./login.html">Go to the login page.</a></p>
+            <p class="muted small">Need an account? <a href="./portal.html">Go to the sign-up page.</a></p>
           </div>
 
           <p id="authStatus" class="muted small" aria-live="polite" style="grid-column: 1 / -1">Checking your session...</p>
