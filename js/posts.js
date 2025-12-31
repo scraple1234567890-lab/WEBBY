@@ -62,7 +62,7 @@ function renderPosts(posts) {
     const content = document.createElement("p");
     content.className = "post-content";
     content.style.whiteSpace = "pre-wrap";
-    content.textContent = post.body || "";
+    content.textContent = post.content || "";
 
     article.append(meta, content);
     postsContainer.appendChild(article);
@@ -77,7 +77,7 @@ async function loadPosts() {
   try {
     const { data, error } = await supabase
       .from("posts")
-      .select("id, body, created_at")
+      .select("id, content, created_at")
       .order("created_at", { ascending: false })
       .limit(50);
 
@@ -116,7 +116,7 @@ async function handleSubmit(event) {
 
   const { error, data } = await supabase
     .from("posts")
-    .insert([{ user_id: currentUser.id, body: trimmedText }])
+    .insert([{ user_id: currentUser.id, content: trimmedText }])
     .select("id")
     .single();
 

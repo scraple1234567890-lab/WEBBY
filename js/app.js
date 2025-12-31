@@ -126,7 +126,7 @@ function updateAuthVisibility(isLoggedIn, email = "") {
 async function fetchPosts() {
   const { data, error } = await supabase
     .from("posts")
-    .select("id, created_at, user_id, body")
+    .select("id, created_at, user_id, content")
     .order("created_at", { ascending: false })
     .limit(50);
 
@@ -166,7 +166,7 @@ function renderPosts(posts) {
     meta.textContent = formatDate(post.created_at);
 
     const body = document.createElement("p");
-    body.innerHTML = escapeHtml(post.body || "");
+    body.innerHTML = escapeHtml(post.content || "");
 
     card.append(meta, body);
 
@@ -285,22 +285,29 @@ async function handleLogout() {
 async function handlePostSubmit(event) {
   event.preventDefault();
   if (!postForm || !postBodyInput) return;
+  if (!currentSession?.user?.id) {
+    setStatus(postError, "You must be logged in to post.", "error");
+    setStatus(postStatus, "");
+    return;
+  }
   setStatus(postError, "");
   setStatus(postStatus, "Publishing your post...");
 
-  const body = postBodyInput.value.trim();
-  if (!body) {
+  const content = postBodyInput.value.trim();
+  if (!content) {
     setStatus(postError, "Please write something before posting.", "error");
     setStatus(postStatus, "");
     return;
   }
-  if (body.length > 2000) {
+  if (content.length > 2000) {
     setStatus(postError, "Post must be 2000 characters or fewer.", "error");
     setStatus(postStatus, "");
     return;
   }
 
-  const { error } = await supabase.from("posts").insert({ body });
+  const { error } = await supabase
+    .from("posts")
+    .insert({ user_id: currentSession.user.id, content });
 
   if (error) {
     setStatus(postError, error.message, "error");

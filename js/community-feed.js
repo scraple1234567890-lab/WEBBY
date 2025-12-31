@@ -42,7 +42,7 @@ function renderPosts(posts) {
     const body = document.createElement("p");
     body.className = "postBody";
     body.style.whiteSpace = "pre-wrap";
-    body.textContent = post.body || "";
+    body.textContent = post.content || "";
 
     article.append(meta, body);
     feed.appendChild(article);
@@ -55,7 +55,7 @@ async function loadPosts() {
   try {
     const { data, error } = await supabase
       .from("posts")
-      .select("id, body, created_at")
+      .select("id, content, created_at")
       .order("created_at", { ascending: false })
       .limit(POST_LIMIT);
 
