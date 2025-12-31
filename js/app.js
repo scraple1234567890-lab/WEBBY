@@ -4,6 +4,7 @@ const loginForm = document.getElementById("loginForm");
 const signupForm = document.getElementById("signupForm");
 const logoutButton = document.getElementById("logoutBtn");
 const authStatus = document.getElementById("authStatus");
+const loginError = document.getElementById("loginError");
 const feed = document.getElementById("supabaseFeed");
 const postForm = document.getElementById("postForm");
 const postBodyInput = document.getElementById("postBody");
@@ -188,14 +189,17 @@ async function handleLogin(event) {
   const email = formData.get("email");
   const password = formData.get("password");
 
+  setStatus(loginError, "");
   setStatus(authStatus, "Signing in...");
 
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) {
-    setStatus(authStatus, error.message, "error");
+    setStatus(loginError, error.message, "error");
+    setStatus(authStatus, "Sign-in failed. Please try again.", "error");
     return;
   }
 
+  setStatus(loginError, "");
   setStatus(authStatus, "Signed in.");
   updateAuthVisibility(true, typeof email === "string" ? email : "your account");
   loginForm.reset();
