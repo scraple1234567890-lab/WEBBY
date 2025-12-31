@@ -2,10 +2,12 @@
   const root = document.documentElement;
   const navToggle = document.getElementById("navToggle");
   const navLinks = document.getElementById("navLinks");
+  const loginButtons = Array.from(document.querySelectorAll('[data-auth-target="login-cta"]'));
   const loreFeeds = Array.from(document.querySelectorAll("[data-lore-feed]"));
   const loreComposerForm = document.getElementById("loreComposerForm");
   const loreComposerStatus = document.getElementById("loreComposerStatus");
   const LOCAL_LORE_KEY = "userLorePosts";
+  const LOGIN_STATE_KEY = "auth:isLoggedIn";
   const POSTS_API_URL = "/api/posts";
   const DATA_POSTS_URL = "./data/posts.json";
 
@@ -85,6 +87,33 @@
   function pickRandom(list) {
     return list[Math.floor(Math.random() * list.length)];
   }
+
+  function toggleLoginButtons(show) {
+    loginButtons.forEach((button) => {
+      if (!(button instanceof HTMLElement)) return;
+      if (!button.dataset.defaultDisplay) {
+        button.dataset.defaultDisplay = button.style.display || "";
+      }
+      button.style.display = show ? button.dataset.defaultDisplay : "none";
+    });
+  }
+
+  function syncLoginButtonsFromStorage() {
+    let isLoggedIn = false;
+    try {
+      isLoggedIn = localStorage.getItem(LOGIN_STATE_KEY) === "true";
+    } catch (err) {
+      console.warn("Unable to read auth state from storage", err);
+    }
+    toggleLoginButtons(!isLoggedIn);
+  }
+
+  syncLoginButtonsFromStorage();
+  window.addEventListener("storage", (event) => {
+    if (event.key === LOGIN_STATE_KEY) {
+      syncLoginButtonsFromStorage();
+    }
+  });
 
   function createVisitLorePost() {
     const createdAt = new Date();
