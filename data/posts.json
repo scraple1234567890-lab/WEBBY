@@ -649,5 +649,12 @@
     "school": "Smell/Taste",
     "createdAt": "2025-12-31T08:56:40.444Z",
     "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
+  },
+  {
+    "id": "post-94",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2025-12-31T09:46:41.789Z",
+    "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
   }
 ]
