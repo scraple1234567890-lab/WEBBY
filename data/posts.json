@@ -852,5 +852,12 @@
     "school": "Smell/Taste",
     "createdAt": "2025-12-31T21:53:35.490Z",
     "text": "Smell/Taste alchemists infused the greenhouse with rosemary vapor; memories surfaced like bubbles."
+  },
+  {
+    "id": "post-123",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2025-12-31T22:40:44.615Z",
+    "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
   }
 ]
