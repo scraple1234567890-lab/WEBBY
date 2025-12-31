@@ -691,5 +691,12 @@
     "school": "Smell/Taste",
     "createdAt": "2025-12-31T11:45:22.512Z",
     "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
+  },
+  {
+    "id": "post-100",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2025-12-31T11:53:16.476Z",
+    "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
   }
 ]
