@@ -1,6 +1,6 @@
 import { supabase } from "./supabaseClient.js";
 
-const postForm = document.getElementById("post-form");
+const postForm = document.getElementById("new-post-form");
 const postContentInput = document.getElementById("post-content");
 const postStatus = document.getElementById("post-status");
 const postsContainer = document.getElementById("posts");
@@ -60,6 +60,7 @@ function renderPosts(posts) {
 
     const content = document.createElement("p");
     content.className = "post-content";
+    content.style.whiteSpace = "pre-wrap";
     content.textContent = post.content || "";
 
     article.append(meta, content);
@@ -112,8 +113,8 @@ async function handleSubmit(event) {
     return;
   }
 
-  const content = (postContentInput?.value || "").trim();
-  if (!content) {
+  const trimmedText = (postContentInput?.value || "").trim();
+  if (!trimmedText) {
     setStatus("Post content cannot be empty.", "error");
     return;
   }
@@ -121,7 +122,7 @@ async function handleSubmit(event) {
   setFormEnabled(false);
   setStatus("");
 
-  const { error } = await supabase.from("posts").insert([{ user_id: currentUser.id, content }]);
+  const { error } = await supabase.from("posts").insert([{ user_id: currentUser.id, content: trimmedText }]);
 
   if (error) {
     console.error("Error creating post", error);
@@ -145,9 +146,9 @@ function init() {
     postForm.addEventListener("submit", handleSubmit);
   }
 
-  supabase.auth.onAuthStateChange(() => {
-    refreshAuthUI();
-    loadPosts();
+  supabase.auth.onAuthStateChange(async () => {
+    await refreshAuthUI();
+    await loadPosts();
   });
 }
 

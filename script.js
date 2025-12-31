@@ -8,7 +8,6 @@
   const loreComposerStatus = document.getElementById("loreComposerStatus");
   const LOCAL_LORE_KEY = "userLorePosts";
   const LOGIN_STATE_KEY = "auth:isLoggedIn";
-  const POSTS_API_URL = "/api/posts";
   const DATA_POSTS_URL = "./data/posts.json";
 
   const loreAuthors = ["Archivist Mira", "Keeper Iden", "Cantor Lysa", "Essence Steward", "Field Mentor Ryn", "Constellation Scribe Ixa"];
@@ -172,7 +171,7 @@
       : [];
   }
 
-  async function fetchPostsFromEndpoint(url) {
+  async function fetchPostsFromFile(url) {
     const response = await fetch(url, { cache: "no-store" });
     if (!response.ok) {
       throw new Error(`Request failed: ${response.status}`);
@@ -183,16 +182,7 @@
 
   async function loadLorePosts() {
     try {
-      const posts = await fetchPostsFromEndpoint(POSTS_API_URL);
-      if (posts.length) {
-        return { posts, source: "api" };
-      }
-    } catch (err) {
-      console.warn("Unable to fetch shared posts from API", err);
-    }
-
-    try {
-      const posts = await fetchPostsFromEndpoint(DATA_POSTS_URL);
+      const posts = await fetchPostsFromFile(DATA_POSTS_URL);
       if (posts.length) {
         return { posts, source: "file" };
       }
@@ -299,32 +289,16 @@
   renderLoreBoards();
 
   async function publishSharedLorePost(submission) {
-    try {
-      const response = await fetch(POSTS_API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(submission),
-      });
-
-      if (!response.ok) {
-        const message = await response.text();
-        throw new Error(message || `Request failed: ${response.status}`);
-      }
-
-      const saved = await response.json();
-      return { post: saved, shared: true };
-    } catch (err) {
-      console.warn("Unable to publish to shared board, saving locally instead", err);
-      const localPost = {
-        ...submission,
-        id: `local-${Date.now()}`,
-        createdAt: new Date().toISOString(),
-        localOnly: true,
-      };
-      const existing = loadUserLorePosts();
-      saveUserLorePosts([localPost, ...existing]);
-      return { post: localPost, shared: false };
-    }
+    console.info("Shared board endpoint unavailable on static hosting; saving locally instead.");
+    const localPost = {
+      ...submission,
+      id: `local-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      localOnly: true,
+    };
+    const existing = loadUserLorePosts();
+    saveUserLorePosts([localPost, ...existing]);
+    return { post: localPost, shared: false };
   }
 
   // Lore composer (archive page only)
