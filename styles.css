@@ -1024,6 +1024,12 @@ input:focus, textarea:focus {
   min-height: 18px;
   font-size: 0.92rem;
 }
+.success {
+  margin: 6px 2px 0;
+  color: color-mix(in srgb, #6be28b 85%, var(--text));
+  min-height: 18px;
+  font-size: 0.92rem;
+}
 .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
 .actions .textLink { padding: 12px 0; }
 
