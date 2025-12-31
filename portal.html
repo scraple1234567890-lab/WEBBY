@@ -55,6 +55,16 @@
             <p class="muted small">Already have an account? <a href="./login.html">Go to the login page.</a></p>
           </div>
 
+          <div class="card" id="authSuccessMessage" style="display: none">
+            <h3>Login successful</h3>
+            <p class="muted">
+              You’re signed in as <span data-auth-email>your account</span>. Head to the Lore Board to share a post or refresh to stay in sync.
+            </p>
+            <div class="actions">
+              <a class="btn primary" href="./lore-board.html">Go to the Lore Board</a>
+            </div>
+          </div>
+
           <div class="actions" style="grid-column: 1 / -1; display: flex; gap: 10px; flex-wrap: wrap;">
             <p id="authStatus" class="muted small" aria-live="polite" style="flex: 1 1 auto">Checking your session...</p>
             <button id="logoutBtn" class="btn ghost" type="button" style="display: none">Log out</button>

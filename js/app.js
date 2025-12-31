@@ -12,6 +12,9 @@ const postError = document.getElementById("postError");
 const postGuestNotice = document.getElementById("postGuestNotice");
 const postComposerCard = document.getElementById("postComposerCard");
 const loginButtons = Array.from(document.querySelectorAll('[data-auth-target="login-cta"]'));
+const authSuccessMessage = document.getElementById("authSuccessMessage");
+const loginCard = loginForm?.closest(".card");
+const signupCard = signupForm?.closest(".card");
 const LOGIN_STATE_KEY = "auth:isLoggedIn";
 
 let currentSession = null;
@@ -56,6 +59,24 @@ function toggleLoginButtons(show) {
   });
 }
 
+function toggleAuthCards(show) {
+  if (loginCard instanceof HTMLElement) {
+    loginCard.style.display = show ? "" : "none";
+  }
+  if (signupCard instanceof HTMLElement) {
+    signupCard.style.display = show ? "" : "none";
+  }
+}
+
+function toggleAuthSuccess(isLoggedIn, email) {
+  if (!(authSuccessMessage instanceof HTMLElement)) return;
+  authSuccessMessage.style.display = isLoggedIn ? "block" : "none";
+  const emailTarget = authSuccessMessage.querySelector("[data-auth-email]");
+  if (emailTarget) {
+    emailTarget.textContent = email || "your account";
+  }
+}
+
 function setLoginStateFlag(isLoggedIn) {
   try {
     if (isLoggedIn) {
@@ -68,10 +89,12 @@ function setLoginStateFlag(isLoggedIn) {
   }
 }
 
-function updateAuthVisibility(isLoggedIn) {
+function updateAuthVisibility(isLoggedIn, email = "") {
   toggleComposer(isLoggedIn);
   toggleLogout(isLoggedIn);
   toggleLoginButtons(!isLoggedIn);
+  toggleAuthCards(!isLoggedIn);
+  toggleAuthSuccess(isLoggedIn, email);
   setLoginStateFlag(isLoggedIn);
 }
 
@@ -174,6 +197,7 @@ async function handleLogin(event) {
   }
 
   setStatus(authStatus, "Signed in.");
+  updateAuthVisibility(true, typeof email === "string" ? email : "your account");
   loginForm.reset();
 }
 
@@ -250,7 +274,7 @@ async function loadSession() {
   currentSession = data.session;
   if (currentSession) {
     setStatus(authStatus, `Logged in as ${currentSession.user.email}`);
-    updateAuthVisibility(true);
+    updateAuthVisibility(true, currentSession.user.email);
   } else {
     setStatus(authStatus, "You are browsing as a guest.");
     updateAuthVisibility(false);
@@ -267,7 +291,7 @@ function initAuthListeners() {
     }
     if (event === "SIGNED_IN") {
       setStatus(authStatus, `Logged in as ${session?.user?.email || "member"}.`);
-      updateAuthVisibility(true);
+      updateAuthVisibility(true, session?.user?.email || "your account");
     }
     refreshPosts();
   });
