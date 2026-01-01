@@ -119,22 +119,25 @@ function toggleProfileExtras(show) {
 }
 
 // Modified: allow controlling whether the read-only summary text is shown
-function setProfileSummaryVisible(show, showText = true) {
+function setProfileSummaryVisible(show) {
+  const isVisible = Boolean(show);
+
   if (profileSummary instanceof HTMLElement) {
-    profileSummary.hidden = !show;
-    profileSummary.setAttribute("aria-hidden", String(!show));
+    profileSummary.hidden = !isVisible;
+    profileSummary.setAttribute("aria-hidden", String(!isVisible));
   }
+
+  // Keep the name/bio visible whenever the summary is shown
   if (profileSummaryText instanceof HTMLElement) {
-    const textVisible = Boolean(show && showText);
-    profileSummaryText.hidden = !textVisible;
-    profileSummaryText.setAttribute("aria-hidden", String(!textVisible));
+    profileSummaryText.hidden = !isVisible;
+    profileSummaryText.setAttribute("aria-hidden", String(!isVisible));
   }
-  if (!show) {
-    setProfileEditVisible(false);
-  }
+
+  if (!isVisible) setProfileEditVisible(false);
+
   if (profileEditToggle instanceof HTMLElement) {
-    profileEditToggle.disabled = !show;
-    profileEditToggle.setAttribute("aria-hidden", String(!show));
+    profileEditToggle.disabled = !isVisible;
+    profileEditToggle.setAttribute("aria-hidden", String(!isVisible));
   }
 }
 
@@ -167,19 +170,15 @@ function setProfileEditStatus(message, tone = "muted") {
 
 function setProfileEditVisible(show) {
   const isOpen = Boolean(show);
+
   if (profileEditForm instanceof HTMLElement) {
     profileEditForm.hidden = !isOpen;
     profileEditForm.setAttribute("aria-hidden", String(!isOpen));
   }
+
   if (profileEditToggle instanceof HTMLElement) {
     profileEditToggle.classList.toggle("isActive", isOpen);
     profileEditToggle.setAttribute("aria-expanded", String(isOpen));
-  }
-
-  // When edit form opens, reveal the summary text (display name & bio). Hide it again when closing.
-  if (profileSummaryText instanceof HTMLElement) {
-    profileSummaryText.hidden = !isOpen;
-    profileSummaryText.setAttribute("aria-hidden", String(!isOpen));
   }
 
   if (isOpen) {
@@ -286,8 +285,8 @@ function renderProfile(user) {
   if (guestNotice instanceof HTMLElement) guestNotice.hidden = true;
   showAvatarBlock(true);
   toggleProfileExtras(true);
-  // show the summary container and edit button, but keep the read-only name/bio hidden until the user clicks Edit
-  setProfileSummaryVisible(true, false);
+  // show the summary container and edit button (keep the read-only name/bio visible)
+  setProfileSummaryVisible(true);
   setProfileEditVisible(false);
 
   syncAvatar(user?.id);
