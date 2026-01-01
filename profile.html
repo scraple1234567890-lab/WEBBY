@@ -64,8 +64,6 @@
       <section class="section">
         <div class="container profileGrid">
           <article class="profileCard">
-            <p class="kicker">Your account</p>
-            <h1>Account</h1>
             <p id="profileStatus" class="muted" aria-live="polite">Checking your session...</p>
 
             <div class="profileAvatarBlock" id="profileAvatarBlock" hidden>
@@ -92,8 +90,8 @@
 
             <div class="profileSummary" id="profileSummary" hidden>
               <div class="profileSummaryHeader">
-                <div class="profileSummaryText">
-                  <p class="profileSummaryName" id="profileNameDisplay">Account</p>
+                <div class="profileSummaryText" id="profileSummaryText" hidden>
+                  <p class="profileSummaryName" id="profileNameDisplay">Profile</p>
                   <p class="muted" id="profileBioDisplay">Share a short description for your profile.</p>
                 </div>
                 <button
@@ -144,8 +142,7 @@
 
           <article class="profileCard" id="profilePostsCard" hidden>
             <div class="profileCardHeader">
-              <p class="kicker">Your posts</p>
-              <h2>All posts you’ve made</h2>
+              <p class="muted">All posts you’ve made</p>
               <p class="muted small">These are the notes you’ve shared on the Lore Board.</p>
             </div>
             <div class="postFeed" id="profilePosts"></div>
