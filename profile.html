@@ -90,25 +90,19 @@
 
             <div class="profileSummary" id="profileSummary" hidden>
               <div class="profileSummaryHeader">
-                <div class="profileSummaryText" id="profileSummaryText" hidden>
+                <<div class="profileSummaryText" id="profileSummaryText">
                   <p class="profileSummaryName" id="profileNameDisplay">Profile</p>
                   <p class="muted" id="profileBioDisplay">Share a short description for your profile.</p>
                 </div>
                 <button
-                  class="iconCircle profileEditToggle"
-                  type="button"
-                  id="profileEditToggle"
-                  aria-label="Edit profile text"
-                  aria-expanded="false"
-                  aria-controls="profileEditForm"
-                >
-                  <svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true">
-                    <path
-                      d="M12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7Zm9.16-2.75-.74-1.25a1 1 0 0 0-.9-.5l-1.44.13a7.29 7.29 0 0 0-.64-.37l-.26-1.42a1 1 0 0 0-.77-.8l-1.42-.26c-.12-.23-.25-.45[...]"
-                      fill="currentColor"
-                    />
-                  </svg>
-                </button>
+  class="btn ghost profileEditToggle"
+  type="button"
+  id="profileEditToggle"
+  aria-expanded="false"
+  aria-controls="profileEditForm"
+>
+  Edit
+</button>
               </div>
               <form class="profileForm" id="profileEditForm" hidden aria-hidden="true">
                 <label class="field">
