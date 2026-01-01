@@ -1265,6 +1265,50 @@ input:focus, textarea:focus {
   display: grid;
   gap: 6px;
 }
+.profilePostsTitle {
+  font-family: "Cinzel", "Times New Roman", Georgia, serif;
+  letter-spacing: 1.1px;
+  font-size: clamp(1.1rem, 1.1rem + 0.5vw, 1.6rem);
+  color: #f9f1ff;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: linear-gradient(120deg, rgba(255, 200, 255, 0.15), rgba(112, 73, 255, 0.08));
+  border: 1px solid color-mix(in srgb, #ffb9ff 62%, rgba(255, 255, 255, 0.16));
+  box-shadow: 0 10px 26px rgba(59, 9, 96, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+  position: relative;
+  overflow: hidden;
+}
+.profilePostsTitle::before,
+.profilePostsTitle::after {
+  content: "";
+  position: absolute;
+  inset: -120%;
+  background: conic-gradient(from 180deg, rgba(255, 255, 255, 0.2), rgba(255, 100, 220, 0.35), rgba(255, 255, 255, 0.2));
+  filter: blur(18px);
+  opacity: 0.4;
+  animation: shimmer 14s linear infinite;
+}
+.profilePostsTitle::after {
+  animation-duration: 18s;
+  animation-direction: reverse;
+}
+.profilePostsSigil {
+  color: #ffe4ff;
+  text-shadow: 0 0 12px rgba(255, 118, 224, 0.6);
+  filter: drop-shadow(0 0 8px rgba(132, 82, 255, 0.6));
+}
+@keyframes shimmer {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 
 /* Footer */
 .footer {
@@ -1313,7 +1357,7 @@ input:focus, textarea:focus {
   justify-content: flex-end;
 }
 .postMetaRow {
-  margin-bottom: 4px;
+  margin-top: 6px;
 }
 .isDisabled {
   opacity: 0.8;
