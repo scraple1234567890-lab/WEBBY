@@ -1248,6 +1248,11 @@ input:focus, textarea:focus {
 .profileNotice {
   margin: 8px 0 0;
 }
+.profilePostsSection {
+  display: grid;
+  gap: 12px;
+  margin-top: 10px;
+}
 .profileForm {
   display: grid;
   gap: 12px;

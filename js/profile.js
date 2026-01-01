@@ -13,16 +13,8 @@ const profileSummary = document.getElementById("profileSummary");
 const profileSummaryText = document.getElementById("profileSummaryText");
 const profileNameDisplay = document.getElementById("profileNameDisplay");
 const profileBioDisplay = document.getElementById("profileBioDisplay");
-const profileForm = document.getElementById("profileForm");
-const profileEditToggle = document.getElementById("profileEditToggle");
-const profileNameInput = document.getElementById("profileName");
-const profileBioInput = document.getElementById("profileBio");
-const profileFormStatus = document.getElementById("profileFormStatus");
-const profileSaveButton = document.getElementById("profileSave");
 const profilePosts = document.getElementById("profilePosts");
 const profilePostsCard = document.getElementById("profilePostsCard");
-let isEditingProfile = false;
-let profileDetailsVisible = false;
 
 const LOGIN_STATE_KEY = "auth:isLoggedIn";
 const AVATAR_KEY_PREFIX = "profile:avatar:";
@@ -40,22 +32,6 @@ function setAvatarStatus(message) {
   if (!(avatarStatus instanceof HTMLElement)) return;
   avatarStatus.textContent = message || "";
   avatarStatus.hidden = !message;
-}
-
-function setProfileFormStatus(message, tone = "muted") {
-  if (!profileFormStatus) return;
-  profileFormStatus.textContent = message || "";
-  profileFormStatus.className = `${tone} small`;
-  profileFormStatus.hidden = !message || !isEditingProfile;
-}
-
-function setProfileFormEnabled(enabled) {
-  if (!(profileSaveButton instanceof HTMLButtonElement)) return;
-  profileSaveButton.disabled = !enabled;
-  if (!profileSaveButton.dataset.defaultText) {
-    profileSaveButton.dataset.defaultText = profileSaveButton.textContent || "Save profile";
-  }
-  profileSaveButton.textContent = enabled ? profileSaveButton.dataset.defaultText : "Saving...";
 }
 
 function setLoginStateFlag(isLoggedIn) {
@@ -131,39 +107,8 @@ function syncAvatar(userId) {
   setAvatarStatus(src ? "" : "Choose a picture to personalize your account.");
 }
 
-function fillProfileForm(metadata = {}) {
-  if (profileNameInput instanceof HTMLInputElement) {
-    profileNameInput.value = metadata.displayName || metadata.full_name || metadata.name || "";
-  }
-  if (profileBioInput instanceof HTMLTextAreaElement) {
-    profileBioInput.value = metadata.bio || "";
-  }
-}
-
 function toggleProfileExtras(show) {
   if (profilePostsCard instanceof HTMLElement) profilePostsCard.hidden = !show;
-}
-
-function setProfileDetailsVisible(show) {
-  profileDetailsVisible = show;
-  setProfileFormVisible(show);
-}
-
-function setProfileFormVisible(show) {
-  isEditingProfile = show;
-  if (profileForm instanceof HTMLElement) {
-    profileForm.hidden = !show;
-    profileForm.setAttribute("aria-hidden", String(!show));
-  }
-  if (profileEditToggle instanceof HTMLElement) {
-    profileEditToggle.setAttribute("aria-expanded", String(show));
-    profileEditToggle.classList.toggle("isActive", show);
-  }
-  if (!show) {
-    setProfileFormStatus("");
-  } else {
-    setProfileFormStatus(profileFormStatus?.textContent || "");
-  }
 }
 
 function setProfileSummaryVisible(show) {
@@ -266,13 +211,10 @@ function showGuestState(message = "You’re not logged in yet.") {
   setAvatarPreview(null);
   setAvatarStatus("");
   toggleProfileExtras(false);
-  setProfileDetailsVisible(false);
   setProfileSummaryVisible(false);
-  if (profileEditToggle instanceof HTMLElement) profileEditToggle.hidden = true;
   if (profileNameDisplay) profileNameDisplay.textContent = "Profile";
   if (profileBioDisplay) profileBioDisplay.textContent = "Share a short description for your profile.";
   if (profilePosts) profilePosts.innerHTML = "";
-  setProfileFormStatus("");
   setStatus(message);
 }
 
@@ -287,13 +229,9 @@ function renderProfile(user) {
 
   syncAvatar(user?.id);
   const metadata = user?.user_metadata || {};
-  fillProfileForm(metadata);
   updateProfileSummary(metadata);
   loadUserPosts(user?.id);
-  setProfileFormStatus("");
 
-  if (profileEditToggle instanceof HTMLElement) profileEditToggle.hidden = false;
-  setProfileDetailsVisible(false);
   setStatus("");
 }
 
@@ -348,47 +286,6 @@ function handleAvatarReset() {
   setAvatarStatus("Picture removed. You can add one anytime.");
 }
 
-function toggleProfileEditor() {
-  const shouldShow = !profileDetailsVisible;
-  setProfileDetailsVisible(shouldShow);
-  if (shouldShow && profileNameInput instanceof HTMLInputElement) profileNameInput.focus();
-}
-
-async function handleProfileFormSubmit(event) {
-  event.preventDefault();
-  if (!activeUserId) {
-    setProfileFormStatus("Log in to update your profile.", "error");
-    return;
-  }
-
-  const displayName = (profileNameInput?.value || "").trim();
-  const bio = (profileBioInput?.value || "").trim();
-
-  if (!displayName && !bio) {
-    setProfileFormStatus("Add a name or description before saving.", "error");
-    return;
-  }
-
-  setProfileFormEnabled(false);
-  setProfileFormStatus("Saving your profile...");
-
-  const { error, data } = await supabase.auth.updateUser({
-    data: { displayName, bio },
-  });
-
-  if (error) {
-    setProfileFormStatus(error.message || "Unable to save your profile.", "error");
-    setProfileFormEnabled(true);
-    return;
-  }
-
-  const metadata = data?.user?.user_metadata || {};
-  fillProfileForm(metadata);
-  updateProfileSummary(metadata);
-  setProfileFormStatus("Profile updated.", "success");
-  setProfileFormEnabled(true);
-}
-
 async function loadProfile() {
   setStatus("Checking your session...");
   try {
@@ -411,8 +308,6 @@ async function loadProfile() {
 function init() {
   avatarInput?.addEventListener("change", handleAvatarChange);
   avatarReset?.addEventListener("click", handleAvatarReset);
-  profileForm?.addEventListener("submit", handleProfileFormSubmit);
-  profileEditToggle?.addEventListener("click", toggleProfileEditor);
 
   supabase.auth.onAuthStateChange((_event, session) => {
     const user = session?.user ?? null;
