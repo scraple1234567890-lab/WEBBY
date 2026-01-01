@@ -1,0 +1,98 @@
+/* profile.css - styles for the toggle dropdown */
+
+.profile-component {
+  max-width: 720px;
+  margin: 0 auto;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+.profile-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.profile-toggle:focus {
+  outline: 3px solid rgba(21,156,228,0.25);
+  outline-offset: 2px;
+}
+
+/* Dropdown panel - collapsed by default using max-height trick */
+.profile-details {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 260ms ease, padding 180ms ease;
+  padding: 0 0; /* collapsed padding removed */
+  border-radius: 6px;
+  border: 1px solid transparent;
+  margin-top: 0.5rem;
+  background: #fbfbfc;
+}
+
+/* Open state */
+.profile-details.open {
+  /* max-height large enough for the content; adjust if needed */
+  max-height: 420px;
+  padding: 1rem;
+  border-color: #e6edf3;
+}
+
+/* Form inside panel */
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.profile-form label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.profile-form input[type="text"],
+.profile-form textarea {
+  padding: 0.5rem 0.6rem;
+  border: 1px solid #cfd8e3;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  width: 100%;
+  box-sizing: border-box;
+  background: #fff;
+}
+
+.profile-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.save-button {
+  background: #0969da;
+  color: #fff;
+  border: none;
+  padding: 0.45rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.cancel-button {
+  background: transparent;
+  border: 1px solid #cfd8e3;
+  padding: 0.45rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* small responsive tweak */
+@media (max-width: 480px) {
+  .profile-toggle {
+    width: 100%;
+    justify-content: center;
+  }
+}
