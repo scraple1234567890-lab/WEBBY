@@ -1454,3 +1454,9 @@ input:focus, textarea:focus {
   .mosaic { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .tile, .tile.wide, .tile.tall { grid-column: span 2; grid-row: auto; }
 }
+
+/* Force the HTML `hidden` attribute to actually hide elements */
+[hidden] { 
+  display: none !important; 
+}
+
