@@ -1,4 +1,7 @@
 import { supabase } from "./supabaseClient.js";
+console.log("🔍 Profile.js loaded - version 2");
+
+import { supabase } from "./supabaseClient.js";
 
 const statusEl = document.getElementById("profileStatus");
 const guestNotice = document.getElementById("profileGuestNotice");
