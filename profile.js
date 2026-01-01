@@ -427,3 +427,72 @@ function init() {
 }
 
 init();
+
+// ===== Profile Edit Toggle (View mode vs Edit mode) =====
+(() => {
+  const editBtn = document.getElementById("profileEditToggle");
+  const form = document.getElementById("profileEditForm");
+  const summaryText = document.getElementById("profileSummaryText");
+  const cancelBtn = document.getElementById("profileEditCancel");
+
+  const nameDisplay = document.getElementById("profileNameDisplay");
+  const bioDisplay = document.getElementById("profileBioDisplay");
+  const nameInput = document.getElementById("profileNameInput");
+  const bioInput = document.getElementById("profileBioInput");
+
+  if (!editBtn || !form || !summaryText) return;
+
+  function readDisplayValues() {
+    const name = (nameDisplay?.textContent || "").trim();
+    const bio = (bioDisplay?.textContent || "").trim();
+
+    // If your JS uses placeholders, treat them as "empty" when copying into inputs
+    const cleanName = name === "Profile" ? "" : name;
+    const cleanBio = bio === "Share a short description for your profile." ? "" : bio;
+
+    return { name: cleanName, bio: cleanBio };
+  }
+
+  function writeInputsFromDisplay() {
+    const { name, bio } = readDisplayValues();
+    if (nameInput) nameInput.value = name;
+    if (bioInput) bioInput.value = bio;
+  }
+
+  function setEditMode(isEditing) {
+    // Toggle visibility
+    summaryText.hidden = isEditing;
+    form.hidden = !isEditing;
+
+    // ARIA
+    form.setAttribute("aria-hidden", String(!isEditing));
+    editBtn.setAttribute("aria-expanded", String(isEditing));
+
+    // Button label
+    editBtn.textContent = isEditing ? "Close" : "Edit";
+
+    // When entering edit mode, preload inputs with current display values
+    if (isEditing) writeInputsFromDisplay();
+  }
+
+  // Default: VIEW MODE (inputs hidden)
+  setEditMode(false);
+
+  // Edit button toggles edit mode
+  editBtn.addEventListener("click", () => {
+    setEditMode(form.hidden); // if form is hidden -> enter edit mode
+  });
+
+  // Cancel returns to view mode and restores inputs from display text
+  if (cancelBtn) {
+    cancelBtn.addEventListener("click", () => {
+      writeInputsFromDisplay();
+      setEditMode(false);
+    });
+  }
+
+  // Optional helper: if your existing save logic wants to close the form on success,
+  // call: window.profileSetEditMode(false)
+  window.profileSetEditMode = (isEditing) => setEditMode(!!isEditing);
+})();
+
