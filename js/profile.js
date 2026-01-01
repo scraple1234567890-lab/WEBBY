@@ -146,10 +146,6 @@ function toggleProfileExtras(show) {
 
 function setProfileDetailsVisible(show) {
   profileDetailsVisible = show;
-  if (profileSummaryText instanceof HTMLElement) {
-    profileSummaryText.hidden = !show;
-    profileSummaryText.setAttribute("aria-hidden", String(!show));
-  }
   setProfileFormVisible(show);
 }
 
@@ -167,6 +163,17 @@ function setProfileFormVisible(show) {
     setProfileFormStatus("");
   } else {
     setProfileFormStatus(profileFormStatus?.textContent || "");
+  }
+}
+
+function setProfileSummaryVisible(show) {
+  if (profileSummary instanceof HTMLElement) {
+    profileSummary.hidden = !show;
+    profileSummary.setAttribute("aria-hidden", String(!show));
+  }
+  if (profileSummaryText instanceof HTMLElement) {
+    profileSummaryText.hidden = !show;
+    profileSummaryText.setAttribute("aria-hidden", String(!show));
   }
 }
 
@@ -260,9 +267,8 @@ function showGuestState(message = "You’re not logged in yet.") {
   setAvatarStatus("");
   toggleProfileExtras(false);
   setProfileDetailsVisible(false);
+  setProfileSummaryVisible(false);
   if (profileEditToggle instanceof HTMLElement) profileEditToggle.hidden = true;
-  if (profileSummary instanceof HTMLElement) profileSummary.hidden = true;
-  if (profileSummaryText instanceof HTMLElement) profileSummaryText.hidden = true;
   if (profileNameDisplay) profileNameDisplay.textContent = "Profile";
   if (profileBioDisplay) profileBioDisplay.textContent = "Share a short description for your profile.";
   if (profilePosts) profilePosts.innerHTML = "";
@@ -277,10 +283,7 @@ function renderProfile(user) {
   if (guestNotice instanceof HTMLElement) guestNotice.hidden = true;
   showAvatarBlock(true);
   toggleProfileExtras(true);
-  if (profileSummary instanceof HTMLElement) {
-    profileSummary.hidden = false;
-    profileSummary.setAttribute("aria-hidden", "false");
-  }
+  setProfileSummaryVisible(true);
 
   syncAvatar(user?.id);
   const metadata = user?.user_metadata || {};
