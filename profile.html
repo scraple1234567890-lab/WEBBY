@@ -94,7 +94,43 @@
                   <p class="profileSummaryName" id="profileNameDisplay">Profile</p>
                   <p class="muted" id="profileBioDisplay">Share a short description for your profile.</p>
                 </div>
+                <button
+                  class="iconCircle profileEditToggle"
+                  type="button"
+                  id="profileEditToggle"
+                  aria-label="Edit profile text"
+                  aria-expanded="false"
+                  aria-controls="profileEditForm"
+                >
+                  <svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true">
+                    <path
+                      d="M12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7Zm9.16-2.75-.74-1.25a1 1 0 0 0-.9-.5l-1.44.13a7.29 7.29 0 0 0-.64-.37l-.26-1.42a1 1 0 0 0-.77-.8l-1.42-.26c-.12-.23-.25-.45-.4-.66l.72-1.26a1 1 0 0 0-.08-1.07l-.9-1.14a1 1 0 0 0-1.05-.33l-1.35.44c-.23-.14-.47-.26-.72-.37l-.12-1.45a1 1 0 0 0-.59-.86L12.5 1h-1a1 1 0 0 0-.98.87l-.13 1.45c-.25.11-.49.23-.72.37l-1.35-.44a1 1 0 0 0-1.05.33l-.9 1.14a1 1 0 0 0-.08 1.07l.72 1.26c-.15.21-.28.43-.4.66l-1.42.26a1 1 0 0 0-.77.8l-.26 1.42a7.29 7.29 0 0 0-.64.37l-1.44-.13a1 1 0 0 0-.9.5l-.74 1.25a1 1 0 0 0 .08 1.07l1.07 1.07c-.02.25-.02.5 0 .75l-1.07 1.07a1 1 0 0 0-.08 1.07l.74 1.25a1 1 0 0 0 .9.5l1.44-.13c.2.14.42.26.64.37l.26 1.42a1 1 0 0 0 .77.8l1.42.26c.12.23.25.45.4.66l-.72 1.26a1 1 0 0 0 .08 1.07l.9 1.14a1 1 0 0 0 1.05.33l1.35-.44c.23.14.47.26.72.37l.13 1.45a1 1 0 0 0 .98.87h1a1 1 0 0 0 .98-.87l.12-1.45c.25-.11.49-.23.72-.37l1.35.44a1 1 0 0 0 1.05-.33l.9-1.14a1 1 0 0 0 .08-1.07l-.72-1.26c.15-.21.28-.43.4-.66l1.42-.26a1 1 0 0 0 .77-.8l.26-1.42c.22-.11.44-.23.64-.37l1.44.13a1 1 0 0 0 .9-.5l.74-1.25a1 1 0 0 0-.08-1.07l-1.07-1.07c.02-.25.02-.5 0-.75l1.07-1.07a1 1 0 0 0 .08-1.07ZM12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </button>
               </div>
+              <form class="profileForm" id="profileEditForm" hidden aria-hidden="true">
+                <label class="field">
+                  <span>Display name</span>
+                  <input type="text" name="displayName" id="profileNameInput" maxlength="80" placeholder="How should we address you?" />
+                </label>
+                <label class="field">
+                  <span>Bio</span>
+                  <textarea
+                    id="profileBioInput"
+                    name="bio"
+                    rows="3"
+                    maxlength="200"
+                    placeholder="Share a short description for your profile."
+                  ></textarea>
+                </label>
+                <p class="muted small" id="profileEditStatus" aria-live="polite"></p>
+                <div class="actions">
+                  <button class="btn ghost" type="button" id="profileEditCancel">Cancel</button>
+                  <button class="btn primary" type="submit" id="profileEditSave">Save changes</button>
+                </div>
+              </form>
             </div>
             <div class="profilePostsSection" id="profilePostsCard" hidden>
               <div class="profileCardHeader">
