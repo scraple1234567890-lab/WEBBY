@@ -1183,6 +1183,17 @@ input:focus, textarea:focus {
   gap: 4px;
   margin: 6px 0 0;
 }
+.profileSummaryHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.profileSummaryText {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
 .profileSummaryName {
   margin: 0;
   font-weight: 700;
@@ -1208,6 +1219,26 @@ input:focus, textarea:focus {
   margin: 2px 0 0;
   font-weight: 700;
   color: color-mix(in srgb, var(--text) 92%, var(--muted) 8%);
+}
+.iconCircle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--panel2) 84%, transparent);
+  color: var(--text);
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform 120ms ease, box-shadow 200ms ease, border-color 160ms ease;
+}
+.iconCircle:hover { transform: translateY(-1px); box-shadow: 0 10px 22px rgba(0,0,0,0.18); }
+.iconCircle:active { transform: translateY(0); }
+.iconCircle.isActive {
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--border));
+  box-shadow: 0 10px 26px color-mix(in srgb, var(--accent) 28%, transparent);
 }
 .profileActions {
   display: flex;

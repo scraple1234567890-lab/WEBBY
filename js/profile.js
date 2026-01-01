@@ -1,11 +1,7 @@
 import { supabase } from "./supabaseClient.js";
 
 const statusEl = document.getElementById("profileStatus");
-const profileDetails = document.getElementById("profileDetails");
-const profileActions = document.getElementById("profileActions");
-const profileLogout = document.getElementById("profileLogout");
 const guestNotice = document.getElementById("profileGuestNotice");
-const guestActions = document.getElementById("profileGuestActions");
 const avatarBlock = document.getElementById("profileAvatarBlock");
 const avatarPreview = document.getElementById("profileAvatarPreview");
 const avatarPreviewImg = avatarPreview?.querySelector("img");
@@ -17,6 +13,7 @@ const profileSummary = document.getElementById("profileSummary");
 const profileNameDisplay = document.getElementById("profileNameDisplay");
 const profileBioDisplay = document.getElementById("profileBioDisplay");
 const profileForm = document.getElementById("profileForm");
+const profileEditToggle = document.getElementById("profileEditToggle");
 const profileNameInput = document.getElementById("profileName");
 const profileBioInput = document.getElementById("profileBio");
 const profileFormStatus = document.getElementById("profileFormStatus");
@@ -121,7 +118,7 @@ function syncAvatar(userId) {
   const src = loadAvatar(userId);
   setAvatarPreview(src);
   if (avatarStatus) {
-    avatarStatus.textContent = src ? "This picture appears in your navigation menu." : "Choose a picture to personalize your account.";
+    avatarStatus.textContent = src ? "Profile picture saved." : "Choose a picture to personalize your account.";
   }
 }
 
@@ -135,8 +132,15 @@ function fillProfileForm(metadata = {}) {
 }
 
 function toggleProfileExtras(show) {
-  if (profileForm instanceof HTMLElement) profileForm.hidden = !show;
   if (profilePostsCard instanceof HTMLElement) profilePostsCard.hidden = !show;
+}
+
+function setProfileFormVisible(show) {
+  if (profileForm instanceof HTMLElement) profileForm.hidden = !show;
+  if (profileEditToggle instanceof HTMLElement) {
+    profileEditToggle.setAttribute("aria-expanded", String(show));
+    profileEditToggle.classList.toggle("isActive", show);
+  }
 }
 
 function updateProfileSummary(metadata = {}) {
@@ -147,7 +151,7 @@ function updateProfileSummary(metadata = {}) {
     profileSummary.hidden = false;
   }
   if (profileNameDisplay) {
-    profileNameDisplay.textContent = displayName || "Profile";
+    profileNameDisplay.textContent = displayName || "Account";
   }
   if (profileBioDisplay) {
     profileBioDisplay.textContent = bio || "Add a short description to personalize your profile.";
@@ -226,14 +230,14 @@ async function loadUserPosts(userId) {
 function showGuestState(message = "You’re not logged in yet.") {
   setLoginStateFlag(false);
   activeUserId = null;
-  if (profileActions instanceof HTMLElement) profileActions.hidden = true;
   if (guestNotice instanceof HTMLElement) guestNotice.hidden = false;
-  if (guestActions instanceof HTMLElement) guestActions.hidden = false;
   showAvatarBlock(false);
   setAvatarPreview(null);
   toggleProfileExtras(false);
+  setProfileFormVisible(false);
+  if (profileEditToggle instanceof HTMLElement) profileEditToggle.hidden = true;
   if (profileSummary instanceof HTMLElement) profileSummary.hidden = true;
-  if (profileNameDisplay) profileNameDisplay.textContent = "Profile";
+  if (profileNameDisplay) profileNameDisplay.textContent = "Account";
   if (profileBioDisplay) profileBioDisplay.textContent = "Share a short description for your profile.";
   if (profilePosts) profilePosts.innerHTML = "";
   if (profileFormStatus) profileFormStatus.textContent = "";
@@ -245,8 +249,6 @@ function renderProfile(user) {
   activeUserId = user?.id || null;
 
   if (guestNotice instanceof HTMLElement) guestNotice.hidden = true;
-  if (guestActions instanceof HTMLElement) guestActions.hidden = true;
-  if (profileActions instanceof HTMLElement) profileActions.hidden = false;
   showAvatarBlock(true);
   toggleProfileExtras(true);
 
@@ -257,23 +259,9 @@ function renderProfile(user) {
   loadUserPosts(user?.id);
   setProfileFormStatus("");
 
-  setStatus("You’re logged in.", "success");
-}
-
-async function handleLogoutClick() {
-  if (!(profileLogout instanceof HTMLButtonElement)) return;
-  profileLogout.disabled = true;
-  setStatus("Signing you out...");
-
-  const { error } = await supabase.auth.signOut();
-  if (error) {
-    setStatus(error.message || "Unable to sign out right now.", "error");
-    profileLogout.disabled = false;
-    return;
-  }
-
-  showGuestState("Signed out. You can log in again anytime.");
-  profileLogout.disabled = false;
+  if (profileEditToggle instanceof HTMLElement) profileEditToggle.hidden = false;
+  setProfileFormVisible(false);
+  setStatus("Profile ready.", "success");
 }
 
 function readFileAsDataUrl(file) {
@@ -325,6 +313,14 @@ function handleAvatarReset() {
   setAvatarPreview(null);
   window.dispatchEvent(new CustomEvent("profile:avatarUpdated", { detail: { userId: activeUserId, src: null } }));
   if (avatarStatus) avatarStatus.textContent = "Picture removed. You can add one anytime.";
+}
+
+function toggleProfileEditor() {
+  const shouldShow = profileForm instanceof HTMLElement ? profileForm.hidden : true;
+  setProfileFormVisible(shouldShow);
+  if (shouldShow && profileNameInput instanceof HTMLInputElement) {
+    profileNameInput.focus();
+  }
 }
 
 async function handleProfileFormSubmit(event) {
@@ -382,10 +378,10 @@ async function loadProfile() {
 }
 
 function init() {
-  profileLogout?.addEventListener("click", handleLogoutClick);
   avatarInput?.addEventListener("change", handleAvatarChange);
   avatarReset?.addEventListener("click", handleAvatarReset);
   profileForm?.addEventListener("submit", handleProfileFormSubmit);
+  profileEditToggle?.addEventListener("click", toggleProfileEditor);
 
   supabase.auth.onAuthStateChange((_event, session) => {
     const user = session?.user ?? null;
