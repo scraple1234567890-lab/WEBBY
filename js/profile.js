@@ -20,6 +20,7 @@ const profileFormStatus = document.getElementById("profileFormStatus");
 const profileSaveButton = document.getElementById("profileSave");
 const profilePosts = document.getElementById("profilePosts");
 const profilePostsCard = document.getElementById("profilePostsCard");
+let isEditingProfile = false;
 
 const LOGIN_STATE_KEY = "auth:isLoggedIn";
 const AVATAR_KEY_PREFIX = "profile:avatar:";
@@ -30,12 +31,20 @@ function setStatus(message, tone = "muted") {
   if (!statusEl) return;
   statusEl.textContent = message || "";
   statusEl.className = `${tone} small`;
+  statusEl.hidden = !message;
+}
+
+function setAvatarStatus(message) {
+  if (!(avatarStatus instanceof HTMLElement)) return;
+  avatarStatus.textContent = message || "";
+  avatarStatus.hidden = !message;
 }
 
 function setProfileFormStatus(message, tone = "muted") {
   if (!profileFormStatus) return;
   profileFormStatus.textContent = message || "";
   profileFormStatus.className = `${tone} small`;
+  profileFormStatus.hidden = !message || !isEditingProfile;
 }
 
 function setProfileFormEnabled(enabled) {
@@ -117,9 +126,7 @@ function showAvatarBlock(show) {
 function syncAvatar(userId) {
   const src = loadAvatar(userId);
   setAvatarPreview(src);
-  if (avatarStatus) {
-    avatarStatus.textContent = src ? "Profile picture saved." : "Choose a picture to personalize your account.";
-  }
+  setAvatarStatus(src ? "" : "Choose a picture to personalize your account.");
 }
 
 function fillProfileForm(metadata = {}) {
@@ -136,10 +143,19 @@ function toggleProfileExtras(show) {
 }
 
 function setProfileFormVisible(show) {
-  if (profileForm instanceof HTMLElement) profileForm.hidden = !show;
+  isEditingProfile = show;
+  if (profileForm instanceof HTMLElement) {
+    profileForm.hidden = !show;
+    profileForm.setAttribute("aria-hidden", String(!show));
+  }
   if (profileEditToggle instanceof HTMLElement) {
     profileEditToggle.setAttribute("aria-expanded", String(show));
     profileEditToggle.classList.toggle("isActive", show);
+  }
+  if (!show) {
+    setProfileFormStatus("");
+  } else {
+    setProfileFormStatus(profileFormStatus?.textContent || "");
   }
 }
 
@@ -233,6 +249,7 @@ function showGuestState(message = "You’re not logged in yet.") {
   if (guestNotice instanceof HTMLElement) guestNotice.hidden = false;
   showAvatarBlock(false);
   setAvatarPreview(null);
+  setAvatarStatus("");
   toggleProfileExtras(false);
   setProfileFormVisible(false);
   if (profileEditToggle instanceof HTMLElement) profileEditToggle.hidden = true;
@@ -240,7 +257,7 @@ function showGuestState(message = "You’re not logged in yet.") {
   if (profileNameDisplay) profileNameDisplay.textContent = "Account";
   if (profileBioDisplay) profileBioDisplay.textContent = "Share a short description for your profile.";
   if (profilePosts) profilePosts.innerHTML = "";
-  if (profileFormStatus) profileFormStatus.textContent = "";
+  setProfileFormStatus("");
   setStatus(message);
 }
 
@@ -261,7 +278,7 @@ function renderProfile(user) {
 
   if (profileEditToggle instanceof HTMLElement) profileEditToggle.hidden = false;
   setProfileFormVisible(false);
-  setStatus("Profile ready.", "success");
+  setStatus("");
 }
 
 function readFileAsDataUrl(file) {
@@ -277,18 +294,18 @@ async function handleAvatarChange(event) {
   const file = event.target?.files?.[0];
   if (!file) return;
   if (!activeUserId) {
-    if (avatarStatus) avatarStatus.textContent = "Log in to update your picture.";
+    setAvatarStatus("Log in to update your picture.");
     return;
   }
 
   const maxSizeBytes = 2 * 1024 * 1024;
   if (file.size > maxSizeBytes) {
-    if (avatarStatus) avatarStatus.textContent = "Please choose an image under 2 MB.";
+    setAvatarStatus("Please choose an image under 2 MB.");
     if (avatarInput) avatarInput.value = "";
     return;
   }
 
-  if (avatarStatus) avatarStatus.textContent = "Uploading your picture...";
+  setAvatarStatus("Uploading your picture...");
   try {
     const dataUrl = await readFileAsDataUrl(file);
     if (typeof dataUrl === "string") {
@@ -297,11 +314,11 @@ async function handleAvatarChange(event) {
       window.dispatchEvent(
         new CustomEvent("profile:avatarUpdated", { detail: { userId: activeUserId, src: dataUrl } }),
       );
-      if (avatarStatus) avatarStatus.textContent = "Saved. Your picture now appears in the menu.";
+      setAvatarStatus("Saved. Your picture now appears in the menu.");
     }
   } catch (error) {
     console.error("Unable to read avatar file", error);
-    if (avatarStatus) avatarStatus.textContent = "Unable to read that file. Try another image.";
+    setAvatarStatus("Unable to read that file. Try another image.");
   } finally {
     if (avatarInput) avatarInput.value = "";
   }
@@ -312,7 +329,7 @@ function handleAvatarReset() {
   clearAvatar(activeUserId);
   setAvatarPreview(null);
   window.dispatchEvent(new CustomEvent("profile:avatarUpdated", { detail: { userId: activeUserId, src: null } }));
-  if (avatarStatus) avatarStatus.textContent = "Picture removed. You can add one anytime.";
+  setAvatarStatus("Picture removed. You can add one anytime.");
 }
 
 function toggleProfileEditor() {
