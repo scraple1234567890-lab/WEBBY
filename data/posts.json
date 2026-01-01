@@ -1020,5 +1020,12 @@
     "school": "Sight",
     "createdAt": "2026-01-01T15:39:32.323Z",
     "text": "Sound mages recorded the library's quiet and play it back during storms to steady readers."
+  },
+  {
+    "id": "post-147",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-01T15:51:51.635Z",
+    "text": "Sight mentors recalibrated star charts after a meteor shower rewrote the sky’s margins."
   }
 ]
