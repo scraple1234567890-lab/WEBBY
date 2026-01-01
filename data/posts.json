@@ -992,5 +992,12 @@
     "school": "Sight",
     "createdAt": "2026-01-01T11:53:36.172Z",
     "text": "Sound mages recorded the library's quiet and play it back during storms to steady readers."
+  },
+  {
+    "id": "post-143",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-01T13:47:22.575Z",
+    "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
   }
 ]
