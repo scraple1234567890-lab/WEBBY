@@ -1,7 +1,4 @@
 import { supabase } from "./supabaseClient.js";
-console.log("🔍 Profile.js loaded - version 2");
-
-import { supabase } from "./supabaseClient.js";
 
 const statusEl = document.getElementById("profileStatus");
 const guestNotice = document.getElementById("profileGuestNotice");
@@ -297,7 +294,21 @@ function renderProfile(user) {
   showAvatarBlock(true);
   toggleProfileExtras(true);
   setProfileSummaryVisible(true);
-  setProfileEditVisible(false);
+  
+  // Explicitly show the text and hide the form on initial load
+  if (profileSummaryText instanceof HTMLElement) {
+    profileSummaryText.hidden = false;
+    profileSummaryText.setAttribute("aria-hidden", "false");
+  }
+  if (profileEditForm instanceof HTMLElement) {
+    profileEditForm.hidden = true;
+    profileEditForm.setAttribute("aria-hidden", "true");
+    profileEditForm.style.display = "none";
+  }
+  if (profileEditToggle instanceof HTMLElement) {
+    profileEditToggle.setAttribute("aria-expanded", "false");
+    profileEditToggle.textContent = "Edit";
+  }
 
   syncAvatar(user?.id);
   const metadata = user?.user_metadata || {};
