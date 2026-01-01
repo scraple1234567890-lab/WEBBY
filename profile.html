@@ -103,11 +103,20 @@
                   Edit
                 </button>
               </div>
-              <form class="profileForm" id="profileEditForm" hidden aria-hidden="true" style="display:none;">
+
+              <!-- UPDATED: removed aria-hidden + inline display style so JS can control it cleanly -->
+              <form class="profileForm" id="profileEditForm" hidden>
                 <label class="field">
                   <span>Display name</span>
-                  <input type="text" name="displayName" id="profileNameInput" maxlength="80" placeholder="How should we address you?" />
+                  <input
+                    type="text"
+                    name="displayName"
+                    id="profileNameInput"
+                    maxlength="80"
+                    placeholder="How should we address you?"
+                  />
                 </label>
+
                 <label class="field">
                   <span>Bio</span>
                   <textarea
@@ -118,13 +127,16 @@
                     placeholder="Share a short description for your profile."
                   ></textarea>
                 </label>
+
                 <p class="muted small" id="profileEditStatus" aria-live="polite"></p>
+
                 <div class="actions">
                   <button class="btn ghost" type="button" id="profileEditCancel">Cancel</button>
                   <button class="btn primary" type="submit" id="profileEditSave">Save changes</button>
                 </div>
               </form>
             </div>
+
             <div class="profilePostsSection" id="profilePostsCard" hidden>
               <div class="profileCardHeader">
                 <p class="profilePostsTitle">
@@ -150,21 +162,6 @@
         <a class="muted small" href="#top">Back to the stars ↑</a>
       </div>
     </footer>
-
-    <!-- Force correct initial state before any JS runs -->
-    <script>
-      // Ensure form starts hidden and text starts visible
-      const form = document.getElementById('profileEditForm');
-      const text = document.getElementById('profileSummaryText');
-      if (form) {
-        form.hidden = true;
-        form.style.display = 'none';
-      }
-      if (text) {
-        text.hidden = false;
-        text.style.display = '';
-      }
-    </script>
 
     <script src="./script.js?v=3" defer></script>
     <script type="module" src="./js/app.js?v=3"></script>
