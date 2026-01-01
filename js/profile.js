@@ -13,9 +13,9 @@ const avatarPlaceholder = avatarPreview?.querySelector(".profileAvatarPlaceholde
 const avatarInput = document.getElementById("profileAvatarInput");
 const avatarReset = document.getElementById("profileAvatarReset");
 const avatarStatus = document.getElementById("profileAvatarStatus");
-const emailTarget = document.querySelector("[data-profile-email]");
-const joinedTarget = document.querySelector("[data-profile-joined]");
-const idTarget = document.querySelector("[data-profile-id]");
+const profileSummary = document.getElementById("profileSummary");
+const profileNameDisplay = document.getElementById("profileNameDisplay");
+const profileBioDisplay = document.getElementById("profileBioDisplay");
 const profileForm = document.getElementById("profileForm");
 const profileNameInput = document.getElementById("profileName");
 const profileBioInput = document.getElementById("profileBio");
@@ -139,6 +139,22 @@ function toggleProfileExtras(show) {
   if (profilePostsCard instanceof HTMLElement) profilePostsCard.hidden = !show;
 }
 
+function updateProfileSummary(metadata = {}) {
+  const displayName = metadata.displayName || metadata.full_name || metadata.name || "";
+  const bio = metadata.bio || "";
+
+  if (profileSummary instanceof HTMLElement) {
+    profileSummary.hidden = false;
+  }
+  if (profileNameDisplay) {
+    profileNameDisplay.textContent = displayName || "Profile";
+  }
+  if (profileBioDisplay) {
+    profileBioDisplay.textContent = bio || "Add a short description to personalize your profile.";
+    profileBioDisplay.classList.toggle("muted", !bio);
+  }
+}
+
 function formatDate(value) {
   const date = value ? new Date(value) : null;
   if (!date || Number.isNaN(date.getTime())) return "Unknown";
@@ -210,13 +226,15 @@ async function loadUserPosts(userId) {
 function showGuestState(message = "You’re not logged in yet.") {
   setLoginStateFlag(false);
   activeUserId = null;
-  if (profileDetails instanceof HTMLElement) profileDetails.hidden = true;
   if (profileActions instanceof HTMLElement) profileActions.hidden = true;
   if (guestNotice instanceof HTMLElement) guestNotice.hidden = false;
   if (guestActions instanceof HTMLElement) guestActions.hidden = false;
   showAvatarBlock(false);
   setAvatarPreview(null);
   toggleProfileExtras(false);
+  if (profileSummary instanceof HTMLElement) profileSummary.hidden = true;
+  if (profileNameDisplay) profileNameDisplay.textContent = "Profile";
+  if (profileBioDisplay) profileBioDisplay.textContent = "Share a short description for your profile.";
   if (profilePosts) profilePosts.innerHTML = "";
   if (profileFormStatus) profileFormStatus.textContent = "";
   setStatus(message);
@@ -226,20 +244,16 @@ function renderProfile(user) {
   setLoginStateFlag(true);
   activeUserId = user?.id || null;
 
-  if (profileDetails instanceof HTMLElement) {
-    profileDetails.hidden = false;
-  }
   if (guestNotice instanceof HTMLElement) guestNotice.hidden = true;
   if (guestActions instanceof HTMLElement) guestActions.hidden = true;
   if (profileActions instanceof HTMLElement) profileActions.hidden = false;
   showAvatarBlock(true);
   toggleProfileExtras(true);
 
-  if (emailTarget) emailTarget.textContent = user?.email || "Unknown email";
-  if (joinedTarget) joinedTarget.textContent = formatDate(user?.created_at);
-  if (idTarget) idTarget.textContent = user?.id || "Unknown id";
   syncAvatar(user?.id);
-  fillProfileForm(user?.user_metadata || {});
+  const metadata = user?.user_metadata || {};
+  fillProfileForm(metadata);
+  updateProfileSummary(metadata);
   loadUserPosts(user?.id);
   setProfileFormStatus("");
 
@@ -343,6 +357,7 @@ async function handleProfileFormSubmit(event) {
 
   const metadata = data?.user?.user_metadata || {};
   fillProfileForm(metadata);
+  updateProfileSummary(metadata);
   setProfileFormStatus("Profile updated.", "success");
   setProfileFormEnabled(true);
 }
