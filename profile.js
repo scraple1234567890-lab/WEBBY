@@ -158,19 +158,20 @@ function setProfileEditStatus(message, tone = "muted") {
 function setProfileEditVisible(show) {
   const isOpen = Boolean(show);
   
-  // Toggle display text visibility (hide when editing, show when not)
+  // Hide display text when editing, show when not editing
   if (profileSummaryText instanceof HTMLElement) {
     profileSummaryText.hidden = isOpen;
     profileSummaryText.setAttribute("aria-hidden", String(isOpen));
   }
   
-  // Toggle form visibility (show when editing, hide when not)
+  // Show form when editing, hide when not editing
   if (profileEditForm instanceof HTMLElement) {
     profileEditForm.hidden = !isOpen;
     profileEditForm.setAttribute("aria-hidden", String(!isOpen));
     profileEditForm.style.display = isOpen ? "block" : "none";
   }
   
+  // Update button state
   if (profileEditToggle instanceof HTMLElement) {
     profileEditToggle.classList.toggle("isActive", isOpen);
     profileEditToggle.setAttribute("aria-expanded", String(isOpen));
