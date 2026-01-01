@@ -1178,6 +1178,20 @@ input:focus, textarea:focus {
   margin: 0;
   gap: 8px;
 }
+.profileSummary {
+  display: grid;
+  gap: 4px;
+  margin: 6px 0 0;
+}
+.profileSummaryName {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--text);
+}
+.profileSummary .muted {
+  margin: 0;
+}
 .profileDetails {
   display: grid;
   gap: 10px;
