@@ -26,7 +26,6 @@
         <div class="navLinks" id="navLinks">
           <a href="./quiz.html">Sorting quiz</a>
           <a href="./posts.html">Posts</a>
-          <a href="./index.html#contact">Send an owl</a>
           <div class="profileMenu" id="profileMenu" data-default-display="inline-flex" style="display: none">
             <button
               class="btn ghost profileTrigger"
@@ -100,6 +99,27 @@
               <dd class="muted small" data-profile-id>—</dd>
             </dl>
 
+            <form class="profileForm" id="profileForm" hidden>
+              <div class="field">
+                <label for="profileName">Profile name</label>
+                <input id="profileName" name="profileName" type="text" maxlength="80" placeholder="How should others see your name?" />
+              </div>
+              <div class="field">
+                <label for="profileBio">Description</label>
+                <textarea
+                  id="profileBio"
+                  name="profileBio"
+                  rows="3"
+                  maxlength="240"
+                  placeholder="Share a short description for your profile."
+                ></textarea>
+              </div>
+              <div class="actions">
+                <button class="btn primary" type="submit" id="profileSave">Save profile</button>
+              </div>
+              <p id="profileFormStatus" class="muted small" aria-live="polite"></p>
+            </form>
+
             <div class="profileActions" id="profileActions" hidden>
               <a class="btn primary" href="./posts.html">Go to Posts</a>
               <button class="btn ghost" type="button" id="profileLogout">Log out</button>
@@ -112,6 +132,15 @@
               <a class="btn primary magentaGlow" href="./portal.html">Open the login portal</a>
               <a class="btn ghost" href="./quiz.html">Take the sorting quiz</a>
             </div>
+          </article>
+
+          <article class="profileCard" id="profilePostsCard" hidden>
+            <div class="profileCardHeader">
+              <p class="kicker">Your posts</p>
+              <h2>All posts you’ve made</h2>
+              <p class="muted small">These are the notes you’ve shared on the Lore Board.</p>
+            </div>
+            <div class="postFeed" id="profilePosts"></div>
           </article>
         </div>
       </section>

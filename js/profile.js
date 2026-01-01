@@ -16,6 +16,13 @@ const avatarStatus = document.getElementById("profileAvatarStatus");
 const emailTarget = document.querySelector("[data-profile-email]");
 const joinedTarget = document.querySelector("[data-profile-joined]");
 const idTarget = document.querySelector("[data-profile-id]");
+const profileForm = document.getElementById("profileForm");
+const profileNameInput = document.getElementById("profileName");
+const profileBioInput = document.getElementById("profileBio");
+const profileFormStatus = document.getElementById("profileFormStatus");
+const profileSaveButton = document.getElementById("profileSave");
+const profilePosts = document.getElementById("profilePosts");
+const profilePostsCard = document.getElementById("profilePostsCard");
 
 const LOGIN_STATE_KEY = "auth:isLoggedIn";
 const AVATAR_KEY_PREFIX = "profile:avatar:";
@@ -26,6 +33,21 @@ function setStatus(message, tone = "muted") {
   if (!statusEl) return;
   statusEl.textContent = message || "";
   statusEl.className = `${tone} small`;
+}
+
+function setProfileFormStatus(message, tone = "muted") {
+  if (!profileFormStatus) return;
+  profileFormStatus.textContent = message || "";
+  profileFormStatus.className = `${tone} small`;
+}
+
+function setProfileFormEnabled(enabled) {
+  if (!(profileSaveButton instanceof HTMLButtonElement)) return;
+  profileSaveButton.disabled = !enabled;
+  if (!profileSaveButton.dataset.defaultText) {
+    profileSaveButton.dataset.defaultText = profileSaveButton.textContent || "Save profile";
+  }
+  profileSaveButton.textContent = enabled ? profileSaveButton.dataset.defaultText : "Saving...";
 }
 
 function setLoginStateFlag(isLoggedIn) {
@@ -103,10 +125,86 @@ function syncAvatar(userId) {
   }
 }
 
+function fillProfileForm(metadata = {}) {
+  if (profileNameInput instanceof HTMLInputElement) {
+    profileNameInput.value = metadata.displayName || metadata.full_name || metadata.name || "";
+  }
+  if (profileBioInput instanceof HTMLTextAreaElement) {
+    profileBioInput.value = metadata.bio || "";
+  }
+}
+
+function toggleProfileExtras(show) {
+  if (profileForm instanceof HTMLElement) profileForm.hidden = !show;
+  if (profilePostsCard instanceof HTMLElement) profilePostsCard.hidden = !show;
+}
+
 function formatDate(value) {
   const date = value ? new Date(value) : null;
   if (!date || Number.isNaN(date.getTime())) return "Unknown";
   return date.toLocaleString();
+}
+
+function renderUserPosts(posts) {
+  if (!profilePosts) return;
+  profilePosts.innerHTML = "";
+
+  if (!posts.length) {
+    const p = document.createElement("p");
+    p.className = "muted";
+    p.textContent = "No posts yet. Share something on the Lore Board to see it here.";
+    profilePosts.appendChild(p);
+    return;
+  }
+
+  posts.forEach((post) => {
+    const article = document.createElement("article");
+    article.className = "card";
+    article.dataset.id = post.id;
+
+    const meta = document.createElement("p");
+    meta.className = "muted small postMetaRow";
+    meta.textContent = formatDate(post.created_at);
+
+    const body = document.createElement("p");
+    body.className = "post-content";
+    body.style.whiteSpace = "pre-wrap";
+    body.textContent = post.content || "";
+
+    article.append(meta, body);
+    profilePosts.appendChild(article);
+  });
+}
+
+async function loadUserPosts(userId) {
+  if (!profilePosts) return;
+  if (!userId) {
+    profilePosts.innerHTML = "";
+    return;
+  }
+
+  profilePosts.innerHTML = '<p class="muted">Loading your posts...</p>';
+
+  try {
+    const { data, error } = await supabase
+      .from("posts")
+      .select("id, content, created_at")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      throw error;
+    }
+
+    renderUserPosts(data || []);
+  } catch (error) {
+    console.error("Unable to load user posts", error);
+    profilePosts.innerHTML = "";
+    const message = document.createElement("p");
+    message.className = "error";
+    message.textContent = error?.message || "Unable to load your posts right now.";
+    profilePosts.appendChild(message);
+  }
 }
 
 function showGuestState(message = "You’re not logged in yet.") {
@@ -118,6 +216,9 @@ function showGuestState(message = "You’re not logged in yet.") {
   if (guestActions instanceof HTMLElement) guestActions.hidden = false;
   showAvatarBlock(false);
   setAvatarPreview(null);
+  toggleProfileExtras(false);
+  if (profilePosts) profilePosts.innerHTML = "";
+  if (profileFormStatus) profileFormStatus.textContent = "";
   setStatus(message);
 }
 
@@ -132,11 +233,15 @@ function renderProfile(user) {
   if (guestActions instanceof HTMLElement) guestActions.hidden = true;
   if (profileActions instanceof HTMLElement) profileActions.hidden = false;
   showAvatarBlock(true);
+  toggleProfileExtras(true);
 
   if (emailTarget) emailTarget.textContent = user?.email || "Unknown email";
   if (joinedTarget) joinedTarget.textContent = formatDate(user?.created_at);
   if (idTarget) idTarget.textContent = user?.id || "Unknown id";
   syncAvatar(user?.id);
+  fillProfileForm(user?.user_metadata || {});
+  loadUserPosts(user?.id);
+  setProfileFormStatus("");
 
   setStatus("You’re logged in.", "success");
 }
@@ -208,6 +313,40 @@ function handleAvatarReset() {
   if (avatarStatus) avatarStatus.textContent = "Picture removed. You can add one anytime.";
 }
 
+async function handleProfileFormSubmit(event) {
+  event.preventDefault();
+  if (!activeUserId) {
+    setProfileFormStatus("Log in to update your profile.", "error");
+    return;
+  }
+
+  const displayName = (profileNameInput?.value || "").trim();
+  const bio = (profileBioInput?.value || "").trim();
+
+  if (!displayName && !bio) {
+    setProfileFormStatus("Add a name or description before saving.", "error");
+    return;
+  }
+
+  setProfileFormEnabled(false);
+  setProfileFormStatus("Saving your profile...");
+
+  const { error, data } = await supabase.auth.updateUser({
+    data: { displayName, bio },
+  });
+
+  if (error) {
+    setProfileFormStatus(error.message || "Unable to save your profile.", "error");
+    setProfileFormEnabled(true);
+    return;
+  }
+
+  const metadata = data?.user?.user_metadata || {};
+  fillProfileForm(metadata);
+  setProfileFormStatus("Profile updated.", "success");
+  setProfileFormEnabled(true);
+}
+
 async function loadProfile() {
   setStatus("Checking your session...");
   try {
@@ -231,6 +370,7 @@ function init() {
   profileLogout?.addEventListener("click", handleLogoutClick);
   avatarInput?.addEventListener("change", handleAvatarChange);
   avatarReset?.addEventListener("click", handleAvatarReset);
+  profileForm?.addEventListener("submit", handleProfileFormSubmit);
 
   supabase.auth.onAuthStateChange((_event, session) => {
     const user = session?.user ?? null;
