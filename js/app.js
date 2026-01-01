@@ -21,7 +21,11 @@ const authSuccessMessage = document.getElementById("authSuccessMessage");
 const loginCard = loginForm?.closest(".card");
 const signupCard = signupForm?.closest(".card");
 const loginSubmitButton = loginForm?.querySelector('button[type="submit"]');
+const profileAvatar = document.getElementById("profileAvatar");
+const profileAvatarImg = profileAvatar?.querySelector("img");
+const profileAvatarPlaceholder = profileAvatar?.querySelector(".profileAvatarPlaceholder");
 const LOGIN_STATE_KEY = "auth:isLoggedIn";
+const AVATAR_KEY_PREFIX = "profile:avatar:";
 const LOGIN_REDIRECT_DELAY_MS = 1000;
 
 let currentSession = null;
@@ -132,7 +136,41 @@ function setLoginStateFlag(isLoggedIn) {
   }
 }
 
-function updateAuthVisibility(isLoggedIn, email = "") {
+function getAvatarStorageKey(userId) {
+  return userId ? `${AVATAR_KEY_PREFIX}${userId}` : "";
+}
+
+function loadStoredAvatar(userId) {
+  const key = getAvatarStorageKey(userId);
+  if (!key) return null;
+  try {
+    return localStorage.getItem(key);
+  } catch (error) {
+    console.warn("Unable to read avatar from storage", error);
+    return null;
+  }
+}
+
+function setProfileAvatar(src) {
+  if (!(profileAvatar instanceof HTMLElement) || !(profileAvatarImg instanceof HTMLImageElement)) return;
+  if (src) {
+    profileAvatarImg.src = src;
+    profileAvatar.classList.add("hasImage");
+  } else {
+    profileAvatarImg.removeAttribute("src");
+    profileAvatar.classList.remove("hasImage");
+  }
+  if (profileAvatarPlaceholder instanceof HTMLElement) {
+    profileAvatarPlaceholder.hidden = Boolean(src);
+  }
+}
+
+function syncProfileAvatar(userId) {
+  const avatar = userId ? loadStoredAvatar(userId) : null;
+  setProfileAvatar(avatar);
+}
+
+function updateAuthVisibility(isLoggedIn, email = "", userId = "") {
   if (!isLoggedIn) {
     redirectingAfterLogin = false;
   }
@@ -143,6 +181,7 @@ function updateAuthVisibility(isLoggedIn, email = "") {
   toggleAuthCards(shouldShowAuthCards);
   toggleAuthSuccess(isLoggedIn, email);
   setLoginStateFlag(isLoggedIn);
+  syncProfileAvatar(isLoggedIn ? userId : "");
 }
 
 async function fetchPosts() {
@@ -362,7 +401,7 @@ async function loadSession() {
   currentSession = data.session;
   if (currentSession) {
     setStatus(authStatus, `Logged in as ${currentSession.user.email}`);
-    updateAuthVisibility(true, currentSession.user.email);
+    updateAuthVisibility(true, currentSession.user.email, currentSession.user.id);
   } else {
     setStatus(authStatus, "You are browsing as a guest.");
     updateAuthVisibility(false);
@@ -379,7 +418,7 @@ function initAuthListeners() {
     }
     if (event === "SIGNED_IN") {
       setStatus(authStatus, `Logged in as ${session?.user?.email || "member"}.`);
-      updateAuthVisibility(true, session?.user?.email || "your account");
+      updateAuthVisibility(true, session?.user?.email || "your account", session?.user?.id || "");
     }
     refreshPosts();
   });
@@ -411,6 +450,25 @@ function bindEvents() {
     if (!(target instanceof HTMLElement)) return;
     if (target.dataset.action === "delete" && target.dataset.id) {
       handleDelete(target.dataset.id);
+    }
+  });
+
+  window.addEventListener("storage", (event) => {
+    if (event.key === LOGIN_STATE_KEY) {
+      const isLoggedIn = event.newValue === "true";
+      toggleLoginButtons(!isLoggedIn);
+      toggleProfileMenuVisibility(isLoggedIn);
+    }
+    if (currentSession?.user?.id && event.key === getAvatarStorageKey(currentSession.user.id)) {
+      syncProfileAvatar(currentSession.user.id);
+    }
+  });
+
+  window.addEventListener("profile:avatarUpdated", (event) => {
+    const detail = event.detail || {};
+    const userId = detail.userId || currentSession?.user?.id;
+    if (userId && userId === currentSession?.user?.id) {
+      syncProfileAvatar(userId);
     }
   });
 }
