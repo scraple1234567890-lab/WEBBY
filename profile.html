@@ -94,58 +94,19 @@
                   <p class="profileSummaryName" id="profileNameDisplay">Profile</p>
                   <p class="muted" id="profileBioDisplay">Share a short description for your profile.</p>
                 </div>
-                <button
-                  class="iconCircle"
-                  type="button"
-                  id="profileEditToggle"
-                  aria-label="Edit profile settings"
-                  aria-controls="profileForm"
-                  aria-expanded="false"
-                  hidden
-                >
-                  <span class="srOnly">Edit profile settings</span>
-                  <svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true">
-                    <path
-                      fill="currentColor"
-                      d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm7.94-4.75c.03.25.06.5.06.75s-.03.5-.06.75l2.03 1.59a.5.5 0 0 1 .12.63l-1.92 3.32a.5.5 0 0 1-.6.22l-2.39-.96c-.39.3-.81.56-1.27.76l-.36 2.54a.5.5 0 0 1-.5.43h-3.84a.5.5 0 0 1-.5-.43l-.36-2.54a7.04 7.04 0 0 1-1.27-.76l-2.39.96a.5.5 0 0 1-.6-.22L2.83 15a.5.5 0 0 1 .12-.63l2.03-1.59A5.9 5.9 0 0 1 5 12c0-.25.03-.5.06-.75L3.03 9.66a.5.5 0 0 1-.12-.63l1.92-3.32a.5.5 0 0 1 .6-.22l2.39.96c.39-.3.81-.56 1.27-.76l.36-2.54a.5.5 0 0 1 .5-.43h3.84a.5.5 0 0 1 .5.43l.36 2.54c.46.2.88.46 1.27.76l2.39-.96a.5.5 0 0 1 .6.22l1.92 3.32a.5.5 0 0 1-.12.63l-2.03 1.59Z"
-                    />
-                  </svg>
-                </button>
               </div>
             </div>
-
-            <form class="profileForm" id="profileForm" hidden>
-              <div class="field">
-                <label for="profileName">Profile name</label>
-                <input id="profileName" name="profileName" type="text" maxlength="80" placeholder="How should others see your name?" />
+            <div class="profilePostsSection" id="profilePostsCard" hidden>
+              <div class="profileCardHeader">
+                <p class="muted">All posts you’ve made</p>
+                <p class="muted small">These are the notes you’ve shared on the Lore Board.</p>
               </div>
-              <div class="field">
-                <label for="profileBio">Description</label>
-                <textarea
-                  id="profileBio"
-                  name="profileBio"
-                  rows="3"
-                  maxlength="240"
-                  placeholder="Share a short description for your profile."
-                ></textarea>
-              </div>
-              <div class="actions">
-                <button class="btn primary" type="submit" id="profileSave">Save profile</button>
-              </div>
-              <p id="profileFormStatus" class="muted small" aria-live="polite"></p>
-            </form>
+              <div class="postFeed" id="profilePosts"></div>
+            </div>
 
             <p class="profileNotice muted small" id="profileGuestNotice" hidden>
               You’re browsing as a guest. Log in to see your profile details.
             </p>
-          </article>
-
-          <article class="profileCard" id="profilePostsCard" hidden>
-            <div class="profileCardHeader">
-              <p class="muted">All posts you’ve made</p>
-              <p class="muted small">These are the notes you’ve shared on the Lore Board.</p>
-            </div>
-            <div class="postFeed" id="profilePosts"></div>
           </article>
         </div>
       </section>
