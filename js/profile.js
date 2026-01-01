@@ -10,6 +10,7 @@ const avatarInput = document.getElementById("profileAvatarInput");
 const avatarReset = document.getElementById("profileAvatarReset");
 const avatarStatus = document.getElementById("profileAvatarStatus");
 const profileSummary = document.getElementById("profileSummary");
+const profileSummaryText = document.getElementById("profileSummaryText");
 const profileNameDisplay = document.getElementById("profileNameDisplay");
 const profileBioDisplay = document.getElementById("profileBioDisplay");
 const profileForm = document.getElementById("profileForm");
@@ -21,6 +22,7 @@ const profileSaveButton = document.getElementById("profileSave");
 const profilePosts = document.getElementById("profilePosts");
 const profilePostsCard = document.getElementById("profilePostsCard");
 let isEditingProfile = false;
+let profileDetailsVisible = false;
 
 const LOGIN_STATE_KEY = "auth:isLoggedIn";
 const AVATAR_KEY_PREFIX = "profile:avatar:";
@@ -142,6 +144,15 @@ function toggleProfileExtras(show) {
   if (profilePostsCard instanceof HTMLElement) profilePostsCard.hidden = !show;
 }
 
+function setProfileDetailsVisible(show) {
+  profileDetailsVisible = show;
+  if (profileSummaryText instanceof HTMLElement) {
+    profileSummaryText.hidden = !show;
+    profileSummaryText.setAttribute("aria-hidden", String(!show));
+  }
+  setProfileFormVisible(show);
+}
+
 function setProfileFormVisible(show) {
   isEditingProfile = show;
   if (profileForm instanceof HTMLElement) {
@@ -163,11 +174,8 @@ function updateProfileSummary(metadata = {}) {
   const displayName = metadata.displayName || metadata.full_name || metadata.name || "";
   const bio = metadata.bio || "";
 
-  if (profileSummary instanceof HTMLElement) {
-    profileSummary.hidden = false;
-  }
   if (profileNameDisplay) {
-    profileNameDisplay.textContent = displayName || "Account";
+    profileNameDisplay.textContent = displayName || "Profile";
   }
   if (profileBioDisplay) {
     profileBioDisplay.textContent = bio || "Add a short description to personalize your profile.";
@@ -251,10 +259,11 @@ function showGuestState(message = "You’re not logged in yet.") {
   setAvatarPreview(null);
   setAvatarStatus("");
   toggleProfileExtras(false);
-  setProfileFormVisible(false);
+  setProfileDetailsVisible(false);
   if (profileEditToggle instanceof HTMLElement) profileEditToggle.hidden = true;
   if (profileSummary instanceof HTMLElement) profileSummary.hidden = true;
-  if (profileNameDisplay) profileNameDisplay.textContent = "Account";
+  if (profileSummaryText instanceof HTMLElement) profileSummaryText.hidden = true;
+  if (profileNameDisplay) profileNameDisplay.textContent = "Profile";
   if (profileBioDisplay) profileBioDisplay.textContent = "Share a short description for your profile.";
   if (profilePosts) profilePosts.innerHTML = "";
   setProfileFormStatus("");
@@ -268,6 +277,10 @@ function renderProfile(user) {
   if (guestNotice instanceof HTMLElement) guestNotice.hidden = true;
   showAvatarBlock(true);
   toggleProfileExtras(true);
+  if (profileSummary instanceof HTMLElement) {
+    profileSummary.hidden = false;
+    profileSummary.setAttribute("aria-hidden", "false");
+  }
 
   syncAvatar(user?.id);
   const metadata = user?.user_metadata || {};
@@ -277,7 +290,7 @@ function renderProfile(user) {
   setProfileFormStatus("");
 
   if (profileEditToggle instanceof HTMLElement) profileEditToggle.hidden = false;
-  setProfileFormVisible(false);
+  setProfileDetailsVisible(false);
   setStatus("");
 }
 
@@ -333,11 +346,9 @@ function handleAvatarReset() {
 }
 
 function toggleProfileEditor() {
-  const shouldShow = profileForm instanceof HTMLElement ? profileForm.hidden : true;
-  setProfileFormVisible(shouldShow);
-  if (shouldShow && profileNameInput instanceof HTMLInputElement) {
-    profileNameInput.focus();
-  }
+  const shouldShow = !profileDetailsVisible;
+  setProfileDetailsVisible(shouldShow);
+  if (shouldShow && profileNameInput instanceof HTMLInputElement) profileNameInput.focus();
 }
 
 async function handleProfileFormSubmit(event) {
