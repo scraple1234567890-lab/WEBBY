@@ -496,11 +496,10 @@ init();
   window.profileSetEditMode = (isEditing) => setEditMode(!!isEditing);
 })();
 
-// ===== Profile Edit Toggle (View mode vs Edit mode) — hardened =====
+// ===== Profile Editor: keep saved text always visible; Edit only opens/closes the form =====
 (() => {
   const editBtn = document.getElementById("profileEditToggle");
   const form = document.getElementById("profileEditForm");
-  const summaryText = document.getElementById("profileSummaryText");
   const cancelBtn = document.getElementById("profileEditCancel");
 
   const nameDisplay = document.getElementById("profileNameDisplay");
@@ -508,7 +507,7 @@ init();
   const nameInput = document.getElementById("profileNameInput");
   const bioInput = document.getElementById("profileBioInput");
 
-  if (!editBtn || !form || !summaryText) return;
+  if (!editBtn || !form) return;
 
   let isEditing = false;
   let applying = false;
@@ -517,6 +516,7 @@ init();
     const name = (nameDisplay?.textContent || "").trim();
     const bio = (bioDisplay?.textContent || "").trim();
 
+    // Treat placeholder text as empty when copying into inputs
     const cleanName = name === "Profile" ? "" : name;
     const cleanBio = bio === "Share a short description for your profile." ? "" : bio;
 
@@ -533,20 +533,14 @@ init();
     if (applying) return;
     applying = true;
 
-    // Summary text (view mode)
-    summaryText.hidden = isEditing;
-    summaryText.style.display = isEditing ? "none" : "";
-
-    // Form (edit mode) — enforce BOTH hidden + display
+    // Only show/hide the FORM. Saved text stays on screen.
     form.hidden = !isEditing;
     form.setAttribute("aria-hidden", String(!isEditing));
     form.style.display = isEditing ? "" : "none";
 
-    // Button state
     editBtn.setAttribute("aria-expanded", String(isEditing));
     editBtn.textContent = isEditing ? "Close" : "Edit";
 
-    // Preload inputs when entering edit mode
     if (isEditing) writeInputsFromDisplay();
 
     applying = false;
@@ -557,15 +551,15 @@ init();
     applyMode();
   }
 
-  // Default: VIEW MODE (inputs hidden)
+  // Default: form closed
   setEditMode(false);
 
-  // Toggle
+  // Edit button toggles editor open/close
   editBtn.addEventListener("click", () => {
     setEditMode(!isEditing);
   });
 
-  // Cancel
+  // Cancel closes editor and restores inputs back to saved display values
   if (cancelBtn) {
     cancelBtn.addEventListener("click", () => {
       writeInputsFromDisplay();
@@ -573,15 +567,13 @@ init();
     });
   }
 
-  // If any other code tries to unhide the form, force it back unless editing
+  // If other code tries to force the form open, keep it closed unless editing
   const observer = new MutationObserver(() => {
     if (!isEditing) applyMode();
   });
   observer.observe(form, { attributes: true, attributeFilter: ["hidden", "style"] });
 
-  // Optional hook for your save logic:
-  // call window.profileSetEditMode(false) after a successful save.
+  // Optional: call this after a successful save to close the editor
   window.profileSetEditMode = (val) => setEditMode(val);
 })();
-
 
