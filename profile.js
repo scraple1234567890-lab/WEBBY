@@ -204,6 +204,12 @@ function setProfileEditVisible(show) {
   setVisible(profileSummaryText, !isOpen);
   setVisible(profileEditForm, isOpen);
 
+  // Extra safety: if the summary text is still present in layout due to CSS,
+  // ensure it cannot block clicking/typing in the form.
+  if (profileSummaryText instanceof HTMLElement) {
+    profileSummaryText.style.pointerEvents = isOpen ? "none" : "";
+  }
+
   if (profileEditToggle instanceof HTMLElement) {
     profileEditToggle.classList.toggle("isActive", isOpen);
     profileEditToggle.setAttribute("aria-expanded", String(isOpen));
@@ -213,23 +219,38 @@ function setProfileEditVisible(show) {
   setProfileEditStatus("");
 
   if (isOpen) {
-    const displayName =
-      profileMetadata.displayName ||
-      profileMetadata.full_name ||
-      profileMetadata.name ||
-      "";
+    // Pull values from what's currently shown on the page (most reliable),
+    // falling back to metadata if needed.
+    const currentNameFromUI =
+      (profileNameDisplay instanceof HTMLElement ? profileNameDisplay.textContent : "")?.trim() || "";
 
-    const bio = profileMetadata.bio || "";
+    const bioIsPlaceholder =
+      profileBioDisplay instanceof HTMLElement && profileBioDisplay.classList.contains("muted");
+
+    const currentBioFromUI = bioIsPlaceholder
+      ? ""
+      : ((profileBioDisplay instanceof HTMLElement ? profileBioDisplay.textContent : "")?.trim() || "");
+
+    const fallbackName =
+      profileMetadata.displayName || profileMetadata.full_name || profileMetadata.name || "";
+
+    const fallbackBio = profileMetadata.bio || "";
+
+    const displayName = currentNameFromUI || fallbackName || "";
+    const bio = currentBioFromUI || fallbackBio || "";
 
     if (profileNameInput instanceof HTMLInputElement) {
-      profileNameInput.value = displayName || "";
-      // Focus after paint
+      profileNameInput.value = displayName;
+      // Focus after paint so it's definitely clickable/typable
       setTimeout(() => profileNameInput.focus(), 50);
     }
+
     if (profileBioInput instanceof HTMLTextAreaElement) {
-      profileBioInput.value = bio || "";
+      profileBioInput.value = bio;
     }
   }
+}
+
 }
 
 /** ---------- posts ---------- */
