@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="description" content="StarSpell Academy — create your account to join the Lore Board community." />
-    <title>StarSpell Academy — Sign up</title>
+    <meta name="description" content="StarSpell Academy — view your profile and account status." />
+    <title>StarSpell Academy — Profile</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
 
@@ -51,51 +51,47 @@
 
     <main id="main">
       <section class="section">
-        <div class="container authGrid">
-          <div class="card">
-            <h3>Sign up</h3>
-            <p class="muted">Create your StarSpell account to join the Lore Board community.</p>
-            <form id="signupForm">
-              <div class="field">
-                <label for="signupEmail">Email</label>
-                <input id="signupEmail" name="email" type="email" autocomplete="email" required />
-              </div>
-              <div class="field">
-                <label for="signupPassword">Password</label>
-                <input id="signupPassword" name="password" type="password" autocomplete="new-password" required />
-              </div>
-              <div class="actions">
-                <button class="btn secondary" type="submit">Create account</button>
-              </div>
-            </form>
-            <p class="muted small">Already have an account? <a href="./login.html">Go to the login page.</a></p>
-          </div>
+        <div class="container profileGrid">
+          <article class="profileCard">
+            <p class="kicker">Your account</p>
+            <h1>Profile</h1>
+            <p id="profileStatus" class="muted" aria-live="polite">Checking your session...</p>
 
-          <div class="card" id="authSuccessMessage" style="display: none">
-            <h3>Login successful</h3>
-            <p class="muted">
-              You’re signed in as <span data-auth-email>your account</span>. Head to Posts to share a note or refresh to stay in sync.
-            </p>
-            <div class="actions">
+            <dl class="profileDetails" id="profileDetails" hidden>
+              <dt>Email</dt>
+              <dd data-profile-email>—</dd>
+              <dt>Joined</dt>
+              <dd data-profile-joined>—</dd>
+              <dt>User ID</dt>
+              <dd class="muted small" data-profile-id>—</dd>
+            </dl>
+
+            <div class="profileActions" id="profileActions" hidden>
               <a class="btn primary" href="./posts.html">Go to Posts</a>
+              <button class="btn ghost" type="button" id="profileLogout">Log out</button>
             </div>
-          </div>
 
-          <div class="actions" style="grid-column: 1 / -1; display: flex; gap: 10px; flex-wrap: wrap;">
-            <p id="authStatus" class="muted small" aria-live="polite" style="flex: 1 1 auto">Checking your session...</p>
-          </div>
+            <p class="profileNotice muted small" id="profileGuestNotice" hidden>
+              You’re browsing as a guest. Log in to see your profile details.
+            </p>
+            <div class="actions" id="profileGuestActions" hidden>
+              <a class="btn primary magentaGlow" href="./portal.html">Open the login portal</a>
+              <a class="btn ghost" href="./quiz.html">Take the sorting quiz</a>
+            </div>
+          </article>
         </div>
       </section>
     </main>
 
     <footer class="footer">
       <div class="container footerRow">
-        <p class="muted small">© <span id="year"></span> StarSpell Academy. Keep listening to the halls.</p>
-        <a class="muted small" href="#top">Back to top ↑</a>
+        <p class="muted small">© <span id="year"></span> StarSpell Academy. May your path stay bright.</p>
+        <a class="muted small" href="#top">Back to the stars ↑</a>
       </div>
     </footer>
 
     <script src="./script.js" defer></script>
     <script type="module" src="./js/app.js"></script>
+    <script type="module" src="./js/profile.js"></script>
   </body>
 </html>

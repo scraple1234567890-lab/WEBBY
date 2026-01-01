@@ -124,7 +124,23 @@
           <a href="./quiz.html">Sorting quiz</a>
           <a href="./posts.html">Posts</a>
           <a href="./index.html#contact">Send an owl</a>
-          <button id="logoutBtn" class="btn ghost" type="button" style="display: none">Log out</button>
+          <div class="profileMenu" id="profileMenu" data-default-display="inline-flex" style="display: none">
+            <button
+              class="btn ghost profileTrigger"
+              type="button"
+              id="profileMenuToggle"
+              aria-expanded="false"
+              aria-haspopup="menu"
+              aria-controls="profileMenuList"
+            >
+              Profile
+              <span class="profileCaret" aria-hidden="true">▾</span>
+            </button>
+            <div class="profileMenuList" id="profileMenuList" role="menu" aria-hidden="true">
+              <a href="./profile.html" role="menuitem">View profile</a>
+              <button id="logoutBtn" type="button" role="menuitem">Log out</button>
+            </div>
+          </div>
           <a class="btn primary magentaGlow" href="./portal.html" data-auth-target="login-cta">Open the login portal</a>
         </div>
       </nav>
@@ -174,6 +190,7 @@
     </main>
 
     <script src="./script.js" defer></script>
+    <script type="module" src="./js/app.js"></script>
     <script type="module" src="./js/posts.js"></script>
   </body>
 </html>

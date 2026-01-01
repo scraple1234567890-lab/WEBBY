@@ -245,6 +245,64 @@ header, main, footer {
   color: var(--muted);
 }
 .navLinks a:hover { background: color-mix(in srgb, var(--panel) 70%, transparent); color: var(--text); }
+.profileMenu {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.profileTrigger {
+  padding-inline: 14px;
+  gap: 8px;
+}
+.profileCaret { opacity: 0.75; font-size: 0.92em; }
+.profileMenuList {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  min-width: 220px;
+  display: none;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--panel) 92%, transparent);
+  box-shadow: var(--shadow);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 140ms ease, visibility 140ms ease, transform 140ms ease;
+  z-index: 40;
+}
+.profileMenu.open .profileMenuList {
+  display: grid;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+.profileMenuList a,
+.profileMenuList button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  background: color-mix(in srgb, var(--panel2) 86%, transparent);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+}
+.profileMenuList a:hover,
+.profileMenuList button:hover {
+  background: color-mix(in srgb, var(--panel) 84%, transparent);
+  border-color: color-mix(in srgb, var(--accent2) 40%, var(--border));
+}
+.profileMenuList button {
+  width: 100%;
+  text-align: left;
+}
 
 .iconBtn {
   display: none;
@@ -1038,6 +1096,46 @@ input:focus, textarea:focus {
 }
 .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
 .actions .textLink { padding: 12px 0; }
+.profileGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+.profileCard {
+  border: 1px solid var(--border);
+  border-radius: var(--radius2);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--panel) 86%, transparent), color-mix(in srgb, var(--panel2) 70%, transparent));
+  box-shadow: var(--shadow);
+  padding: 18px;
+  display: grid;
+  gap: 10px;
+}
+.profileDetails {
+  display: grid;
+  gap: 10px;
+  margin: 8px 0 0;
+}
+.profileDetails dt {
+  margin: 0;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-size: 0.9rem;
+}
+.profileDetails dd {
+  margin: 2px 0 0;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--text) 92%, var(--muted) 8%);
+}
+.profileActions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.profileNotice {
+  margin: 8px 0 0;
+}
 
 /* Footer */
 .footer {
@@ -1170,6 +1268,13 @@ input:focus, textarea:focus {
   .navLinks.open { display: flex; }
   .navLinks a { padding: 12px; }
   .btn { width: 100%; }
+  .profileMenu { width: 100%; }
+  .profileMenuList {
+    left: 0;
+    right: 0;
+    min-width: unset;
+    background: color-mix(in srgb, var(--panel) 92%, transparent);
+  }
   .mosaic { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .tile, .tile.wide, .tile.tall { grid-column: span 2; grid-row: auto; }
 }
