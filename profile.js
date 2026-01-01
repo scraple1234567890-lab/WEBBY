@@ -157,18 +157,34 @@ function setProfileEditStatus(message, tone = "muted") {
 
 function setProfileEditVisible(show) {
   const isOpen = Boolean(show);
+  console.log(`🔄 setProfileEditVisible called with: ${isOpen}`);
   
   // Hide display text when editing, show when not editing
   if (profileSummaryText instanceof HTMLElement) {
     profileSummaryText.hidden = isOpen;
+    if (isOpen) {
+      profileSummaryText.setAttribute("hidden", "");
+      profileSummaryText.style.display = "none";
+    } else {
+      profileSummaryText.removeAttribute("hidden");
+      profileSummaryText.style.display = "";
+    }
     profileSummaryText.setAttribute("aria-hidden", String(isOpen));
+    console.log(`  Text hidden: ${profileSummaryText.hidden}`);
   }
   
   // Show form when editing, hide when not editing
   if (profileEditForm instanceof HTMLElement) {
     profileEditForm.hidden = !isOpen;
+    if (isOpen) {
+      profileEditForm.removeAttribute("hidden");
+      profileEditForm.style.display = "block";
+    } else {
+      profileEditForm.setAttribute("hidden", "");
+      profileEditForm.style.display = "none";
+    }
     profileEditForm.setAttribute("aria-hidden", String(!isOpen));
-    profileEditForm.style.display = isOpen ? "block" : "none";
+    console.log(`  Form hidden: ${profileEditForm.hidden}`);
   }
   
   // Update button state
@@ -436,6 +452,22 @@ async function loadProfile() {
 }
 
 function init() {
+  console.log("🚀 Profile.js init starting");
+  
+  // Force correct initial state immediately
+  if (profileSummaryText) {
+    profileSummaryText.hidden = false;
+    profileSummaryText.removeAttribute("hidden");
+    profileSummaryText.style.display = "";
+    console.log("✅ Text forced visible");
+  }
+  if (profileEditForm) {
+    profileEditForm.hidden = true;
+    profileEditForm.setAttribute("hidden", "");
+    profileEditForm.style.display = "none";
+    console.log("✅ Form forced hidden");
+  }
+  
   avatarInput?.addEventListener("change", handleAvatarChange);
   avatarReset?.addEventListener("click", handleAvatarReset);
 
