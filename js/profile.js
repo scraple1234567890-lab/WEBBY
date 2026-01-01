@@ -118,14 +118,16 @@ function toggleProfileExtras(show) {
   if (profilePostsCard instanceof HTMLElement) profilePostsCard.hidden = !show;
 }
 
-function setProfileSummaryVisible(show) {
+// Modified: allow controlling whether the read-only summary text is shown
+function setProfileSummaryVisible(show, showText = true) {
   if (profileSummary instanceof HTMLElement) {
     profileSummary.hidden = !show;
     profileSummary.setAttribute("aria-hidden", String(!show));
   }
   if (profileSummaryText instanceof HTMLElement) {
-    profileSummaryText.hidden = !show;
-    profileSummaryText.setAttribute("aria-hidden", String(!show));
+    const textVisible = Boolean(show && showText);
+    profileSummaryText.hidden = !textVisible;
+    profileSummaryText.setAttribute("aria-hidden", String(!textVisible));
   }
   if (!show) {
     setProfileEditVisible(false);
@@ -172,6 +174,12 @@ function setProfileEditVisible(show) {
   if (profileEditToggle instanceof HTMLElement) {
     profileEditToggle.classList.toggle("isActive", isOpen);
     profileEditToggle.setAttribute("aria-expanded", String(isOpen));
+  }
+
+  // When edit form opens, reveal the summary text (display name & bio). Hide it again when closing.
+  if (profileSummaryText instanceof HTMLElement) {
+    profileSummaryText.hidden = !isOpen;
+    profileSummaryText.setAttribute("aria-hidden", String(!isOpen));
   }
 
   if (isOpen) {
@@ -263,6 +271,7 @@ function showGuestState(message = "You’re not logged in yet.") {
   setAvatarPreview(null);
   setAvatarStatus("");
   toggleProfileExtras(false);
+  // hide summary container and text for guests
   setProfileSummaryVisible(false);
   if (profileNameDisplay) profileNameDisplay.textContent = "Profile";
   if (profileBioDisplay) profileBioDisplay.textContent = "Share a short description for your profile.";
@@ -277,7 +286,8 @@ function renderProfile(user) {
   if (guestNotice instanceof HTMLElement) guestNotice.hidden = true;
   showAvatarBlock(true);
   toggleProfileExtras(true);
-  setProfileSummaryVisible(true);
+  // show the summary container and edit button, but keep the read-only name/bio hidden until the user clicks Edit
+  setProfileSummaryVisible(true, false);
   setProfileEditVisible(false);
 
   syncAvatar(user?.id);
