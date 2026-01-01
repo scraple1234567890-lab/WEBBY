@@ -138,7 +138,7 @@ function renderProfile(user) {
   if (idTarget) idTarget.textContent = user?.id || "Unknown id";
   syncAvatar(user?.id);
 
-  setStatus(`Logged in as ${user?.email || "member"}.`, "success");
+  setStatus("You’re logged in.", "success");
 }
 
 async function handleLogoutClick() {
