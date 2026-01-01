@@ -577,3 +577,123 @@ init();
   window.profileSetEditMode = (val) => setEditMode(val);
 })();
 
+
+
+// Profile Edit Functionality
+// Add this to your profile.js file or include it separately
+
+document.addEventListener('DOMContentLoaded', () => {
+  const editToggle = document.getElementById('profileEditToggle');
+  const editForm = document.getElementById('profileEditForm');
+  const cancelBtn = document.getElementById('profileEditCancel');
+  const saveBtn = document.getElementById('profileEditSave');
+  
+  const nameDisplay = document.getElementById('profileNameDisplay');
+  const bioDisplay = document.getElementById('profileBioDisplay');
+  const nameInput = document.getElementById('profileNameInput');
+  const bioInput = document.getElementById('profileBioInput');
+  const editStatus = document.getElementById('profileEditStatus');
+
+  // Show edit form
+  if (editToggle) {
+    editToggle.addEventListener('click', () => {
+      const isExpanded = editToggle.getAttribute('aria-expanded') === 'true';
+      
+      if (!isExpanded) {
+        // Populate form with current values
+        nameInput.value = nameDisplay.textContent;
+        bioInput.value = bioDisplay.textContent;
+        
+        // Show form
+        editForm.hidden = false;
+        editForm.setAttribute('aria-hidden', 'false');
+        editForm.style.display = 'block';
+        editToggle.setAttribute('aria-expanded', 'true');
+        editToggle.textContent = 'Cancel';
+        
+        // Focus on name input
+        nameInput.focus();
+      } else {
+        // Hide form (same as cancel)
+        hideEditForm();
+      }
+    });
+  }
+
+  // Cancel editing
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', () => {
+      hideEditForm();
+    });
+  }
+
+  // Save changes
+  if (editForm) {
+    editForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const newName = nameInput.value.trim();
+      const newBio = bioInput.value.trim();
+      
+      // Validate
+      if (!newName) {
+        editStatus.textContent = 'Please enter a display name.';
+        editStatus.style.color = 'var(--error, #e74c3c)';
+        return;
+      }
+      
+      // Update display
+      nameDisplay.textContent = newName;
+      bioDisplay.textContent = newBio || 'Share a short description for your profile.';
+      
+      // Show success message
+      editStatus.textContent = 'Profile updated successfully!';
+      editStatus.style.color = 'var(--success, #27ae60)';
+      
+      // Save to localStorage (optional - for persistence)
+      try {
+        localStorage.setItem('profileName', newName);
+        localStorage.setItem('profileBio', newBio);
+      } catch (error) {
+        console.warn('Could not save to localStorage:', error);
+      }
+      
+      // Hide form after a brief delay
+      setTimeout(() => {
+        hideEditForm();
+        editStatus.textContent = '';
+      }, 1500);
+    });
+  }
+
+  // Helper function to hide edit form
+  function hideEditForm() {
+    editForm.hidden = true;
+    editForm.setAttribute('aria-hidden', 'true');
+    editForm.style.display = 'none';
+    editToggle.setAttribute('aria-expanded', 'false');
+    editToggle.textContent = 'Edit';
+    editStatus.textContent = '';
+  }
+
+  // Load saved profile data on page load (optional)
+  function loadProfileData() {
+    try {
+      const savedName = localStorage.getItem('profileName');
+      const savedBio = localStorage.getItem('profileBio');
+      
+      if (savedName) {
+        nameDisplay.textContent = savedName;
+      }
+      if (savedBio) {
+        bioDisplay.textContent = savedBio;
+      }
+    } catch (error) {
+      console.warn('Could not load from localStorage:', error);
+    }
+  }
+
+  // Load profile on page load
+  loadProfileData();
+});
+
