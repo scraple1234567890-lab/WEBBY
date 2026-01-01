@@ -217,7 +217,7 @@ function renderUserPosts(posts) {
     body.style.whiteSpace = "pre-wrap";
     body.textContent = post.content || "";
 
-    article.append(meta, body);
+    article.append(body, meta);
     profilePosts.appendChild(article);
   });
 }
