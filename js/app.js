@@ -3,6 +3,9 @@ import { supabase } from "./supabaseClient.js";
 const loginForm = document.getElementById("loginForm");
 const signupForm = document.getElementById("signupForm");
 const logoutButton = document.getElementById("logoutBtn");
+const profileMenu = document.getElementById("profileMenu");
+const profileToggle = document.getElementById("profileMenuToggle");
+const profileMenuList = document.getElementById("profileMenuList");
 const authStatus = document.getElementById("authStatus");
 const loginError = document.getElementById("loginError");
 const loginSuccess = document.getElementById("loginSuccess");
@@ -53,6 +56,18 @@ function setLogoutButtonState(isLoading) {
   logoutButton.textContent = isLoading ? "Logging out..." : defaultText;
 }
 
+function setProfileMenuOpen(open) {
+  if (profileMenu) {
+    profileMenu.classList.toggle("open", open);
+  }
+  if (profileToggle) {
+    profileToggle.setAttribute("aria-expanded", String(open));
+  }
+  if (profileMenuList) {
+    profileMenuList.setAttribute("aria-hidden", String(!open));
+  }
+}
+
 function toggleComposer(enabled) {
   if (postForm) {
     postForm.style.display = enabled ? "grid" : "none";
@@ -65,11 +80,6 @@ function toggleComposer(enabled) {
   }
 }
 
-function toggleLogout(show) {
-  if (!logoutButton) return;
-  logoutButton.style.display = show ? "inline-flex" : "none";
-}
-
 function toggleLoginButtons(show) {
   loginButtons.forEach((button) => {
     if (!(button instanceof HTMLElement)) return;
@@ -78,6 +88,18 @@ function toggleLoginButtons(show) {
     }
     button.style.display = show ? button.dataset.defaultDisplay : "none";
   });
+}
+
+function toggleProfileMenuVisibility(show) {
+  if (!(profileMenu instanceof HTMLElement)) return;
+  if (!profileMenu.dataset.defaultDisplay) {
+    profileMenu.dataset.defaultDisplay =
+      profileMenu.style.display && profileMenu.style.display !== "none" ? profileMenu.style.display : "inline-flex";
+  }
+  profileMenu.style.display = show ? profileMenu.dataset.defaultDisplay : "none";
+  if (!show) {
+    setProfileMenuOpen(false);
+  }
 }
 
 function toggleAuthCards(show) {
@@ -116,7 +138,7 @@ function updateAuthVisibility(isLoggedIn, email = "") {
   }
   const shouldShowAuthCards = !isLoggedIn || redirectingAfterLogin;
   toggleComposer(isLoggedIn);
-  toggleLogout(isLoggedIn);
+  toggleProfileMenuVisibility(isLoggedIn);
   toggleLoginButtons(!isLoggedIn);
   toggleAuthCards(shouldShowAuthCards);
   toggleAuthSuccess(isLoggedIn, email);
@@ -264,6 +286,7 @@ async function handleLogout() {
   setStatus(postStatus, "");
   setStatus(postError, "");
   setLogoutButtonState(true);
+  setProfileMenuOpen(false);
 
   const { error } = await supabase.auth.signOut();
   if (error) {
