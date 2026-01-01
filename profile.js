@@ -118,23 +118,20 @@ function toggleProfileExtras(show) {
   if (profilePostsCard instanceof HTMLElement) profilePostsCard.hidden = !show;
 }
 
-// Modified: allow controlling whether the read-only summary text is shown
-function setProfileSummaryVisible(show, showText = true) {
+function setProfileSummaryVisible(show) {
   if (profileSummary instanceof HTMLElement) {
     profileSummary.hidden = !show;
     profileSummary.setAttribute("aria-hidden", String(!show));
   }
   if (profileSummaryText instanceof HTMLElement) {
-    const textVisible = Boolean(show && showText);
-    profileSummaryText.hidden = !textVisible;
-    profileSummaryText.setAttribute("aria-hidden", String(!textVisible));
+    profileSummaryText.hidden = !show;
+    profileSummaryText.setAttribute("aria-hidden", String(!show));
   }
   if (!show) {
     setProfileEditVisible(false);
   }
   if (profileEditToggle instanceof HTMLElement) {
     profileEditToggle.disabled = !show;
-    profileEditToggle.setAttribute("aria-hidden", String(!show));
   }
 }
 
@@ -150,13 +147,6 @@ function updateProfileSummary(metadata = {}) {
     profileBioDisplay.textContent = bio || "Add a short description to personalize your profile.";
     profileBioDisplay.classList.toggle("muted", !bio);
   }
-
-  if (profileNameInput instanceof HTMLInputElement && !profileEditForm?.hidden) {
-    profileNameInput.value = displayName || "";
-  }
-  if (profileBioInput instanceof HTMLTextAreaElement && !profileEditForm?.hidden) {
-    profileBioInput.value = bio || "";
-  }
 }
 
 function setProfileEditStatus(message, tone = "muted") {
@@ -167,27 +157,37 @@ function setProfileEditStatus(message, tone = "muted") {
 
 function setProfileEditVisible(show) {
   const isOpen = Boolean(show);
+  
   if (profileEditForm instanceof HTMLElement) {
     profileEditForm.hidden = !isOpen;
     profileEditForm.setAttribute("aria-hidden", String(!isOpen));
+    profileEditForm.style.display = isOpen ? "block" : "none";
   }
+  
   if (profileEditToggle instanceof HTMLElement) {
     profileEditToggle.classList.toggle("isActive", isOpen);
     profileEditToggle.setAttribute("aria-expanded", String(isOpen));
-  }
-
-  // When edit form opens, reveal the summary text (display name & bio). Hide it again when closing.
-  if (profileSummaryText instanceof HTMLElement) {
-    profileSummaryText.hidden = !isOpen;
-    profileSummaryText.setAttribute("aria-hidden", String(!isOpen));
+    profileEditToggle.textContent = isOpen ? "Cancel" : "Edit";
   }
 
   if (isOpen) {
+    // Populate inputs with current display values
     const displayName = profileMetadata.displayName || profileMetadata.full_name || profileMetadata.name || "";
     const bio = profileMetadata.bio || "";
-    if (profileNameInput instanceof HTMLInputElement) profileNameInput.value = displayName || "";
-    if (profileBioInput instanceof HTMLTextAreaElement) profileBioInput.value = bio || "";
-    setProfileEditStatus("You can update your profile text now.");
+    
+    if (profileNameInput instanceof HTMLInputElement) {
+      profileNameInput.value = displayName || "";
+    }
+    if (profileBioInput instanceof HTMLTextAreaElement) {
+      profileBioInput.value = bio || "";
+    }
+    
+    setProfileEditStatus("");
+    
+    // Focus on first input
+    if (profileNameInput) {
+      setTimeout(() => profileNameInput.focus(), 100);
+    }
   } else {
     setProfileEditStatus("");
   }
@@ -261,7 +261,7 @@ async function loadUserPosts(userId) {
   }
 }
 
-function showGuestState(message = "You’re not logged in yet.") {
+function showGuestState(message = "You're not logged in yet.") {
   setLoginStateFlag(false);
   activeUserId = null;
   profileMetadata = {};
@@ -271,7 +271,6 @@ function showGuestState(message = "You’re not logged in yet.") {
   setAvatarPreview(null);
   setAvatarStatus("");
   toggleProfileExtras(false);
-  // hide summary container and text for guests
   setProfileSummaryVisible(false);
   if (profileNameDisplay) profileNameDisplay.textContent = "Profile";
   if (profileBioDisplay) profileBioDisplay.textContent = "Share a short description for your profile.";
@@ -286,8 +285,7 @@ function renderProfile(user) {
   if (guestNotice instanceof HTMLElement) guestNotice.hidden = true;
   showAvatarBlock(true);
   toggleProfileExtras(true);
-  // show the summary container and edit button, but keep the read-only name/bio hidden until the user clicks Edit
-  setProfileSummaryVisible(true, false);
+  setProfileSummaryVisible(true);
   setProfileEditVisible(false);
 
   syncAvatar(user?.id);
@@ -359,6 +357,11 @@ async function handleProfileEditSubmit(event) {
   const displayName = profileNameInput instanceof HTMLInputElement ? profileNameInput.value.trim() : "";
   const bio = profileBioInput instanceof HTMLTextAreaElement ? profileBioInput.value.trim() : "";
 
+  if (!displayName) {
+    setProfileEditStatus("Please enter a display name.", "error");
+    return;
+  }
+
   setProfileEditStatus("Saving your changes...");
   try {
     const { error } = await supabase.auth.updateUser({ data: { displayName, bio } });
@@ -366,8 +369,12 @@ async function handleProfileEditSubmit(event) {
 
     profileMetadata = { ...profileMetadata, displayName, bio };
     updateProfileSummary(profileMetadata);
-    setProfileEditStatus("Profile updated.");
-    setProfileEditVisible(false);
+    setProfileEditStatus("Profile updated successfully!", "success");
+    
+    // Close form after brief delay
+    setTimeout(() => {
+      setProfileEditVisible(false);
+    }, 1500);
   } catch (error) {
     console.error("Unable to update profile text", error);
     setProfileEditStatus(error?.message || "Unable to save changes.", "error");
@@ -379,8 +386,8 @@ function handleProfileEditToggle() {
     setProfileEditStatus("Log in to update your profile.", "error");
     return;
   }
-  const isOpen = !(profileEditForm instanceof HTMLElement) ? false : profileEditForm.hidden;
-  setProfileEditVisible(isOpen);
+  const isCurrentlyOpen = profileEditForm && !profileEditForm.hidden;
+  setProfileEditVisible(!isCurrentlyOpen);
 }
 
 function handleProfileEditCancel() {
@@ -427,273 +434,3 @@ function init() {
 }
 
 init();
-
-// ===== Profile Edit Toggle (View mode vs Edit mode) =====
-(() => {
-  const editBtn = document.getElementById("profileEditToggle");
-  const form = document.getElementById("profileEditForm");
-  const summaryText = document.getElementById("profileSummaryText");
-  const cancelBtn = document.getElementById("profileEditCancel");
-
-  const nameDisplay = document.getElementById("profileNameDisplay");
-  const bioDisplay = document.getElementById("profileBioDisplay");
-  const nameInput = document.getElementById("profileNameInput");
-  const bioInput = document.getElementById("profileBioInput");
-
-  if (!editBtn || !form || !summaryText) return;
-
-  function readDisplayValues() {
-    const name = (nameDisplay?.textContent || "").trim();
-    const bio = (bioDisplay?.textContent || "").trim();
-
-    // If your JS uses placeholders, treat them as "empty" when copying into inputs
-    const cleanName = name === "Profile" ? "" : name;
-    const cleanBio = bio === "Share a short description for your profile." ? "" : bio;
-
-    return { name: cleanName, bio: cleanBio };
-  }
-
-  function writeInputsFromDisplay() {
-    const { name, bio } = readDisplayValues();
-    if (nameInput) nameInput.value = name;
-    if (bioInput) bioInput.value = bio;
-  }
-
-  function setEditMode(isEditing) {
-    // Toggle visibility
-    summaryText.hidden = isEditing;
-    form.hidden = !isEditing;
-
-    // ARIA
-    form.setAttribute("aria-hidden", String(!isEditing));
-    editBtn.setAttribute("aria-expanded", String(isEditing));
-
-    // Button label
-    editBtn.textContent = isEditing ? "Close" : "Edit";
-
-    // When entering edit mode, preload inputs with current display values
-    if (isEditing) writeInputsFromDisplay();
-  }
-
-  // Default: VIEW MODE (inputs hidden)
-  setEditMode(false);
-
-  // Edit button toggles edit mode
-  editBtn.addEventListener("click", () => {
-    setEditMode(form.hidden); // if form is hidden -> enter edit mode
-  });
-
-  // Cancel returns to view mode and restores inputs from display text
-  if (cancelBtn) {
-    cancelBtn.addEventListener("click", () => {
-      writeInputsFromDisplay();
-      setEditMode(false);
-    });
-  }
-
-  // Optional helper: if your existing save logic wants to close the form on success,
-  // call: window.profileSetEditMode(false)
-  window.profileSetEditMode = (isEditing) => setEditMode(!!isEditing);
-})();
-
-// ===== Profile Editor: keep saved text always visible; Edit only opens/closes the form =====
-(() => {
-  const editBtn = document.getElementById("profileEditToggle");
-  const form = document.getElementById("profileEditForm");
-  const cancelBtn = document.getElementById("profileEditCancel");
-
-  const nameDisplay = document.getElementById("profileNameDisplay");
-  const bioDisplay = document.getElementById("profileBioDisplay");
-  const nameInput = document.getElementById("profileNameInput");
-  const bioInput = document.getElementById("profileBioInput");
-
-  if (!editBtn || !form) return;
-
-  let isEditing = false;
-  let applying = false;
-
-  function readDisplayValues() {
-    const name = (nameDisplay?.textContent || "").trim();
-    const bio = (bioDisplay?.textContent || "").trim();
-
-    // Treat placeholder text as empty when copying into inputs
-    const cleanName = name === "Profile" ? "" : name;
-    const cleanBio = bio === "Share a short description for your profile." ? "" : bio;
-
-    return { name: cleanName, bio: cleanBio };
-  }
-
-  function writeInputsFromDisplay() {
-    const { name, bio } = readDisplayValues();
-    if (nameInput) nameInput.value = name;
-    if (bioInput) bioInput.value = bio;
-  }
-
-  function applyMode() {
-    if (applying) return;
-    applying = true;
-
-    // Only show/hide the FORM. Saved text stays on screen.
-    form.hidden = !isEditing;
-    form.setAttribute("aria-hidden", String(!isEditing));
-    form.style.display = isEditing ? "" : "none";
-
-    editBtn.setAttribute("aria-expanded", String(isEditing));
-    editBtn.textContent = isEditing ? "Close" : "Edit";
-
-    if (isEditing) writeInputsFromDisplay();
-
-    applying = false;
-  }
-
-  function setEditMode(next) {
-    isEditing = !!next;
-    applyMode();
-  }
-
-  // Default: form closed
-  setEditMode(false);
-
-  // Edit button toggles editor open/close
-  editBtn.addEventListener("click", () => {
-    setEditMode(!isEditing);
-  });
-
-  // Cancel closes editor and restores inputs back to saved display values
-  if (cancelBtn) {
-    cancelBtn.addEventListener("click", () => {
-      writeInputsFromDisplay();
-      setEditMode(false);
-    });
-  }
-
-  // If other code tries to force the form open, keep it closed unless editing
-  const observer = new MutationObserver(() => {
-    if (!isEditing) applyMode();
-  });
-  observer.observe(form, { attributes: true, attributeFilter: ["hidden", "style"] });
-
-  // Optional: call this after a successful save to close the editor
-  window.profileSetEditMode = (val) => setEditMode(val);
-})();
-
-
-
-// Profile Edit Functionality
-// Add this to your profile.js file or include it separately
-
-document.addEventListener('DOMContentLoaded', () => {
-  const editToggle = document.getElementById('profileEditToggle');
-  const editForm = document.getElementById('profileEditForm');
-  const cancelBtn = document.getElementById('profileEditCancel');
-  const saveBtn = document.getElementById('profileEditSave');
-  
-  const nameDisplay = document.getElementById('profileNameDisplay');
-  const bioDisplay = document.getElementById('profileBioDisplay');
-  const nameInput = document.getElementById('profileNameInput');
-  const bioInput = document.getElementById('profileBioInput');
-  const editStatus = document.getElementById('profileEditStatus');
-
-  // Show edit form
-  if (editToggle) {
-    editToggle.addEventListener('click', () => {
-      const isExpanded = editToggle.getAttribute('aria-expanded') === 'true';
-      
-      if (!isExpanded) {
-        // Populate form with current values
-        nameInput.value = nameDisplay.textContent;
-        bioInput.value = bioDisplay.textContent;
-        
-        // Show form
-        editForm.hidden = false;
-        editForm.setAttribute('aria-hidden', 'false');
-        editForm.style.display = 'block';
-        editToggle.setAttribute('aria-expanded', 'true');
-        editToggle.textContent = 'Cancel';
-        
-        // Focus on name input
-        nameInput.focus();
-      } else {
-        // Hide form (same as cancel)
-        hideEditForm();
-      }
-    });
-  }
-
-  // Cancel editing
-  if (cancelBtn) {
-    cancelBtn.addEventListener('click', () => {
-      hideEditForm();
-    });
-  }
-
-  // Save changes
-  if (editForm) {
-    editForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      
-      const newName = nameInput.value.trim();
-      const newBio = bioInput.value.trim();
-      
-      // Validate
-      if (!newName) {
-        editStatus.textContent = 'Please enter a display name.';
-        editStatus.style.color = 'var(--error, #e74c3c)';
-        return;
-      }
-      
-      // Update display
-      nameDisplay.textContent = newName;
-      bioDisplay.textContent = newBio || 'Share a short description for your profile.';
-      
-      // Show success message
-      editStatus.textContent = 'Profile updated successfully!';
-      editStatus.style.color = 'var(--success, #27ae60)';
-      
-      // Save to localStorage (optional - for persistence)
-      try {
-        localStorage.setItem('profileName', newName);
-        localStorage.setItem('profileBio', newBio);
-      } catch (error) {
-        console.warn('Could not save to localStorage:', error);
-      }
-      
-      // Hide form after a brief delay
-      setTimeout(() => {
-        hideEditForm();
-        editStatus.textContent = '';
-      }, 1500);
-    });
-  }
-
-  // Helper function to hide edit form
-  function hideEditForm() {
-    editForm.hidden = true;
-    editForm.setAttribute('aria-hidden', 'true');
-    editForm.style.display = 'none';
-    editToggle.setAttribute('aria-expanded', 'false');
-    editToggle.textContent = 'Edit';
-    editStatus.textContent = '';
-  }
-
-  // Load saved profile data on page load (optional)
-  function loadProfileData() {
-    try {
-      const savedName = localStorage.getItem('profileName');
-      const savedBio = localStorage.getItem('profileBio');
-      
-      if (savedName) {
-        nameDisplay.textContent = savedName;
-      }
-      if (savedBio) {
-        bioDisplay.textContent = savedBio;
-      }
-    } catch (error) {
-      console.warn('Could not load from localStorage:', error);
-    }
-  }
-
-  // Load profile on page load
-  loadProfileData();
-});
-
