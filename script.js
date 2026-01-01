@@ -9,6 +9,7 @@
   const LOCAL_LORE_KEY = "userLorePosts";
   const LOGIN_STATE_KEY = "auth:isLoggedIn";
   const DATA_POSTS_URL = "./data/posts.json";
+  const header = document.querySelector(".header");
 
   const loreAuthors = ["Archivist Mira", "Keeper Iden", "Cantor Lysa", "Essence Steward", "Field Mentor Ryn", "Constellation Scribe Ixa"];
   const loreSchools = ["Touch", "Sight", "Sound", "Essence", "Cross-House", "Archival Wing"];
@@ -97,6 +98,29 @@
       }
       button.style.display = show ? button.dataset.defaultDisplay : "none";
     });
+  }
+
+  // Hide header while scrolling down
+  if (header) {
+    let lastScrollY = window.scrollY;
+    const SCROLL_DELTA = 12;
+
+    const updateHeaderVisibility = () => {
+      const currentY = window.scrollY;
+      const scrollingDown = currentY - lastScrollY > SCROLL_DELTA;
+      const scrollingUp = lastScrollY - currentY > SCROLL_DELTA;
+      const nearTop = currentY < 20;
+
+      if (nearTop || scrollingUp) {
+        header.classList.remove("header--hidden");
+      } else if (scrollingDown) {
+        header.classList.add("header--hidden");
+      }
+
+      lastScrollY = currentY;
+    };
+
+    window.addEventListener("scroll", updateHeaderVisibility, { passive: true });
   }
 
   function syncLoginButtonsFromStorage() {

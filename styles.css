@@ -195,6 +195,12 @@ header, main, footer {
   backdrop-filter: blur(16px) saturate(1.05);
   background: linear-gradient(180deg, rgba(10, 6, 22, 0.9), rgba(10, 6, 22, 0.7));
   border-bottom: 1px solid var(--border);
+  transition: transform 200ms ease, opacity 200ms ease;
+}
+
+.header.header--hidden {
+  transform: translateY(-110%);
+  opacity: 0;
 }
 
 .nav {
