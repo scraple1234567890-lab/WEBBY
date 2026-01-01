@@ -10,8 +10,12 @@ const shareButton = document.getElementById("share-post-btn");
 const composerCard = document.getElementById("composer-card");
 const closeComposerButton = document.getElementById("close-composer");
 
+const AVATAR_KEY_PREFIX = "profile:avatar:";
+
 let currentUser = null;
 let redirectTimeout = null;
+let postsCache = [];
+const avatarCache = new Map();
 
 function setStatus(message, tone = "muted") {
   if (!postStatus) return;
@@ -69,6 +73,60 @@ function formatDate(input) {
   return date.toLocaleString();
 }
 
+function getAvatarStorageKey(userId) {
+  return userId ? `${AVATAR_KEY_PREFIX}${userId}` : "";
+}
+
+function loadStoredAvatar(userId) {
+  const key = getAvatarStorageKey(userId);
+  if (!key) return null;
+  try {
+    return localStorage.getItem(key);
+  } catch (error) {
+    console.warn("Unable to read avatar from storage", error);
+    return null;
+  }
+}
+
+function getAvatarForUser(userId) {
+  if (!userId) return null;
+  if (avatarCache.has(userId)) {
+    return avatarCache.get(userId);
+  }
+  const avatar = loadStoredAvatar(userId);
+  avatarCache.set(userId, avatar);
+  return avatar;
+}
+
+function createAvatarElement(userId) {
+  const avatar = document.createElement("span");
+  avatar.className = "profileAvatar profileAvatar--post";
+
+  const placeholder = document.createElement("span");
+  placeholder.className = "profileAvatarPlaceholder";
+  placeholder.innerHTML = `
+    <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+      <path
+        d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5Zm0 2c-3.33 0-10 1.67-10 5v1h20v-1c0-3.33-6.67-5-10-5Z"
+        fill="currentColor"
+      />
+    </svg>
+  `;
+
+  const img = document.createElement("img");
+  img.alt = "User profile picture";
+  img.loading = "lazy";
+
+  const src = getAvatarForUser(userId);
+  if (src) {
+    img.src = src;
+    avatar.classList.add("hasImage");
+  }
+
+  avatar.append(placeholder, img);
+  return avatar;
+}
+
 function renderPosts(posts) {
   if (!postsContainer) return;
 
@@ -87,16 +145,28 @@ function renderPosts(posts) {
     article.className = "card";
     article.dataset.id = post.id;
 
-    const meta = document.createElement("p");
-    meta.className = "muted small";
-    meta.textContent = formatDate(post.created_at);
+    const metaRow = document.createElement("div");
+    metaRow.className = "postMetaRow";
+
+    const avatar = createAvatarElement(post.user_id);
+
+    const metaText = document.createElement("p");
+    metaText.className = "muted small";
+    metaText.textContent = formatDate(post.created_at);
+    metaText.style.margin = "0";
+
+    const metaTextWrapper = document.createElement("div");
+    metaTextWrapper.className = "postMetaText";
+    metaTextWrapper.appendChild(metaText);
+
+    metaRow.append(avatar, metaTextWrapper);
 
     const content = document.createElement("p");
     content.className = "post-content";
     content.style.whiteSpace = "pre-wrap";
     content.textContent = post.content || "";
 
-    article.append(meta, content);
+    article.append(metaRow, content);
     postsContainer.appendChild(article);
   });
 }
@@ -109,7 +179,7 @@ async function loadPosts() {
   try {
     const { data, error } = await supabase
       .from("posts")
-      .select("id, content, created_at")
+      .select("id, content, created_at, user_id")
       .order("created_at", { ascending: false })
       .limit(50);
 
@@ -117,7 +187,8 @@ async function loadPosts() {
       throw error;
     }
 
-    renderPosts(data || []);
+    postsCache = data || [];
+    renderPosts(postsCache);
   } catch (error) {
     console.error("Error fetching posts", error);
     if (postsContainer) {
@@ -250,6 +321,21 @@ async function init() {
     }
 
     await loadPosts();
+  });
+
+  window.addEventListener("storage", (event) => {
+    if (!currentUser || !event.key || !event.key.startsWith(AVATAR_KEY_PREFIX)) return;
+    const userId = event.key.slice(AVATAR_KEY_PREFIX.length);
+    avatarCache.delete(userId);
+    renderPosts(postsCache);
+  });
+
+  window.addEventListener("profile:avatarUpdated", (event) => {
+    if (!currentUser) return;
+    const userId = event.detail?.userId;
+    if (!userId) return;
+    avatarCache.set(userId, event.detail?.src || null);
+    renderPosts(postsCache);
   });
 }
 
