@@ -30,6 +30,19 @@
         gap: 1rem;
         flex-wrap: wrap;
       }
+      .loreTitle {
+        font-family: "Cinzel", "Times New Roman", Georgia, serif;
+        letter-spacing: 1.4px;
+        text-transform: uppercase;
+        font-size: clamp(1.5rem, 1.6rem + 0.8vw, 2.3rem);
+        color: #f7e8ff;
+        background: linear-gradient(120deg, #f7e8ff, #ffb8e8 40%, #ff5ad1 72%, #ffd6f2);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 2px 18px rgba(255, 90, 209, 0.22);
+        margin: 0;
+      }
     </style>
   </head>
   <body>
@@ -60,12 +73,11 @@
       <div class="container postLayout">
         <div class="postHeader">
           <div>
-            <p class="kicker">Share your thoughts</p>
             <h1>Posts</h1>
           </div>
           <div class="actions" style="gap: 0.5rem; align-items: center;">
             <p id="must-login" class="muted" aria-live="polite" style="margin: 0">You must be logged in to post.</p>
-            <button id="share-post-btn" class="btn primary" type="button" aria-expanded="false">Share a post</button>
+            <button id="share-post-btn" class="btn heroCta magentaGlow" type="button" aria-expanded="false">Share a post</button>
           </div>
         </div>
 
@@ -89,8 +101,7 @@
 
         <section aria-live="polite" class="card">
           <div class="sectionHead">
-            <p class="kicker">Lore Board</p>
-            <h2>Recent posts</h2>
+            <h2 class="loreTitle">Lore Board</h2>
             <p class="muted">See the newest Lore Board notes as soon as they are shared.</p>
           </div>
           <div id="posts" class="postFeed"></div>
