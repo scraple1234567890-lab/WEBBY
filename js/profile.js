@@ -13,6 +13,12 @@ const profileSummary = document.getElementById("profileSummary");
 const profileSummaryText = document.getElementById("profileSummaryText");
 const profileNameDisplay = document.getElementById("profileNameDisplay");
 const profileBioDisplay = document.getElementById("profileBioDisplay");
+const profileEditToggle = document.getElementById("profileEditToggle");
+const profileEditForm = document.getElementById("profileEditForm");
+const profileNameInput = document.getElementById("profileNameInput");
+const profileBioInput = document.getElementById("profileBioInput");
+const profileEditStatus = document.getElementById("profileEditStatus");
+const profileEditCancel = document.getElementById("profileEditCancel");
 const profilePosts = document.getElementById("profilePosts");
 const profilePostsCard = document.getElementById("profilePostsCard");
 
@@ -20,6 +26,7 @@ const LOGIN_STATE_KEY = "auth:isLoggedIn";
 const AVATAR_KEY_PREFIX = "profile:avatar:";
 
 let activeUserId = null;
+let profileMetadata = {};
 
 function setStatus(message, tone = "muted") {
   if (!statusEl) return;
@@ -120,11 +127,19 @@ function setProfileSummaryVisible(show) {
     profileSummaryText.hidden = !show;
     profileSummaryText.setAttribute("aria-hidden", String(!show));
   }
+  if (!show) {
+    setProfileEditVisible(false);
+  }
+  if (profileEditToggle instanceof HTMLElement) {
+    profileEditToggle.disabled = !show;
+    profileEditToggle.setAttribute("aria-hidden", String(!show));
+  }
 }
 
 function updateProfileSummary(metadata = {}) {
-  const displayName = metadata.displayName || metadata.full_name || metadata.name || "";
-  const bio = metadata.bio || "";
+  profileMetadata = metadata || {};
+  const displayName = profileMetadata.displayName || profileMetadata.full_name || profileMetadata.name || "";
+  const bio = profileMetadata.bio || "";
 
   if (profileNameDisplay) {
     profileNameDisplay.textContent = displayName || "Profile";
@@ -132,6 +147,41 @@ function updateProfileSummary(metadata = {}) {
   if (profileBioDisplay) {
     profileBioDisplay.textContent = bio || "Add a short description to personalize your profile.";
     profileBioDisplay.classList.toggle("muted", !bio);
+  }
+
+  if (profileNameInput instanceof HTMLInputElement && !profileEditForm?.hidden) {
+    profileNameInput.value = displayName || "";
+  }
+  if (profileBioInput instanceof HTMLTextAreaElement && !profileEditForm?.hidden) {
+    profileBioInput.value = bio || "";
+  }
+}
+
+function setProfileEditStatus(message, tone = "muted") {
+  if (!(profileEditStatus instanceof HTMLElement)) return;
+  profileEditStatus.textContent = message || "";
+  profileEditStatus.className = `${tone} small`;
+}
+
+function setProfileEditVisible(show) {
+  const isOpen = Boolean(show);
+  if (profileEditForm instanceof HTMLElement) {
+    profileEditForm.hidden = !isOpen;
+    profileEditForm.setAttribute("aria-hidden", String(!isOpen));
+  }
+  if (profileEditToggle instanceof HTMLElement) {
+    profileEditToggle.classList.toggle("isActive", isOpen);
+    profileEditToggle.setAttribute("aria-expanded", String(isOpen));
+  }
+
+  if (isOpen) {
+    const displayName = profileMetadata.displayName || profileMetadata.full_name || profileMetadata.name || "";
+    const bio = profileMetadata.bio || "";
+    if (profileNameInput instanceof HTMLInputElement) profileNameInput.value = displayName || "";
+    if (profileBioInput instanceof HTMLTextAreaElement) profileBioInput.value = bio || "";
+    setProfileEditStatus("You can update your profile text now.");
+  } else {
+    setProfileEditStatus("");
   }
 }
 
@@ -206,6 +256,8 @@ async function loadUserPosts(userId) {
 function showGuestState(message = "You’re not logged in yet.") {
   setLoginStateFlag(false);
   activeUserId = null;
+  profileMetadata = {};
+  setProfileEditVisible(false);
   if (guestNotice instanceof HTMLElement) guestNotice.hidden = false;
   showAvatarBlock(false);
   setAvatarPreview(null);
@@ -226,6 +278,7 @@ function renderProfile(user) {
   showAvatarBlock(true);
   toggleProfileExtras(true);
   setProfileSummaryVisible(true);
+  setProfileEditVisible(false);
 
   syncAvatar(user?.id);
   const metadata = user?.user_metadata || {};
@@ -286,6 +339,44 @@ function handleAvatarReset() {
   setAvatarStatus("Picture removed. You can add one anytime.");
 }
 
+async function handleProfileEditSubmit(event) {
+  event.preventDefault();
+  if (!activeUserId) {
+    setProfileEditStatus("Log in to update your profile.", "error");
+    return;
+  }
+
+  const displayName = profileNameInput instanceof HTMLInputElement ? profileNameInput.value.trim() : "";
+  const bio = profileBioInput instanceof HTMLTextAreaElement ? profileBioInput.value.trim() : "";
+
+  setProfileEditStatus("Saving your changes...");
+  try {
+    const { error } = await supabase.auth.updateUser({ data: { displayName, bio } });
+    if (error) throw error;
+
+    profileMetadata = { ...profileMetadata, displayName, bio };
+    updateProfileSummary(profileMetadata);
+    setProfileEditStatus("Profile updated.");
+    setProfileEditVisible(false);
+  } catch (error) {
+    console.error("Unable to update profile text", error);
+    setProfileEditStatus(error?.message || "Unable to save changes.", "error");
+  }
+}
+
+function handleProfileEditToggle() {
+  if (!activeUserId) {
+    setProfileEditStatus("Log in to update your profile.", "error");
+    return;
+  }
+  const isOpen = !(profileEditForm instanceof HTMLElement) ? false : profileEditForm.hidden;
+  setProfileEditVisible(isOpen);
+}
+
+function handleProfileEditCancel() {
+  setProfileEditVisible(false);
+}
+
 async function loadProfile() {
   setStatus("Checking your session...");
   try {
@@ -317,6 +408,10 @@ function init() {
     }
     renderProfile(user);
   });
+
+  profileEditForm?.addEventListener("submit", handleProfileEditSubmit);
+  profileEditToggle?.addEventListener("click", handleProfileEditToggle);
+  profileEditCancel?.addEventListener("click", handleProfileEditCancel);
 
   loadProfile();
 }
