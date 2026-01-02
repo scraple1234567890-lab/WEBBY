@@ -1405,5 +1405,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-02T21:28:50.488Z",
     "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
+  },
+  {
+    "id": "post-202",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-02T21:43:52.368Z",
+    "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
   }
 ]
