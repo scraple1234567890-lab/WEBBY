@@ -1447,5 +1447,12 @@
     "school": "Sight",
     "createdAt": "2026-01-02T23:33:03.400Z",
     "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
+  },
+  {
+    "id": "post-208",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-02T23:46:14.824Z",
+    "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
   }
 ]
