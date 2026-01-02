@@ -1181,5 +1181,12 @@
     "school": "Sight",
     "createdAt": "2026-01-02T05:58:59.271Z",
     "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
+  },
+  {
+    "id": "post-170",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-02T07:02:24.155Z",
+    "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
   }
 ]
