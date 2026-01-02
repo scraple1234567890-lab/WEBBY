@@ -1342,5 +1342,12 @@
     "school": "Sight",
     "createdAt": "2026-01-02T17:49:51.376Z",
     "text": "Sound mages recorded the library's quiet and play it back during storms to steady readers."
+  },
+  {
+    "id": "post-193",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-02T17:57:05.696Z",
+    "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
   }
 ]
