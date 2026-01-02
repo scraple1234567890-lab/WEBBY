@@ -1167,5 +1167,12 @@
     "school": "Sound",
     "createdAt": "2026-01-02T05:03:22.347Z",
     "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
+  },
+  {
+    "id": "post-168",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-02T05:50:50.525Z",
+    "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
   }
 ]
