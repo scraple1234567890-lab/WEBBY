@@ -1664,5 +1664,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-03T16:00:35.560Z",
     "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
+  },
+  {
+    "id": "post-239",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-03T16:50:29.875Z",
+    "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
   }
 ]
