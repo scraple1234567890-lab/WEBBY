@@ -1650,5 +1650,12 @@
     "school": "Sight",
     "createdAt": "2026-01-03T15:42:06.262Z",
     "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
+  },
+  {
+    "id": "post-237",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-03T15:53:13.011Z",
+    "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
   }
 ]
