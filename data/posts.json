@@ -1475,5 +1475,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-03T04:54:16.240Z",
     "text": "Sound mages recorded the library's quiet and play it back during storms to steady readers."
+  },
+  {
+    "id": "post-212",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-03T05:44:29.803Z",
+    "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
   }
 ]
