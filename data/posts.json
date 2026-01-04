@@ -1,12 +1,5 @@
 [
   {
-    "id": "seed-1",
-    "author": "Archivist Mira",
-    "school": "Sight",
-    "createdAt": "2024-12-01T08:00:00.000Z",
-    "text": "A prism left in the observatory focused moonlight into a perfect star map—no one touched the lenses."
-  },
-  {
     "id": "seed-2",
     "author": "Keeper Iden",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-04T20:42:28.848Z",
     "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
+  },
+  {
+    "id": "post-301",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-04T20:53:51.881Z",
+    "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
   }
 ]
