@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-9",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2025-12-29T07:46:23.359Z",
-    "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
-  },
-  {
     "id": "post-10",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-04T23:38:32.122Z",
     "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
+  },
+  {
+    "id": "post-309",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-04T23:51:02.739Z",
+    "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
   }
 ]
