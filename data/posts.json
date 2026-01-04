@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-10",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2025-12-29T07:55:33.896Z",
-    "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
-  },
-  {
     "id": "post-11",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-04T23:51:02.739Z",
     "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
+  },
+  {
+    "id": "post-310",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-04T23:58:31.016Z",
+    "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
   }
 ]
