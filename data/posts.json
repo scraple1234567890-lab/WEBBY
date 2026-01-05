@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-25",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2025-12-29T17:00:46.613Z",
-    "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
-  },
-  {
     "id": "post-26",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-05T16:00:48.896Z",
     "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
+  },
+  {
+    "id": "post-325",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-05T16:57:40.700Z",
+    "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
   }
 ]
