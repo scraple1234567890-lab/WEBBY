@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-40",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2025-12-29T22:52:07.925Z",
-    "text": "Touch mentors added braille runes to the dueling circle; the floor thrums when your stance is true."
-  },
-  {
     "id": "post-41",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-05T23:36:35.688Z",
     "text": "Sound choir traced a lullaby into the walls; echoes now hush arguments before they flare."
+  },
+  {
+    "id": "post-340",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-05T23:48:53.471Z",
+    "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
   }
 ]
