@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-30",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2025-12-29T19:28:04.186Z",
-    "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
-  },
-  {
     "id": "post-31",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-05T19:35:40.792Z",
     "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
+  },
+  {
+    "id": "post-330",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-05T19:47:30.919Z",
+    "text": "Smell/Taste tutors revised the scent curriculum—amber notes now mark safety drills in the dorms."
   }
 ]
