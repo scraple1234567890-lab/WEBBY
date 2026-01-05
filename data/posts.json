@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-16",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2025-12-29T11:47:58.546Z",
-    "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
-  },
-  {
     "id": "post-17",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-05T09:01:14.973Z",
     "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
+  },
+  {
+    "id": "post-316",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-05T09:57:32.419Z",
+    "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
   }
 ]
