@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-32",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2025-12-29T19:50:18.474Z",
-    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
-  },
-  {
     "id": "post-33",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-05T19:55:27.754Z",
     "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
+  },
+  {
+    "id": "post-332",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-05T20:47:16.060Z",
+    "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
   }
 ]
