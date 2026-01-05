@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-36",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2025-12-29T21:34:31.265Z",
-    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
-  },
-  {
     "id": "post-37",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-05T21:52:16.333Z",
     "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
+  },
+  {
+    "id": "post-336",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-05T21:59:35.138Z",
+    "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
   }
 ]
