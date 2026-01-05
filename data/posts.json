@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-41",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2025-12-29T22:59:27.930Z",
-    "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
-  },
-  {
     "id": "post-42",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-05T23:48:53.471Z",
     "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
+  },
+  {
+    "id": "post-341",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-05T23:56:43.536Z",
+    "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
   }
 ]
