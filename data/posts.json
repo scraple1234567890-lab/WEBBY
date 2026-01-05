@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-29",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2025-12-29T18:56:38.167Z",
-    "text": "Touch apprentices wove a tapestry ward so dense it softened every footstep in the moonlit hall."
-  },
-  {
     "id": "post-30",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-05T19:00:01.251Z",
     "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
+  },
+  {
+    "id": "post-329",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-05T19:35:40.792Z",
+    "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
   }
 ]
