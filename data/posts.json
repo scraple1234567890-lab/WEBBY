@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-35",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2025-12-29T20:56:03.722Z",
-    "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
-  },
-  {
     "id": "post-36",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-05T21:40:42.072Z",
     "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
+  },
+  {
+    "id": "post-335",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-05T21:52:16.333Z",
+    "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
   }
 ]
