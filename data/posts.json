@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-64",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2025-12-30T14:57:45.718Z",
-    "text": "Smell/Taste tutors revised the scent curriculum—amber notes now mark safety drills in the dorms."
-  },
-  {
     "id": "post-65",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-06T17:48:31.140Z",
     "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
+  },
+  {
+    "id": "post-364",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-06T17:58:52.940Z",
+    "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
   }
 ]
