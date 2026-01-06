@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-69",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2025-12-30T17:53:35.904Z",
-    "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
-  },
-  {
     "id": "post-70",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2097,6 +2090,13 @@
     "author": "Warden of Touch",
     "school": "Touch",
     "createdAt": "2026-01-06T19:54:03.724Z",
+    "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
+  },
+  {
+    "id": "post-369",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-06T20:43:35.628Z",
     "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
   }
 ]
