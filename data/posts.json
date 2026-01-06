@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-56",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2025-12-30T10:55:30.177Z",
-    "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
-  },
-  {
     "id": "post-57",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-06T11:47:50.185Z",
     "text": "Smell/Taste tutors revised the scent curriculum—amber notes now mark safety drills in the dorms."
+  },
+  {
+    "id": "post-356",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-06T11:55:04.630Z",
+    "text": "Sound choir traced a lullaby into the walls; echoes now hush arguments before they flare."
   }
 ]
