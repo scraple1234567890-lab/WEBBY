@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-73",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2025-12-30T19:50:52.014Z",
-    "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
-  },
-  {
     "id": "post-74",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-06T21:52:22.708Z",
     "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
+  },
+  {
+    "id": "post-373",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-06T21:59:50.873Z",
+    "text": "Sound choir traced a lullaby into the walls; echoes now hush arguments before they flare."
   }
 ]
