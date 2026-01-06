@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-68",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2025-12-30T17:43:14.071Z",
-    "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
-  },
-  {
     "id": "post-69",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-06T19:45:55.061Z",
     "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
+  },
+  {
+    "id": "post-368",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-06T19:54:03.724Z",
+    "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
   }
 ]
