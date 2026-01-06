@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-54",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2025-12-30T09:53:17.663Z",
-    "text": "Sight mentors recalibrated star charts after a meteor shower rewrote the sky’s margins."
-  },
-  {
     "id": "post-55",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-06T11:00:37.163Z",
     "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
+  },
+  {
+    "id": "post-354",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-06T11:34:19.568Z",
+    "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
   }
 ]
