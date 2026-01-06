@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-51",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2025-12-30T07:56:33.960Z",
-    "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
-  },
-  {
     "id": "post-52",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-06T09:51:11.114Z",
     "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
+  },
+  {
+    "id": "post-351",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-06T09:58:52.223Z",
+    "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
   }
 ]
