@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-52",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2025-12-30T08:04:02.175Z",
-    "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
-  },
-  {
     "id": "post-53",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-06T09:58:52.223Z",
     "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
+  },
+  {
+    "id": "post-352",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-06T10:53:16.552Z",
+    "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
   }
 ]
