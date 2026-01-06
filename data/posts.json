@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-47",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2025-12-30T05:47:39.965Z",
-    "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
-  },
-  {
     "id": "post-48",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-06T07:03:55.346Z",
     "text": "Sound mages recorded the library's quiet and play it back during storms to steady readers."
+  },
+  {
+    "id": "post-347",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-06T07:46:45.046Z",
+    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
   }
 ]
