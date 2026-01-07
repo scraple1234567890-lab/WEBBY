@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>StarSpell Academy | Articles</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+
+  <body class="postsPage">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div id="top"></div>
+
+    <header class="header" role="banner">
+      <nav class="nav container" aria-label="Primary">
+        <a class="brand" href="./index.html#top" aria-label="Home">
+          <span class="brandText">StarSpell Academy</span>
+        </a>
+
+        <button class="iconBtn navToggle" id="navToggle" aria-expanded="false" aria-controls="navLinks">
+          <span class="srOnly">Open menu</span>
+          <span class="hamburger" aria-hidden="true"></span>
+        </button>
+
+        <div class="navLinks" id="navLinks">
+          <a href="./quiz.html">Sorting quiz</a>
+          <a href="./posts.html">Posts</a>
+          <a href="./articles.html" aria-current="page">Articles</a>
+          <a class="btn ghost" href="./shop.html">Shop</a>
+
+          <div class="profileMenu" id="profileMenu" data-default-display="inline-flex" style="display: none">
+            <button
+              class="btn ghost profileTrigger"
+              type="button"
+              id="profileMenuToggle"
+              aria-expanded="false"
+              aria-haspopup="menu"
+              aria-controls="profileMenuList"
+              aria-label="Open account menu"
+            >
+              <span class="srOnly">Profile</span>
+              <span class="profileAvatar profileAvatar--menu" id="profileAvatar">
+                <span class="profileAvatarPlaceholder" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                    <path
+                      d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5Zm0 2c-3.33 0-10 1.67-10 5v1h20v-1c0-3.33-6.67-5-10-5Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </span>
+                <img alt="" loading="lazy" />
+              </span>
+              <span class="profileCaret" aria-hidden="true">▾</span>
+            </button>
+            <div class="profileMenuList" id="profileMenuList" role="menu" aria-hidden="true">
+              <a href="./profile.html" role="menuitem">View profile</a>
+              <button id="logoutBtn" type="button" role="menuitem">Log out</button>
+            </div>
+          </div>
+
+          <a class="btn primary magentaGlow" href="./portal.html" data-auth-target="login-cta">Open the login portal</a>
+        </div>
+      </nav>
+    </header>
+
+    <main id="main" class="section">
+      <div class="container postLayout">
+        <div class="postHeader">
+          <div>
+            <h1>Articles</h1>
+          </div>
+
+          <div class="actions" style="gap: 0.5rem; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
+            <p id="must-login" class="muted" aria-live="polite" style="margin: 0">You must be logged in to publish.</p>
+            <button id="share-post-btn" class="btn heroCta magentaGlow btnSm" type="button" aria-expanded="false">
+              Share a post
+            </button>
+            <button id="share-article-btn" class="btn ghost btnSm" type="button" aria-expanded="false">
+              Write an article
+            </button>
+          </div>
+        </div>
+
+        <!-- Post composer (short notes) -->
+        <section class="card" id="composer-card" hidden>
+          <div class="postComposerHeader">
+            <div>
+              <p class="kicker">Share a post</p>
+              <p class="muted small">Write a short note for the Lore Board. (2000 characters max)</p>
+            </div>
+            <button class="btn ghost" type="button" id="close-composer">Close</button>
+          </div>
+          <form class="postForm" id="new-post-form">
+            <label for="post-content" class="muted small">What would you like to share?</label>
+            <textarea id="post-content" name="content" rows="4" maxlength="2000" required></textarea>
+            <div class="actions">
+              <button type="submit" class="btn primary" id="post-submit">Post</button>
+            </div>
+            <p id="post-status" class="muted small" aria-live="polite"></p>
+          </form>
+        </section>
+
+        <!-- Article composer -->
+        <section class="card" id="article-composer-card" hidden>
+          <div class="postComposerHeader">
+            <div>
+              <p class="kicker">Write an article</p>
+              <p class="muted small">Create a longer writeup for the community. (Title 120 chars, body 12,000 chars max)</p>
+            </div>
+            <button class="btn ghost" id="close-article-composer" type="button">Close</button>
+          </div>
+
+          <form class="postForm" id="new-article-form">
+            <label class="muted small" for="article-title">Title</label>
+            <input id="article-title" name="title" maxlength="120" required type="text" autocomplete="off" />
+
+            <label class="muted small" for="article-tags">Tags (optional)</label>
+            <input
+              id="article-tags"
+              name="tags"
+              type="text"
+              maxlength="220"
+              autocomplete="off"
+              placeholder="e.g., networking, backup, windows"
+            />
+            <p class="muted small" id="article-tags-help" style="margin: -6px 0 0;">
+              Comma-separated. Use a few keywords people might search.
+            </p>
+
+            <label class="muted small" for="article-editor">Article</label>
+
+            <div class="richEditorShell">
+              <div class="richToolbar" id="article-toolbar" role="toolbar" aria-label="Article formatting toolbar">
+                <button class="btn ghost btnSm" type="button" data-cmd="bold" aria-label="Bold"><strong>B</strong></button>
+                <button class="btn ghost btnSm" type="button" data-cmd="italic" aria-label="Italic"><em>I</em></button>
+                <button class="btn ghost btnSm" type="button" data-cmd="underline" aria-label="Underline">
+                  <span style="text-decoration: underline;">U</span>
+                </button>
+
+                <span class="richDivider" aria-hidden="true"></span>
+
+                <button class="btn ghost btnSm" type="button" data-block="h2" aria-label="Heading">H2</button>
+                <button class="btn ghost btnSm" type="button" data-block="h3" aria-label="Subheading">H3</button>
+                <button class="btn ghost btnSm" type="button" data-cmd="insertUnorderedList" aria-label="Bulleted list">• List</button>
+                <button class="btn ghost btnSm" type="button" data-cmd="insertOrderedList" aria-label="Numbered list">1. List</button>
+                <button class="btn ghost btnSm" type="button" data-block="blockquote" aria-label="Quote">Quote</button>
+
+                <span class="richDivider" aria-hidden="true"></span>
+
+                <button class="btn ghost btnSm" type="button" id="article-link-btn" aria-label="Insert link">Link</button>
+                <button class="btn ghost btnSm" type="button" id="article-inline-image-btn" aria-label="Insert image">Insert image</button>
+                <input id="article-inline-image" type="file" accept="image/*" multiple hidden />
+
+                <span class="richDivider" aria-hidden="true"></span>
+
+                <button class="btn ghost btnSm" type="button" data-cmd="removeFormat" aria-label="Remove formatting">Clear format</button>
+
+                <p class="muted small richHint" style="margin: 0; flex-basis: 100%;">
+                  Tip: Drag and drop images into the editor, or use “Insert image”.
+                </p>
+              </div>
+
+              <div
+                id="article-editor"
+                class="richEditor"
+                contenteditable="true"
+                role="textbox"
+                aria-multiline="true"
+                data-placeholder="Write your article…"
+              ></div>
+            </div>
+
+            <textarea id="article-content" name="content" maxlength="200000" hidden></textarea>
+
+            <label class="muted small" for="article-image">Cover image (optional)</label>
+            <input id="article-image" name="image" type="file" accept="image/*" />
+            <p class="muted small" id="article-image-help" style="margin: -6px 0 0;">
+              Choose an image (up to 15MB). We'll resize and compress it before upload.
+            </p>
+
+            <div class="articleImagePreview" id="article-image-preview" hidden>
+              <img alt="Selected cover image preview" loading="lazy" />
+              <button class="btn ghost btnSm" id="article-image-clear" type="button">Remove image</button>
+            </div>
+
+            <div class="actions">
+              <button class="btn primary" id="article-submit" type="submit">Publish</button>
+            </div>
+            <p aria-live="polite" class="muted small" id="article-status"></p>
+          </form>
+        </section>
+
+        <!-- Articles feed -->
+        <section aria-live="polite" class="card feedCard articlesCard">
+          <div class="sectionHead loreBoardHeader articlesHeader">
+            <div class="articlesTopRow">
+              <div class="loreTitleWrap">
+                <span class="loreSigil" aria-hidden="true">✷</span>
+                <h2 class="loreTitle">Articles</h2>
+                <span class="loreSigil" aria-hidden="true">✷</span>
+              </div>
+              <div class="articlesTools">
+                <button
+                  class="btn ghost btnSm"
+                  id="article-search-toggle"
+                  type="button"
+                  aria-expanded="false"
+                  aria-controls="article-search-panel"
+                >
+                  Search
+                </button>
+              </div>
+            </div>
+
+            <p class="muted small" style="margin: 0;">Long-form writeups from the community.</p>
+
+            <div class="articleSearchPanel" id="article-search-panel" hidden>
+              <div class="articleSearchRow">
+                <label class="srOnly" for="article-search">Search articles</label>
+                <input
+                  id="article-search"
+                  type="search"
+                  autocomplete="off"
+                  placeholder="Search articles (title, tags, or body)…"
+                />
+                <button class="btn ghost btnSm" id="article-search-clear" type="button" disabled>Clear</button>
+              </div>
+
+              <div class="articleTagShelf" id="article-tag-shelf" hidden>
+                <p class="muted small" style="margin: 10px 0 6px;">Quick tags</p>
+                <div class="articleTagRow" id="article-tag-chips"></div>
+              </div>
+
+              <p class="muted small" id="article-search-meta" style="margin: 8px 0 0;"></p>
+            </div>
+          </div>
+
+          <div class="postFeed" id="articles"></div>
+        </section>
+
+        <!-- Lore Board feed -->
+        <section aria-live="polite" class="card feedCard">
+          <div class="sectionHead loreBoardHeader">
+            <div class="loreTitleWrap">
+              <span aria-hidden="true" class="loreSigil">✶</span>
+              <h2 class="loreTitle">Lore Board</h2>
+              <span aria-hidden="true" class="loreSigil">✶</span>
+            </div>
+          </div>
+          <div class="postFeed" id="posts"></div>
+        </section>
+      </div>
+    </main>
+
+    <script src="./script.js" defer></script>
+    <script type="module" src="./js/app.js"></script>
+    <script type="module" src="./js/posts.js"></script>
+    <script type="module" src="./js/articles.js"></script>
+  </body>
+</html>
