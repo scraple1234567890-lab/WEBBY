@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-86",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2025-12-31T03:53:12.226Z",
-    "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
-  },
-  {
     "id": "post-87",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-07T19:48:19.685Z",
     "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
+  },
+  {
+    "id": "post-386",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-07T19:56:15.847Z",
+    "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
   }
 ]
