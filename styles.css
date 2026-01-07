@@ -1550,7 +1550,14 @@ input:focus, textarea:focus {
 .articleExcerpt { margin: 0; line-height: 1.7; color: color-mix(in srgb, var(--text) 90%, var(--muted) 10%); }
 .articleFull { line-height: 1.75; }
 .articleFull p { margin: 0.8rem 0; }
+.articleFull div { margin: 0.8rem 0; }
 .articleFull h2, .articleFull h3 { margin: 1.1rem 0 0.6rem; }
+.articleFull ul, .articleFull ol {
+  margin: 0.8rem 0 0.8rem 1.4rem;
+  padding: 0;
+}
+.articleFull li { margin: 0.35rem 0; }
+.articleFull img { max-width: 100%; height: auto; border-radius: var(--radius2); }
 .articleFull blockquote {
   margin: 1rem 0;
   padding: 0.85rem 1rem;
