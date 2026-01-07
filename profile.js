@@ -1,4 +1,4 @@
-import { supabase } from "./supabaseClient.js";
+import { supabase } from "./js/supabaseClient.js";
 
 /** Toggle to true when debugging UI state issues */
 const DEBUG = false;
