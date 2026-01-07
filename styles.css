@@ -1662,7 +1662,7 @@ input:focus, textarea:focus {
   border: 1px solid color-mix(in srgb, var(--border) 85%, var(--accent2) 15%);
   border-radius: var(--radius2);
   padding: 14px;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--panel) 86%, transparent), color-mix(in srgb, var(--panel2) 60%, transparent));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--panel) 94%, transparent), color-mix(in srgb, var(--panel2) 80%, transparent));
   box-shadow: var(--shadow);
 }
 .shopStatCard .statValue {
@@ -1674,7 +1674,7 @@ input:focus, textarea:focus {
   border: 1px solid color-mix(in srgb, var(--border) 85%, var(--accent) 15%);
   border-radius: var(--radius2);
   padding: 18px;
-  background: linear-gradient(160deg, color-mix(in srgb, var(--panel) 80%, transparent), color-mix(in srgb, var(--panel2) 68%, transparent));
+  background: linear-gradient(160deg, color-mix(in srgb, var(--panel) 92%, transparent), color-mix(in srgb, var(--panel2) 82%, transparent));
   box-shadow: var(--shadow);
   display: grid;
   gap: 12px;
@@ -1692,7 +1692,7 @@ input:focus, textarea:focus {
   border: 1px solid var(--border);
   border-radius: var(--radius2);
   padding: 16px;
-  background: color-mix(in srgb, var(--panel) 92%, transparent);
+  background: color-mix(in srgb, var(--panel) 96%, transparent);
   box-shadow: var(--shadow);
   display: grid;
   gap: 16px;
@@ -1708,7 +1708,7 @@ input:focus, textarea:focus {
   padding: 12px;
   border-radius: 14px;
   border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--panel2) 70%, transparent);
+  background: color-mix(in srgb, var(--panel2) 84%, transparent);
   color: var(--text);
 }
 .rangeField input[type="range"] {
@@ -1721,7 +1721,7 @@ input:focus, textarea:focus {
   padding: 12px 14px;
   border-radius: 14px;
   border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--panel2) 60%, transparent);
+  background: color-mix(in srgb, var(--panel2) 80%, transparent);
   color: var(--muted);
 }
 .shopToggle input { accent-color: var(--accent2); }
@@ -1740,7 +1740,7 @@ input:focus, textarea:focus {
 .shopItem {
   border: 1px solid color-mix(in srgb, var(--border) 85%, var(--accent2) 12%);
   border-radius: var(--radius2);
-  background: color-mix(in srgb, var(--panel) 86%, transparent);
+  background: color-mix(in srgb, var(--panel) 94%, transparent);
   box-shadow: var(--shadow);
   display: grid;
   grid-template-rows: auto 1fr auto;
@@ -1792,7 +1792,7 @@ input:focus, textarea:focus {
 .shopItemDetails {
   border-top: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
   padding: 12px 14px;
-  background: color-mix(in srgb, var(--panel2) 60%, transparent);
+  background: color-mix(in srgb, var(--panel2) 78%, transparent);
   display: grid;
   gap: 8px;
 }
@@ -1810,7 +1810,7 @@ input:focus, textarea:focus {
   border: 1px solid color-mix(in srgb, var(--border) 85%, var(--accent2) 12%);
   border-radius: var(--radius2);
   padding: 16px;
-  background: color-mix(in srgb, var(--panel) 90%, transparent);
+  background: color-mix(in srgb, var(--panel) 95%, transparent);
   box-shadow: var(--shadow);
   display: grid;
   gap: 12px;
@@ -1821,7 +1821,7 @@ input:focus, textarea:focus {
   border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
   border-radius: var(--radius);
   padding: 12px;
-  background: color-mix(in srgb, var(--panel2) 60%, transparent);
+  background: color-mix(in srgb, var(--panel2) 78%, transparent);
   display: grid;
   gap: 8px;
 }
@@ -1857,7 +1857,7 @@ input:focus, textarea:focus {
   border: 1px solid color-mix(in srgb, var(--border) 85%, var(--accent3) 12%);
   border-radius: var(--radius2);
   padding: 16px;
-  background: color-mix(in srgb, var(--panel) 92%, transparent);
+  background: color-mix(in srgb, var(--panel) 96%, transparent);
   box-shadow: var(--shadow);
 }
 
@@ -1870,7 +1870,7 @@ input:focus, textarea:focus {
   border: 1px solid var(--border);
   border-radius: var(--radius2);
   padding: 16px;
-  background: linear-gradient(150deg, color-mix(in srgb, var(--panel) 80%, transparent), color-mix(in srgb, var(--panel2) 60%, transparent));
+  background: linear-gradient(150deg, color-mix(in srgb, var(--panel) 92%, transparent), color-mix(in srgb, var(--panel2) 78%, transparent));
   box-shadow: var(--shadow);
   display: grid;
   gap: 6px;
