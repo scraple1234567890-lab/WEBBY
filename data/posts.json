@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-94",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2025-12-31T09:46:41.789Z",
-    "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
-  },
-  {
     "id": "post-95",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-07T22:56:50.573Z",
     "text": "Sound choir traced a lullaby into the walls; echoes now hush arguments before they flare."
+  },
+  {
+    "id": "post-394",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-07T23:36:36.977Z",
+    "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
   }
 ]
