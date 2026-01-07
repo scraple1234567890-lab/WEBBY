@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-81",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2025-12-30T22:52:16.622Z",
-    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
-  },
-  {
     "id": "post-82",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-07T16:59:30.168Z",
     "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
+  },
+  {
+    "id": "post-381",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-07T17:52:07.079Z",
+    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
   }
 ]
