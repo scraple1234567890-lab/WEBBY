@@ -220,7 +220,7 @@ function formatArticleContent(html) {
   const doc = parser.parseFromString(sanitized, "text/html");
   const body = doc.body;
   const hasBlockElements = Boolean(
-    body.querySelector("p, h1, h2, h3, h4, h5, h6, ul, ol, blockquote, pre"),
+    body.querySelector("p, h1, h2, h3, h4, h5, h6, ul, ol, blockquote, pre, figure, img, picture"),
   );
 
   if (!hasBlockElements) {

@@ -1549,6 +1549,12 @@ input:focus, textarea:focus {
 .articleBody { margin-top: 0.9rem; }
 .articleExcerpt { margin: 0; line-height: 1.7; color: color-mix(in srgb, var(--text) 90%, var(--muted) 10%); }
 .articleFull { line-height: 1.75; }
+.articleTitle,
+.articleExcerpt,
+.articleFull {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
 .articleFull p { margin: 0.8rem 0; }
 .articleFull div { margin: 0.8rem 0; }
 .articleFull h2, .articleFull h3 { margin: 1.1rem 0 0.6rem; }
