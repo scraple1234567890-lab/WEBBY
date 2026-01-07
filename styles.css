@@ -1470,6 +1470,10 @@ input:focus, textarea:focus {
 .articlesTopRow { display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; flex-wrap: wrap; }
 .articlesTools { display: inline-flex; align-items: center; gap: 0.5rem; }
 .articlesCard .sectionHead { gap: 0.75rem; }
+.articlesCard .postFeed {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  align-items: start;
+}
 
 .articleSearchPanel {
   margin-top: 0.85rem;
@@ -1496,6 +1500,30 @@ input:focus, textarea:focus {
 .tagList { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.6rem; }
 
 .articleItem { padding: 1.15rem; }
+.articlesCard .articleItem {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(244, 239, 255, 0.9));
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: 0 18px 38px rgba(10, 6, 22, 0.22);
+  color: #1f1831;
+}
+.articlesCard .articleItem .muted { color: rgba(47, 39, 66, 0.78); }
+.articlesCard .articleItem .articleTitle { color: #1a122b; }
+.articlesCard .articleItem .articleExcerpt,
+.articlesCard .articleItem .articleFull { color: rgba(34, 27, 52, 0.92); }
+.articlesCard .articleItem .tagPill {
+  background: rgba(255, 255, 255, 0.82);
+  border-color: rgba(53, 42, 78, 0.2);
+  color: rgba(43, 33, 66, 0.9);
+}
+.articlesCard .articleItem .tagPill:hover { filter: brightness(0.98); }
+.articlesCard .articleItem .articleCover {
+  border-color: rgba(53, 42, 78, 0.18);
+  background: rgba(255, 255, 255, 0.65);
+}
+.articlesCard .articleItem .articleFull blockquote {
+  background: rgba(244, 239, 255, 0.72);
+  border-left-color: rgba(132, 82, 255, 0.45);
+}
 .articleTitle { margin: 0; }
 .articleMetaRow {
   margin-top: 0.55rem;
