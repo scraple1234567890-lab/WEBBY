@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-81",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2025-12-30T22:52:16.622Z",
-    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
-  },
-  {
     "id": "post-82",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-07T05:58:33.488Z",
     "text": "Sight mentors recalibrated star charts after a meteor shower rewrote the sky’s margins."
+  },
+  {
+    "id": "post-381",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-07T07:02:20.486Z",
+    "text": "Smell/Taste tutors revised the scent curriculum—amber notes now mark safety drills in the dorms."
   }
 ]
