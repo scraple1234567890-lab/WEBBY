@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-79",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2025-12-30T21:55:32.984Z",
-    "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
-  },
-  {
     "id": "post-80",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-06T23:54:54.352Z",
     "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
+  },
+  {
+    "id": "post-379",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-07T05:02:55.006Z",
+    "text": "Smell/Taste alchemists infused the greenhouse with rosemary vapor; memories surfaced like bubbles."
   }
 ]
