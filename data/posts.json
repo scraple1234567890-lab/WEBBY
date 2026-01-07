@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-82",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2025-12-30T22:59:37.714Z",
-    "text": "Touch mentors added braille runes to the dueling circle; the floor thrums when your stance is true."
-  },
-  {
     "id": "post-83",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2097,6 +2090,13 @@
     "author": "Essence Steward",
     "school": "Smell/Taste",
     "createdAt": "2026-01-07T07:02:20.486Z",
+    "text": "Smell/Taste tutors revised the scent curriculum—amber notes now mark safety drills in the dorms."
+  },
+  {
+    "id": "post-382",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-07T07:46:35.298Z",
     "text": "Smell/Taste tutors revised the scent curriculum—amber notes now mark safety drills in the dorms."
   }
 ]
