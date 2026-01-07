@@ -214,6 +214,61 @@ function sanitizeHtml(html) {
   return doc.body.innerHTML || "";
 }
 
+function formatArticleContent(html) {
+  const sanitized = sanitizeHtml(html);
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(sanitized, "text/html");
+  const body = doc.body;
+  const hasBlockElements = Boolean(
+    body.querySelector("p, h1, h2, h3, h4, h5, h6, ul, ol, blockquote, pre"),
+  );
+
+  if (!hasBlockElements) {
+    const rebuilt = doc.createElement("div");
+    let buffer = "";
+
+    const flushBuffer = () => {
+      const paragraphs = buffer
+        .split(/\n\s*\n/)
+        .map((segment) => segment.replace(/\n+/g, " ").trim())
+        .filter(Boolean);
+      paragraphs.forEach((paragraph) => {
+        const p = doc.createElement("p");
+        p.textContent = paragraph;
+        rebuilt.appendChild(p);
+      });
+      buffer = "";
+    };
+
+    Array.from(body.childNodes).forEach((node) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        buffer += node.textContent || "";
+        return;
+      }
+
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        const element = node;
+        if (element.tagName.toLowerCase() === "br") {
+          buffer += "\n";
+          return;
+        }
+        if (buffer.trim()) {
+          flushBuffer();
+        }
+        rebuilt.appendChild(element);
+      }
+    });
+
+    if (buffer.trim()) {
+      flushBuffer();
+    }
+
+    body.innerHTML = rebuilt.innerHTML;
+  }
+
+  return body.innerHTML || "";
+}
+
 function createTagList(tags) {
   const list = document.createElement("div");
   list.className = "tagList";
@@ -303,14 +358,7 @@ function renderArticles(articles) {
     const body = document.createElement("div");
     body.className = "articleBody";
 
-    const fullHtml = sanitizeHtml(article.content || "");
-    const text = stripHtml(fullHtml);
-    const excerpt = text.length > 280 ? `${text.slice(0, 280).trim()}…` : text;
-
-    const excerptEl = document.createElement("p");
-    excerptEl.className = "articleExcerpt";
-    excerptEl.textContent = excerpt || "—";
-
+    const fullHtml = formatArticleContent(article.content || "");
     const fullEl = document.createElement("div");
     fullEl.className = "articleFull";
     fullEl.innerHTML = fullHtml;
@@ -321,14 +369,13 @@ function renderArticles(articles) {
     toggle.textContent = "Read more";
     toggle.addEventListener("click", () => {
       const expanded = card.classList.toggle("isExpanded");
-      excerptEl.hidden = expanded;
       fullEl.hidden = !expanded;
       toggle.textContent = expanded ? "Show less" : "Read more";
     });
 
     fullEl.hidden = true;
 
-    body.append(excerptEl, fullEl, toggle);
+    body.append(fullEl, toggle);
 
     if (cover) card.appendChild(cover);
     card.append(title, meta);
