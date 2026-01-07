@@ -1470,6 +1470,10 @@ input:focus, textarea:focus {
 .articlesTopRow { display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; flex-wrap: wrap; }
 .articlesTools { display: inline-flex; align-items: center; gap: 0.5rem; }
 .articlesCard .sectionHead { gap: 0.75rem; }
+.articlesCard .postFeed {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  align-items: start;
+}
 
 .articleSearchPanel {
   margin-top: 0.85rem;
