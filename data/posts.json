@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-103",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2025-12-31T14:43:01.166Z",
-    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
-  },
-  {
     "id": "post-104",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-08T21:52:28.189Z",
     "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
+  },
+  {
+    "id": "post-403",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-08T21:59:55.254Z",
+    "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
   }
 ]
