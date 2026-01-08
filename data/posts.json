@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-91",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2025-12-31T07:41:49.063Z",
-    "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
-  },
-  {
     "id": "post-92",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-08T11:36:35.311Z",
     "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
+  },
+  {
+    "id": "post-391",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-08T11:52:26.962Z",
+    "text": "Touch mentors added braille runes to the dueling circle; the floor thrums when your stance is true."
   }
 ]
