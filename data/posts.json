@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-96",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2025-12-31T10:45:20.854Z",
-    "text": "Smell/Taste alchemists infused the greenhouse with rosemary vapor; memories surfaced like bubbles."
-  },
-  {
     "id": "post-97",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2097,6 +2090,13 @@
     "author": "Warden of Touch",
     "school": "Touch",
     "createdAt": "2026-01-08T18:56:04.653Z",
+    "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
+  },
+  {
+    "id": "post-396",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-08T19:33:53.739Z",
     "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
   }
 ]
