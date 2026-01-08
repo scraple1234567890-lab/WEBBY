@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="description" content="Overworld Prototype — a tiny Pokémon-like tile overworld you can walk around in." />
+    <title>StarSpell Academy | Overworld</title>
+    <link rel="icon" href="./favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" href="./favicon.png" />
+
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+
+  <body class="gamePage">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div id="top"></div>
+
+    <header class="header" role="banner">
+      <nav class="nav container" aria-label="Primary">
+        <a class="brand" href="./index.html#top" aria-label="Home">
+          <span class="brandText">StarSpell Academy</span>
+        </a>
+
+        <button class="iconBtn navToggle" id="navToggle" aria-expanded="false" aria-controls="navLinks">
+          <span class="srOnly">Open menu</span>
+          <span class="hamburger" aria-hidden="true"></span>
+        </button>
+
+        <div class="navLinks" id="navLinks">
+          <a href="./quiz.html">Sorting quiz</a>
+          <a href="./posts.html">Posts</a>
+          <a href="./articles.html">Articles</a>
+          <a href="./game.html">Game</a>
+          <a href="./overworld.html" aria-current="page">Overworld</a>
+          <a class="btn ghost" href="./shop.html">Shop</a>
+          <div class="profileMenu" id="profileMenu" data-default-display="inline-flex" style="display: none">
+            <button
+              class="btn ghost profileTrigger"
+              type="button"
+              id="profileMenuToggle"
+              aria-expanded="false"
+              aria-haspopup="menu"
+              aria-controls="profileMenuList"
+              aria-label="Open account menu"
+            >
+              <span class="srOnly">Profile</span>
+              <span class="profileAvatar profileAvatar--menu" id="profileAvatar">
+                <span class="profileAvatarPlaceholder" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                    <path
+                      d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5Zm0 2c-3.33 0-10 1.67-10 5v1h20v-1c0-3.33-6.67-5-10-5Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </span>
+                <img alt="" loading="lazy" />
+              </span>
+              <span class="profileCaret" aria-hidden="true">▾</span>
+            </button>
+            <div class="profileMenuList" id="profileMenuList" role="menu" aria-hidden="true">
+              <a href="./profile.html" role="menuitem">View profile</a>
+              <button id="logoutBtn" type="button" role="menuitem">Log out</button>
+            </div>
+          </div>
+          <a class="btn primary magentaGlow" href="./login.html" data-auth-target="login-cta">Open the login portal</a>
+        </div>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="section">
+        <div class="container">
+          <div class="sectionHead">
+            <p class="kicker">Minigame</p>
+            <h1>Overworld Prototype</h1>
+            <p class="muted">
+              Click the game to focus it, then move with <strong>Arrow Keys</strong> or <strong>WASD</strong>. Press <strong>Space</strong> or
+              <strong>Enter</strong> to interact.
+            </p>
+          </div>
+
+          <div class="post" style="display: grid; place-items: center; gap: 12px">
+            <!-- Registers the <rpg-overworld> web component (Shadow DOM, embeddable). -->
+            <script type="module" src="./overworld/rpg-overworld.js"></script>
+
+            <rpg-overworld></rpg-overworld>
+
+            <p class="muted small" style="max-width: 70ch; text-align: center">
+              This overworld is a self-contained Web Component (Shadow DOM), designed to avoid CSS/JS conflicts when embedded into the rest of
+              the site.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footerRow">
+        <p class="muted small">© <span id="year"></span> StarSpell Academy. May your steps stay steady.</p>
+        <a class="muted small" href="#top">Back to top ↑</a>
+      </div>
+    </footer>
+
+    <script src="./script.js" defer></script>
+    <script type="module" src="./js/app.js"></script>
+  </body>
+</html>
