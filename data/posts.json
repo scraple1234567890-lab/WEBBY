@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-99",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2025-12-31T11:45:22.512Z",
-    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
-  },
-  {
     "id": "post-100",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-08T19:54:46.559Z",
     "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
+  },
+  {
+    "id": "post-399",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-08T20:45:28.093Z",
+    "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
   }
 ]
