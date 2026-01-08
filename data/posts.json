@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-84",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2025-12-30T23:46:16.424Z",
-    "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
-  },
-  {
     "id": "post-85",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-08T07:00:22.266Z",
     "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
+  },
+  {
+    "id": "post-384",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-08T07:44:26.048Z",
+    "text": "Sound choir traced a lullaby into the walls; echoes now hush arguments before they flare."
   }
 ]
