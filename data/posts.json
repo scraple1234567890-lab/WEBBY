@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-97",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2025-12-31T10:55:53.844Z",
-    "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
-  },
-  {
     "id": "post-98",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-08T19:33:53.739Z",
     "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
+  },
+  {
+    "id": "post-397",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-08T19:46:52.439Z",
+    "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
   }
 ]
