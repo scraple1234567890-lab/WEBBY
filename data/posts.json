@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-125",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2025-12-31T23:33:39.899Z",
-    "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
-  },
-  {
     "id": "post-126",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-09T21:38:22.650Z",
     "text": "Sound choir traced a lullaby into the walls; echoes now hush arguments before they flare."
+  },
+  {
+    "id": "post-425",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-09T21:50:54.247Z",
+    "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
   }
 ]
