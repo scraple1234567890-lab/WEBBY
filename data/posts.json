@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-128",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-01T04:16:39.014Z",
-    "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
-  },
-  {
     "id": "post-129",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-09T22:44:25.652Z",
     "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
+  },
+  {
+    "id": "post-428",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-09T22:55:27.466Z",
+    "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
   }
 ]
