@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-99",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2025-12-31T11:45:22.512Z",
-    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
-  },
-  {
     "id": "post-100",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-09T05:59:24.651Z",
     "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
+  },
+  {
+    "id": "post-399",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-09T07:03:21.807Z",
+    "text": "Touch mentors added braille runes to the dueling circle; the floor thrums when your stance is true."
   }
 ]
