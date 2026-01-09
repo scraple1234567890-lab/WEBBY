@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-130",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2026-01-01T05:58:44.376Z",
-    "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
-  },
-  {
     "id": "post-131",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-09T23:36:14.196Z",
     "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
+  },
+  {
+    "id": "post-430",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-09T23:50:38.916Z",
+    "text": "Touch apprentices wove a tapestry ward so dense it softened every footstep in the moonlit hall."
   }
 ]
