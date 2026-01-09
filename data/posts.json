@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-102",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2025-12-31T13:57:42.156Z",
-    "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
-  },
-  {
     "id": "post-103",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-09T07:55:47.665Z",
     "text": "Smell/Taste alchemists infused the greenhouse with rosemary vapor; memories surfaced like bubbles."
+  },
+  {
+    "id": "post-402",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-09T08:59:12.939Z",
+    "text": "Touch mentors added braille runes to the dueling circle; the floor thrums when your stance is true."
   }
 ]
