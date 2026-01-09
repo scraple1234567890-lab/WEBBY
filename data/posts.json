@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-126",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2025-12-31T23:48:06.684Z",
-    "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
-  },
-  {
     "id": "post-127",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-09T21:50:54.247Z",
     "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
+  },
+  {
+    "id": "post-426",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-09T21:58:23.969Z",
+    "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
   }
 ]
