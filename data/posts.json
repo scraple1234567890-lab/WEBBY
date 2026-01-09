@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-106",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2025-12-31T15:51:33.394Z",
-    "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
-  },
-  {
     "id": "post-107",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-09T10:52:45.984Z",
     "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
+  },
+  {
+    "id": "post-406",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-09T11:00:59.368Z",
+    "text": "Smell/Taste tutors revised the scent curriculum—amber notes now mark safety drills in the dorms."
   }
 ]
