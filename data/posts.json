@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-103",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2025-12-31T14:43:01.166Z",
-    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
-  },
-  {
     "id": "post-104",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-09T08:59:12.939Z",
     "text": "Touch mentors added braille runes to the dueling circle; the floor thrums when your stance is true."
+  },
+  {
+    "id": "post-403",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-09T09:53:36.852Z",
+    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
   }
 ]
