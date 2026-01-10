@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-108",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2025-12-31T16:53:24.722Z",
-    "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
-  },
-  {
     "id": "post-109",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-10T09:54:26.672Z",
     "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
+  },
+  {
+    "id": "post-408",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-10T10:02:03.087Z",
+    "text": "Touch mentors added braille runes to the dueling circle; the floor thrums when your stance is true."
   }
 ]
