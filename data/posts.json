@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-139",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-01T10:56:29.436Z",
-    "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
-  },
-  {
     "id": "post-140",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-10T21:00:46.230Z",
     "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
+  },
+  {
+    "id": "post-439",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-10T21:34:17.783Z",
+    "text": "Smell/Taste tutors revised the scent curriculum—amber notes now mark safety drills in the dorms."
   }
 ]
