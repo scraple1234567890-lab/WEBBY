@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-113",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2025-12-31T18:55:09.666Z",
-    "text": "Touch mentors added braille runes to the dueling circle; the floor thrums when your stance is true."
-  },
-  {
     "id": "post-114",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-10T11:36:40.269Z",
     "text": "Touch mentors added braille runes to the dueling circle; the floor thrums when your stance is true."
+  },
+  {
+    "id": "post-413",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-10T11:49:47.404Z",
+    "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
   }
 ]
