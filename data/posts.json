@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-143",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-01T13:47:22.575Z",
-    "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
-  },
-  {
     "id": "post-144",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-10T22:39:45.977Z",
     "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
+  },
+  {
+    "id": "post-443",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-10T22:51:55.488Z",
+    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
   }
 ]
