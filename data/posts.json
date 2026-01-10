@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-133",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-01T07:51:44.441Z",
-    "text": "Touch mentors added braille runes to the dueling circle; the floor thrums when your stance is true."
-  },
-  {
     "id": "post-134",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-10T19:30:18.350Z",
     "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
+  },
+  {
+    "id": "post-433",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-10T19:41:54.288Z",
+    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
   }
 ]
