@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-119",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2025-12-31T20:54:19.573Z",
-    "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
-  },
-  {
     "id": "post-120",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-10T14:04:40.907Z",
     "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
+  },
+  {
+    "id": "post-419",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-10T14:46:02.058Z",
+    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
   }
 ]
