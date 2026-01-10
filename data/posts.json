@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-145",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-01T14:54:22.218Z",
-    "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
-  },
-  {
     "id": "post-146",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-10T22:59:20.808Z",
     "text": "Touch mentors added braille runes to the dueling circle; the floor thrums when your stance is true."
+  },
+  {
+    "id": "post-445",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-10T23:34:56.219Z",
+    "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
   }
 ]
