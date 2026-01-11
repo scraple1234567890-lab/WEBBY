@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-154",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-01T19:29:12.469Z",
-    "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
-  },
-  {
     "id": "post-155",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-11T07:48:32.046Z",
     "text": "Smell/Taste alchemists infused the greenhouse with rosemary vapor; memories surfaced like bubbles."
+  },
+  {
+    "id": "post-454",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-11T07:56:12.665Z",
+    "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
   }
 ]
