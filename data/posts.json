@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-168",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-02T05:50:50.525Z",
-    "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
-  },
-  {
     "id": "post-169",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-11T13:59:46.794Z",
     "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
+  },
+  {
+    "id": "post-468",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-11T14:44:45.348Z",
+    "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
   }
 ]
