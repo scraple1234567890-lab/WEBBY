@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-172",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-02T07:52:59.682Z",
-    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
-  },
-  {
     "id": "post-173",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-11T15:38:08.095Z",
     "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
+  },
+  {
+    "id": "post-472",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-11T15:49:18.839Z",
+    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
   }
 ]
