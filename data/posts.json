@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-190",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-02T17:00:49.243Z",
-    "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
-  },
-  {
     "id": "post-191",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-11T21:53:39.397Z",
     "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
+  },
+  {
+    "id": "post-490",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-11T22:40:20.291Z",
+    "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
   }
 ]
