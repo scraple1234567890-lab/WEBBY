@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-195",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-02T19:23:38.285Z",
-    "text": "Sound choir traced a lullaby into the walls; echoes now hush arguments before they flare."
-  },
-  {
     "id": "post-196",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-11T23:49:12.718Z",
     "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
+  },
+  {
+    "id": "post-495",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-11T23:56:50.930Z",
+    "text": "Smell/Taste alchemists infused the greenhouse with rosemary vapor; memories surfaced like bubbles."
   }
 ]
