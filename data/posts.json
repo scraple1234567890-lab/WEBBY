@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-189",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-02T16:51:32.895Z",
-    "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
-  },
-  {
     "id": "post-190",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-11T21:45:30.963Z",
     "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
+  },
+  {
+    "id": "post-489",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-11T21:53:39.397Z",
+    "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
   }
 ]
