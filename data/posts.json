@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-184",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-02T13:57:38.890Z",
-    "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
-  },
-  {
     "id": "post-185",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-11T19:50:35.023Z",
     "text": "Sight mentors recalibrated star charts after a meteor shower rewrote the sky’s margins."
+  },
+  {
+    "id": "post-484",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-11T19:58:36.429Z",
+    "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
   }
 ]
