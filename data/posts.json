@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-180",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-02T11:44:29.844Z",
-    "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
-  },
-  {
     "id": "post-181",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-11T18:53:53.264Z",
     "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
+  },
+  {
+    "id": "post-480",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-11T19:00:13.444Z",
+    "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
   }
 ]
