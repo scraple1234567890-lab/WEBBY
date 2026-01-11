@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-169",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-02T05:58:59.271Z",
-    "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
-  },
-  {
     "id": "post-170",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-11T14:44:45.348Z",
     "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
+  },
+  {
+    "id": "post-469",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-11T14:56:30.866Z",
+    "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
   }
 ]
