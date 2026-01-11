@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-158",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-01T20:56:31.291Z",
-    "text": "Sound choir traced a lullaby into the walls; echoes now hush arguments before they flare."
-  },
-  {
     "id": "post-159",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-11T09:45:05.170Z",
     "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
+  },
+  {
+    "id": "post-458",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-11T09:55:45.185Z",
+    "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
   }
 ]
