@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-205",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-02T22:44:03.191Z",
-    "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
-  },
-  {
     "id": "post-206",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-12T10:53:56.674Z",
     "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
+  },
+  {
+    "id": "post-505",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-12T11:37:08.550Z",
+    "text": "Sight mentors recalibrated star charts after a meteor shower rewrote the sky’s margins."
   }
 ]
