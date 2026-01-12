@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-207",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-02T23:33:03.400Z",
-    "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
-  },
-  {
     "id": "post-208",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-12T11:51:34.061Z",
     "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
+  },
+  {
+    "id": "post-507",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-12T11:59:23.396Z",
+    "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
   }
 ]
