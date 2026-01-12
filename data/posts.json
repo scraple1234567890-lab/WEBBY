@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-208",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-02T23:46:14.824Z",
-    "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
-  },
-  {
     "id": "post-209",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-12T11:59:23.396Z",
     "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
+  },
+  {
+    "id": "post-508",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-12T13:56:40.680Z",
+    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
   }
 ]
