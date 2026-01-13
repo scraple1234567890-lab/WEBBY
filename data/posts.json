@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-253",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-03T21:34:29.019Z",
-    "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
-  },
-  {
     "id": "post-254",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-13T20:00:08.247Z",
     "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
+  },
+  {
+    "id": "post-553",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-13T20:49:39.930Z",
+    "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
   }
 ]
