@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-256",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2026-01-03T22:39:47.162Z",
-    "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
-  },
-  {
     "id": "post-257",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-13T21:41:04.129Z",
     "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
+  },
+  {
+    "id": "post-556",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-13T21:54:03.823Z",
+    "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
   }
 ]
