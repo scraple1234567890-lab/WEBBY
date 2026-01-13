@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-230",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-03T13:42:54.796Z",
-    "text": "Smell/Taste tutors revised the scent curriculum—amber notes now mark safety drills in the dorms."
-  },
-  {
     "id": "post-231",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-13T03:55:28.249Z",
     "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
+  },
+  {
+    "id": "post-530",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-13T05:02:50.285Z",
+    "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
   }
 ]
