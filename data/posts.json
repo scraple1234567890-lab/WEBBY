@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-255",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-03T21:53:12.961Z",
-    "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
-  },
-  {
     "id": "post-256",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-13T20:59:41.696Z",
     "text": "Touch mentors added braille runes to the dueling circle; the floor thrums when your stance is true."
+  },
+  {
+    "id": "post-555",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-13T21:41:04.129Z",
+    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
   }
 ]
