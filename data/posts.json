@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-242",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-03T17:48:07.384Z",
-    "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
-  },
-  {
     "id": "post-243",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-13T11:51:46.767Z",
     "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
+  },
+  {
+    "id": "post-542",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-13T11:59:16.846Z",
+    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
   }
 ]
