@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-244",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-03T18:53:20.509Z",
-    "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
-  },
-  {
     "id": "post-245",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-13T13:54:08.103Z",
     "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
+  },
+  {
+    "id": "post-544",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-13T14:56:11.960Z",
+    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
   }
 ]
