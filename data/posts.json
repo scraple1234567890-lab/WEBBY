@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-282",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2026-01-04T14:01:16.127Z",
-    "text": "Sight mentors recalibrated star charts after a meteor shower rewrote the sky’s margins."
-  },
-  {
     "id": "post-283",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-14T18:58:51.806Z",
     "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
+  },
+  {
+    "id": "post-582",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-14T19:33:57.478Z",
+    "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
   }
 ]
