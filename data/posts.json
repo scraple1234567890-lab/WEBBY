@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-287",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-04T15:52:57.417Z",
-    "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
-  },
-  {
     "id": "post-288",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-14T20:56:49.254Z",
     "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
+  },
+  {
+    "id": "post-587",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-14T21:41:30.117Z",
+    "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
   }
 ]
