@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-281",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-04T13:43:59.820Z",
-    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
-  },
-  {
     "id": "post-282",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-14T17:53:51.840Z",
     "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
+  },
+  {
+    "id": "post-581",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-14T18:58:51.806Z",
+    "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
   }
 ]
