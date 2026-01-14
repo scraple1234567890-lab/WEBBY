@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-286",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-04T15:42:03.003Z",
-    "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
-  },
-  {
     "id": "post-287",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-14T20:41:32.522Z",
     "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
+  },
+  {
+    "id": "post-586",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-14T20:56:49.254Z",
+    "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
   }
 ]
