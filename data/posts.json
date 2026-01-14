@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-283",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2026-01-04T14:46:38.262Z",
-    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
-  },
-  {
     "id": "post-284",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-14T19:33:57.478Z",
     "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
+  },
+  {
+    "id": "post-583",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-14T19:46:44.548Z",
+    "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
   }
 ]
