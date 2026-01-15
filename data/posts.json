@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-305",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-04T22:41:01.227Z",
-    "text": "Touch apprentices wove a tapestry ward so dense it softened every footstep in the moonlit hall."
-  },
-  {
     "id": "post-306",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-15T10:53:05.945Z",
     "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
+  },
+  {
+    "id": "post-605",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-15T11:37:18.970Z",
+    "text": "Sight mentors recalibrated star charts after a meteor shower rewrote the sky’s margins."
   }
 ]
