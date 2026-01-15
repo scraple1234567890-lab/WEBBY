@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-303",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-04T21:46:15.913Z",
-    "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
-  },
-  {
     "id": "post-304",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-15T09:51:43.204Z",
     "text": "Sound choir traced a lullaby into the walls; echoes now hush arguments before they flare."
+  },
+  {
+    "id": "post-603",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-15T10:00:05.265Z",
+    "text": "Touch mentors added braille runes to the dueling circle; the floor thrums when your stance is true."
   }
 ]
