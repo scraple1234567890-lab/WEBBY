@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-301",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-04T20:53:51.881Z",
-    "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
-  },
-  {
     "id": "post-302",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-15T07:55:16.279Z",
     "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
+  },
+  {
+    "id": "post-601",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-15T08:58:36.757Z",
+    "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
   }
 ]
