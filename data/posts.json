@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-300",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-04T20:42:28.848Z",
-    "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
-  },
-  {
     "id": "post-301",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-15T07:45:22.622Z",
     "text": "Touch apprentices wove a tapestry ward so dense it softened every footstep in the moonlit hall."
+  },
+  {
+    "id": "post-600",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-15T07:55:16.279Z",
+    "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
   }
 ]
