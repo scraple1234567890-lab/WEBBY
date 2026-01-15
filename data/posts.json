@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-308",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-04T23:38:32.122Z",
-    "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
-  },
-  {
     "id": "post-309",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-15T11:59:56.180Z",
     "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
+  },
+  {
+    "id": "post-608",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-15T13:53:29.307Z",
+    "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
   }
 ]
