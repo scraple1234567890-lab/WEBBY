@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-304",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2026-01-04T21:53:46.922Z",
-    "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
-  },
-  {
     "id": "post-305",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-15T10:00:05.265Z",
     "text": "Touch mentors added braille runes to the dueling circle; the floor thrums when your stance is true."
+  },
+  {
+    "id": "post-604",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-15T10:53:05.945Z",
+    "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
   }
 ]
