@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-340",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-05T23:48:53.471Z",
-    "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
-  },
-  {
     "id": "post-341",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-16T11:58:47.915Z",
     "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
+  },
+  {
+    "id": "post-640",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-16T13:51:17.096Z",
+    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
   }
 ]
