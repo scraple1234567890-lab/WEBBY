@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-325",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-05T16:57:40.700Z",
-    "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
-  },
-  {
     "id": "post-326",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-15T23:58:19.679Z",
     "text": "Touch apprentices wove a tapestry ward so dense it softened every footstep in the moonlit hall."
+  },
+  {
+    "id": "post-625",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-16T03:54:59.796Z",
+    "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
   }
 ]
