@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-359",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-06T15:00:50.780Z",
-    "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
-  },
-  {
     "id": "post-360",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-16T22:56:04.932Z",
     "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
+  },
+  {
+    "id": "post-659",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-16T23:37:01.414Z",
+    "text": "Touch apprentices wove a tapestry ward so dense it softened every footstep in the moonlit hall."
   }
 ]
