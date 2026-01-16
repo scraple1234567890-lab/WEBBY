@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-334",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-05T21:40:42.072Z",
-    "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
-  },
-  {
     "id": "post-335",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-16T09:49:49.319Z",
     "text": "Smell/Taste tutors revised the scent curriculum—amber notes now mark safety drills in the dorms."
+  },
+  {
+    "id": "post-634",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-16T09:58:44.435Z",
+    "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
   }
 ]
