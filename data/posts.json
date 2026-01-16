@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-349",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-06T08:58:45.380Z",
-    "text": "Touch mentors added braille runes to the dueling circle; the floor thrums when your stance is true."
-  },
-  {
     "id": "post-350",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2097,6 +2090,13 @@
     "author": "Warden of Touch",
     "school": "Touch",
     "createdAt": "2026-01-16T19:30:56.375Z",
+    "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
+  },
+  {
+    "id": "post-649",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-16T19:43:26.776Z",
     "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
   }
 ]
