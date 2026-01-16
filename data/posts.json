@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-356",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-06T11:55:04.630Z",
-    "text": "Sound choir traced a lullaby into the walls; echoes now hush arguments before they flare."
-  },
-  {
     "id": "post-357",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-16T21:51:30.122Z",
     "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
+  },
+  {
+    "id": "post-656",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-16T21:59:02.796Z",
+    "text": "Smell/Taste tutors revised the scent curriculum—amber notes now mark safety drills in the dorms."
   }
 ]
