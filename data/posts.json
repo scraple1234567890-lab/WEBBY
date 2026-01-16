@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-339",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-05T23:36:35.688Z",
-    "text": "Sound choir traced a lullaby into the walls; echoes now hush arguments before they flare."
-  },
-  {
     "id": "post-340",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-16T11:51:30.497Z",
     "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
+  },
+  {
+    "id": "post-639",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-16T11:58:47.915Z",
+    "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
   }
 ]
