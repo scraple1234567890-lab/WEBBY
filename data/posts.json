@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-327",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-05T17:57:51.003Z",
-    "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
-  },
-  {
     "id": "post-328",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-16T05:00:56.089Z",
     "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
+  },
+  {
+    "id": "post-627",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-16T05:50:28.782Z",
+    "text": "Smell/Taste tutors revised the scent curriculum—amber notes now mark safety drills in the dorms."
   }
 ]
