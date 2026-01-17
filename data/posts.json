@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-384",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-08T07:44:26.048Z",
-    "text": "Sound choir traced a lullaby into the walls; echoes now hush arguments before they flare."
-  },
-  {
     "id": "post-385",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-17T11:59:05.312Z",
     "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
+  },
+  {
+    "id": "post-684",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-17T13:36:59.556Z",
+    "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
   }
 ]
