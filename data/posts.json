@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-392",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-08T12:00:09.592Z",
-    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
-  },
-  {
     "id": "post-393",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-17T15:50:08.783Z",
     "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
+  },
+  {
+    "id": "post-692",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-17T15:57:57.571Z",
+    "text": "Touch apprentices wove a tapestry ward so dense it softened every footstep in the moonlit hall."
   }
 ]
