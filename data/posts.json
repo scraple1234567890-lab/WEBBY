@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-396",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-10T04:56:52.494Z",
-    "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
-  },
-  {
     "id": "post-397",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-17T17:34:35.865Z",
     "text": "Sight mentors recalibrated star charts after a meteor shower rewrote the sky’s margins."
+  },
+  {
+    "id": "post-696",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-17T17:46:19.131Z",
+    "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
   }
 ]
