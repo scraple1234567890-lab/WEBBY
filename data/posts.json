@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-398",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-10T05:53:09.114Z",
-    "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
-  },
-  {
     "id": "post-399",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-17T17:53:55.297Z",
     "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
+  },
+  {
+    "id": "post-698",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-17T18:52:03.431Z",
+    "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
   }
 ]
