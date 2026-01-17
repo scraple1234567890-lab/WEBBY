@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-391",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-08T11:52:26.962Z",
-    "text": "Touch mentors added braille runes to the dueling circle; the floor thrums when your stance is true."
-  },
-  {
     "id": "post-392",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-17T15:37:08.236Z",
     "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
+  },
+  {
+    "id": "post-691",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-17T15:50:08.783Z",
+    "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
   }
 ]
