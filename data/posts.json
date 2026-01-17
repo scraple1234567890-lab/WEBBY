@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-393",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-08T13:53:41.918Z",
-    "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
-  },
-  {
     "id": "post-394",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-17T15:57:57.571Z",
     "text": "Touch apprentices wove a tapestry ward so dense it softened every footstep in the moonlit hall."
+  },
+  {
+    "id": "post-693",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-17T16:46:10.684Z",
+    "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
   }
 ]
