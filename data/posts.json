@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-400",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-10T07:32:15.653Z",
-    "text": "Sight mentors recalibrated star charts after a meteor shower rewrote the sky’s margins."
-  },
-  {
     "id": "post-401",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-17T19:00:00.451Z",
     "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
+  },
+  {
+    "id": "post-700",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-17T19:28:13.131Z",
+    "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
   }
 ]
