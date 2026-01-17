@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-382",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-08T05:59:20.911Z",
-    "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
-  },
-  {
     "id": "post-383",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-17T11:43:44.631Z",
     "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
+  },
+  {
+    "id": "post-682",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-17T11:51:33.295Z",
+    "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
   }
 ]
