@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-379",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2026-01-07T05:02:55.006Z",
-    "text": "Smell/Taste alchemists infused the greenhouse with rosemary vapor; memories surfaced like bubbles."
-  },
-  {
     "id": "post-380",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-17T10:52:51.008Z",
     "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
+  },
+  {
+    "id": "post-679",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-17T11:00:06.937Z",
+    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
   }
 ]
