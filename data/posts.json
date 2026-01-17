@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-389",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-08T10:53:51.916Z",
-    "text": "Smell/Taste alchemists infused the greenhouse with rosemary vapor; memories surfaced like bubbles."
-  },
-  {
     "id": "post-390",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-17T14:51:39.676Z",
     "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
+  },
+  {
+    "id": "post-689",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-17T14:59:27.697Z",
+    "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
   }
 ]
