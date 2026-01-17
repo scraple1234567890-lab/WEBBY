@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-365",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-06T18:56:33.759Z",
-    "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
-  },
-  {
     "id": "post-366",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-17T05:40:36.270Z",
     "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
+  },
+  {
+    "id": "post-665",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-17T05:52:04.448Z",
+    "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
   }
 ]
