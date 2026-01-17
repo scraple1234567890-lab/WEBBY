@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-381",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-08T05:51:15.477Z",
-    "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
-  },
-  {
     "id": "post-382",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-17T11:30:30.922Z",
     "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
+  },
+  {
+    "id": "post-681",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-17T11:43:44.631Z",
+    "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
   }
 ]
