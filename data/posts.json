@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-416",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-10T13:44:03.231Z",
-    "text": "Touch apprentices wove a tapestry ward so dense it softened every footstep in the moonlit hall."
-  },
-  {
     "id": "post-417",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-17T23:47:07.818Z",
     "text": "Sound mages recorded the library's quiet and play it back during storms to steady readers."
+  },
+  {
+    "id": "post-716",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-17T23:54:28.044Z",
+    "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
   }
 ]
