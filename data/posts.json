@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-448",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-11T04:17:57.622Z",
-    "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
-  },
-  {
     "id": "post-449",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-18T17:37:29.951Z",
     "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
+  },
+  {
+    "id": "post-748",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-18T17:48:12.226Z",
+    "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
   }
 ]
