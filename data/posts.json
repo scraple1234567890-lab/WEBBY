@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-455",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-11T08:51:24.717Z",
-    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
-  },
-  {
     "id": "post-456",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-18T19:49:00.535Z",
     "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
+  },
+  {
+    "id": "post-755",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-18T19:56:16.930Z",
+    "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
   }
 ]
