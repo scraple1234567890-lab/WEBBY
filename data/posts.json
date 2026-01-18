@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-460",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2026-01-11T10:50:41.557Z",
-    "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
-  },
-  {
     "id": "post-461",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-18T21:44:32.400Z",
     "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
+  },
+  {
+    "id": "post-760",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-18T21:51:57.615Z",
+    "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
   }
 ]
