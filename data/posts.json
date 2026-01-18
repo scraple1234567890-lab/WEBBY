@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-421",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-10T15:04:24.160Z",
-    "text": "Smell/Taste tutors revised the scent curriculum—amber notes now mark safety drills in the dorms."
-  },
-  {
     "id": "post-422",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-18T05:56:16.246Z",
     "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
+  },
+  {
+    "id": "post-721",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-18T06:56:01.837Z",
+    "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
   }
 ]
