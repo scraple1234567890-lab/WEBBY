@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-433",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-10T19:41:54.288Z",
-    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
-  },
-  {
     "id": "post-434",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-18T11:28:30.054Z",
     "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
+  },
+  {
+    "id": "post-733",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-18T11:42:44.566Z",
+    "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
   }
 ]
