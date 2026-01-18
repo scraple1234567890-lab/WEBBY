@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-453",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-11T07:48:32.046Z",
-    "text": "Smell/Taste alchemists infused the greenhouse with rosemary vapor; memories surfaced like bubbles."
-  },
-  {
     "id": "post-454",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-18T19:28:01.835Z",
     "text": "Smell/Taste tutors revised the scent curriculum—amber notes now mark safety drills in the dorms."
+  },
+  {
+    "id": "post-753",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-18T19:41:09.822Z",
+    "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
   }
 ]
