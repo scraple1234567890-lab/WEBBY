@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-445",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-10T23:34:56.219Z",
-    "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
-  },
-  {
     "id": "post-446",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-18T15:55:38.994Z",
     "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
+  },
+  {
+    "id": "post-745",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-18T16:48:14.583Z",
+    "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
   }
 ]
