@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-464",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-11T11:57:39.227Z",
-    "text": "Sight mentors recalibrated star charts after a meteor shower rewrote the sky’s margins."
-  },
-  {
     "id": "post-465",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-18T22:53:06.399Z",
     "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
+  },
+  {
+    "id": "post-764",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-18T23:33:53.987Z",
+    "text": "Touch mentors added braille runes to the dueling circle; the floor thrums when your stance is true."
   }
 ]
