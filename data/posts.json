@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-439",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-10T21:34:17.783Z",
-    "text": "Smell/Taste tutors revised the scent curriculum—amber notes now mark safety drills in the dorms."
-  },
-  {
     "id": "post-440",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-18T13:59:57.858Z",
     "text": "Touch apprentices wove a tapestry ward so dense it softened every footstep in the moonlit hall."
+  },
+  {
+    "id": "post-739",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-18T14:39:02.735Z",
+    "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
   }
 ]
