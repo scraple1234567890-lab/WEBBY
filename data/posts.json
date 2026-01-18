@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-425",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-10T16:48:36.974Z",
-    "text": "Touch apprentices wove a tapestry ward so dense it softened every footstep in the moonlit hall."
-  },
-  {
     "id": "post-426",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-18T07:53:38.078Z",
     "text": "Touch apprentices wove a tapestry ward so dense it softened every footstep in the moonlit hall."
+  },
+  {
+    "id": "post-725",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-18T08:49:52.538Z",
+    "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
   }
 ]
