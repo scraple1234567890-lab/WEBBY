@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-418",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-10T14:04:40.907Z",
-    "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
-  },
-  {
     "id": "post-419",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-18T04:00:11.325Z",
     "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
+  },
+  {
+    "id": "post-718",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-18T05:01:10.378Z",
+    "text": "Sound mages recorded the library's quiet and play it back during storms to steady readers."
   }
 ]
