@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-437",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2026-01-10T20:52:53.895Z",
-    "text": "Sight mentors recalibrated star charts after a meteor shower rewrote the sky’s margins."
-  },
-  {
     "id": "post-438",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2097,6 +2090,13 @@
     "author": "Cantor of Sound",
     "school": "Sound",
     "createdAt": "2026-01-18T13:37:29.588Z",
+    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
+  },
+  {
+    "id": "post-737",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-18T13:52:50.939Z",
     "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
   }
 ]
