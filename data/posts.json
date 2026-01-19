@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-470",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-11T15:03:45.910Z",
-    "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
-  },
-  {
     "id": "post-471",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-19T07:05:57.819Z",
     "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
+  },
+  {
+    "id": "post-770",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-19T07:52:36.229Z",
+    "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
   }
 ]
