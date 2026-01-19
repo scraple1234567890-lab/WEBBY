@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-478",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-11T17:56:11.658Z",
-    "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
-  },
-  {
     "id": "post-479",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-19T13:56:24.111Z",
     "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
+  },
+  {
+    "id": "post-778",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-19T14:57:08.976Z",
+    "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
   }
 ]
