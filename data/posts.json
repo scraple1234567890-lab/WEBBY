@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-492",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-11T23:00:13.866Z",
-    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
-  },
-  {
     "id": "post-493",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-19T21:58:44.795Z",
     "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
+  },
+  {
+    "id": "post-792",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-19T22:47:17.959Z",
+    "text": "Touch apprentices wove a tapestry ward so dense it softened every footstep in the moonlit hall."
   }
 ]
