@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-480",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-11T19:00:13.444Z",
-    "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
-  },
-  {
     "id": "post-481",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-19T15:52:07.086Z",
     "text": "Sight mentors recalibrated star charts after a meteor shower rewrote the sky’s margins."
+  },
+  {
+    "id": "post-780",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-19T16:59:03.123Z",
+    "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
   }
 ]
