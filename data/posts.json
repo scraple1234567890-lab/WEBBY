@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-468",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-11T14:44:45.348Z",
-    "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
-  },
-  {
     "id": "post-469",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-19T04:17:48.450Z",
     "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
+  },
+  {
+    "id": "post-768",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-19T05:50:28.111Z",
+    "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
   }
 ]
