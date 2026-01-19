@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-482",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-11T19:42:42.543Z",
-    "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
-  },
-  {
     "id": "post-483",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-19T17:49:05.695Z",
     "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
+  },
+  {
+    "id": "post-782",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-19T17:57:48.943Z",
+    "text": "Touch mentors added braille runes to the dueling circle; the floor thrums when your stance is true."
   }
 ]
