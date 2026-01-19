@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-489",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-11T21:53:39.397Z",
-    "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
-  },
-  {
     "id": "post-490",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-19T20:57:14.317Z",
     "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
+  },
+  {
+    "id": "post-789",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-19T21:38:10.187Z",
+    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
   }
 ]
