@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-481",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-11T19:30:11.592Z",
-    "text": "Smell/Taste alchemists infused the greenhouse with rosemary vapor; memories surfaced like bubbles."
-  },
-  {
     "id": "post-482",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-19T16:59:03.123Z",
     "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
+  },
+  {
+    "id": "post-781",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-19T17:49:05.695Z",
+    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
   }
 ]
