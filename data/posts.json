@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-477",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-11T17:48:46.090Z",
-    "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
-  },
-  {
     "id": "post-478",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-19T11:55:29.499Z",
     "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
+  },
+  {
+    "id": "post-777",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-19T13:56:24.111Z",
+    "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
   }
 ]
