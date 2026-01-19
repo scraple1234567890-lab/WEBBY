@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-491",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-11T22:52:21.864Z",
-    "text": "Smell/Taste tutors revised the scent curriculum—amber notes now mark safety drills in the dorms."
-  },
-  {
     "id": "post-492",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-19T21:51:11.039Z",
     "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
+  },
+  {
+    "id": "post-791",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-19T21:58:44.795Z",
+    "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
   }
 ]
