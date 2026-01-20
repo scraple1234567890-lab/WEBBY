@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-504",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-12T10:53:56.674Z",
-    "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
-  },
-  {
     "id": "post-505",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-20T09:57:48.323Z",
     "text": "Touch apprentices wove a tapestry ward so dense it softened every footstep in the moonlit hall."
+  },
+  {
+    "id": "post-804",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-20T10:57:56.155Z",
+    "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
   }
 ]
