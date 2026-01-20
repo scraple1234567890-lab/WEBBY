@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-515",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-12T19:36:05.447Z",
-    "text": "Sight mentors recalibrated star charts after a meteor shower rewrote the sky’s margins."
-  },
-  {
     "id": "post-516",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-20T21:41:40.025Z",
     "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
+  },
+  {
+    "id": "post-815",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-20T21:50:52.113Z",
+    "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
   }
 ]
