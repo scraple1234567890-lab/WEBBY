@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-502",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-12T09:02:23.937Z",
-    "text": "Touch mentors added braille runes to the dueling circle; the floor thrums when your stance is true."
-  },
-  {
     "id": "post-503",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-20T07:59:45.773Z",
     "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
+  },
+  {
+    "id": "post-802",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-20T09:04:16.546Z",
+    "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
   }
 ]
