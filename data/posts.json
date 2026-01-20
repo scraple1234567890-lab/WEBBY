@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-513",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-12T17:53:50.343Z",
-    "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
-  },
-  {
     "id": "post-514",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-20T20:35:40.879Z",
     "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
+  },
+  {
+    "id": "post-813",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-20T21:01:59.462Z",
+    "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
   }
 ]
