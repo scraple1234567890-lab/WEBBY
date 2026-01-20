@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-500",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-12T07:49:08.481Z",
-    "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
-  },
-  {
     "id": "post-501",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-20T07:05:10.611Z",
     "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
+  },
+  {
+    "id": "post-800",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-20T07:51:34.831Z",
+    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
   }
 ]
