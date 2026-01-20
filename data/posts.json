@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-503",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-12T09:57:11.737Z",
-    "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
-  },
-  {
     "id": "post-504",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-20T09:04:16.546Z",
     "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
+  },
+  {
+    "id": "post-803",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-20T09:57:48.323Z",
+    "text": "Touch apprentices wove a tapestry ward so dense it softened every footstep in the moonlit hall."
   }
 ]
