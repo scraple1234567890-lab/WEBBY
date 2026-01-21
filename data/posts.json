@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-525",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-12T23:28:52.865Z",
-    "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
-  },
-  {
     "id": "post-526",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-21T06:00:45.472Z",
     "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
+  },
+  {
+    "id": "post-825",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-21T07:05:35.754Z",
+    "text": "Sound mages recorded the library's quiet and play it back during storms to steady readers."
   }
 ]
