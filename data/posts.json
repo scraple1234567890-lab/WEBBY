@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-526",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-12T23:45:06.324Z",
-    "text": "Smell/Taste alchemists infused the greenhouse with rosemary vapor; memories surfaced like bubbles."
-  },
-  {
     "id": "post-527",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-21T07:05:35.754Z",
     "text": "Sound mages recorded the library's quiet and play it back during storms to steady readers."
+  },
+  {
+    "id": "post-826",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-21T07:52:25.843Z",
+    "text": "Sight mentors recalibrated star charts after a meteor shower rewrote the sky’s margins."
   }
 ]
