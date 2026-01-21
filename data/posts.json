@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-533",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-13T07:01:37.255Z",
-    "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
-  },
-  {
     "id": "post-534",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-21T11:57:33.821Z",
     "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
+  },
+  {
+    "id": "post-833",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-21T13:58:13.489Z",
+    "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
   }
 ]
