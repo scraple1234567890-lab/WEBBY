@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-539",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2026-01-13T10:53:17.126Z",
-    "text": "Touch mentors added braille runes to the dueling circle; the floor thrums when your stance is true."
-  },
-  {
     "id": "post-540",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-21T20:58:49.877Z",
     "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
+  },
+  {
+    "id": "post-839",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-21T21:53:38.092Z",
+    "text": "Touch apprentices wove a tapestry ward so dense it softened every footstep in the moonlit hall."
   }
 ]
