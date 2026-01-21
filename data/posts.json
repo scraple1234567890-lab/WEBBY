@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-530",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-13T05:02:50.285Z",
-    "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
-  },
-  {
     "id": "post-531",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-21T09:57:49.373Z",
     "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
+  },
+  {
+    "id": "post-830",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-21T10:58:50.170Z",
+    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
   }
 ]
