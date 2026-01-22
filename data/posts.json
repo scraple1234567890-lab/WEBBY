@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-544",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-13T14:56:11.960Z",
-    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
-  },
-  {
     "id": "post-545",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-22T04:16:06.697Z",
     "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
+  },
+  {
+    "id": "post-844",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-22T05:48:30.453Z",
+    "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
   }
 ]
