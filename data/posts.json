@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-560",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-13T23:48:05.640Z",
-    "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
-  },
-  {
     "id": "post-561",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-22T19:03:09.634Z",
     "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
+  },
+  {
+    "id": "post-860",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-22T19:45:31.728Z",
+    "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
   }
 ]
