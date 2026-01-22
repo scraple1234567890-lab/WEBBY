@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-547",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-13T17:54:10.087Z",
-    "text": "Sound choir traced a lullaby into the walls; echoes now hush arguments before they flare."
-  },
-  {
     "id": "post-548",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-22T07:04:01.816Z",
     "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
+  },
+  {
+    "id": "post-847",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-22T07:50:43.841Z",
+    "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
   }
 ]
