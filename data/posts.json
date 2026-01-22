@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-565",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-14T05:59:12.132Z",
-    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
-  },
-  {
     "id": "post-566",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-22T21:58:37.130Z",
     "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
+  },
+  {
+    "id": "post-865",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-22T22:51:13.109Z",
+    "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
   }
 ]
