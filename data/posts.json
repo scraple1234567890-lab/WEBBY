@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-556",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-13T21:54:03.823Z",
-    "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
-  },
-  {
     "id": "post-557",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-22T15:00:46.868Z",
     "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
+  },
+  {
+    "id": "post-856",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-22T15:59:29.557Z",
+    "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
   }
 ]
