@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-563",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2026-01-14T05:05:08.540Z",
-    "text": "Smell/Taste alchemists infused the greenhouse with rosemary vapor; memories surfaced like bubbles."
-  },
-  {
     "id": "post-564",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-22T20:53:43.391Z",
     "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
+  },
+  {
+    "id": "post-863",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-22T21:44:11.462Z",
+    "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
   }
 ]
