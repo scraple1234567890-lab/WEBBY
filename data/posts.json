@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-562",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-14T04:13:46.182Z",
-    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
-  },
-  {
     "id": "post-563",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-22T19:57:47.616Z",
     "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
+  },
+  {
+    "id": "post-862",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-22T20:53:43.391Z",
+    "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
   }
 ]
