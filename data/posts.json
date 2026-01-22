@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-554",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-13T20:59:41.696Z",
-    "text": "Touch mentors added braille runes to the dueling circle; the floor thrums when your stance is true."
-  },
-  {
     "id": "post-555",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-22T11:57:27.963Z",
     "text": "Smell/Taste alchemists infused the greenhouse with rosemary vapor; memories surfaced like bubbles."
+  },
+  {
+    "id": "post-854",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-22T13:58:07.330Z",
+    "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
   }
 ]
