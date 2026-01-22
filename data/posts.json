@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-548",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-13T18:58:01.732Z",
-    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
-  },
-  {
     "id": "post-549",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-22T07:50:43.841Z",
     "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
+  },
+  {
+    "id": "post-848",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-22T07:58:05.849Z",
+    "text": "Sound mages recorded the library's quiet and play it back during storms to steady readers."
   }
 ]
