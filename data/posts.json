@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-599",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-15T07:45:22.622Z",
-    "text": "Touch apprentices wove a tapestry ward so dense it softened every footstep in the moonlit hall."
-  },
-  {
     "id": "post-600",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-23T23:52:24.067Z",
     "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
+  },
+  {
+    "id": "post-899",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-23T23:59:42.123Z",
+    "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
   }
 ]
