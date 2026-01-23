@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-588",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-14T21:55:00.711Z",
-    "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
-  },
-  {
     "id": "post-589",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-23T19:39:17.721Z",
     "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
+  },
+  {
+    "id": "post-888",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-23T19:51:05.503Z",
+    "text": "Smell/Taste tutors revised the scent curriculum—amber notes now mark safety drills in the dorms."
   }
 ]
