@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-590",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-14T22:57:42.995Z",
-    "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
-  },
-  {
     "id": "post-591",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-23T19:58:51.981Z",
     "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
+  },
+  {
+    "id": "post-890",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-23T20:50:37.345Z",
+    "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
   }
 ]
