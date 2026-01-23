@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-578",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-14T16:00:07.833Z",
-    "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
-  },
-  {
     "id": "post-579",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-23T10:54:00.176Z",
     "text": "Smell/Taste alchemists infused the greenhouse with rosemary vapor; memories surfaced like bubbles."
+  },
+  {
+    "id": "post-878",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-23T11:38:58.266Z",
+    "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
   }
 ]
