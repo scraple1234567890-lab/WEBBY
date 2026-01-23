@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-595",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-15T05:02:55.170Z",
-    "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
-  },
-  {
     "id": "post-596",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-23T22:00:40.136Z",
     "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
+  },
+  {
+    "id": "post-895",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-23T22:42:49.204Z",
+    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
   }
 ]
