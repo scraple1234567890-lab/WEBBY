@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-604",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-15T10:53:05.945Z",
-    "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
-  },
-  {
     "id": "post-605",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-24T05:53:49.714Z",
     "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
+  },
+  {
+    "id": "post-904",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-24T06:55:52.429Z",
+    "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
   }
 ]
