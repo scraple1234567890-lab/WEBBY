@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-628",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2026-01-16T05:58:26.679Z",
-    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
-  },
-  {
     "id": "post-629",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-24T16:59:05.893Z",
     "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
+  },
+  {
+    "id": "post-928",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-24T17:38:04.409Z",
+    "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
   }
 ]
