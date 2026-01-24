@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-626",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-16T05:00:56.089Z",
-    "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
-  },
-  {
     "id": "post-627",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-24T15:57:29.103Z",
     "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
+  },
+  {
+    "id": "post-926",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-24T16:49:48.018Z",
+    "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
   }
 ]
