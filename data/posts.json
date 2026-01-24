@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-643",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-16T15:59:37.785Z",
-    "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
-  },
-  {
     "id": "post-644",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-24T22:40:10.935Z",
     "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
+  },
+  {
+    "id": "post-943",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-24T22:52:45.859Z",
+    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
   }
 ]
