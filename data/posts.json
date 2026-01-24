@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-600",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-15T07:55:16.279Z",
-    "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
-  },
-  {
     "id": "post-601",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-23T23:59:42.123Z",
     "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
+  },
+  {
+    "id": "post-900",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-24T03:52:11.688Z",
+    "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
   }
 ]
