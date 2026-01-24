@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-610",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2026-01-15T15:58:39.668Z",
-    "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
-  },
-  {
     "id": "post-611",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-24T09:00:29.741Z",
     "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
+  },
+  {
+    "id": "post-910",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-24T09:38:53.170Z",
+    "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
   }
 ]
