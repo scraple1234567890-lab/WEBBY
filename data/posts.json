@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-601",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-15T08:58:36.757Z",
-    "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
-  },
-  {
     "id": "post-602",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-24T03:52:11.688Z",
     "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
+  },
+  {
+    "id": "post-901",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-24T04:57:44.809Z",
+    "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
   }
 ]
