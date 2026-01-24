@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-640",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-16T13:51:17.096Z",
-    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
-  },
-  {
     "id": "post-641",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-24T21:33:01.202Z",
     "text": "Smell/Taste tutors revised the scent curriculum—amber notes now mark safety drills in the dorms."
+  },
+  {
+    "id": "post-940",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-24T21:45:40.917Z",
+    "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
   }
 ]
