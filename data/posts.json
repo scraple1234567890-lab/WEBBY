@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-644",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2026-01-16T16:58:24.304Z",
-    "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
-  },
-  {
     "id": "post-645",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-24T22:52:45.859Z",
     "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
+  },
+  {
+    "id": "post-944",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-24T22:59:57.925Z",
+    "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
   }
 ]
