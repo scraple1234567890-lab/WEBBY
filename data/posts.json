@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-606",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-15T11:52:07.255Z",
-    "text": "Sound mages recorded the library's quiet and play it back during storms to steady readers."
-  },
-  {
     "id": "post-607",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-24T07:33:15.064Z",
     "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
+  },
+  {
+    "id": "post-906",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-24T07:45:48.078Z",
+    "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
   }
 ]
