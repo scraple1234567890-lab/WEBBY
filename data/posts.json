@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-609",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-15T14:53:25.260Z",
-    "text": "Sound choir traced a lullaby into the walls; echoes now hush arguments before they flare."
-  },
-  {
     "id": "post-610",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-24T08:51:18.894Z",
     "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
+  },
+  {
+    "id": "post-909",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-24T09:00:29.741Z",
+    "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
   }
 ]
