@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-615",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-15T20:50:02.095Z",
-    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
-  },
-  {
     "id": "post-616",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-24T10:55:04.678Z",
     "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
+  },
+  {
+    "id": "post-915",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-24T11:30:03.685Z",
+    "text": "Sound choir traced a lullaby into the walls; echoes now hush arguments before they flare."
   }
 ]
