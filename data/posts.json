@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-668",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2026-01-17T07:32:19.683Z",
-    "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
-  },
-  {
     "id": "post-669",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-25T14:40:46.960Z",
     "text": "Smell/Taste alchemists infused the greenhouse with rosemary vapor; memories surfaced like bubbles."
+  },
+  {
+    "id": "post-968",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-25T14:52:50.295Z",
+    "text": "Smell/Taste tutors revised the scent curriculum—amber notes now mark safety drills in the dorms."
   }
 ]
