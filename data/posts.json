@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-675",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2026-01-17T09:48:54.440Z",
-    "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
-  },
-  {
     "id": "post-676",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2097,6 +2090,13 @@
     "author": "Stargazer of Sight",
     "school": "Sight",
     "createdAt": "2026-01-25T17:00:03.139Z",
+    "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
+  },
+  {
+    "id": "post-975",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-25T17:39:47.904Z",
     "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
   }
 ]
