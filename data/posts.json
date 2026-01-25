@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-690",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-17T15:37:08.236Z",
-    "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
-  },
-  {
     "id": "post-691",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-25T22:54:48.640Z",
     "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
+  },
+  {
+    "id": "post-990",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-25T23:37:24.084Z",
+    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
   }
 ]
