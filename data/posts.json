@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-677",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-17T10:41:14.204Z",
-    "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
-  },
-  {
     "id": "post-678",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-25T17:51:24.210Z",
     "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
+  },
+  {
+    "id": "post-977",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-25T17:58:50.413Z",
+    "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
   }
 ]
