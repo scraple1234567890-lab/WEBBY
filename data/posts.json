@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-663",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-17T04:53:52.815Z",
-    "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
-  },
-  {
     "id": "post-664",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-25T11:31:04.746Z",
     "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
+  },
+  {
+    "id": "post-963",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-25T11:45:16.549Z",
+    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
   }
 ]
