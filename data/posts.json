@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-691",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-17T15:50:08.783Z",
-    "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
-  },
-  {
     "id": "post-692",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-25T23:37:24.084Z",
     "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
+  },
+  {
+    "id": "post-991",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-25T23:51:51.850Z",
+    "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
   }
 ]
