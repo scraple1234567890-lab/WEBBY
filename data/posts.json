@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-661",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-16T23:58:18.675Z",
-    "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
-  },
-  {
     "id": "post-662",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-25T10:47:51.279Z",
     "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
+  },
+  {
+    "id": "post-961",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-25T10:56:33.506Z",
+    "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
   }
 ]
