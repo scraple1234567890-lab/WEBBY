@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-665",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2026-01-17T05:52:04.448Z",
-    "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
-  },
-  {
     "id": "post-666",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2097,6 +2090,13 @@
     "author": "Warden of Touch",
     "school": "Touch",
     "createdAt": "2026-01-25T11:53:16.373Z",
+    "text": "Sound mages recorded the library's quiet and play it back during storms to steady readers."
+  },
+  {
+    "id": "post-965",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-25T13:43:30.401Z",
     "text": "Sound mages recorded the library's quiet and play it back during storms to steady readers."
   }
 ]
