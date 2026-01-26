@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-709",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-17T21:52:27.454Z",
-    "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
-  },
-  {
     "id": "post-710",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-26T19:03:36.365Z",
     "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
+  },
+  {
+    "id": "post-1009",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-26T19:44:25.479Z",
+    "text": "Sight mentors recalibrated star charts after a meteor shower rewrote the sky’s margins."
   }
 ]
