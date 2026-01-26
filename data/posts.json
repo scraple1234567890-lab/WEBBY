@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-707",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-17T21:32:08.417Z",
-    "text": "Sight mentors recalibrated star charts after a meteor shower rewrote the sky’s margins."
-  },
-  {
     "id": "post-708",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-26T17:04:56.019Z",
     "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
+  },
+  {
+    "id": "post-1007",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-26T17:56:46.447Z",
+    "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
   }
 ]
