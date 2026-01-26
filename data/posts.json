@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-698",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-17T18:52:03.431Z",
-    "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
-  },
-  {
     "id": "post-699",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-26T07:58:54.068Z",
     "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
+  },
+  {
+    "id": "post-998",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-26T09:03:09.621Z",
+    "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
   }
 ]
