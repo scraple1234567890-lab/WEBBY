@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-702",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-17T19:49:13.542Z",
-    "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
-  },
-  {
     "id": "post-703",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-26T11:38:32.826Z",
     "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
+  },
+  {
+    "id": "post-1002",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-26T11:53:11.331Z",
+    "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
   }
 ]
