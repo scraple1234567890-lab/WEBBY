@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-693",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-17T16:46:10.684Z",
-    "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
-  },
-  {
     "id": "post-694",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-25T23:59:01.366Z",
     "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
+  },
+  {
+    "id": "post-993",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-26T04:35:36.373Z",
+    "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
   }
 ]
