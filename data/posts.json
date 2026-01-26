@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-715",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-17T23:47:07.818Z",
-    "text": "Sound mages recorded the library's quiet and play it back during storms to steady readers."
-  },
-  {
     "id": "post-716",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-26T22:50:08.618Z",
     "text": "Touch mentors added braille runes to the dueling circle; the floor thrums when your stance is true."
+  },
+  {
+    "id": "post-1015",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-26T22:59:34.074Z",
+    "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
   }
 ]
