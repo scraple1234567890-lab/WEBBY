@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-699",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-17T19:00:00.451Z",
-    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
-  },
-  {
     "id": "post-700",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-26T09:03:09.621Z",
     "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
+  },
+  {
+    "id": "post-999",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-26T09:59:05.642Z",
+    "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
   }
 ]
