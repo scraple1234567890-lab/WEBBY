@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-717",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-18T04:00:11.325Z",
-    "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
-  },
-  {
     "id": "post-718",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-26T23:44:36.256Z",
     "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
+  },
+  {
+    "id": "post-1017",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-26T23:57:08.852Z",
+    "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
   }
 ]
