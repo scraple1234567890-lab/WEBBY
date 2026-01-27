@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-738",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-18T13:59:57.858Z",
-    "text": "Touch apprentices wove a tapestry ward so dense it softened every footstep in the moonlit hall."
-  },
-  {
     "id": "post-739",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-27T20:49:52.182Z",
     "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
+  },
+  {
+    "id": "post-1038",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-27T21:00:03.262Z",
+    "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
   }
 ]
