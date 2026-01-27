@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-740",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-18T14:50:49.912Z",
-    "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
-  },
-  {
     "id": "post-741",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-27T21:39:08.600Z",
     "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
+  },
+  {
+    "id": "post-1040",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-27T21:52:59.007Z",
+    "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
   }
 ]
