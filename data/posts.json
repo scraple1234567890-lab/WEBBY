@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-723",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-18T07:46:10.756Z",
-    "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
-  },
-  {
     "id": "post-724",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-27T07:50:52.354Z",
     "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
+  },
+  {
+    "id": "post-1023",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-27T07:59:23.605Z",
+    "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
   }
 ]
