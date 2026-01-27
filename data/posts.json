@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-722",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-18T07:33:23.365Z",
-    "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
-  },
-  {
     "id": "post-723",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-27T07:03:58.877Z",
     "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
+  },
+  {
+    "id": "post-1022",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-27T07:50:52.354Z",
+    "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
   }
 ]
