@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-720",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-18T05:56:16.246Z",
-    "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
-  },
-  {
     "id": "post-721",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-27T05:45:30.472Z",
     "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
+  },
+  {
+    "id": "post-1020",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-27T06:00:04.399Z",
+    "text": "Smell/Taste alchemists infused the greenhouse with rosemary vapor; memories surfaced like bubbles."
   }
 ]
