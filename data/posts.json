@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-737",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-18T13:52:50.939Z",
-    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
-  },
-  {
     "id": "post-738",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-27T20:00:16.977Z",
     "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
+  },
+  {
+    "id": "post-1037",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-27T20:49:52.182Z",
+    "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
   }
 ]
