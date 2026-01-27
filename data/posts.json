@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-726",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-18T08:59:04.810Z",
-    "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
-  },
-  {
     "id": "post-727",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-27T09:58:33.430Z",
     "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
+  },
+  {
+    "id": "post-1026",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-27T10:58:58.501Z",
+    "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
   }
 ]
