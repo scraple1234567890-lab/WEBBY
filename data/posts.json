@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-741",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-18T14:58:35.570Z",
-    "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
-  },
-  {
     "id": "post-742",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-27T21:52:59.007Z",
     "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
+  },
+  {
+    "id": "post-1041",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-27T22:00:52.642Z",
+    "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
   }
 ]
