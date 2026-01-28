@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-784",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-19T19:32:40.766Z",
-    "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
-  },
-  {
     "id": "post-785",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-28T21:17:42.685Z",
     "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
+  },
+  {
+    "id": "post-1084",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-28T21:47:31.016Z",
+    "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
   }
 ]
