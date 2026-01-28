@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-768",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-19T05:50:28.111Z",
-    "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
-  },
-  {
     "id": "post-769",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2097,6 +2090,13 @@
     "author": "Stargazer of Sight",
     "school": "Sight",
     "createdAt": "2026-01-28T12:50:25.319Z",
+    "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
+  },
+  {
+    "id": "post-1068",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-28T13:38:00.667Z",
     "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
   }
 ]
