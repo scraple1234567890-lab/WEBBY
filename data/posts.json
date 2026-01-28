@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-769",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-19T07:05:57.819Z",
-    "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
-  },
-  {
     "id": "post-770",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-28T13:38:00.667Z",
     "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
+  },
+  {
+    "id": "post-1069",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-28T14:05:15.461Z",
+    "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
   }
 ]
