@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-789",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-19T21:38:10.187Z",
-    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
-  },
-  {
     "id": "post-790",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-28T23:27:30.281Z",
     "text": "Touch apprentices wove a tapestry ward so dense it softened every footstep in the moonlit hall."
+  },
+  {
+    "id": "post-1089",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-28T23:48:42.868Z",
+    "text": "Touch mentors added braille runes to the dueling circle; the floor thrums when your stance is true."
   }
 ]
