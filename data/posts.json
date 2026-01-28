@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-751",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-18T18:58:29.903Z",
-    "text": "Sound choir traced a lullaby into the walls; echoes now hush arguments before they flare."
-  },
-  {
     "id": "post-752",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-28T05:24:41.477Z",
     "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
+  },
+  {
+    "id": "post-1051",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-28T05:49:35.427Z",
+    "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
   }
 ]
