@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-778",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-19T14:57:08.976Z",
-    "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
-  },
-  {
     "id": "post-779",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-28T18:42:44.908Z",
     "text": "Sight mentors recalibrated star charts after a meteor shower rewrote the sky’s margins."
+  },
+  {
+    "id": "post-1078",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-28T19:04:41.915Z",
+    "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
   }
 ]
