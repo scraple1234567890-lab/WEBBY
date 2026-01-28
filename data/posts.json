@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-781",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-19T17:49:05.695Z",
-    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
-  },
-  {
     "id": "post-782",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-28T19:54:58.681Z",
     "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
+  },
+  {
+    "id": "post-1081",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-28T20:21:04.207Z",
+    "text": "Sound choir traced a lullaby into the walls; echoes now hush arguments before they flare."
   }
 ]
