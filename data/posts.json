@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-771",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-19T08:00:02.278Z",
-    "text": "Smell/Taste tutors revised the scent curriculum—amber notes now mark safety drills in the dorms."
-  },
-  {
     "id": "post-772",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-28T14:46:29.990Z",
     "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
+  },
+  {
+    "id": "post-1071",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-28T15:16:18.248Z",
+    "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
   }
 ]
