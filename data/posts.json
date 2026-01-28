@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-775",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-19T11:40:18.156Z",
-    "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
-  },
-  {
     "id": "post-776",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-28T17:00:08.912Z",
     "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
+  },
+  {
+    "id": "post-1075",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-28T17:37:34.029Z",
+    "text": "Touch apprentices wove a tapestry ward so dense it softened every footstep in the moonlit hall."
   }
 ]
