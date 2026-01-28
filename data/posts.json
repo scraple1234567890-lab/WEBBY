@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-788",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-19T20:57:14.317Z",
-    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
-  },
-  {
     "id": "post-789",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-28T22:58:18.496Z",
     "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
+  },
+  {
+    "id": "post-1088",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-28T23:27:30.281Z",
+    "text": "Touch apprentices wove a tapestry ward so dense it softened every footstep in the moonlit hall."
   }
 ]
