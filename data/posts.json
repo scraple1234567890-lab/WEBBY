@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-757",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-18T20:53:12.687Z",
-    "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
-  },
-  {
     "id": "post-758",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-28T07:54:07.278Z",
     "text": "Touch mentors added braille runes to the dueling circle; the floor thrums when your stance is true."
+  },
+  {
+    "id": "post-1057",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-28T08:18:32.921Z",
+    "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
   }
 ]
