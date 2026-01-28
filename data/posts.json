@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-783",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-19T18:58:28.899Z",
-    "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
-  },
-  {
     "id": "post-784",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-28T20:52:33.627Z",
     "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
+  },
+  {
+    "id": "post-1083",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-28T21:17:42.685Z",
+    "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
   }
 ]
