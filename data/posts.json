@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-797",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-20T05:46:07.268Z",
-    "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
-  },
-  {
     "id": "post-798",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-29T07:35:11.133Z",
     "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
+  },
+  {
+    "id": "post-1097",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-29T08:03:34.809Z",
+    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
   }
 ]
