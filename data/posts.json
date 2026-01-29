@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-812",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-20T20:35:40.879Z",
-    "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
-  },
-  {
     "id": "post-813",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-29T17:51:27.544Z",
     "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
+  },
+  {
+    "id": "post-1112",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-29T18:25:47.487Z",
+    "text": "Sound choir traced a lullaby into the walls; echoes now hush arguments before they flare."
   }
 ]
