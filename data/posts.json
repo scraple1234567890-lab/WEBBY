@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-819",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-20T22:59:56.004Z",
-    "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
-  },
-  {
     "id": "post-820",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-29T21:21:25.628Z",
     "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
+  },
+  {
+    "id": "post-1119",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-29T21:47:05.909Z",
+    "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
   }
 ]
