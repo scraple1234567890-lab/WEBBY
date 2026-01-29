@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-810",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-20T17:04:42.755Z",
-    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
-  },
-  {
     "id": "post-811",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-29T16:24:13.252Z",
     "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
+  },
+  {
+    "id": "post-1110",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-29T17:06:51.750Z",
+    "text": "Smell/Taste tutors revised the scent curriculum—amber notes now mark safety drills in the dorms."
   }
 ]
