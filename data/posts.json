@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-793",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-19T22:57:04.244Z",
-    "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
-  },
-  {
     "id": "post-794",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-29T04:18:56.406Z",
     "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
+  },
+  {
+    "id": "post-1093",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-29T05:14:36.032Z",
+    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
   }
 ]
