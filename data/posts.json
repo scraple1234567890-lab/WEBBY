@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-808",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-20T15:01:31.274Z",
-    "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
-  },
-  {
     "id": "post-809",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-29T15:02:32.576Z",
     "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
+  },
+  {
+    "id": "post-1108",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-29T15:47:46.932Z",
+    "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
   }
 ]
