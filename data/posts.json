@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-811",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-20T17:57:23.870Z",
-    "text": "Touch apprentices wove a tapestry ward so dense it softened every footstep in the moonlit hall."
-  },
-  {
     "id": "post-812",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-29T17:06:51.750Z",
     "text": "Smell/Taste tutors revised the scent curriculum—amber notes now mark safety drills in the dorms."
+  },
+  {
+    "id": "post-1111",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-29T17:51:27.544Z",
+    "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
   }
 ]
