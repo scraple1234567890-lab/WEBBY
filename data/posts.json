@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-809",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-20T16:00:22.784Z",
-    "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
-  },
-  {
     "id": "post-810",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-29T15:47:46.932Z",
     "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
+  },
+  {
+    "id": "post-1109",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-29T16:24:13.252Z",
+    "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
   }
 ]
