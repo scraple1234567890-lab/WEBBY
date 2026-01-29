@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-800",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-20T07:51:34.831Z",
-    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
-  },
-  {
     "id": "post-801",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-29T09:34:39.821Z",
     "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
+  },
+  {
+    "id": "post-1100",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-29T10:08:19.380Z",
+    "text": "Smell/Taste tutors revised the scent curriculum—amber notes now mark safety drills in the dorms."
   }
 ]
