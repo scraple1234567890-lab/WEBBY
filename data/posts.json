@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-805",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2026-01-20T11:43:28.637Z",
-    "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
-  },
-  {
     "id": "post-806",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-29T12:23:53.266Z",
     "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
+  },
+  {
+    "id": "post-1105",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-29T13:36:18.078Z",
+    "text": "Sound mages recorded the library's quiet and play it back during storms to steady readers."
   }
 ]
