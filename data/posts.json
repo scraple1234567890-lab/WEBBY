@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-821",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-20T23:55:34.777Z",
-    "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
-  },
-  {
     "id": "post-822",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-29T22:00:57.514Z",
     "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
+  },
+  {
+    "id": "post-1121",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-29T22:36:34.522Z",
+    "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
   }
 ]
