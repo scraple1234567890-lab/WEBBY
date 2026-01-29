@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-825",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-21T07:05:35.754Z",
-    "text": "Sound mages recorded the library's quiet and play it back during storms to steady readers."
-  },
-  {
     "id": "post-826",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-29T23:48:24.169Z",
     "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
+  },
+  {
+    "id": "post-1125",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-29T23:59:42.841Z",
+    "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
   }
 ]
