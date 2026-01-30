@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-854",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-22T13:58:07.330Z",
-    "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
-  },
-  {
     "id": "post-855",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-30T20:54:45.364Z",
     "text": "Sight mentors recalibrated star charts after a meteor shower rewrote the sky’s margins."
+  },
+  {
+    "id": "post-1154",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-30T21:19:50.485Z",
+    "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
   }
 ]
