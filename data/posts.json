@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-845",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-22T06:00:37.485Z",
-    "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
-  },
-  {
     "id": "post-846",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-30T15:53:31.371Z",
     "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
+  },
+  {
+    "id": "post-1145",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-30T16:24:13.057Z",
+    "text": "Sound mages recorded the library's quiet and play it back during storms to steady readers."
   }
 ]
