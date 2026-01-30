@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-830",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-21T10:58:50.170Z",
-    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
-  },
-  {
     "id": "post-831",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2097,6 +2090,13 @@
     "author": "Stargazer of Sight",
     "school": "Sight",
     "createdAt": "2026-01-30T06:06:37.336Z",
+    "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
+  },
+  {
+    "id": "post-1130",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-30T07:04:28.592Z",
     "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
   }
 ]
