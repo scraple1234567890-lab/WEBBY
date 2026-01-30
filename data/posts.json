@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-832",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-21T11:57:33.821Z",
-    "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
-  },
-  {
     "id": "post-833",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-30T07:48:28.037Z",
     "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
+  },
+  {
+    "id": "post-1132",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-30T08:20:36.838Z",
+    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
   }
 ]
