@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-847",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-22T07:50:43.841Z",
-    "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
-  },
-  {
     "id": "post-848",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-30T17:04:34.239Z",
     "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
+  },
+  {
+    "id": "post-1147",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-30T17:47:06.331Z",
+    "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
   }
 ]
