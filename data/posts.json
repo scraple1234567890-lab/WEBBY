@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-852",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-22T11:43:08.345Z",
-    "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
-  },
-  {
     "id": "post-853",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-30T19:57:19.843Z",
     "text": "Sight mentors recalibrated star charts after a meteor shower rewrote the sky’s margins."
+  },
+  {
+    "id": "post-1152",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-30T20:27:47.441Z",
+    "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
   }
 ]
