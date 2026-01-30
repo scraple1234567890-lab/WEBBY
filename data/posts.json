@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-844",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-22T05:48:30.453Z",
-    "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
-  },
-  {
     "id": "post-845",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-30T15:18:39.500Z",
     "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
+  },
+  {
+    "id": "post-1144",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-30T15:53:31.371Z",
+    "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
   }
 ]
