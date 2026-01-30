@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-828",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-21T09:02:14.415Z",
-    "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
-  },
-  {
     "id": "post-829",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-30T04:20:55.022Z",
     "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
+  },
+  {
+    "id": "post-1128",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-30T05:27:24.449Z",
+    "text": "Touch apprentices wove a tapestry ward so dense it softened every footstep in the moonlit hall."
   }
 ]
