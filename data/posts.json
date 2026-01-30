@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-829",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2026-01-21T09:57:49.373Z",
-    "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
-  },
-  {
     "id": "post-830",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-30T05:27:24.449Z",
     "text": "Touch apprentices wove a tapestry ward so dense it softened every footstep in the moonlit hall."
+  },
+  {
+    "id": "post-1129",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-30T06:06:37.336Z",
+    "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
   }
 ]
