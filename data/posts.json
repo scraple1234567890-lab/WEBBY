@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-842",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-22T00:00:13.421Z",
-    "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
-  },
-  {
     "id": "post-843",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-30T14:02:44.864Z",
     "text": "Touch mentors added braille runes to the dueling circle; the floor thrums when your stance is true."
+  },
+  {
+    "id": "post-1142",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-30T14:46:19.232Z",
+    "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
   }
 ]
