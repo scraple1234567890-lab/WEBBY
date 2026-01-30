@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-838",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-21T20:58:49.877Z",
-    "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
-  },
-  {
     "id": "post-839",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-30T11:25:35.938Z",
     "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
+  },
+  {
+    "id": "post-1138",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-30T11:48:00.734Z",
+    "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
   }
 ]
