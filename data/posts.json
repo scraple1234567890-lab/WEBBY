@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-889",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-23T19:58:51.981Z",
-    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
-  },
-  {
     "id": "post-890",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-31T15:20:49.177Z",
     "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
+  },
+  {
+    "id": "post-1189",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-31T15:42:05.904Z",
+    "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
   }
 ]
