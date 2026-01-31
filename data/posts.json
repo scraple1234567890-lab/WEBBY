@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-873",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-23T07:47:21.053Z",
-    "text": "Sight mentors recalibrated star charts after a meteor shower rewrote the sky’s margins."
-  },
-  {
     "id": "post-874",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-31T08:52:47.436Z",
     "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
+  },
+  {
+    "id": "post-1173",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-31T09:15:10.316Z",
+    "text": "Sight mentors recalibrated star charts after a meteor shower rewrote the sky’s margins."
   }
 ]
