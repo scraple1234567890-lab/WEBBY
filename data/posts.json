@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-870",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2026-01-23T05:04:22.323Z",
-    "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
-  },
-  {
     "id": "post-871",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-31T07:43:19.615Z",
     "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
+  },
+  {
+    "id": "post-1170",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-31T07:56:30.753Z",
+    "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
   }
 ]
