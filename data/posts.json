@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-898",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-23T23:52:24.067Z",
-    "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
-  },
-  {
     "id": "post-899",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-01-31T18:51:45.759Z",
     "text": "Sound mages recorded the library's quiet and play it back during storms to steady readers."
+  },
+  {
+    "id": "post-1198",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-31T19:10:46.361Z",
+    "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
   }
 ]
