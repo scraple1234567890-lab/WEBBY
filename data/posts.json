@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-880",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-23T13:54:42.949Z",
-    "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
-  },
-  {
     "id": "post-881",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-31T11:26:52.934Z",
     "text": "Sound choir traced a lullaby into the walls; echoes now hush arguments before they flare."
+  },
+  {
+    "id": "post-1180",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-31T11:42:48.537Z",
+    "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
   }
 ]
