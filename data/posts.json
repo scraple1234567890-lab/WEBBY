@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-909",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-24T09:00:29.741Z",
-    "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
-  },
-  {
     "id": "post-910",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-31T21:59:57.738Z",
     "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
+  },
+  {
+    "id": "post-1209",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-31T22:28:54.207Z",
+    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
   }
 ]
