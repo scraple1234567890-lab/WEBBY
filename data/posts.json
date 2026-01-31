@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-866",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-22T22:59:14.627Z",
-    "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
-  },
-  {
     "id": "post-867",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-01-31T05:26:45.639Z",
     "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
+  },
+  {
+    "id": "post-1166",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-01-31T05:58:40.878Z",
+    "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
   }
 ]
