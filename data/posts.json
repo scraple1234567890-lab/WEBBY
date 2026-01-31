@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-895",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-23T22:42:49.204Z",
-    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
-  },
-  {
     "id": "post-896",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-01-31T17:39:53.724Z",
     "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
+  },
+  {
+    "id": "post-1195",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-31T17:54:59.724Z",
+    "text": "Smell/Taste alchemists infused the greenhouse with rosemary vapor; memories surfaced like bubbles."
   }
 ]
