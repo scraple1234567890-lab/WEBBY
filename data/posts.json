@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-904",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-24T06:55:52.429Z",
-    "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
-  },
-  {
     "id": "post-905",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-31T20:41:26.199Z",
     "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
+  },
+  {
+    "id": "post-1204",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-01-31T20:56:13.984Z",
+    "text": "Smell/Taste tutors revised the scent curriculum—amber notes now mark safety drills in the dorms."
   }
 ]
