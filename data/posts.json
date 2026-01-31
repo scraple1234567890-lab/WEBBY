@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-868",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-22T23:53:51.365Z",
-    "text": "Sound mages recorded the library's quiet and play it back during storms to steady readers."
-  },
-  {
     "id": "post-869",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-31T06:42:06.628Z",
     "text": "Touch wardens tempered quills with riverstone ink, preventing smudged sigils during rainy season."
+  },
+  {
+    "id": "post-1168",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-01-31T07:16:24.769Z",
+    "text": "Touch artisans carved gratitude knots into stair rails; the wood warms when thanked aloud."
   }
 ]
