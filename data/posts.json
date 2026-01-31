@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-900",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-24T03:52:11.688Z",
-    "text": "Sound engineers tuned the speaking tubes to filter gossip; only urgent tones now carry through."
-  },
-  {
     "id": "post-901",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-01-31T19:31:36.390Z",
     "text": "Smell/Taste tutors revised the scent curriculum—amber notes now mark safety drills in the dorms."
+  },
+  {
+    "id": "post-1200",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-01-31T19:44:37.528Z",
+    "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
   }
 ]
