@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-935",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-24T19:57:18.405Z",
-    "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
-  },
-  {
     "id": "post-936",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-02-01T14:02:01.132Z",
     "text": "Sound choir traced a lullaby into the walls; echoes now hush arguments before they flare."
+  },
+  {
+    "id": "post-1235",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-02-01T14:35:27.606Z",
+    "text": "Touch crafters reforged practice wands with woven leather grips; no more slips mid-incantation."
   }
 ]
