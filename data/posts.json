@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-940",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-24T21:45:40.917Z",
-    "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
-  },
-  {
     "id": "post-941",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-02-01T15:58:19.272Z",
     "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
+  },
+  {
+    "id": "post-1240",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-02-01T16:30:05.846Z",
+    "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
   }
 ]
