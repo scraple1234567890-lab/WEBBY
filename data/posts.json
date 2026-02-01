@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-922",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2026-01-24T14:53:10.593Z",
-    "text": "Sound choir traced a lullaby into the walls; echoes now hush arguments before they flare."
-  },
-  {
     "id": "post-923",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-02-01T08:16:40.716Z",
     "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
+  },
+  {
+    "id": "post-1222",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-02-01T08:50:11.721Z",
+    "text": "Smell/Taste students bottled bakery warmth; uncorked near the infirmary, it brightened every bed."
   }
 ]
