@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-946",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2026-01-24T23:49:19.762Z",
-    "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
-  },
-  {
     "id": "post-947",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2097,6 +2090,13 @@
     "author": "Essence Steward",
     "school": "Smell/Taste",
     "createdAt": "2026-02-01T18:38:41.875Z",
+    "text": "Sound choir traced a lullaby into the walls; echoes now hush arguments before they flare."
+  },
+  {
+    "id": "post-1246",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-02-01T19:03:30.650Z",
     "text": "Sound choir traced a lullaby into the walls; echoes now hush arguments before they flare."
   }
 ]
