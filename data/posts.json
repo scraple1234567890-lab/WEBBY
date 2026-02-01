@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-919",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-24T13:42:00.039Z",
-    "text": "Touch apprentices wove a tapestry ward so dense it softened every footstep in the moonlit hall."
-  },
-  {
     "id": "post-920",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-02-01T06:31:26.113Z",
     "text": "Sight novices set prisms in courtyard lanterns; each path now wears a shifting aurora for guidance."
+  },
+  {
+    "id": "post-1219",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-02-01T07:22:54.914Z",
+    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
   }
 ]
