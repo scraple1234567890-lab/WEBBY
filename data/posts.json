@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-939",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2026-01-24T21:33:01.202Z",
-    "text": "Smell/Taste tutors revised the scent curriculum—amber notes now mark safety drills in the dorms."
-  },
-  {
     "id": "post-940",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-02-01T15:43:10.821Z",
     "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
+  },
+  {
+    "id": "post-1239",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-02-01T15:58:19.272Z",
+    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
   }
 ]
