@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-943",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-24T22:52:45.859Z",
-    "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
-  },
-  {
     "id": "post-944",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-02-01T17:19:37.101Z",
     "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
+  },
+  {
+    "id": "post-1243",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-02-01T17:45:58.801Z",
+    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
   }
 ]
