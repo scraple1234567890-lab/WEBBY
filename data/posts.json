@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-916",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-24T11:44:39.565Z",
-    "text": "Touch apprentices wove a tapestry ward so dense it softened every footstep in the moonlit hall."
-  },
-  {
     "id": "post-917",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-02-01T02:07:36.362Z",
     "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
+  },
+  {
+    "id": "post-1216",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-02-01T04:35:37.931Z",
+    "text": "Smell/Taste alchemists infused the greenhouse with rosemary vapor; memories surfaced like bubbles."
   }
 ]
