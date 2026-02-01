@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-948",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2026-01-25T04:20:45.678Z",
-    "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
-  },
-  {
     "id": "post-949",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-02-01T23:02:10.629Z",
     "text": "Sound archivists captured a thunderclap in crystal; played back quietly, it calms restless familiars."
+  },
+  {
+    "id": "post-1248",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-02-01T23:34:33.656Z",
+    "text": "Sound choir traced a lullaby into the walls; echoes now hush arguments before they flare."
   }
 ]
