@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-933",
-    "author": "Warden of Touch",
-    "school": "Touch",
-    "createdAt": "2026-01-24T19:41:51.530Z",
-    "text": "Sound mages recorded the library's quiet and play it back during storms to steady readers."
-  },
-  {
     "id": "post-934",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-02-01T12:55:07.005Z",
     "text": "Sight trackers mapped a comet tail over the observatory—its glow traced the old ward-lines perfectly."
+  },
+  {
+    "id": "post-1233",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-02-01T13:37:36.647Z",
+    "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
   }
 ]
