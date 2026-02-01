@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-928",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-24T17:38:04.409Z",
-    "text": "Smell/Taste scholars discovered a spice that tastes like remembered courage; rationed for finals week."
-  },
-  {
     "id": "post-929",
     "author": "Essence Steward",
     "school": "Smell/Taste",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-02-01T10:55:07.385Z",
     "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
+  },
+  {
+    "id": "post-1228",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-02-01T11:16:04.059Z",
+    "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
   }
 ]
