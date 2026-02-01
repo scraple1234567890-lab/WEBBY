@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-949",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-25T05:45:40.058Z",
-    "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
-  },
-  {
     "id": "post-950",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-02-01T19:47:54.818Z",
     "text": "Sound mages recorded the library's quiet and play it back during storms to steady readers."
+  },
+  {
+    "id": "post-1249",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-02-01T19:57:16.535Z",
+    "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
   }
 ]
