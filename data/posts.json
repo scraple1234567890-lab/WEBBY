@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-920",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2026-01-24T13:56:03.477Z",
-    "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
-  },
-  {
     "id": "post-921",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2097,6 +2090,13 @@
     "author": "Warden of Touch",
     "school": "Touch",
     "createdAt": "2026-02-01T07:22:54.914Z",
+    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
+  },
+  {
+    "id": "post-1220",
+    "author": "Essence Steward",
+    "school": "Smell/Taste",
+    "createdAt": "2026-02-01T07:51:58.611Z",
     "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
   }
 ]
