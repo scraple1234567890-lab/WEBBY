@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-951",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-25T06:58:39.091Z",
-    "text": "Touch dueling club installed cushioned ward-rings, easing the recoil of high-voltage sigils."
-  },
-  {
     "id": "post-952",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-02-02T00:56:27.895Z",
     "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
+  },
+  {
+    "id": "post-1251",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-02-02T03:38:05.067Z",
+    "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
   }
 ]
