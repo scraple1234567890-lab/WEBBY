@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-949",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-25T05:45:40.058Z",
-    "text": "Sound keepers report the wind tunnel harmonized on its own, as if practicing scales before class."
-  },
-  {
     "id": "post-950",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-02-02T07:58:50.631Z",
     "text": "Sight mentors recalibrated star charts after a meteor shower rewrote the sky’s margins."
+  },
+  {
+    "id": "post-1249",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-02-02T08:49:03.216Z",
+    "text": "Smell/Taste novices brewed a tea that tastes like first snowfall; it cleared every fogged mind in exams."
   }
 ]
