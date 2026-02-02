@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+
+<html data-theme="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="Tiny Turn RPG — a quick turn-based battle against a rival mage." name="description"/>
+<title>StarSpell Academy | Tiny Turn RPG</title>
+<link href="./favicon.ico" rel="icon" sizes="any"/>
+<link href="./favicon.png" rel="icon" type="image/png"/>
+<link href="./styles.css" rel="stylesheet"/>
+</head>
+<body class="gamePage">
+<a class="skip-link" href="#main">Skip to content</a>
+<div id="top"></div>
+<header class="header" role="banner">
+<nav aria-label="Primary" class="nav container">
+<a aria-label="Home" class="brand" href="./index.html#top">
+<span class="brandText">StarSpell Academy</span>
+</a>
+<button aria-controls="navLinks" aria-expanded="false" class="iconBtn navToggle" id="navToggle">
+<span class="srOnly">Open menu</span>
+<span aria-hidden="true" class="hamburger"></span>
+</button>
+<div class="navLinks" id="navLinks">
+<a href="./quiz.html">Sorting quiz</a>
+<a href="./posts.html">Posts</a>
+<a href="./articles.html">Articles</a><a href="./search.html">Search</a>
+<a href="./badges.html">Badges</a>
+<a href="./map.html">Map</a>
+<a href="./timeline.html">Timeline</a>
+<a aria-current="page" href="./game.html">Game</a>
+<a class="btn ghost" href="./shop.html">Shop</a>
+<form action="./search.html" class="navSearch" method="get" role="search"><input aria-label="Search" class="navSearchInput" name="q" placeholder="Search…" type="search"/><button aria-label="Run search" class="navSearchBtn" type="submit">Go</button></form><div class="profileMenu" data-default-display="inline-flex" id="profileMenu" style="display: none">
+<button aria-controls="profileMenuList" aria-expanded="false" aria-haspopup="menu" aria-label="Open account menu" class="btn ghost profileTrigger" id="profileMenuToggle" type="button">
+<span class="srOnly">Profile</span>
+<span class="profileAvatar profileAvatar--menu" id="profileAvatar">
+<span aria-hidden="true" class="profileAvatarPlaceholder">
+<svg focusable="false" role="presentation" viewbox="0 0 24 24">
+<path d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5Zm0 2c-3.33 0-10 1.67-10 5v1h20v-1c0-3.33-6.67-5-10-5Z" fill="currentColor"></path>
+</svg>
+</span>
+<img alt="" loading="lazy"/>
+</span>
+<span aria-hidden="true" class="profileCaret">▾</span>
+</button>
+<div aria-hidden="true" class="profileMenuList" id="profileMenuList" role="menu">
+<a href="./profile.html" role="menuitem">View profile</a>
+<button id="logoutBtn" role="menuitem" type="button">Log out</button>
+</div>
+</div>
+<a class="btn primary magentaGlow" data-auth-target="login-cta" href="./login.html">Open the login portal</a>
+</div>
+</nav>
+</header>
+<main id="main">
+<section class="section">
+<div class="container">
+<div class="sectionHead">
+<p class="kicker">Minigame</p>
+<h1>Tiny Turn RPG</h1>
+<p class="muted">Pick an action, watch your rival respond, and keep your HP above zero.</p>
+</div>
+<div class="rpgWrap" id="rpgRoot">
+<div aria-label="Battlefield" class="rpgGrid" role="group">
+<article aria-label="Player" class="post rpgCard" id="playerCard">
+<div class="rpgCardTop">
+<div>
+<h2 class="rpgName">Player</h2>
+<p class="muted small" id="playerStatus">Ready</p>
+</div>
+<p class="rpgHpText" id="playerHpText">HP 20 / 20</p>
+</div>
+<div aria-hidden="true" class="rpgHpTrack">
+<div class="rpgHpFill" id="playerHpFill" style="width: 100%"></div>
+</div>
+</article>
+<article aria-label="Enemy" class="post rpgCard" id="enemyCard">
+<div class="rpgCardTop">
+<div>
+<h2 class="rpgName">Rival Mage</h2>
+<p class="muted small" id="enemyStatus">Channeling</p>
+</div>
+<p class="rpgHpText" id="enemyHpText">HP 18 / 18</p>
+</div>
+<div aria-hidden="true" class="rpgHpTrack">
+<div class="rpgHpFill" id="enemyHpFill" style="width: 100%"></div>
+</div>
+</article>
+</div>
+<article aria-label="Battle scene" class="post rpgStage">
+<div aria-label="A tiny battle scene: the player faces a rival mage." class="rpgStageInner" role="img">
+<div aria-hidden="true" class="rpgFoe rpgFoe--player" id="playerSprite">
+<img alt="" class="rpgSpriteImg" loading="lazy" src="./assets/images/player-brown.png"/>
+<span aria-hidden="true" class="rpgShield" id="playerShield"></span>
+</div>
+<div aria-hidden="true" class="rpgFoe rpgFoe--enemy" id="enemySprite">
+<img alt="" class="rpgSpriteImg" loading="lazy" src="./assets/images/enemy-blue.png"/>
+</div>
+</div>
+</article>
+<div aria-label="Actions" class="rpgActions">
+<button class="btn primary" id="attackBtn" type="button">Attack</button>
+<button class="btn secondary" id="healBtn" type="button">Heal</button>
+<button class="btn ghost" id="guardBtn" type="button">Guard</button>
+<button class="btn ghost" id="restartBtn" type="button">Restart</button>
+</div>
+<article aria-label="Battle log" class="post rpgLogCard">
+<div class="rpgLogHead">
+<h2 class="rpgLogTitle">Battle log</h2>
+<p class="muted small">Newest messages appear first.</p>
+</div>
+<ul aria-live="polite" aria-relevant="additions" class="rpgLog" id="battleLog"></ul>
+</article>
+</div>
+</div>
+</section>
+</main>
+<footer class="footer">
+<div class="container footerRow">
+<p class="muted small">© <span id="year"></span> StarSpell Academy. May your turns be kind.</p>
+<a class="muted small" href="#top">Back to top ↑</a>
+</div>
+</footer>
+<script defer="" src="./script.js"></script>
+<script src="./js/app.js" type="module"></script>
+<script src="./js/game.js" type="module"></script>
+</body>
+</html>
