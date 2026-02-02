@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>StarSpell Academy | Map</title>
+    <link rel="icon" href="./favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" href="./favicon.png" />
+
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./map.css" />
+  </head>
+  <body class="mapPage">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div id="top"></div>
+
+    <header class="header" role="banner">
+      <nav class="nav container" aria-label="Primary">
+        <a class="brand" href="./index.html#top" aria-label="Home">
+          <span class="brandText">StarSpell Academy</span>
+        </a>
+
+        <button class="iconBtn navToggle" id="navToggle" aria-expanded="false" aria-controls="navLinks">
+          <span class="srOnly">Open menu</span>
+          <span class="hamburger" aria-hidden="true"></span>
+        </button>
+
+        <div class="navLinks" id="navLinks">
+          <a href="./quiz.html">Sorting quiz</a>
+          <a href="./posts.html">Posts</a>
+          <a href="./articles.html">Articles</a>
+          <a href="./map.html" aria-current="page">Map</a>
+          <a href="./timeline.html">Timeline</a>
+          <a href="./game.html">Game</a>
+          <a class="btn ghost" href="./shop.html">Shop</a>
+
+          <div class="profileMenu" id="profileMenu" data-default-display="inline-flex" style="display: none">
+            <button
+              class="btn ghost profileTrigger"
+              type="button"
+              id="profileMenuToggle"
+              aria-expanded="false"
+              aria-haspopup="menu"
+              aria-controls="profileMenuList"
+              aria-label="Open account menu"
+            >
+              <span class="srOnly">Profile</span>
+              <span class="profileAvatar profileAvatar--menu" id="profileAvatar">
+                <span class="profileAvatarPlaceholder" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                    <path
+                      d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5Zm0 2c-3.33 0-10 1.67-10 5v1h20v-1c0-3.33-6.67-5-10-5Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </span>
+                <img alt="" loading="lazy" />
+              </span>
+              <span class="profileCaret" aria-hidden="true">▾</span>
+            </button>
+            <div class="profileMenuList" id="profileMenuList" role="menu" aria-hidden="true">
+              <a href="./profile.html" role="menuitem">View profile</a>
+              <button id="logoutBtn" type="button" role="menuitem">Log out</button>
+            </div>
+          </div>
+
+          <a class="btn primary magentaGlow" href="./login.html" data-auth-target="login-cta">Open the login portal</a>
+        </div>
+      </nav>
+    </header>
+
+    <main id="main" class="section">
+      <div class="container mapLayout">
+        <div class="sectionHead">
+          <h1>Interactive map</h1>
+          <p class="muted mapIntro">
+            Click a marker to preview a location. Use “Read more” for the full entry, or copy a direct link to a marker.
+            (Tip: zoom your browser if you want a closer look.)
+          </p>
+        </div>
+
+        <div class="mapStage" id="mapStage">
+          <img
+            class="mapImage"
+            src="./assets/images/city-map.png"
+            alt="A stylized city map with districts like Sanc, Arena, Palace, Fey Forest, Roots, and Industry. Small circular markers indicate points of interest."
+            loading="eager"
+          />
+          <div class="mapPins" id="mapPins" aria-label="Map markers" role="group"></div>
+        </div>
+
+        <section aria-label="Locations list">
+          <div class="mapHints">
+            <p class="muted" style="margin: 0">Prefer a list? Pick a location below.</p>
+            <a class="btn ghost" href="#top">Back to top</a>
+          </div>
+          <div class="mapListGrid" id="mapList"></div>
+        </section>
+      </div>
+    </main>
+
+    <dialog class="mapModal" id="mapModal" aria-labelledby="mapModalTitle">
+      <div class="mapModalHeader">
+        <div>
+          <h2 id="mapModalTitle">Location</h2>
+        </div>
+        <button class="mapCloseBtn" id="mapModalClose" type="button" aria-label="Close">✕</button>
+      </div>
+      <div class="mapModalBody">
+        <p class="muted" id="mapModalBlurb" style="margin: 0"></p>
+
+        <div class="mapModalMedia" id="mapModalMedia" hidden>
+          <img class="mapModalImage" id="mapModalImage" alt="" loading="lazy" />
+        </div>
+        <div class="mapModalActions">
+          <a class="btn primary" id="mapModalLink" href="#">Read more</a>
+          <button class="btn ghost" id="mapModalCopy" type="button">Copy link</button>
+        </div>
+      </div>
+    </dialog>
+
+    <footer class="footer">
+      <div class="container footerRow">
+        <p class="muted small">© <span id="year"></span> StarSpell Academy. May your path stay bright.</p>
+        <a class="muted small" href="#top">Back to the stars ↑</a>
+      </div>
+    </footer>
+
+    <script src="./script.js" defer></script>
+    <script type="module" src="./js/app.js"></script>
+    <script src="./data/map-locations.js" defer></script>
+    <script src="./js/map.js" defer></script>
+  </body>
+</html>
