@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-959",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-25T09:59:49.748Z",
-    "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
-  },
-  {
     "id": "post-960",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Smell/Taste",
     "createdAt": "2026-02-02T15:48:34.746Z",
     "text": "Sound faculty tuned the bells to the heartbeat of the library—silence now thuds softly between shelves."
+  },
+  {
+    "id": "post-1259",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-02-02T16:18:21.422Z",
+    "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
   }
 ]
