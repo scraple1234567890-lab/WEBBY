@@ -23,11 +23,137 @@ const profileEditCancel = document.getElementById("profileEditCancel");
 const profilePosts = document.getElementById("profilePosts");
 const profilePostsCard = document.getElementById("profilePostsCard");
 
+// Badges (client-side achievements)
+const profileBadgesSection = document.getElementById("profileBadgesSection");
+const profileBadgesGrid = document.getElementById("profileBadgesGrid");
+const profileBadgesCount = document.getElementById("profileBadgesCount");
+const profileBadgesTotal = document.getElementById("profileBadgesTotal");
+const profileBadgesEmpty = document.getElementById("profileBadgesEmpty");
+
 const LOGIN_STATE_KEY = "auth:isLoggedIn";
 const AVATAR_KEY_PREFIX = "profile:avatar:";
 
 let activeUserId = null;
 let profileMetadata = {};
+
+function safeJsonParse(text, fallback) {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return fallback;
+  }
+}
+
+function setBadgesVisible(show) {
+  if (!(profileBadgesSection instanceof HTMLElement)) return;
+  profileBadgesSection.hidden = !show;
+  profileBadgesSection.setAttribute("aria-hidden", String(!show));
+}
+
+function renderProfileBadges() {
+  if (!(profileBadgesSection instanceof HTMLElement)) return;
+  if (!(profileBadgesGrid instanceof HTMLElement)) return;
+
+  const defs = window.SSA_BADGE_DEFS || [];
+  const api = window.SSAchievements;
+
+  if (!api || !Array.isArray(defs) || defs.length === 0) {
+    setBadgesVisible(false);
+    return;
+  }
+
+  setBadgesVisible(true);
+
+  // Pull unlock timestamps for nicer ordering.
+  const stateRaw = (() => {
+    try {
+      return localStorage.getItem("ssa:badges:v1") || "";
+    } catch {
+      return "";
+    }
+  })();
+  const state = safeJsonParse(stateRaw, { unlocked: {} });
+  const unlockedMap = (state && typeof state === "object" && state.unlocked && typeof state.unlocked === "object") ? state.unlocked : {};
+
+  const unlockedIds = new Set(api.getUnlockedIds());
+  const unlockedDefs = defs.filter((d) => unlockedIds.has(d.id));
+
+  if (profileBadgesCount instanceof HTMLElement) profileBadgesCount.textContent = String(unlockedDefs.length);
+  if (profileBadgesTotal instanceof HTMLElement) profileBadgesTotal.textContent = String(defs.length);
+
+  profileBadgesGrid.innerHTML = "";
+
+  if (!unlockedDefs.length) {
+    if (profileBadgesEmpty instanceof HTMLElement) profileBadgesEmpty.hidden = false;
+    return;
+  }
+  if (profileBadgesEmpty instanceof HTMLElement) profileBadgesEmpty.hidden = true;
+
+  unlockedDefs.sort((a, b) => {
+    const ad = unlockedMap?.[a.id]?.unlockedAt ? new Date(unlockedMap[a.id].unlockedAt).getTime() : 0;
+    const bd = unlockedMap?.[b.id]?.unlockedAt ? new Date(unlockedMap[b.id].unlockedAt).getTime() : 0;
+    return bd - ad;
+  });
+
+  const max = 12;
+  unlockedDefs.slice(0, max).forEach((def) => {
+    const pill = document.createElement("a");
+    pill.className = "profileBadgePill";
+    pill.href = "./badges.html";
+    pill.title = def.desc || def.title || "";
+
+    const icon = document.createElement("div");
+    icon.className = "profileBadgeIcon";
+    icon.textContent = def.icon || "✨";
+
+    const text = document.createElement("div");
+    text.className = "profileBadgeText";
+
+    const name = document.createElement("div");
+    name.className = "profileBadgeName";
+    name.textContent = def.title || def.id;
+
+    const meta = document.createElement("div");
+    meta.className = "profileBadgeMeta";
+    meta.textContent = def.category ? String(def.category) : "badge";
+
+    text.appendChild(name);
+    text.appendChild(meta);
+
+    pill.appendChild(icon);
+    pill.appendChild(text);
+
+    profileBadgesGrid.appendChild(pill);
+  });
+
+  if (unlockedDefs.length > max) {
+    const more = document.createElement("a");
+    more.className = "profileBadgePill";
+    more.href = "./badges.html";
+
+    const icon = document.createElement("div");
+    icon.className = "profileBadgeIcon";
+    icon.textContent = "➕";
+
+    const text = document.createElement("div");
+    text.className = "profileBadgeText";
+
+    const name = document.createElement("div");
+    name.className = "profileBadgeName";
+    name.textContent = `+${unlockedDefs.length - max} more`;
+
+    const meta = document.createElement("div");
+    meta.className = "profileBadgeMeta";
+    meta.textContent = "view all";
+
+    text.appendChild(name);
+    text.appendChild(meta);
+
+    more.appendChild(icon);
+    more.appendChild(text);
+    profileBadgesGrid.appendChild(more);
+  }
+}
 
 function setStatus(message, tone = "muted") {
   if (!statusEl) return;
@@ -271,6 +397,8 @@ function showGuestState(message = "You’re not logged in yet.") {
   setAvatarPreview(null);
   setAvatarStatus("");
   toggleProfileExtras(false);
+  setBadgesVisible(false);
+  if (profileBadgesGrid instanceof HTMLElement) profileBadgesGrid.innerHTML = "";
   // hide summary container and text for guests
   setProfileSummaryVisible(false);
   if (profileNameDisplay) profileNameDisplay.textContent = "Profile";
@@ -293,6 +421,9 @@ function renderProfile(user) {
   syncAvatar(user?.id);
   const metadata = user?.user_metadata || {};
   updateProfileSummary(metadata);
+
+  // Show badges (stored per browser via localStorage)
+  renderProfileBadges();
   loadUserPosts(user?.id);
 
   setStatus("");
@@ -425,6 +556,16 @@ function init() {
   profileEditForm?.addEventListener("submit", handleProfileEditSubmit);
   profileEditToggle?.addEventListener("click", handleProfileEditToggle);
   profileEditCancel?.addEventListener("click", handleProfileEditCancel);
+
+  // Refresh badges when you come back to this tab (e.g., after unlocking one elsewhere)
+  window.addEventListener("focus", () => {
+    if (!activeUserId) return;
+    try {
+      renderProfileBadges();
+    } catch {
+      // ignore
+    }
+  });
 
   loadProfile();
 }
