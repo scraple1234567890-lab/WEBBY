@@ -2,12 +2,16 @@ name: Daily lore post
 
 on:
   schedule:
-    # Runs every 5 minutes (cron times are in UTC)
-    - cron: "*/5 * * * *"
+    # Runs once per day at 15:00 UTC (change if you want a different time)
+    - cron: "0 15 * * *"
   workflow_dispatch:
 
 permissions:
   contents: write
+
+concurrency:
+  group: "lore-post"
+  cancel-in-progress: true
 
 jobs:
   post:
@@ -15,6 +19,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -31,6 +37,8 @@ jobs:
           git add data/posts.json
           git commit -m "chore: add daily lore post" || echo "No changes to commit"
 
+      - name: Pull latest (rebase)
+        run: git pull --rebase origin main
+
       - name: Push changes
-        if: success()
         run: git push
