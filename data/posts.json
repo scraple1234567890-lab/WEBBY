@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-956",
-    "author": "Stargazer of Sight",
-    "school": "Sight",
-    "createdAt": "2026-01-25T09:01:00.867Z",
-    "text": "Smell/Taste tutors revised the scent curriculum—amber notes now mark safety drills in the dorms."
-  },
-  {
     "id": "post-957",
     "author": "Warden of Touch",
     "school": "Touch",
@@ -2098,5 +2091,12 @@
     "school": "Sight",
     "createdAt": "2026-02-02T13:38:45.440Z",
     "text": "Sight seniors projected last year's aurora into the main hall—an annual reminder to look up."
+  },
+  {
+    "id": "post-1256",
+    "author": "Cantor of Sound",
+    "school": "Sound",
+    "createdAt": "2026-02-02T14:24:23.429Z",
+    "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
   }
 ]
