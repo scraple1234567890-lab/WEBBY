@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+
+<html data-theme="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="StarSpell Academy — discover your magical school through the sensory sorting ritual." name="description"/>
+<title>StarSpell Academy — Sorting Quiz</title>
+<link href="./favicon.ico" rel="icon" sizes="any"/>
+<link href="./favicon.png" rel="icon" type="image/png"/>
+<link href="./styles.css" rel="stylesheet"/>
+</head>
+<body class="quizPage">
+<a class="skip-link" href="#main">Skip to content</a>
+<div id="top"></div>
+<header class="header" role="banner">
+<nav aria-label="Primary" class="nav container">
+<a aria-label="Home" class="brand" href="./index.html#top">
+<span class="brandText">StarSpell Academy</span>
+</a>
+<button aria-controls="navLinks" aria-expanded="false" class="iconBtn navToggle" id="navToggle">
+<span class="srOnly">Open menu</span>
+<span aria-hidden="true" class="hamburger"></span>
+</button>
+<div class="navLinks" id="navLinks">
+<a href="./quiz.html">Sorting quiz</a>
+<a href="./posts.html">Posts</a>
+<a href="./articles.html">Articles</a><a href="./search.html">Search</a>
+<a href="./map.html">Map</a>
+<a href="./characters.html">Characters</a>
+<a href="./timeline.html">Timeline</a>
+<a href="./game.html">Game</a>
+<a class="btn ghost" href="./shop.html">Shop</a>
+<form action="./search.html" class="navSearch" method="get" role="search"><input aria-label="Search" class="navSearchInput" name="q" placeholder="Search…" type="search"/><button aria-label="Run search" class="navSearchBtn" type="submit">Go</button></form><div class="profileMenu" data-default-display="inline-flex" id="profileMenu" style="display: none">
+<button aria-controls="profileMenuList" aria-expanded="false" aria-haspopup="menu" aria-label="Open account menu" class="btn ghost profileTrigger" id="profileMenuToggle" type="button">
+<span class="srOnly">Profile</span>
+<span class="profileAvatar profileAvatar--menu" id="profileAvatar">
+<span aria-hidden="true" class="profileAvatarPlaceholder">
+<svg focusable="false" role="presentation" viewbox="0 0 24 24">
+<path d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5Zm0 2c-3.33 0-10 1.67-10 5v1h20v-1c0-3.33-6.67-5-10-5Z" fill="currentColor"></path>
+</svg>
+</span>
+<img alt="" loading="lazy"/>
+</span>
+<span aria-hidden="true" class="profileCaret">▾</span>
+</button>
+<div aria-hidden="true" class="profileMenuList" id="profileMenuList" role="menu">
+<a href="./profile.html" role="menuitem">View profile</a>
+<button id="logoutBtn" role="menuitem" type="button">Log out</button>
+</div>
+</div>
+<a class="btn primary magentaGlow" data-auth-target="login-cta" href="./login.html">Open the login portal</a>
+</div>
+</nav>
+</header>
+<main id="main">
+<section class="quizHero section">
+<div class="container quizHeroGrid">
+<div class="quizHeroCopy">
+<p class="kicker">Sorting Ritual</p>
+<h1>Which school sings your name?</h1>
+<p class="senseTagline">Touch, Sight, Sound, or Taste/Smell</p>
+</div>
+</div>
+</section>
+<section class="section">
+<div class="container quizLayout">
+<form class="quizForm column" id="schoolQuiz">
+<div class="questionList">
+<div class="questionCard" data-question="q1">
+<div class="questionHeader">
+<span class="questionNumber">01</span>
+<h3>You enter a wing of the academy you've never seen. What convinces you it’s safe to explore?</h3>
+</div>
+<div class="choiceGrid">
+<label><input name="q1" type="radio" value="touch"/> Sturdy materials, solid latches, and the reassuring weight of the place</label>
+<label><input name="q1" type="radio" value="sight"/> Clean lines, consistent geometry, and a map of exits forming in your mind</label>
+<label><input name="q1" type="radio" value="sound"/> Honest echoes, measured quiet, and the rhythm of your steps returning correctly</label>
+<label><input name="q1" type="radio" value="essence"/> The atmosphere feels right, like a familiar note you can’t name but still trust</label>
+</div>
+</div>
+<div class="questionCard" data-question="q2">
+<div class="questionHeader">
+<span class="questionNumber">02</span>
+<h3>A sealed message arrives with no sender. Your first move is…</h3>
+</div>
+<div class="choiceGrid">
+<label><input name="q2" type="radio" value="touch"/> Test the paper and wax for hidden seams, ridges, and pressure points</label>
+<label><input name="q2" type="radio" value="sight"/> Turn it through light until any secret markings admit defeat</label>
+<label><input name="q2" type="radio" value="sound"/> Give it a careful tap and learn what answers from inside</label>
+<label><input name="q2" type="radio" value="essence"/> Warm it near steam or candleglow and notice what it releases into the air</label>
+</div>
+</div>
+<div class="questionCard" data-question="q3">
+<div class="questionHeader">
+<span class="questionNumber">03</span>
+<h3>Pick the kind of practice that makes time vanish.</h3>
+</div>
+<div class="choiceGrid">
+<label><input name="q3" type="radio" value="touch"/> Craft-work: carving, binding, repairing, building something useful</label>
+<label><input name="q3" type="radio" value="sight"/> Charting: sketches, symbols, puzzles, and making patterns behave</label>
+<label><input name="q3" type="radio" value="sound"/> Tuning: cadence drills, mantras, music, and getting a spell to “click”</label>
+<label><input name="q3" type="radio" value="essence"/> Brewing: blends, small rituals, comfort-craft, and mood alchemy</label>
+</div>
+</div>
+<div class="questionCard" data-question="q4">
+<div class="questionHeader">
+<span class="questionNumber">04</span>
+<h3>A spell goes sideways mid-cast. You recover by…</h3>
+</div>
+<div class="choiceGrid">
+<label><input name="q4" type="radio" value="touch"/> Dropping into a grounded stance and anchoring intent through a steady grip</label>
+<label><input name="q4" type="radio" value="sight"/> Reframing the pattern, correcting alignment, and cutting away the noise</label>
+<label><input name="q4" type="radio" value="sound"/> Finding a new cadence and letting the rhythm carry the correction</label>
+<label><input name="q4" type="radio" value="essence"/> Shifting the atmosphere so the spell has room to settle and behave</label>
+</div>
+</div>
+<div class="questionCard" data-question="q5">
+<div class="questionHeader">
+<span class="questionNumber">05</span>
+<h3>You’re assigned to guard a relic overnight. Your “first layer” of protection is…</h3>
+</div>
+<div class="choiceGrid">
+<label><input name="q5" type="radio" value="touch"/> Physical anchors: lines, knots, weighted seals, and stubborn material truth</label>
+<label><input name="q5" type="radio" value="sight"/> Coverage: sightlines, mirrors, marks, and a plan that leaves no blind corner</label>
+<label><input name="q5" type="radio" value="sound"/> Resonance cues: chimes and tones that change the instant someone disturbs them</label>
+<label><input name="q5" type="radio" value="essence"/> A “signature” in the air that flips the moment the room is tampered with</label>
+</div>
+</div>
+<div class="questionCard" data-question="q6">
+<div class="questionHeader">
+<span class="questionNumber">06</span>
+<h3>A friend is overwhelmed but can’t find the words. You help by…</h3>
+</div>
+<div class="choiceGrid">
+<label><input name="q6" type="radio" value="touch"/> Being a steady presence and offering grounding, practical support</label>
+<label><input name="q6" type="radio" value="sight"/> Gently pointing out the pattern you’re noticing, so they can name it</label>
+<label><input name="q6" type="radio" value="sound"/> Creating space to talk and reflecting back what you hear, carefully</label>
+<label><input name="q6" type="radio" value="essence"/> Making comfort: a warm drink, a small ritual, a mood reset that feels safe</label>
+</div>
+</div>
+<div class="questionCard" data-question="q7">
+<div class="questionHeader">
+<span class="questionNumber">07</span>
+<h3>In a mystery, the clue you trust most is…</h3>
+</div>
+<div class="choiceGrid">
+<label><input name="q7" type="radio" value="touch"/> What’s worn, weighted, repaired, or handled too often to be innocent</label>
+<label><input name="q7" type="radio" value="sight"/> The odd detail that doesn’t match the rest, no matter how small</label>
+<label><input name="q7" type="radio" value="sound"/> The repetition: timing, phrasing, and rhythms that keep returning</label>
+<label><input name="q7" type="radio" value="essence"/> What lingers after: the after-note of a room, a trace nobody mentions</label>
+</div>
+</div>
+<div class="questionCard" data-question="q8">
+<div class="questionHeader">
+<span class="questionNumber">08</span>
+<h3>Choose the tool you’d master first.</h3>
+</div>
+<div class="choiceGrid">
+<label><input name="q8" type="radio" value="touch"/> A gauntlet that turns intent into force, brace, and precision</label>
+<label><input name="q8" type="radio" value="sight"/> A lens that reveals hidden threads and makes invisible structure legible</label>
+<label><input name="q8" type="radio" value="sound"/> A tuning fork that steadies unstable magic and “locks” a casting</label>
+<label><input name="q8" type="radio" value="essence"/> A pocket kit for crafting atmosphere: blends, vials, and memory-anchors</label>
+</div>
+</div>
+<div class="questionCard" data-question="q9">
+<div class="questionHeader">
+<span class="questionNumber">09</span>
+<h3>Your ideal study corner has…</h3>
+</div>
+<div class="choiceGrid">
+<label><input name="q9" type="radio" value="touch"/> A workbench, tools, and something heavy on the desk to keep you honest</label>
+<label><input name="q9" type="radio" value="sight"/> Bright light, tidy lines, and diagrams pinned like constellations</label>
+<label><input name="q9" type="radio" value="sound"/> A soft pulse of music or metronome, plus quiet voices nearby</label>
+<label><input name="q9" type="radio" value="essence"/> A warm drink, a familiar scent, and the feeling of “home” returning</label>
+</div>
+</div>
+<div class="questionCard" data-question="q10">
+<div class="questionHeader">
+<span class="questionNumber">10</span>
+<h3>Choose the vow you’d actually keep.</h3>
+</div>
+<div class="choiceGrid">
+<label><input name="q10" type="radio" value="touch"/> I build what I need and I fix what I break</label>
+<label><input name="q10" type="radio" value="sight"/> I look twice and I miss less</label>
+<label><input name="q10" type="radio" value="sound"/> I speak with purpose and I keep good rhythm</label>
+<label><input name="q10" type="radio" value="essence"/> I remember what matters and I set the room right</label>
+</div>
+</div>
+</div>
+<div class="quizActions">
+<button class="btn primary" type="submit">Reveal my school</button>
+<p aria-live="polite" class="muted small" id="quizStatus"></p>
+</div>
+</form>
+<aside class="quizAside column">
+<div aria-live="polite" class="quizResult" id="quizResult">
+<h4>Awaiting your answers</h4>
+<p class="muted">Complete all prompts to hear the academy's verdict.</p>
+</div>
+<div class="schoolDeck">
+<article class="schoolCard">
+<p class="sigil">Touch</p>
+<h3>Chamber of Touch</h3>
+<p class="muted">Artisans of force and craft, channeling magic through palm, pulse, and pressure.</p>
+</article>
+<article class="schoolCard">
+<p class="sigil">Sight</p>
+<h3>Observatory of Sight</h3>
+<p class="muted">Seers and cartographers of light, mapping ley lines with impeccable focus.</p>
+</article>
+<article class="schoolCard">
+<p class="sigil">Sound</p>
+<h3>Choir of Sound</h3>
+<p class="muted">Conductors of resonance whose rhythms steady storms and soothe dragons.</p>
+</article>
+<article class="schoolCard">
+<p class="sigil">Taste / Smell</p>
+<h3>House of Essence</h3>
+<p class="muted">Keepers of memory and mood, brewing histories into teas and smoke.</p>
+</article>
+</div>
+</aside>
+</div>
+</section>
+</main>
+<footer class="footer">
+<div class="container footerRow">
+<p class="muted small">© <span id="year"></span> StarSpell Academy. May your path stay bright.</p>
+<a class="muted small" href="#top">Back to the stars ↑</a>
+</div>
+</footer>
+<script defer="" src="./script.js"></script>
+<script src="./js/app.js" type="module"></script>
+</body>
+</html>
