@@ -1,0 +1,98 @@
+// Auto-generated from characters.json
+// This file exists so the characters page works even when you open characters.html via file://
+// (most browsers block fetch() for local files). Recommended workflow: run `node server.js`
+// and edit `data/characters.json`. If you insist on file://, edit this file instead.
+window.CHARACTERS_DATA = {
+  "meta": {
+    "title": "StarSpell Academy Characters",
+    "updated": "2026-02-02",
+    "note": "Edit this file to add/remove characters. Spoiler tiers: public, book1, book2, full. If you open the site via file://, most browsers block JSON fetch, so use server.js or edit data/characters-data.js instead."
+  },
+  "characters": [
+    {
+      "id": "alethea",
+      "name": "Alethea",
+      "group": "Core cast",
+      "spoiler_tier": "public",
+      "hook": "Light-aligned. Wind-borne. Sight-touched.",
+      "summary": "Main character. A Light-aligned mage with Wind elemental power and Sight magic.",
+      "alignment": "Light",
+      "element": "Wind",
+      "school": "Sight",
+      "facts": [
+        "Alignment: Light",
+        "Element: Wind",
+        "School: Sight",
+        "Dossier page is ready for you to expand (voice, goals, contradictions, relationships, major scenes)."
+      ],
+      "tags": [
+        "character",
+        "main",
+        "light",
+        "wind",
+        "sight"
+      ],
+      "aliases": [
+        "Alethea (main character)"
+      ],
+      "image": "./assets/images/characters/alethea.png",
+      "href": "./characters/alethea.html",
+      "related_events": [
+        {
+          "name": "The replacement glasses",
+          "href": "./timeline.html#arc0-glasses"
+        }
+      ],
+      "related_locations": [
+        {
+          "name": "Park",
+          "href": "./locations/park.html"
+        }
+      ]
+    },
+    {
+      "id": "belle",
+      "name": "Belle",
+      "group": "Core cast",
+      "spoiler_tier": "public",
+      "hook": "Enchantment-leaning. Fire held in careful hands.",
+      "summary": "A core member of the group. Known for enchantment magic and a fear of her own fire.",
+      "element": "Fire",
+      "school": "Sound",
+      "facts": [
+        "Magic: Enchantment",
+        "Element: Fire (hesitant to use it around others)",
+        "Feels pulled toward the School of Sound"
+      ],
+      "tags": [
+        "character",
+        "core",
+        "enchantment",
+        "fire",
+        "sound"
+      ],
+      "aliases": [],
+      "image": "",
+      "href": "./search.html?q=Belle"
+    },
+    {
+      "id": "elroy",
+      "name": "Elroy",
+      "group": "Core cast",
+      "spoiler_tier": "public",
+      "hook": "Too observant to stay uninvolved.",
+      "summary": "A core member of the group with ties to the Artifact Maker's shadowy orbit.",
+      "facts": [
+        "Core cast member",
+        "Has an early connection to the Artifact Maker"
+      ],
+      "tags": [
+        "character",
+        "core"
+      ],
+      "aliases": [],
+      "image": "",
+      "href": "./search.html?q=Elroy"
+    }
+  ]
+};

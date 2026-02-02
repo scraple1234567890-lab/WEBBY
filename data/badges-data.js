@@ -30,4 +30,11 @@ window.SSA_BADGE_DEFS = [
     icon: "🔎",
     category: "exploration",
   },
+  {
+    id: "visit:characters",
+    title: "Rostermaster",
+    desc: "Visited the characters roster.",
+    icon: "🗂️",
+    category: "exploration",
+  },
 ];

@@ -301,7 +301,7 @@
     return "./" + url.replace(/^\//, "");
   }
 
-  function buildIndex(extraItems, mapJson, timelineJson) {
+  function buildIndex(extraItems, mapJson, timelineJson, charactersJson) {
     const out = [];
 
     // Extra items are author-defined (artifacts/characters/animals now, anything later)
@@ -323,6 +323,31 @@
         });
       }
     }
+
+
+// Characters from characters JSON
+if (charactersJson && Array.isArray(charactersJson.characters)) {
+  for (const ch of charactersJson.characters) {
+    if (!ch || !ch.name) continue;
+    const facts = Array.isArray(ch.facts) ? ch.facts.filter(Boolean) : [];
+    const detailText = facts.length ? facts.join(" • ") : "";
+
+    const tags = Array.isArray(ch.tags) ? ch.tags : [];
+    const aliases = Array.isArray(ch.aliases) ? ch.aliases : [];
+
+    out.push({
+      type: "character",
+      id: ch.id || "",
+      title: ch.name,
+      summary: ch.summary || ch.hook || "",
+      details: detailText,
+      image: ch.image ? normalizeUrl(ch.image) : "",
+      tags,
+      aliases,
+      url: normalizeUrl(ch.href || `characters.html#${ch.id || ""}`),
+    });
+  }
+}
 
     // Locations from map JSON
     if (mapJson && Array.isArray(mapJson.locations)) {
@@ -392,13 +417,17 @@
     const timelineFallback =
       window.TIMELINE_DATA && typeof window.TIMELINE_DATA === "object" ? window.TIMELINE_DATA : null;
 
-    const [extra, mapJson, timelineJson] = await Promise.all([
+    const charsFallback =
+      window.CHARACTERS_DATA && typeof window.CHARACTERS_DATA === "object" ? window.CHARACTERS_DATA : null;
+
+    const [extra, mapJson, timelineJson, charactersJson] = await Promise.all([
       tryFetchJson("./data/searchIndex.json", extraFallback),
       tryFetchJson("./data/map-locations.json", mapFallback),
       tryFetchJson("./data/timeline.json", timelineFallback),
+      tryFetchJson("./data/characters.json", charsFallback)
     ]);
 
-    index = buildIndex(extra, mapJson, timelineJson);
+    index = buildIndex(extra, mapJson, timelineJson, charactersJson);
     typeCounts = computeTypeCounts(index);
     loaded = true;
 
