@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-950",
-    "author": "Cantor of Sound",
-    "school": "Sound",
-    "createdAt": "2026-01-25T05:58:55.199Z",
-    "text": "Sight adepts painted doorways with light; even closed portals now reveal who knocks by silhouette."
-  },
-  {
     "id": "post-951",
     "author": "Stargazer of Sight",
     "school": "Sight",
@@ -2098,5 +2091,12 @@
     "school": "Sound",
     "createdAt": "2026-02-01T23:52:53.832Z",
     "text": "Sound choir traced a lullaby into the walls; echoes now hush arguments before they flare."
+  },
+  {
+    "id": "post-1250",
+    "author": "Stargazer of Sight",
+    "school": "Sight",
+    "createdAt": "2026-02-02T00:56:27.895Z",
+    "text": "A stray spell orb drifted through the east cloister, humming like bees until a Sight student sketched its orbit."
   }
 ]
