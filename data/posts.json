@@ -1,12 +1,5 @@
 [
   {
-    "id": "post-948",
-    "author": "Essence Steward",
-    "school": "Smell/Taste",
-    "createdAt": "2026-01-25T04:20:45.678Z",
-    "text": "Smell/Taste faculty seeded the orchard with mint-snow pears; blossoms ring like glass when stirred."
-  },
-  {
     "id": "post-949",
     "author": "Cantor of Sound",
     "school": "Sound",
@@ -2098,5 +2091,12 @@
     "school": "Touch",
     "createdAt": "2026-02-02T07:18:15.205Z",
     "text": "Touch apprentices wove a tapestry ward so dense it softened every footstep in the moonlit hall."
+  },
+  {
+    "id": "post-1248",
+    "author": "Warden of Touch",
+    "school": "Touch",
+    "createdAt": "2026-02-02T07:58:50.631Z",
+    "text": "Sight mentors recalibrated star charts after a meteor shower rewrote the sky’s margins."
   }
 ]
