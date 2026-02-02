@@ -1,0 +1,231 @@
+/* Timeline page: content-first, readable, still starry. */
+
+body.timelinePage {
+  --bg: #0c0820;
+  --panel: #140d29;
+  --panel2: #1b1236;
+  --border: #2f2450;
+  --shadow: 0 18px 42px rgba(0, 0, 0, 0.38);
+
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(180deg, rgba(12, 8, 32, 0.82), rgba(12, 8, 32, 0.92)),
+    url("./assets/images/These_are_the_202512031938.jpeg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+body.timelinePage::before,
+body.timelinePage::after {
+  display: none;
+}
+
+.timelinePage .header {
+  backdrop-filter: none;
+  background: #120c26;
+  border-bottom-color: var(--border);
+}
+
+.timelineLayout {
+  display: grid;
+  gap: 16px;
+}
+
+.timelineControls {
+  border: 1px solid var(--border);
+  border-radius: var(--radius2);
+  padding: 16px;
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--panel) 90%, rgba(0, 0, 0, 0.1)),
+    color-mix(in srgb, var(--panel2) 92%, rgba(0, 0, 0, 0.08))
+  );
+  box-shadow: var(--shadow);
+}
+
+.timelineControlGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+.timelineControls select {
+  width: 100%;
+  padding: 12px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--panel2) 72%, transparent);
+  color: var(--text);
+  outline: none;
+}
+
+.timelineControls select:focus {
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+.timelineControlRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.timelineToggle {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--panel2) 52%, transparent);
+  cursor: pointer;
+  user-select: none;
+}
+
+.timelineToggle input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+}
+
+.timelineList {
+  display: grid;
+  gap: 12px;
+}
+
+.timelineEraHeader {
+  position: sticky;
+  top: 86px;
+  z-index: 3;
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, #120c26 92%, rgba(0, 0, 0, 0.1));
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.24);
+}
+
+.timelineEraHeader h2 {
+  margin: 0;
+  font-size: 1.08rem;
+  letter-spacing: 0.2px;
+}
+
+.timelineCard {
+  border: 1px solid color-mix(in srgb, var(--border) 86%, var(--accent2) 14%);
+  border-radius: var(--radius2);
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--panel2) 92%, var(--panel) 12%),
+    color-mix(in srgb, var(--panel) 96%, var(--panel2) 14%)
+  );
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.28);
+  padding: 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.timelineHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+}
+
+.timelineHeader h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.timelineMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.timelineBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--panel2) 58%, transparent);
+  color: color-mix(in srgb, var(--text) 92%, var(--muted) 8%);
+}
+
+.timelineFacts {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+  color: color-mix(in srgb, var(--text) 90%, var(--muted) 10%);
+}
+
+.timelineTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.timelineTagLabel {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.timelineChip {
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.timelineChip:hover {
+  color: var(--text);
+  background: color-mix(in srgb, var(--panel2) 60%, transparent);
+}
+
+.timelineLocked {
+  opacity: 0.92;
+}
+
+.timelineLocked .timelineLockedBox {
+  border: 1px dashed color-mix(in srgb, var(--border) 70%, var(--accent) 25%);
+  border-radius: 16px;
+  padding: 12px;
+  background: color-mix(in srgb, var(--panel2) 55%, transparent);
+}
+
+.timelineLockedTitle {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.timelineLockedHint {
+  margin: 8px 0 0;
+}
+
+@media (max-width: 900px) {
+  .timelineControlGrid {
+    grid-template-columns: 1fr;
+  }
+  .timelineEraHeader {
+    top: 76px;
+  }
+}
+
+
+/* Highlight when jumping to #event-id */
+.timelineFlash{
+  outline: 2px solid color-mix(in srgb, var(--accent2) 65%, transparent);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent2) 18%, transparent);
+}

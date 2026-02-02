@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+
+<html data-theme="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="StarSpell Academy — log in to your account to view the Lore Board." name="description"/>
+<title>StarSpell Academy — Login</title>
+<link href="./favicon.ico" rel="icon" sizes="any"/>
+<link href="./favicon.png" rel="icon" type="image/png"/>
+<link href="./styles.css" rel="stylesheet"/>
+</head>
+<body class="quizPage">
+<a class="skip-link" href="#main">Skip to content</a>
+<div id="top"></div>
+<header class="header" role="banner">
+<nav aria-label="Primary" class="nav container">
+<a aria-label="Home" class="brand" href="./index.html#top">
+<span class="brandText">StarSpell Academy</span>
+</a>
+<button aria-controls="navLinks" aria-expanded="false" class="iconBtn navToggle" id="navToggle">
+<span class="srOnly">Open menu</span>
+<span aria-hidden="true" class="hamburger"></span>
+</button>
+<div class="navLinks" id="navLinks">
+<a href="./quiz.html">Sorting quiz</a>
+<a href="./posts.html">Posts</a>
+<a href="./articles.html">Articles</a><a href="./search.html">Search</a>
+<a href="./map.html">Map</a>
+<a href="./characters.html">Characters</a>
+<a href="./timeline.html">Timeline</a>
+<a href="./game.html">Game</a>
+<a class="btn ghost" href="./shop.html">Shop</a>
+<form action="./search.html" class="navSearch" method="get" role="search"><input aria-label="Search" class="navSearchInput" name="q" placeholder="Search…" type="search"/><button aria-label="Run search" class="navSearchBtn" type="submit">Go</button></form><div class="profileMenu" data-default-display="inline-flex" id="profileMenu" style="display: none">
+<button aria-controls="profileMenuList" aria-expanded="false" aria-haspopup="menu" aria-label="Open account menu" class="btn ghost profileTrigger" id="profileMenuToggle" type="button">
+<span class="srOnly">Profile</span>
+<span class="profileAvatar profileAvatar--menu" id="profileAvatar">
+<span aria-hidden="true" class="profileAvatarPlaceholder">
+<svg focusable="false" role="presentation" viewbox="0 0 24 24">
+<path d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5Zm0 2c-3.33 0-10 1.67-10 5v1h20v-1c0-3.33-6.67-5-10-5Z" fill="currentColor"></path>
+</svg>
+</span>
+<img alt="" loading="lazy"/>
+</span>
+<span aria-hidden="true" class="profileCaret">▾</span>
+</button>
+<div aria-hidden="true" class="profileMenuList" id="profileMenuList" role="menu">
+<a href="./profile.html" role="menuitem">View profile</a>
+<button id="logoutBtn" role="menuitem" type="button">Log out</button>
+</div>
+</div>
+<a class="btn primary magentaGlow" data-auth-target="login-cta" href="./login.html">Open the login portal</a>
+</div>
+</nav>
+</header>
+<main id="main">
+<section class="section">
+<div class="container authGrid">
+<div class="card">
+<h3>Log in</h3>
+<p class="muted">Return to your StarSpell account to see the latest Lore Board notes.</p>
+<form id="loginForm">
+<div class="field">
+<label for="loginEmail">Email</label>
+<input autocomplete="email" id="loginEmail" name="email" required="" type="email"/>
+</div>
+<div class="field">
+<label for="loginPassword">Password</label>
+<input autocomplete="current-password" id="loginPassword" name="password" required="" type="password"/>
+</div>
+<div class="actions">
+<button class="btn primary" type="submit">Log in</button>
+</div>
+<p aria-live="assertive" class="error small" id="loginError" role="alert"></p>
+<p aria-live="polite" class="small success" id="loginSuccess" role="status"></p>
+</form>
+<p class="muted small">Need an account? <a href="./portal.html">Go to the sign-up page.</a></p>
+</div>
+<div class="card" id="authSuccessMessage" style="display: none">
+<h3>Login successful</h3>
+<p class="muted">
+              You’re signed in as <span data-auth-email="">your account</span>. Head to Posts to share a note or refresh to stay in sync.
+            </p>
+<div class="actions">
+<a class="btn primary" href="./posts.html">Go to Posts</a>
+</div>
+</div>
+<div class="actions" style="grid-column: 1 / -1; display: flex; gap: 10px; flex-wrap: wrap;">
+<p aria-live="polite" class="muted small" id="authStatus" style="flex: 1 1 auto">Checking your session...</p>
+</div>
+</div>
+</section>
+<section class="section alt">
+<div class="container">
+<div class="sectionHead">
+<p class="kicker">Lore Board</p>
+<h2>Recent shared posts</h2>
+<p class="muted">Browse the latest notes and add your own once signed in.</p>
+</div>
+<div class="postGrid">
+<article class="card" id="postComposerCard">
+<h3>Share a post</h3>
+<p class="muted small" id="postGuestNotice">Log in to post a note to the board.</p>
+<form class="postForm" id="postForm" style="display: none">
+<label class="field">
+<span>Your post</span>
+<textarea id="postBody" maxlength="2000" name="body" placeholder="What do you want to share?" required="" rows="4"></textarea>
+</label>
+<p aria-live="polite" class="error small" id="postError"></p>
+<div class="actions">
+<button class="btn primary" type="submit">Post</button>
+</div>
+<p aria-live="polite" class="muted small" id="postStatus"></p>
+</form>
+</article>
+<div>
+<div aria-live="polite" class="postFeed" id="supabaseFeed">
+<p class="muted">Loading posts...</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="footer">
+<div class="container footerRow">
+<p class="muted small">© <span id="year"></span> StarSpell Academy. Keep listening to the halls.</p>
+<a class="muted small" href="#top">Back to top ↑</a>
+</div>
+</footer>
+<script defer="" src="./script.js"></script>
+<script src="./js/app.js" type="module"></script>
+</body>
+</html>
