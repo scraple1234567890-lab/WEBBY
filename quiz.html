@@ -23,7 +23,7 @@
 <span aria-hidden="true" class="hamburger"></span>
 </button>
 <div class="navLinks" id="navLinks">
-<a href="./quiz.html">Sorting quiz</a>
+<a href="./quiz.html">Quizes</a>
 <a href="./posts.html">Posts</a>
 <a href="./articles.html">Articles</a><a href="./search.html">Search</a>
 <a href="./map.html">Map</a><a href="./game.html">Game</a>
@@ -56,132 +56,167 @@
 <div class="quizHeroCopy">
 <p class="kicker">Sorting Ritual</p>
 <h1>Which school sings your name?</h1>
-<p class="senseTagline">Touch, Sight, Sound, or Taste/Smell</p>
+<p class="senseTagline">Senses or Elements</p>
 </div>
 </div>
 </section>
 <section class="section">
-<div class="container quizLayout">
-<form class="quizForm column" id="schoolQuiz">
+  <div class="container">
+    <div class="quizChooser" id="quizChooser" role="region" aria-label="Choose a quiz">
+      <h2 class="quizChooserTitle">Choose a quiz</h2>
+      <p class="muted">Pick your ritual. You can always switch later.</p>
+      <div class="quizChoiceGrid">
+        <button class="quizChoiceCard" type="button" data-quiz-choice="sense">
+          <span class="quizChoiceKicker">SENSE MAGIC</span>
+          <span class="quizChoiceName">Sense Magic Quiz</span>
+          <span class="quizChoiceDesc muted">Touch • Sight • Sound • Essence</span>
+        </button>
+        <button class="quizChoiceCard" type="button" data-quiz-choice="element">
+          <span class="quizChoiceKicker">ELEMENTAL MAGIC</span>
+          <span class="quizChoiceName">Elemental Magic Quiz</span>
+          <span class="quizChoiceDesc muted">Water • Earth • Fire • Wind</span>
+        </button>
+        <button class="quizChoiceCard" type="button" data-quiz-choice="artifact">
+          <span class="quizChoiceKicker">ARTIFACT</span>
+          <span class="quizChoiceName">Artifact Quiz</span>
+          <span class="quizChoiceDesc muted">Ring • Lens • Chime • Vial</span>
+        </button>
+        <button class="quizChoiceCard" type="button" data-quiz-choice="animal">
+          <span class="quizChoiceKicker">ANIMAL COMPANION</span>
+          <span class="quizChoiceName">Animal Companion Quiz</span>
+          <span class="quizChoiceDesc muted">Dragon • Cat • Wolf • Owl</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="quizShell" hidden>
+ hidden>
+      <div class="quizTopRow">
+        <button class="btn ghost" type="button" id="changeQuizBtn">Change quiz</button>
+        <p class="muted small" id="activeQuizLabel" aria-live="polite"></p>
+      </div>
+
+      <div id="senseQuizWrap" class="quizLayout" hidden>
+        <form class="quizForm column" id="schoolQuiz">
 <div class="questionList">
 <div class="questionCard" data-question="q1">
 <div class="questionHeader">
 <span class="questionNumber">01</span>
-<h3>You enter a wing of the academy you've never seen. What convinces you it’s safe to explore?</h3>
+<h3>New wing. What feels safe?</h3>
 </div>
 <div class="choiceGrid">
-<label><input name="q1" type="radio" value="touch"/> Sturdy materials, solid latches, and the reassuring weight of the place</label>
-<label><input name="q1" type="radio" value="sight"/> Clean lines, consistent geometry, and a map of exits forming in your mind</label>
-<label><input name="q1" type="radio" value="sound"/> Honest echoes, measured quiet, and the rhythm of your steps returning correctly</label>
-<label><input name="q1" type="radio" value="essence"/> The atmosphere feels right, like a familiar note you can’t name but still trust</label>
+<label><input name="q1" type="radio" value="touch"/> Sturdy build</label>
+<label><input name="q1" type="radio" value="sight"/> Clear exits</label>
+<label><input name="q1" type="radio" value="sound"/> True echoes</label>
+<label><input name="q1" type="radio" value="essence"/> Right atmosphere</label>
 </div>
 </div>
 <div class="questionCard" data-question="q2">
 <div class="questionHeader">
 <span class="questionNumber">02</span>
-<h3>A sealed message arrives with no sender. Your first move is…</h3>
+<h3>Sealed letter. First move?</h3>
 </div>
 <div class="choiceGrid">
-<label><input name="q2" type="radio" value="touch"/> Test the paper and wax for hidden seams, ridges, and pressure points</label>
-<label><input name="q2" type="radio" value="sight"/> Turn it through light until any secret markings admit defeat</label>
-<label><input name="q2" type="radio" value="sound"/> Give it a careful tap and learn what answers from inside</label>
-<label><input name="q2" type="radio" value="essence"/> Warm it near steam or candleglow and notice what it releases into the air</label>
+<label><input name="q2" type="radio" value="touch"/> Feel for seams</label>
+<label><input name="q2" type="radio" value="sight"/> Hold to light</label>
+<label><input name="q2" type="radio" value="sound"/> Tap and listen</label>
+<label><input name="q2" type="radio" value="essence"/> Warm then smell</label>
 </div>
 </div>
 <div class="questionCard" data-question="q3">
 <div class="questionHeader">
 <span class="questionNumber">03</span>
-<h3>Pick the kind of practice that makes time vanish.</h3>
+<h3>Best kind of practice?</h3>
 </div>
 <div class="choiceGrid">
-<label><input name="q3" type="radio" value="touch"/> Craft-work: carving, binding, repairing, building something useful</label>
-<label><input name="q3" type="radio" value="sight"/> Charting: sketches, symbols, puzzles, and making patterns behave</label>
-<label><input name="q3" type="radio" value="sound"/> Tuning: cadence drills, mantras, music, and getting a spell to “click”</label>
-<label><input name="q3" type="radio" value="essence"/> Brewing: blends, small rituals, comfort-craft, and mood alchemy</label>
+<label><input name="q3" type="radio" value="touch"/> Make or repair</label>
+<label><input name="q3" type="radio" value="sight"/> Sketch patterns</label>
+<label><input name="q3" type="radio" value="sound"/> Tune a beat</label>
+<label><input name="q3" type="radio" value="essence"/> Mix a brew</label>
 </div>
 </div>
 <div class="questionCard" data-question="q4">
 <div class="questionHeader">
 <span class="questionNumber">04</span>
-<h3>A spell goes sideways mid-cast. You recover by…</h3>
+<h3>Spell slips. You recover by…</h3>
 </div>
 <div class="choiceGrid">
-<label><input name="q4" type="radio" value="touch"/> Dropping into a grounded stance and anchoring intent through a steady grip</label>
-<label><input name="q4" type="radio" value="sight"/> Reframing the pattern, correcting alignment, and cutting away the noise</label>
-<label><input name="q4" type="radio" value="sound"/> Finding a new cadence and letting the rhythm carry the correction</label>
-<label><input name="q4" type="radio" value="essence"/> Shifting the atmosphere so the spell has room to settle and behave</label>
+<label><input name="q4" type="radio" value="touch"/> Ground and grip</label>
+<label><input name="q4" type="radio" value="sight"/> Re-align</label>
+<label><input name="q4" type="radio" value="sound"/> Find new beat</label>
+<label><input name="q4" type="radio" value="essence"/> Change the air</label>
 </div>
 </div>
 <div class="questionCard" data-question="q5">
 <div class="questionHeader">
 <span class="questionNumber">05</span>
-<h3>You’re assigned to guard a relic overnight. Your “first layer” of protection is…</h3>
+<h3>Guard a relic. First defense?</h3>
 </div>
 <div class="choiceGrid">
-<label><input name="q5" type="radio" value="touch"/> Physical anchors: lines, knots, weighted seals, and stubborn material truth</label>
-<label><input name="q5" type="radio" value="sight"/> Coverage: sightlines, mirrors, marks, and a plan that leaves no blind corner</label>
-<label><input name="q5" type="radio" value="sound"/> Resonance cues: chimes and tones that change the instant someone disturbs them</label>
-<label><input name="q5" type="radio" value="essence"/> A “signature” in the air that flips the moment the room is tampered with</label>
+<label><input name="q5" type="radio" value="touch"/> Knots & seals</label>
+<label><input name="q5" type="radio" value="sight"/> No blind spots</label>
+<label><input name="q5" type="radio" value="sound"/> Chime alarm</label>
+<label><input name="q5" type="radio" value="essence"/> Scent tripwire</label>
 </div>
 </div>
 <div class="questionCard" data-question="q6">
 <div class="questionHeader">
 <span class="questionNumber">06</span>
-<h3>A friend is overwhelmed but can’t find the words. You help by…</h3>
+<h3>Friend overwhelmed. You help by…</h3>
 </div>
 <div class="choiceGrid">
-<label><input name="q6" type="radio" value="touch"/> Being a steady presence and offering grounding, practical support</label>
-<label><input name="q6" type="radio" value="sight"/> Gently pointing out the pattern you’re noticing, so they can name it</label>
-<label><input name="q6" type="radio" value="sound"/> Creating space to talk and reflecting back what you hear, carefully</label>
-<label><input name="q6" type="radio" value="essence"/> Making comfort: a warm drink, a small ritual, a mood reset that feels safe</label>
+<label><input name="q6" type="radio" value="touch"/> Steady support</label>
+<label><input name="q6" type="radio" value="sight"/> Name the pattern</label>
+<label><input name="q6" type="radio" value="sound"/> Listen & reflect</label>
+<label><input name="q6" type="radio" value="essence"/> Comfort ritual</label>
 </div>
 </div>
 <div class="questionCard" data-question="q7">
 <div class="questionHeader">
 <span class="questionNumber">07</span>
-<h3>In a mystery, the clue you trust most is…</h3>
+<h3>Most trusted clue?</h3>
 </div>
 <div class="choiceGrid">
-<label><input name="q7" type="radio" value="touch"/> What’s worn, weighted, repaired, or handled too often to be innocent</label>
-<label><input name="q7" type="radio" value="sight"/> The odd detail that doesn’t match the rest, no matter how small</label>
-<label><input name="q7" type="radio" value="sound"/> The repetition: timing, phrasing, and rhythms that keep returning</label>
-<label><input name="q7" type="radio" value="essence"/> What lingers after: the after-note of a room, a trace nobody mentions</label>
+<label><input name="q7" type="radio" value="touch"/> Wear marks</label>
+<label><input name="q7" type="radio" value="sight"/> Odd detail</label>
+<label><input name="q7" type="radio" value="sound"/> Repeat timing</label>
+<label><input name="q7" type="radio" value="essence"/> Lingering trace</label>
 </div>
 </div>
 <div class="questionCard" data-question="q8">
 <div class="questionHeader">
 <span class="questionNumber">08</span>
-<h3>Choose the tool you’d master first.</h3>
+<h3>Tool you master first?</h3>
 </div>
 <div class="choiceGrid">
-<label><input name="q8" type="radio" value="touch"/> A gauntlet that turns intent into force, brace, and precision</label>
-<label><input name="q8" type="radio" value="sight"/> A lens that reveals hidden threads and makes invisible structure legible</label>
-<label><input name="q8" type="radio" value="sound"/> A tuning fork that steadies unstable magic and “locks” a casting</label>
-<label><input name="q8" type="radio" value="essence"/> A pocket kit for crafting atmosphere: blends, vials, and memory-anchors</label>
+<label><input name="q8" type="radio" value="touch"/> Force gauntlet</label>
+<label><input name="q8" type="radio" value="sight"/> Truth lens</label>
+<label><input name="q8" type="radio" value="sound"/> Stability fork</label>
+<label><input name="q8" type="radio" value="essence"/> Essence kit</label>
 </div>
 </div>
 <div class="questionCard" data-question="q9">
 <div class="questionHeader">
 <span class="questionNumber">09</span>
-<h3>Your ideal study corner has…</h3>
+<h3>Ideal study nook?</h3>
 </div>
 <div class="choiceGrid">
-<label><input name="q9" type="radio" value="touch"/> A workbench, tools, and something heavy on the desk to keep you honest</label>
-<label><input name="q9" type="radio" value="sight"/> Bright light, tidy lines, and diagrams pinned like constellations</label>
-<label><input name="q9" type="radio" value="sound"/> A soft pulse of music or metronome, plus quiet voices nearby</label>
-<label><input name="q9" type="radio" value="essence"/> A warm drink, a familiar scent, and the feeling of “home” returning</label>
+<label><input name="q9" type="radio" value="touch"/> Workbench</label>
+<label><input name="q9" type="radio" value="sight"/> Bright diagrams</label>
+<label><input name="q9" type="radio" value="sound"/> Soft rhythm</label>
+<label><input name="q9" type="radio" value="essence"/> Warm scent</label>
 </div>
 </div>
 <div class="questionCard" data-question="q10">
 <div class="questionHeader">
 <span class="questionNumber">10</span>
-<h3>Choose the vow you’d actually keep.</h3>
+<h3>Pick your vow.</h3>
 </div>
 <div class="choiceGrid">
-<label><input name="q10" type="radio" value="touch"/> I build what I need and I fix what I break</label>
-<label><input name="q10" type="radio" value="sight"/> I look twice and I miss less</label>
-<label><input name="q10" type="radio" value="sound"/> I speak with purpose and I keep good rhythm</label>
-<label><input name="q10" type="radio" value="essence"/> I remember what matters and I set the room right</label>
+<label><input name="q10" type="radio" value="touch"/> Build & fix</label>
+<label><input name="q10" type="radio" value="sight"/> Look twice</label>
+<label><input name="q10" type="radio" value="sound"/> Speak with purpose</label>
+<label><input name="q10" type="radio" value="essence"/> Set things right</label>
 </div>
 </div>
 </div>
@@ -189,12 +224,13 @@
 <button class="btn primary" type="submit">Reveal my school</button>
 <p aria-live="polite" class="muted small" id="quizStatus"></p>
 </div>
-</form>
-<aside class="quizAside column">
+<div aria-live="polite" class="quizBreakdown" id="quizBreakdown"></div>
 <div aria-live="polite" class="quizResult" id="quizResult">
 <h4>Awaiting your answers</h4>
 <p class="muted">Complete all prompts to hear the academy's verdict.</p>
 </div>
+</form>
+<aside class="quizAside column">
 <div class="schoolDeck">
 <article class="schoolCard">
 <p class="sigil">Touch</p>
@@ -218,9 +254,530 @@
 </article>
 </div>
 </aside>
+      </div>
+
+      <div id="elementQuizWrap" class="quizLayout" hidden>
+  <form class="quizForm column" id="elementQuiz">
+    <div class="questionList">
+      <div class="questionCard" data-question="q1">
+        <div class="questionHeader">
+          <span class="questionNumber">01</span>
+          <h3>Pick a home.</h3>
+        </div>
+        <div class="choiceGrid">
+          <label><input name="q1" type="radio" value="water"/> River town</label>
+          <label><input name="q1" type="radio" value="earth"/> Mountain keep</label>
+          <label><input name="q1" type="radio" value="fire"/> Hearth hall</label>
+          <label><input name="q1" type="radio" value="wind"/> Sky camp</label>
+        </div>
+      </div>
+
+      <div class="questionCard" data-question="q2">
+        <div class="questionHeader">
+          <span class="questionNumber">02</span>
+          <h3>Your calm is…</h3>
+        </div>
+        <div class="choiceGrid">
+          <label><input name="q2" type="radio" value="water"/> Flow</label>
+          <label><input name="q2" type="radio" value="earth"/> Steady</label>
+          <label><input name="q2" type="radio" value="fire"/> Spark</label>
+          <label><input name="q2" type="radio" value="wind"/> Breeze</label>
+        </div>
+      </div>
+
+      <div class="questionCard" data-question="q3">
+        <div class="questionHeader">
+          <span class="questionNumber">03</span>
+          <h3>In trouble, you…</h3>
+        </div>
+        <div class="choiceGrid">
+          <label><input name="q3" type="radio" value="water"/> Adapt</label>
+          <label><input name="q3" type="radio" value="earth"/> Hold firm</label>
+          <label><input name="q3" type="radio" value="fire"/> Act fast</label>
+          <label><input name="q3" type="radio" value="wind"/> Slip away</label>
+        </div>
+      </div>
+
+      <div class="questionCard" data-question="q4">
+        <div class="questionHeader">
+          <span class="questionNumber">04</span>
+          <h3>Your power wants…</h3>
+        </div>
+        <div class="choiceGrid">
+          <label><input name="q4" type="radio" value="water"/> Change</label>
+          <label><input name="q4" type="radio" value="earth"/> Structure</label>
+          <label><input name="q4" type="radio" value="fire"/> Impact</label>
+          <label><input name="q4" type="radio" value="wind"/> Freedom</label>
+        </div>
+      </div>
+
+      <div class="questionCard" data-question="q5">
+        <div class="questionHeader">
+          <span class="questionNumber">05</span>
+          <h3>Pick a weapon.</h3>
+        </div>
+        <div class="choiceGrid">
+          <label><input name="q5" type="radio" value="water"/> Net</label>
+          <label><input name="q5" type="radio" value="earth"/> Shield</label>
+          <label><input name="q5" type="radio" value="fire"/> Blade</label>
+          <label><input name="q5" type="radio" value="wind"/> Bow</label>
+        </div>
+      </div>
+
+      <div class="questionCard" data-question="q6">
+        <div class="questionHeader">
+          <span class="questionNumber">06</span>
+          <h3>Your gift is…</h3>
+        </div>
+        <div class="choiceGrid">
+          <label><input name="q6" type="radio" value="water"/> Reading rooms</label>
+          <label><input name="q6" type="radio" value="earth"/> Building plans</label>
+          <label><input name="q6" type="radio" value="fire"/> Rallying people</label>
+          <label><input name="q6" type="radio" value="wind"/> Finding routes</label>
+        </div>
+      </div>
+
+      <div class="questionCard" data-question="q7">
+        <div class="questionHeader">
+          <span class="questionNumber">07</span>
+          <h3>Best weather?</h3>
+        </div>
+        <div class="choiceGrid">
+          <label><input name="q7" type="radio" value="water"/> Rain</label>
+          <label><input name="q7" type="radio" value="earth"/> Fog</label>
+          <label><input name="q7" type="radio" value="fire"/> Sun</label>
+          <label><input name="q7" type="radio" value="wind"/> Wind</label>
+        </div>
+      </div>
+
+      <div class="questionCard" data-question="q8">
+        <div class="questionHeader">
+          <span class="questionNumber">08</span>
+          <h3>Pick a lesson.</h3>
+        </div>
+        <div class="choiceGrid">
+          <label><input name="q8" type="radio" value="water"/> Redirect</label>
+          <label><input name="q8" type="radio" value="earth"/> Reinforce</label>
+          <label><input name="q8" type="radio" value="fire"/> Amplify</label>
+          <label><input name="q8" type="radio" value="wind"/> Disperse</label>
+        </div>
+      </div>
+
+      <div class="questionCard" data-question="q9">
+        <div class="questionHeader">
+          <span class="questionNumber">09</span>
+          <h3>Pick a promise.</h3>
+        </div>
+        <div class="choiceGrid">
+          <label><input name="q9" type="radio" value="water"/> Protect</label>
+          <label><input name="q9" type="radio" value="earth"/> Endure</label>
+          <label><input name="q9" type="radio" value="fire"/> Ignite</label>
+          <label><input name="q9" type="radio" value="wind"/> Explore</label>
+        </div>
+      </div>
+
+      <div class="questionCard" data-question="q10">
+        <div class="questionHeader">
+          <span class="questionNumber">10</span>
+          <h3>Pick a sign.</h3>
+        </div>
+        <div class="choiceGrid">
+          <label><input name="q10" type="radio" value="water"/> Ripple</label>
+          <label><input name="q10" type="radio" value="earth"/> Stone</label>
+          <label><input name="q10" type="radio" value="fire"/> Ember</label>
+          <label><input name="q10" type="radio" value="wind"/> Feather</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="quizActions">
+      <button class="btn primary" type="submit">Reveal my element</button>
+      <p aria-live="polite" class="muted small" id="elementStatus"></p>
+    </div>
+
+    <div aria-live="polite" class="quizBreakdown" id="elementBreakdown"></div>
+
+    <div aria-live="polite" class="quizResult" id="elementResult">
+      <h4>Awaiting your answers</h4>
+      <p class="muted">Complete all prompts to hear the academy's verdict.</p>
+    </div>
+  </form>
+
+  <aside class="quizAside column">
+    <div class="schoolDeck">
+      <article class="schoolCard">
+        <p class="sigil">Water</p>
+        <h3>Tide of Water</h3>
+        <p class="muted">Adaptive force, patient pressure, and calm control beneath the surface.</p>
+      </article>
+      <article class="schoolCard">
+        <p class="sigil">Earth</p>
+        <h3>Stone of Earth</h3>
+        <p class="muted">Stability, protection, and craft that turns ideals into foundations.</p>
+      </article>
+      <article class="schoolCard">
+        <p class="sigil">Fire</p>
+        <h3>Flame of Fire</h3>
+        <p class="muted">Bold ignition, momentum, and will that warms allies and scorches doubt.</p>
+      </article>
+      <article class="schoolCard">
+        <p class="sigil">Wind</p>
+        <h3>Gale of Wind</h3>
+        <p class="muted">Speed, freedom, and precision that moves unseen and strikes clean.</p>
+      </article>
+    </div>
+  </aside>
 </div>
+
+      <div id="artifactQuizWrap" class="quizLayout" hidden>
+        <form class="quizForm column" id="artifactQuiz">
+          <div class="questionList">
+            <div class="questionCard" data-question="q1">
+              <div class="questionHeader">
+                <span class="questionNumber">01</span>
+                <h3>Pick a relic.</h3>
+              </div>
+              <div class="choiceGrid">
+                <label><input name="q1" type="radio" value="ring"/> Ring</label>
+                <label><input name="q1" type="radio" value="lens"/> Lens</label>
+                <label><input name="q1" type="radio" value="chime"/> Chime</label>
+                <label><input name="q1" type="radio" value="vial"/> Vial</label>
+              </div>
+            </div>
+
+            <div class="questionCard" data-question="q2">
+              <div class="questionHeader">
+                <span class="questionNumber">02</span>
+                <h3>Your spell style?</h3>
+              </div>
+              <div class="choiceGrid">
+                <label><input name="q2" type="radio" value="ring"/> Bind</label>
+                <label><input name="q2" type="radio" value="lens"/> Reveal</label>
+                <label><input name="q2" type="radio" value="chime"/> Resonate</label>
+                <label><input name="q2" type="radio" value="vial"/> Distill</label>
+              </div>
+            </div>
+
+            <div class="questionCard" data-question="q3">
+              <div class="questionHeader">
+                <span class="questionNumber">03</span>
+                <h3>In danger, you…</h3>
+              </div>
+              <div class="choiceGrid">
+                <label><input name="q3" type="radio" value="ring"/> Seal it</label>
+                <label><input name="q3" type="radio" value="lens"/> Spot it</label>
+                <label><input name="q3" type="radio" value="chime"/> Signal</label>
+                <label><input name="q3" type="radio" value="vial"/> Calm air</label>
+              </div>
+            </div>
+
+            <div class="questionCard" data-question="q4">
+              <div class="questionHeader">
+                <span class="questionNumber">04</span>
+                <h3>Best upgrade?</h3>
+              </div>
+              <div class="choiceGrid">
+                <label><input name="q4" type="radio" value="ring"/> Stronger wards</label>
+                <label><input name="q4" type="radio" value="lens"/> Sharper focus</label>
+                <label><input name="q4" type="radio" value="chime"/> Clearer tone</label>
+                <label><input name="q4" type="radio" value="vial"/> Richer blend</label>
+              </div>
+            </div>
+
+            <div class="questionCard" data-question="q5">
+              <div class="questionHeader">
+                <span class="questionNumber">05</span>
+                <h3>Pick a key.</h3>
+              </div>
+              <div class="choiceGrid">
+                <label><input name="q5" type="radio" value="ring"/> Iron</label>
+                <label><input name="q5" type="radio" value="lens"/> Crystal</label>
+                <label><input name="q5" type="radio" value="chime"/> Silver</label>
+                <label><input name="q5" type="radio" value="vial"/> Amber</label>
+              </div>
+            </div>
+
+            <div class="questionCard" data-question="q6">
+              <div class="questionHeader">
+                <span class="questionNumber">06</span>
+                <h3>Your ritual is…</h3>
+              </div>
+              <div class="choiceGrid">
+                <label><input name="q6" type="radio" value="ring"/> Etch a seal</label>
+                <label><input name="q6" type="radio" value="lens"/> Chart a path</label>
+                <label><input name="q6" type="radio" value="chime"/> Hum a note</label>
+                <label><input name="q6" type="radio" value="vial"/> Brew a tea</label>
+              </div>
+            </div>
+
+            <div class="questionCard" data-question="q7">
+              <div class="questionHeader">
+                <span class="questionNumber">07</span>
+                <h3>Most trusted sign?</h3>
+              </div>
+              <div class="choiceGrid">
+                <label><input name="q7" type="radio" value="ring"/> Pressure</label>
+                <label><input name="q7" type="radio" value="lens"/> Glint</label>
+                <label><input name="q7" type="radio" value="chime"/> Echo</label>
+                <label><input name="q7" type="radio" value="vial"/> Scent</label>
+              </div>
+            </div>
+
+            <div class="questionCard" data-question="q8">
+              <div class="questionHeader">
+                <span class="questionNumber">08</span>
+                <h3>Pick a job.</h3>
+              </div>
+              <div class="choiceGrid">
+                <label><input name="q8" type="radio" value="ring"/> Warden</label>
+                <label><input name="q8" type="radio" value="lens"/> Scout</label>
+                <label><input name="q8" type="radio" value="chime"/> Herald</label>
+                <label><input name="q8" type="radio" value="vial"/> Apothecary</label>
+              </div>
+            </div>
+
+            <div class="questionCard" data-question="q9">
+              <div class="questionHeader">
+                <span class="questionNumber">09</span>
+                <h3>Your gift is…</h3>
+              </div>
+              <div class="choiceGrid">
+                <label><input name="q9" type="radio" value="ring"/> Safety</label>
+                <label><input name="q9" type="radio" value="lens"/> Clarity</label>
+                <label><input name="q9" type="radio" value="chime"/> Unity</label>
+                <label><input name="q9" type="radio" value="vial"/> Comfort</label>
+              </div>
+            </div>
+
+            <div class="questionCard" data-question="q10">
+              <div class="questionHeader">
+                <span class="questionNumber">10</span>
+                <h3>Pick a vow.</h3>
+              </div>
+              <div class="choiceGrid">
+                <label><input name="q10" type="radio" value="ring"/> Hold the line</label>
+                <label><input name="q10" type="radio" value="lens"/> Look deeper</label>
+                <label><input name="q10" type="radio" value="chime"/> Keep the beat</label>
+                <label><input name="q10" type="radio" value="vial"/> Set the mood</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="quizActions">
+            <button class="btn primary" type="submit">Reveal my artifact</button>
+            <p aria-live="polite" class="muted small" id="artifactStatus"></p>
+          </div>
+
+          <div aria-live="polite" class="quizBreakdown" id="artifactBreakdown"></div>
+
+          <div aria-live="polite" class="quizResult" id="artifactResult">
+            <h4>Awaiting your answers</h4>
+            <p class="muted">Complete all prompts to hear the academy's verdict.</p>
+          </div>
+        </form>
+
+        <aside class="quizAside column">
+          <div class="schoolDeck">
+            <article class="schoolCard">
+              <p class="sigil">Ring</p>
+              <h3>Ward Ring</h3>
+              <p class="muted">A binding circle that locks intent into place, keeping chaos from slipping through.</p>
+            </article>
+            <article class="schoolCard">
+              <p class="sigil">Lens</p>
+              <h3>Star Lens</h3>
+              <p class="muted">A focus-glass that finds hidden ink, faint auras, and the quiet truth in a glare.</p>
+            </article>
+            <article class="schoolCard">
+              <p class="sigil">Chime</p>
+              <h3>Resonance Chime</h3>
+              <p class="muted">A tone-key that steadies spells, calls allies, and turns noise into guidance.</p>
+            </article>
+            <article class="schoolCard">
+              <p class="sigil">Vial</p>
+              <h3>Essence Vial</h3>
+              <p class="muted">A small bottle for memory and mood, brewed into something you can carry.</p>
+            </article>
+          </div>
+        </aside>
+      </div>
+
+      <div id="animalQuizWrap" class="quizLayout" hidden>
+        <form class="quizForm column" id="animalQuiz">
+          <div class="questionList">
+            <div class="questionCard" data-question="q1">
+              <div class="questionHeader">
+                <span class="questionNumber">01</span>
+                <h3>Who finds you?</h3>
+              </div>
+              <div class="choiceGrid">
+                <label><input name="q1" type="radio" value="dragon"/> Dragon</label>
+                <label><input name="q1" type="radio" value="cat"/> Cat</label>
+                <label><input name="q1" type="radio" value="wolf"/> Wolf</label>
+                <label><input name="q1" type="radio" value="owl"/> Owl</label>
+              </div>
+            </div>
+
+            <div class="questionCard" data-question="q2">
+              <div class="questionHeader">
+                <span class="questionNumber">02</span>
+                <h3>They help by…</h3>
+              </div>
+              <div class="choiceGrid">
+                <label><input name="q2" type="radio" value="dragon"/> Shielding</label>
+                <label><input name="q2" type="radio" value="cat"/> Spotting</label>
+                <label><input name="q2" type="radio" value="wolf"/> Rallying</label>
+                <label><input name="q2" type="radio" value="owl"/> Soothing</label>
+              </div>
+            </div>
+
+            <div class="questionCard" data-question="q3">
+              <div class="questionHeader">
+                <span class="questionNumber">03</span>
+                <h3>Best signal?</h3>
+              </div>
+              <div class="choiceGrid">
+                <label><input name="q3" type="radio" value="dragon"/> Warmth</label>
+                <label><input name="q3" type="radio" value="cat"/> Glint</label>
+                <label><input name="q3" type="radio" value="wolf"/> Howl</label>
+                <label><input name="q3" type="radio" value="owl"/> Incense</label>
+              </div>
+            </div>
+
+            <div class="questionCard" data-question="q4">
+              <div class="questionHeader">
+                <span class="questionNumber">04</span>
+                <h3>Pick a place.</h3>
+              </div>
+              <div class="choiceGrid">
+                <label><input name="q4" type="radio" value="dragon"/> Forge</label>
+                <label><input name="q4" type="radio" value="cat"/> Rooftop</label>
+                <label><input name="q4" type="radio" value="wolf"/> Hallways</label>
+                <label><input name="q4" type="radio" value="owl"/> Library</label>
+              </div>
+            </div>
+
+            <div class="questionCard" data-question="q5">
+              <div class="questionHeader">
+                <span class="questionNumber">05</span>
+                <h3>Their warning is…</h3>
+              </div>
+              <div class="choiceGrid">
+                <label><input name="q5" type="radio" value="dragon"/> Rumble</label>
+                <label><input name="q5" type="radio" value="cat"/> Stare</label>
+                <label><input name="q5" type="radio" value="wolf"/> Growl</label>
+                <label><input name="q5" type="radio" value="owl"/> Whisper</label>
+              </div>
+            </div>
+
+            <div class="questionCard" data-question="q6">
+              <div class="questionHeader">
+                <span class="questionNumber">06</span>
+                <h3>They teach you…</h3>
+              </div>
+              <div class="choiceGrid">
+                <label><input name="q6" type="radio" value="dragon"/> Courage</label>
+                <label><input name="q6" type="radio" value="cat"/> Precision</label>
+                <label><input name="q6" type="radio" value="wolf"/> Loyalty</label>
+                <label><input name="q6" type="radio" value="owl"/> Patience</label>
+              </div>
+            </div>
+
+            <div class="questionCard" data-question="q7">
+              <div class="questionHeader">
+                <span class="questionNumber">07</span>
+                <h3>Pick a gift.</h3>
+              </div>
+              <div class="choiceGrid">
+                <label><input name="q7" type="radio" value="dragon"/> Ember scale</label>
+                <label><input name="q7" type="radio" value="cat"/> Star thread</label>
+                <label><input name="q7" type="radio" value="wolf"/> Moon fang</label>
+                <label><input name="q7" type="radio" value="owl"/> Sage feather</label>
+              </div>
+            </div>
+
+            <div class="questionCard" data-question="q8">
+              <div class="questionHeader">
+                <span class="questionNumber">08</span>
+                <h3>Your bond feels…</h3>
+              </div>
+              <div class="choiceGrid">
+                <label><input name="q8" type="radio" value="dragon"/> Unbreakable</label>
+                <label><input name="q8" type="radio" value="cat"/> Attuned</label>
+                <label><input name="q8" type="radio" value="wolf"/> Pack-bound</label>
+                <label><input name="q8" type="radio" value="owl"/> Gentle</label>
+              </div>
+            </div>
+
+            <div class="questionCard" data-question="q9">
+              <div class="questionHeader">
+                <span class="questionNumber">09</span>
+                <h3>Best downtime?</h3>
+              </div>
+              <div class="choiceGrid">
+                <label><input name="q9" type="radio" value="dragon"/> Training</label>
+                <label><input name="q9" type="radio" value="cat"/> Watching</label>
+                <label><input name="q9" type="radio" value="wolf"/> Running</label>
+                <label><input name="q9" type="radio" value="owl"/> Tea time</label>
+              </div>
+            </div>
+
+            <div class="questionCard" data-question="q10">
+              <div class="questionHeader">
+                <span class="questionNumber">10</span>
+                <h3>Pick a vow.</h3>
+              </div>
+              <div class="choiceGrid">
+                <label><input name="q10" type="radio" value="dragon"/> Stand firm</label>
+                <label><input name="q10" type="radio" value="cat"/> See true</label>
+                <label><input name="q10" type="radio" value="wolf"/> Protect yours</label>
+                <label><input name="q10" type="radio" value="owl"/> Keep peace</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="quizActions">
+            <button class="btn primary" type="submit">Reveal my companion</button>
+            <p aria-live="polite" class="muted small" id="animalStatus"></p>
+          </div>
+
+          <div aria-live="polite" class="quizBreakdown" id="animalBreakdown"></div>
+
+          <div aria-live="polite" class="quizResult" id="animalResult">
+            <h4>Awaiting your answers</h4>
+            <p class="muted">Complete all prompts to hear the academy's verdict.</p>
+          </div>
+        </form>
+
+        <aside class="quizAside column">
+          <div class="schoolDeck">
+            <article class="schoolCard">
+              <p class="sigil">Dragon</p>
+              <h3>Pocket Dragon</h3>
+              <p class="muted">Small body, enormous will. It guards your focus and bites doubt on sight.</p>
+            </article>
+            <article class="schoolCard">
+              <p class="sigil">Cat</p>
+              <h3>Stargazer Cat</h3>
+              <p class="muted">A quiet watcher with lantern-eyes, guiding you to patterns you almost missed.</p>
+            </article>
+            <article class="schoolCard">
+              <p class="sigil">Wolf</p>
+              <h3>Hallway Wolf</h3>
+              <p class="muted">A steadfast shadow that walks with you. It turns fear into forward motion.</p>
+            </article>
+            <article class="schoolCard">
+              <p class="sigil">Owl</p>
+              <h3>Tea Owl</h3>
+              <p class="muted">A calm companion that remembers every path. It steadies rooms with quiet presence.</p>
+            </article>
+          </div>
+        </aside>
+      </div>
+
+    </div>
+  </div>
 </section>
-</main>
 <footer class="footer">
 <div class="container footerRow">
 <p class="muted small">© <span id="year"></span> StarSpell Academy. May your path stay bright.</p>

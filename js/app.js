@@ -37,6 +37,10 @@ const LOGIN_STATE_KEY = "auth:isLoggedIn";
 const AVATAR_KEY_PREFIX = "profile:avatar:";
 const LOGIN_REDIRECT_DELAY_MS = 1000;
 
+const QUIZ_RESULTS_PREFIX = "ssa:quizResults:";
+const GUEST_QUIZ_RESULTS_KEY = `${QUIZ_RESULTS_PREFIX}guest`;
+const QUIZ_TYPES_ORDER = ["sense", "element", "artifact", "animal"];
+
 let currentSession = null;
 let postsChannel = null;
 let redirectingAfterLogin = false;
@@ -148,6 +152,92 @@ function setLoginStateFlag(isLoggedIn) {
 
 function getAvatarStorageKey(userId) {
   return userId ? `${AVATAR_KEY_PREFIX}${userId}` : "";
+}
+
+function safeJsonParse(text, fallback) {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return fallback;
+  }
+}
+
+function getQuizStorageKey(userId) {
+  return userId ? `${QUIZ_RESULTS_PREFIX}${userId}` : GUEST_QUIZ_RESULTS_KEY;
+}
+
+function readStoredQuizResults(userId) {
+  const key = getQuizStorageKey(userId);
+  try {
+    return safeJsonParse(localStorage.getItem(key) || "{}", {});
+  } catch (error) {
+    console.warn("Unable to read quiz results", error);
+    return {};
+  }
+}
+
+function writeStoredQuizResults(userId, results) {
+  const key = getQuizStorageKey(userId);
+  try {
+    localStorage.setItem(key, JSON.stringify(results || {}));
+  } catch (error) {
+    console.warn("Unable to store quiz results", error);
+  }
+}
+
+function storeQuizResultForUser(userId, payload) {
+  const results = readStoredQuizResults(userId);
+  results[payload.quizType] = payload;
+  writeStoredQuizResults(userId, results);
+}
+
+async function persistQuizResultsMapToSupabase(resultsMap) {
+  const user = currentSession?.user;
+  if (!user?.id) return;
+  if (!resultsMap || typeof resultsMap !== "object") return;
+
+  try {
+    const existingMeta = (user.user_metadata && typeof user.user_metadata === "object") ? user.user_metadata : {};
+    const existingResults =
+      existingMeta.quiz_results && typeof existingMeta.quiz_results === "object" ? existingMeta.quiz_results : {};
+    const nextResults = { ...existingResults, ...resultsMap };
+    const nextMeta = { ...existingMeta, quiz_results: nextResults };
+
+    const { error } = await supabase.auth.updateUser({ data: nextMeta });
+    if (error) throw error;
+
+    // Keep local session metadata reasonably up-to-date for later merges.
+    user.user_metadata = nextMeta;
+  } catch (error) {
+    console.warn("Unable to persist quiz results to Supabase metadata", error);
+  }
+}
+
+async function persistQuizResultToSupabase(payload) {
+  if (!payload || typeof payload !== "object") return;
+  if (!payload.quizType) return;
+  const map = { [payload.quizType]: payload };
+  await persistQuizResultsMapToSupabase(map);
+}
+
+async function migrateGuestQuizResultsToUser(userId) {
+  if (!userId) return;
+  const guestResults = readStoredQuizResults("");
+  const hasGuest = guestResults && typeof guestResults === "object" && Object.keys(guestResults).length > 0;
+  if (!hasGuest) return;
+
+  const userResults = readStoredQuizResults(userId);
+  const merged = { ...guestResults, ...userResults };
+  writeStoredQuizResults(userId, merged);
+
+  try {
+    localStorage.removeItem(GUEST_QUIZ_RESULTS_KEY);
+  } catch {
+    // ignore
+  }
+
+  // Best effort: push to Supabase metadata too.
+  await persistQuizResultsMapToSupabase(merged);
 }
 
 function loadStoredAvatar(userId) {
@@ -472,6 +562,8 @@ function initAuthListeners() {
     if (event === "SIGNED_IN") {
       setStatus(authStatus, `Logged in as ${session?.user?.email || "member"}.`);
       updateAuthVisibility(true, session?.user?.email || "your account", session?.user?.id || "");
+    
+      migrateGuestQuizResultsToUser(session?.user?.id || "");
     }
     refreshPosts();
   });
@@ -522,6 +614,20 @@ function bindEvents() {
     const userId = detail.userId || currentSession?.user?.id;
     if (userId && userId === currentSession?.user?.id) {
       syncProfileAvatar(userId);
+    }
+  });
+
+  window.addEventListener("ssa:quizCompleted", (event) => {
+    const payload = event?.detail;
+    if (!payload || typeof payload !== "object") return;
+    if (!payload.quizType) return;
+
+    const userId = currentSession?.user?.id || "";
+    storeQuizResultForUser(userId, payload);
+
+    // Also persist to Supabase when logged in (so results survive browser storage).
+    if (userId) {
+      persistQuizResultToSupabase(payload);
     }
   });
 }

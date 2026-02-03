@@ -465,78 +465,55 @@ navLinks?.addEventListener("click", (e) => {
   }
 
   // Quiz (sorting ritual page only)
-  const quizForm = document.getElementById("schoolQuiz");
-  const quizResult = document.getElementById("quizResult");
-  const quizStatus = document.getElementById("quizStatus");
+  const quizChooser = document.getElementById("quizChooser");
+  const quizShell = document.getElementById("quizShell");
+  const changeQuizBtn = document.getElementById("changeQuizBtn");
+  const activeQuizLabel = document.getElementById("activeQuizLabel");
+  const senseWrap = document.getElementById("senseQuizWrap");
+  const elementWrap = document.getElementById("elementQuizWrap");
+  const artifactWrap = document.getElementById("artifactQuizWrap");
+  const animalWrap = document.getElementById("animalQuizWrap");
 
-  if (quizForm && quizResult) {
-    const schoolCopy = {
-      touch: {
-        name: "Chamber of Touch",
-        fit: "Your choices favored texture, warmth, and the certainty of things held in hand. You steady spells by feeling their shape and making them tangible.",
-        invitation:
-          "Within the Chamber of Touch you'll learn shield-weaving, tactile sigils, and restorative crafts—building wards and tools that pulse with your intent.",
-        status: "You lead with grounding sensation and craft, anchoring magic through touch.",
-      },
-      sight: {
-        name: "Observatory of Sight",
-        fit: "You read meaning in diagrams, glints, and constellations. Patterns reveal themselves quickly to you, and you navigate by the stories light tells.",
-        invitation:
-          "The Observatory of Sight will refine your focus through star charts, illusion wards, and mapwork of ley lines—teaching you to draw the unseen into view.",
-        status: "You lead with a precise gaze, mapping possibilities before others sense them.",
-      },
-      sound: {
-        name: "Choir of Sound",
-        fit: "Vibration, cadence, and harmony guide your focus. You listen between words and tune your magic like an instrument until everything resonates.",
-        invitation:
-          "The Choir of Sound pairs you with conductors who teach resonance spells, storm-calming chorales, and voice-bound wards that answer your rhythm.",
-        status: "You lead with resonance and cadence, coaxing harmony from every element.",
-      },
-      essence: {
-        name: "House of Essence",
-        fit: "Memory and mood speak to you through aroma and flavor. You notice the way scent changes a room and trace emotion through what lingers in the air.",
-        invitation:
-          "Within the House of Essence you'll study aromatic divination, healing brews, and atmosphere-shaping rituals that braid memory into every casting.",
-        status: "You lead with memory-rich essences, shaping spells through taste and scent.",
-      },
-    };
+  function setupScoredQuiz({ form, result, status, breakdown, copy, order, quizType }) {
+    if (!form || !result) return null;
 
     function clearQuizFeedback() {
-      quizForm.querySelectorAll(".questionCard").forEach((field) => field.classList.remove("hasError"));
+      result.classList.remove("hasVerdict");
+      form.querySelectorAll(".questionCard").forEach((field) => field.classList.remove("hasError"));
 
-      quizResult.replaceChildren();
+      result.replaceChildren();
       const title = document.createElement("h4");
       title.textContent = "Awaiting your answers";
       const body = document.createElement("p");
       body.className = "muted";
       body.textContent = "Complete all prompts to hear the academy's verdict.";
-      quizResult.append(title, body);
+      result.append(title, body);
 
-      if (quizStatus) quizStatus.textContent = "";
+      if (status) status.textContent = "";
+      if (breakdown) breakdown.replaceChildren();
     }
 
-    quizForm.addEventListener("submit", (e) => {
+    form.addEventListener("submit", (e) => {
       e.preventDefault();
 
       clearQuizFeedback();
 
-      const formData = new FormData(quizForm);
-      const questionCards = Array.from(quizForm.querySelectorAll(".questionCard"));
+      const formData = new FormData(form);
+      const questionCards = Array.from(form.querySelectorAll(".questionCard"));
 
-      // Weighted scoring reduces ties; a deterministic tie-breaker makes ties impossible.
+      // Weighted scoring reduces ties; a deterministic tie-breaker makes ties improbable.
       const primeWeights = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53];
       const weights =
         questionCards.length <= primeWeights.length
           ? primeWeights.slice(0, questionCards.length)
           : Array.from({ length: questionCards.length }, (_, i) => i + 2);
 
-      const scores = { touch: 0, sight: 0, sound: 0, essence: 0 };
-      const meta = {
-        touch: { picks: 0, lastIndex: -1 },
-        sight: { picks: 0, lastIndex: -1 },
-        sound: { picks: 0, lastIndex: -1 },
-        essence: { picks: 0, lastIndex: -1 },
-      };
+      const scores = {};
+      const meta = {};
+      order.forEach((key) => {
+        scores[key] = 0;
+        meta[key] = { picks: 0, lastIndex: -1 };
+      });
 
       let valid = true;
 
@@ -558,7 +535,7 @@ navLinks?.addEventListener("click", (e) => {
       });
 
       if (!valid) {
-        if (quizStatus) quizStatus.textContent = "Answer each prompt to complete the ritual.";
+        if (status) status.textContent = "Answer each prompt to complete the ritual.";
         return;
       }
 
@@ -579,10 +556,8 @@ navLinks?.addEventListener("click", (e) => {
 
       const top = ranked[0];
       const tiedOnScore = ranked.filter((entry) => entry.score === top.score).map((entry) => entry.key);
-      let schoolKey = top.key;
+      let topKey = top.key;
 
-      // Make ties impossible: break ties by the most recent aligned answer, then by number of aligned answers,
-      // then (only if needed) by a deterministic seed derived from the user's selections.
       if (tiedOnScore.length > 1) {
         const bestLast = Math.max(...tiedOnScore.map((key) => meta[key]?.lastIndex ?? -1));
         let candidates = tiedOnScore.filter((key) => (meta[key]?.lastIndex ?? -1) === bestLast);
@@ -593,7 +568,7 @@ navLinks?.addEventListener("click", (e) => {
         }
 
         if (candidates.length === 1) {
-          schoolKey = candidates[0];
+          topKey = candidates[0];
         } else {
           const seed = questionCards
             .map((field) => {
@@ -604,44 +579,393 @@ navLinks?.addEventListener("click", (e) => {
             .join("|");
 
           const hash = Array.from(seed).reduce((acc, ch) => (acc * 31 + ch.charCodeAt(0)) >>> 0, 7);
-          schoolKey = candidates[hash % candidates.length];
+          topKey = candidates[hash % candidates.length];
         }
       }
 
-      const school = schoolCopy[schoolKey];
+      const pick = copy[topKey];
 
-      if (school) {
+      if (pick) {
+        result.classList.add("hasVerdict");
+
         const title = document.createElement("h4");
-        title.textContent = `${school.name} awaits you.`;
+        title.textContent = `${pick.name} awaits you.`;
 
         const body = document.createElement("p");
         body.className = "resultDetail";
-        body.textContent = school.fit;
+        body.textContent = pick.fit;
 
         const detail = document.createElement("p");
         detail.className = "muted";
-        detail.textContent = school.invitation;
+        detail.textContent = pick.invitation;
+
+        const totalPoints = Object.values(scores).reduce((sum, value) => sum + value, 0) || 1;
+        const breakdownNode = document.createElement("div");
+        breakdownNode.className = "scoreBreakdown";
+        breakdownNode.setAttribute("role", "group");
+        breakdownNode.setAttribute("aria-label", "Score breakdown");
+
+        const breakdownTitle = document.createElement("p");
+        breakdownTitle.className = "muted small";
+        breakdownTitle.textContent = "Score breakdown";
+        breakdownNode.append(breakdownTitle);
+
+        order.forEach((key) => {
+          const row = document.createElement("div");
+          row.className = "scoreRow";
+
+          const name = document.createElement("span");
+          name.className = "scoreName";
+          name.textContent = copy[key]?.name || key;
+
+          const value = document.createElement("span");
+          value.className = "scoreValue";
+          const percent = Math.round((scores[key] / totalPoints) * 100);
+          value.textContent = `${scores[key]} (${percent}%)`;
+
+          row.append(name, value);
+
+          const bar = document.createElement("div");
+          bar.className = "scoreBar";
+
+          const fill = document.createElement("div");
+          fill.className = "scoreFill";
+          fill.style.width = `${percent}%`;
+
+          bar.append(fill);
+          breakdownNode.append(row, bar);
+        });
 
         const note = document.createElement("p");
         note.className = "muted small";
+        const runnerUp = ranked.find((entry) => entry.key !== topKey);
+        note.textContent = runnerUp ? `Second-strongest pull: ${copy[runnerUp.key]?.name || runnerUp.key}.` : "";
 
-        const runnerUp = ranked.find((entry) => entry.key !== schoolKey);
-        note.textContent = runnerUp ? `Second-strongest pull: ${schoolCopy[runnerUp.key]?.name || runnerUp.key}.` : "";
+        result.replaceChildren(title, body, detail);
+        if (note.textContent) result.append(note);
 
-        quizResult.replaceChildren(title, body, detail);
-        if (note.textContent) quizResult.append(note);
-
-        if (quizStatus) {
-          quizStatus.textContent = `${school.name}: ${school.status}`;
+        if (breakdown) {
+          breakdown.replaceChildren(breakdownNode);
+        } else {
+          result.append(breakdownNode);
         }
+
+        if (status) status.textContent = `${pick.name}: ${pick.status}`;
+
+        // Dispatch an event so other scripts can persist this result for the profile page.
+        try {
+          const safeQuizType = quizType || form?.getAttribute?.("id") || "quiz";
+          const labels = {};
+          order.forEach((key) => {
+            labels[key] = copy[key]?.name || key;
+          });
+
+          window.dispatchEvent(
+            new CustomEvent("ssa:quizCompleted", {
+              detail: {
+                quizType: safeQuizType,
+                topKey,
+                topName: pick.name,
+                status: pick.status,
+                scores,
+                order,
+                labels,
+                totalPoints,
+                completedAt: new Date().toISOString(),
+              },
+            }),
+          );
+        } catch (err) {
+          console.warn("Quiz completion event failed", err);
+        }
+
       }
     });
 
-    quizForm.addEventListener("reset", () => {
+    form.addEventListener("reset", () => {
       clearQuizFeedback();
     });
 
     clearQuizFeedback();
+
+    return { clear: clearQuizFeedback };
+  }
+
+  const senseQuiz = document.getElementById("schoolQuiz");
+  const senseResult = document.getElementById("quizResult");
+  const senseStatus = document.getElementById("quizStatus");
+  const senseBreakdown = document.getElementById("quizBreakdown");
+
+  const schoolCopy = {
+    touch: {
+      name: "Chamber of Touch",
+      fit: "Your choices favored texture, warmth, and the certainty of things held in hand. You steady spells by feeling their shape and making them tangible.",
+      invitation:
+        "Within the Chamber of Touch you'll learn shield-weaving, tactile sigils, and restorative crafts—building wards and tools that pulse with your intent.",
+      status: "You lead with grounding sensation and craft, anchoring magic through touch.",
+    },
+    sight: {
+      name: "Observatory of Sight",
+      fit: "You read meaning in diagrams, glints, and constellations. Patterns reveal themselves quickly to you, and you navigate by the stories light tells.",
+      invitation:
+        "The Observatory of Sight will refine your focus through star charts, illusion wards, and mapwork of ley lines—teaching you to draw the unseen into view.",
+      status: "You lead with a precise gaze, mapping possibilities before others sense them.",
+    },
+    sound: {
+      name: "Choir of Sound",
+      fit: "Vibration, cadence, and harmony guide your focus. You listen between words and tune your magic like an instrument until everything resonates.",
+      invitation:
+        "The Choir of Sound pairs you with conductors who teach resonance spells, storm-calming chorales, and voice-bound wards that answer your rhythm.",
+      status: "You lead with resonance and cadence, coaxing harmony from every element.",
+    },
+    essence: {
+      name: "House of Essence",
+      fit: "Memory and mood speak to you through aroma and flavor. You notice the way scent changes a room and trace emotion through what lingers in the air.",
+      invitation:
+        "Within the House of Essence you'll study aromatic divination, healing brews, and atmosphere-shaping rituals that braid memory into every casting.",
+      status: "You lead with memory-rich essences, shaping spells through taste and scent.",
+    },
+  };
+
+  const elementQuiz = document.getElementById("elementQuiz");
+  const elementResult = document.getElementById("elementResult");
+  const elementStatus = document.getElementById("elementStatus");
+  const elementBreakdown = document.getElementById("elementBreakdown");
+
+const artifactQuiz = document.getElementById("artifactQuiz");
+const artifactResult = document.getElementById("artifactResult");
+const artifactStatus = document.getElementById("artifactStatus");
+const artifactBreakdown = document.getElementById("artifactBreakdown");
+
+const animalQuiz = document.getElementById("animalQuiz");
+const animalResult = document.getElementById("animalResult");
+const animalStatus = document.getElementById("animalStatus");
+const animalBreakdown = document.getElementById("animalBreakdown");
+
+  const elementCopy = {
+    water: {
+      name: "Tide of Water",
+      fit: "You move like a current, patient until the moment you redirect everything. You prefer control through adaptation, turning obstacles into routes.",
+      invitation:
+        "In the Tide, you'll practice flow-shaping, pressure wards, and calm recovery rituals—learning how to bend conflict without breaking yourself.",
+      status: "You lead with adaptation and quiet control, reshaping the field like water.",
+    },
+    earth: {
+      name: "Stone of Earth",
+      fit: "You build trust the way mountains build time: slowly, surely, and without apology. You stabilize chaos and make promises that last.",
+      invitation:
+        "In the Stone, you'll train reinforcement seals, barrier craft, and grounding strikes—turning willpower into structure others can lean on.",
+      status: "You lead with stability and protection, anchoring allies with earth-true resolve.",
+    },
+    fire: {
+      name: "Flame of Fire",
+      fit: "You ignite momentum. When you commit, the room changes. Your power thrives on courage, clarity, and decisive action.",
+      invitation:
+        "In the Flame, you'll learn controlled bursts, heat-forged wards, and rallying sparks—channeling intensity into precision instead of havoc.",
+      status: "You lead with bold ignition and purpose, lighting the way forward.",
+    },
+    wind: {
+      name: "Gale of Wind",
+      fit: "You are motion with a point. You notice openings, read the air, and move before others decide. Freedom is your fuel.",
+      invitation:
+        "In the Gale, you'll master cutting drafts, silence slips, and range control—turning speed into elegance and escape into strategy.",
+      status: "You lead with speed and clarity, choosing your angle and making it real.",
+    },
+  };
+
+const artifactCopy = {
+  ring: {
+    name: "Ward Ring",
+    fit: "You favor magic that can be worn, trusted, and relied on under pressure. You turn intent into something sturdy and repeatable.",
+    invitation:
+      "The Ward Ring rewards you with seals, anchors, and boundary craft—magic that holds the line when everything else wavers.",
+    status: "You lead with structure and protection, binding outcomes into place.",
+  },
+  lens: {
+    name: "Star Lens",
+    fit: "You chase clarity. You want the hidden layer, the map beneath the paint, the signal inside the glare.",
+    invitation:
+      "The Star Lens trains focus, reveal-work, and pattern-reading—magic that makes the unseen legible.",
+    status: "You lead with insight and precision, turning questions into clean answers.",
+  },
+  chime: {
+    name: "Resonance Chime",
+    fit: "You move with rhythm. You steady rooms, sync teams, and shape moments by what you hear and how you answer it.",
+    invitation:
+      "The Resonance Chime teaches cadence wards, call-signals, and harmony craft—magic that brings things into tune.",
+    status: "You lead with resonance and timing, making chaos cooperate.",
+  },
+  vial: {
+    name: "Essence Vial",
+    fit: "You understand atmosphere. You notice moods, memories, and the way a space changes when one note shifts.",
+    invitation:
+      "The Essence Vial opens brewing, aura-blending, and comfort rituals—magic that carries calm like a lantern.",
+    status: "You lead with presence and alchemy, shaping spells through scent and taste.",
+  },
+};
+
+const animalCopy = {
+  dragon: {
+    name: "Pocket Dragon",
+    fit: "You thrive when the stakes are real. Your companion amplifies resolve, guards your center, and turns fear into fuel.",
+    invitation:
+      "Together you'll practice boundary-holding, brave leaps, and stubborn protection—firelight discipline in a small fierce body.",
+    status: "You lead with courage and anchored power.",
+  },
+  cat: {
+    name: "Stargazer Cat",
+    fit: "You notice what others skip. Your companion sharpens your attention and nudges you toward the detail that changes everything.",
+    invitation:
+      "Together you'll train observation, timing, and quiet repositioning—winning by seeing first and moving clean.",
+    status: "You lead with insight and clean precision.",
+  },
+  wolf: {
+    name: "Hallway Wolf",
+    fit: "You build loyalty and momentum. Your companion keeps you steady and reminds you that you never have to carry alone.",
+    invitation:
+      "Together you'll train coordination, rally-calls, and protective instincts—turning a group into a unit.",
+    status: "You lead with loyalty and forward motion.",
+  },
+  owl: {
+    name: "Tea Owl",
+    fit: "You bring calm. Your companion helps you read rooms, soften sharp edges, and choose the cleanest path through tension.",
+    invitation:
+      "Together you'll practice patience, memory-maps, and gentle resets—magic that steadies people as well as plans.",
+    status: "You lead with steadiness and quiet care.",
+  },
+};
+
+  const senseSetup = setupScoredQuiz({
+    form: senseQuiz,
+    result: senseResult,
+    status: senseStatus,
+    breakdown: senseBreakdown,
+    copy: schoolCopy,
+    order: ["touch", "sight", "sound", "essence"],
+    quizType: "sense",
+  });
+
+  const elementSetup = setupScoredQuiz({
+    form: elementQuiz,
+    result: elementResult,
+    status: elementStatus,
+    breakdown: elementBreakdown,
+    copy: elementCopy,
+    order: ["water", "earth", "fire", "wind"],
+    quizType: "element",
+});
+
+const artifactSetup = setupScoredQuiz({
+  form: artifactQuiz,
+  result: artifactResult,
+  status: artifactStatus,
+  breakdown: artifactBreakdown,
+  copy: artifactCopy,
+  order: ["ring", "lens", "chime", "vial"],
+    quizType: "artifact",
+});
+
+const animalSetup = setupScoredQuiz({
+  form: animalQuiz,
+  result: animalResult,
+  status: animalStatus,
+  breakdown: animalBreakdown,
+  copy: animalCopy,
+  order: ["dragon", "cat", "wolf", "owl"],
+    quizType: "animal",
+});
+
+function showChooser() {
+    if (!quizChooser || !quizShell) return;
+
+    quizChooser.hidden = false;
+    quizShell.hidden = true;
+
+    if (senseWrap) senseWrap.hidden = true;
+    if (elementWrap) elementWrap.hidden = true;
+    if (artifactWrap) artifactWrap.hidden = true;
+    if (animalWrap) animalWrap.hidden = true;
+
+    if (activeQuizLabel) activeQuizLabel.textContent = "";
+  }
+
+  function setActiveQuiz(type) {
+    if (!quizChooser || !quizShell) return;
+
+    const allowed = ["sense", "element", "artifact", "animal"];
+    if (!allowed.includes(type)) {
+      showChooser();
+      return;
+    }
+
+    quizChooser.hidden = true;
+    quizShell.hidden = false;
+
+    const isSense = type === "sense";
+    const isElement = type === "element";
+    const isArtifact = type === "artifact";
+    const isAnimal = type === "animal";
+
+    if (senseWrap) senseWrap.hidden = !isSense;
+    if (elementWrap) elementWrap.hidden = !isElement;
+    if (artifactWrap) artifactWrap.hidden = !isArtifact;
+    if (animalWrap) animalWrap.hidden = !isAnimal;
+
+    if (activeQuizLabel) {
+      activeQuizLabel.textContent = isSense
+        ? "Sense Magic Quiz"
+        : isElement
+          ? "Elemental Magic Quiz"
+          : isArtifact
+            ? "Artifact Quiz"
+            : "Animal Companion Quiz";
+    }
+
+    if (isSense) {
+      senseQuiz?.reset();
+      senseSetup?.clear?.();
+      senseWrap?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    if (isElement) {
+      elementQuiz?.reset();
+      elementSetup?.clear?.();
+      elementWrap?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    if (isArtifact) {
+      artifactQuiz?.reset();
+      artifactSetup?.clear?.();
+      artifactWrap?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    if (isAnimal) {
+      animalQuiz?.reset();
+      animalSetup?.clear?.();
+      animalWrap?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
+  if (quizChooser && quizShell) {
+    const choiceButtons = Array.from(document.querySelectorAll("[data-quiz-choice]"));
+    choiceButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const type = btn.getAttribute("data-quiz-choice");
+        if (["sense","element","artifact","animal"].includes(type)) setActiveQuiz(type);
+      });
+    });
+
+    if (changeQuizBtn) {
+      changeQuizBtn.addEventListener("click", () => showChooser());
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const preset = params.get("quiz");
+    if (["sense", "element", "artifact", "animal"].includes(preset)) {
+      setActiveQuiz(preset);
+    } else {
+      showChooser();
+    }
   }
 
   // Contact form validation

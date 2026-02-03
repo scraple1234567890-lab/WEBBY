@@ -23,6 +23,20 @@ const profileEditCancel = document.getElementById("profileEditCancel");
 const profilePosts = document.getElementById("profilePosts");
 const profilePostsCard = document.getElementById("profilePostsCard");
 
+// Quiz results
+const profileQuizSection = document.getElementById("profileQuizSection");
+const profileQuizGrid = document.getElementById("profileQuizGrid");
+const profileQuizEmpty = document.getElementById("profileQuizEmpty");
+
+const QUIZ_RESULTS_PREFIX = "ssa:quizResults:";
+const QUIZ_TYPES_ORDER = ["sense", "element", "artifact", "animal"];
+const QUIZ_TITLE_MAP = {
+  sense: "Sense Magic Quiz",
+  element: "Elemental Magic Quiz",
+  artifact: "Artifact Quiz",
+  animal: "Animal Companion Quiz",
+};
+
 // Badges (client-side achievements)
 const profileBadgesSection = document.getElementById("profileBadgesSection");
 const profileBadgesGrid = document.getElementById("profileBadgesGrid");
@@ -44,6 +58,166 @@ function safeJsonParse(text, fallback) {
   }
 }
 
+
+function isObject(value) {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function getQuizStorageKey(userId) {
+  return userId ? `${QUIZ_RESULTS_PREFIX}${userId}` : `${QUIZ_RESULTS_PREFIX}guest`;
+}
+
+function readLocalQuizResults(userId) {
+  const key = getQuizStorageKey(userId);
+  try {
+    return safeJsonParse(localStorage.getItem(key) || "{}", {});
+  } catch {
+    return {};
+  }
+}
+
+function parseIsoTime(value) {
+  const t = value ? Date.parse(value) : NaN;
+  return Number.isNaN(t) ? 0 : t;
+}
+
+function pickNewestPayload(a, b) {
+  if (!a) return b;
+  if (!b) return a;
+  const at = parseIsoTime(a.completedAt || a.completed_at || a.updatedAt);
+  const bt = parseIsoTime(b.completedAt || b.completed_at || b.updatedAt);
+  return bt > at ? b : a;
+}
+
+function mergeQuizResults(primary, secondary) {
+  const out = {};
+  const a = isObject(primary) ? primary : {};
+  const b = isObject(secondary) ? secondary : {};
+  const allKeys = new Set([...Object.keys(a), ...Object.keys(b)]);
+  allKeys.forEach((k) => {
+    out[k] = pickNewestPayload(a[k], b[k]);
+  });
+  return out;
+}
+
+function formatShortDate(value) {
+  const date = value ? new Date(value) : null;
+  if (!date || Number.isNaN(date.getTime())) return "";
+  return date.toLocaleString();
+}
+
+function normalizeQuizPayload(payload, quizType) {
+  if (!isObject(payload)) return null;
+  const scores = isObject(payload.scores) ? payload.scores : {};
+  const order = Array.isArray(payload.order) ? payload.order : Object.keys(scores);
+  const labels = isObject(payload.labels) ? payload.labels : {};
+  const totalPoints = typeof payload.totalPoints === "number" ? payload.totalPoints : 0;
+
+  return {
+    quizType: payload.quizType || quizType || "",
+    topKey: payload.topKey || "",
+    topName: payload.topName || payload.resultName || "",
+    status: payload.status || "",
+    scores,
+    order,
+    labels,
+    totalPoints,
+    completedAt: payload.completedAt || payload.completed_at || payload.updatedAt || "",
+  };
+}
+
+function setQuizSectionVisible(show) {
+  if (!(profileQuizSection instanceof HTMLElement)) return;
+  profileQuizSection.hidden = !show;
+  profileQuizSection.setAttribute("aria-hidden", String(!show));
+}
+
+function renderQuizResults(user, resultsMap) {
+  if (!(profileQuizSection instanceof HTMLElement)) return;
+  if (!(profileQuizGrid instanceof HTMLElement)) return;
+
+  const raw = isObject(resultsMap) ? resultsMap : {};
+  const normalized = {};
+  Object.keys(raw).forEach((k) => {
+    const norm = normalizeQuizPayload(raw[k], k);
+    if (norm) normalized[k] = norm;
+  });
+
+  const ordered = QUIZ_TYPES_ORDER.filter((t) => normalized[t]).concat(Object.keys(normalized).filter((t) => !QUIZ_TYPES_ORDER.includes(t)));
+  profileQuizGrid.innerHTML = "";
+
+  if (!ordered.length) {
+    setQuizSectionVisible(true);
+    if (profileQuizEmpty instanceof HTMLElement) profileQuizEmpty.hidden = false;
+    return;
+  }
+  if (profileQuizEmpty instanceof HTMLElement) profileQuizEmpty.hidden = true;
+  setQuizSectionVisible(true);
+
+  ordered.forEach((type) => {
+    const data = normalized[type];
+    if (!data) return;
+
+    const card = document.createElement("article");
+    card.className = "profileQuizCard";
+
+    const top = document.createElement("div");
+    top.className = "profileQuizTop";
+
+    const title = document.createElement("h3");
+    title.className = "profileQuizTitle";
+    title.textContent = QUIZ_TITLE_MAP[type] || type;
+
+    const meta = document.createElement("p");
+    meta.className = "muted small profileQuizMeta";
+    meta.textContent = data.completedAt ? formatShortDate(data.completedAt) : "";
+
+    top.append(title, meta);
+
+    const resultLine = document.createElement("p");
+    resultLine.className = "profileQuizResult";
+    const main = data.topName || data.topKey || "Unknown result";
+    resultLine.textContent = data.status ? `Result: ${main} (${data.status})` : `Result: ${main}`;
+
+    const breakdown = document.createElement("div");
+    breakdown.className = "profileQuizBreakdown";
+
+    const total = data.totalPoints || data.order.reduce((acc, key) => acc + (Number(data.scores[key]) || 0), 0) || 0;
+
+    data.order.forEach((key) => {
+      const val = Number(data.scores[key]) || 0;
+      const pct = total > 0 ? Math.round((val / total) * 100) : 0;
+
+      const row = document.createElement("div");
+      row.className = "profileQuizRow";
+
+      const rowTop = document.createElement("div");
+      rowTop.className = "profileQuizRowTop";
+
+      const label = document.createElement("span");
+      label.textContent = data.labels[key] || key;
+
+      const score = document.createElement("span");
+      score.className = "muted";
+      score.textContent = `${pct}%`;
+
+      rowTop.append(label, score);
+
+      const bar = document.createElement("div");
+      bar.className = "profileQuizBar";
+      const fill = document.createElement("span");
+      fill.style.setProperty("--pct", `${pct}%`);
+      bar.appendChild(fill);
+
+      row.append(rowTop, bar);
+      breakdown.appendChild(row);
+    });
+
+    card.append(top, resultLine, breakdown);
+    profileQuizGrid.appendChild(card);
+  });
+}
+
 function setBadgesVisible(show) {
   if (!(profileBadgesSection instanceof HTMLElement)) return;
   profileBadgesSection.hidden = !show;
@@ -59,6 +233,7 @@ function renderProfileBadges() {
 
   if (!api || !Array.isArray(defs) || defs.length === 0) {
     setBadgesVisible(false);
+  setQuizSectionVisible(false);
     return;
   }
 
@@ -398,6 +573,7 @@ function showGuestState(message = "You’re not logged in yet.") {
   setAvatarStatus("");
   toggleProfileExtras(false);
   setBadgesVisible(false);
+  setQuizSectionVisible(false);
   if (profileBadgesGrid instanceof HTMLElement) profileBadgesGrid.innerHTML = "";
   // hide summary container and text for guests
   setProfileSummaryVisible(false);
@@ -421,6 +597,13 @@ function renderProfile(user) {
   syncAvatar(user?.id);
   const metadata = user?.user_metadata || {};
   updateProfileSummary(metadata);
+
+
+  // Quiz results (stored to Supabase metadata + localStorage)
+  const metaResults = (metadata && typeof metadata === "object") ? metadata.quiz_results : null;
+  const localResults = readLocalQuizResults(user?.id || "");
+  const mergedResults = mergeQuizResults(metaResults, localResults);
+  renderQuizResults(user, mergedResults);
 
   // Show badges (stored per browser via localStorage)
   renderProfileBadges();
