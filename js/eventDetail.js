@@ -84,7 +84,7 @@
       mount.appendChild(
         el("div", { class: "timelineCard" }, [
           el("p", { class: "muted", text: "No event id provided for this page." }),
-          el("a", { class: "btn ghost", href: "../timeline.html", text: "Back to Timeline" }),
+          el("a", { class: "btn ghost", href: "../search.html", text: "Back to Search" }),
         ])
       );
       return;
@@ -108,7 +108,7 @@
       mount.appendChild(
         el("div", { class: "timelineCard" }, [
           el("p", { class: "muted", text: "Could not find that event in data/timeline.json." }),
-          el("a", { class: "btn ghost", href: "../timeline.html", text: "Back to Timeline" }),
+          el("a", { class: "btn ghost", href: "../search.html", text: "Back to Search" }),
         ])
       );
       if (titleEl) titleEl.textContent = "Event not found";
@@ -208,7 +208,7 @@
     });
 
     const actions = el("div", { class: "timelineActions" }, [
-      el("a", { class: "btn ghost", href: `../timeline.html#${encodeURIComponent(safeText(ev.id) || "")}`, text: "Back to Timeline" }),
+      el("a", { class: "btn ghost", href: "../search.html", text: "Back to Search" }),
       el("a", { class: "btn ghost", href: `../search.html?q=${encodeURIComponent(title)}`, text: "Search" }),
     ]);
 
