@@ -43,7 +43,7 @@ const QUIZ_TYPES_ORDER = ["sense", "element", "artifact", "animal"];
 
 const BADGES_STORAGE_KEY = "ssa:badges:v1";
 const BADGES_META_KEY = "badge_unlocks";
-const BADGES_SYNC_WAIT_MS = 2500;
+const BADGES_SYNC_WAIT_MS = 15000;
 
 let currentSession = null;
 let postsChannel = null;
@@ -821,6 +821,14 @@ function bindEvents() {
     const unlockedAt = detail.unlockedAt || new Date().toISOString();
     persistBadgeUnlockToSupabase(badgeId, unlockedAt);
   });
+
+  // If achievements loads after app.js (slow devices), sync badges once the API is ready.
+  window.addEventListener("ssa:achievementsReady", () => {
+    if (currentSession?.user?.id) {
+      syncBadgesForCurrentUser();
+    }
+  });
+
 }
 
 function init() {

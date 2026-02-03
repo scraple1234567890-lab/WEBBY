@@ -290,6 +290,14 @@
     updateBadgesStats,
   };
 
+  // Signal that the achievements API is ready (useful for cross-device badge sync).
+  try {
+    window.dispatchEvent(new CustomEvent("ssa:achievementsReady"));
+  } catch {
+    // ignore
+  }
+
+
   // Auto-run after DOM is ready if badge defs are present
   document.addEventListener("DOMContentLoaded", () => {
     const defs = window.SSA_BADGE_DEFS || [];
