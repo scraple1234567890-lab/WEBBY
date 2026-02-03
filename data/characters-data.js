@@ -1,7 +1,8 @@
 // Auto-generated from characters.json
 // This file exists so the characters page works even when you open characters.html via file://
 // (most browsers block fetch() for local files). Recommended workflow: run `node server.js`
-// and edit `data/characters.json`. If you insist on file://, edit this file instead.
+// and edit `data/characters.json`.
+
 window.CHARACTERS_DATA = {
   "meta": {
     "title": "StarSpell Academy Characters",
@@ -40,7 +41,7 @@ window.CHARACTERS_DATA = {
       "related_events": [
         {
           "name": "The replacement glasses",
-          "href": "./timeline.html#arc0-glasses"
+          "href": "./events/arc0-glasses.html"
         }
       ],
       "related_locations": [

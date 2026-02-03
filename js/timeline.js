@@ -64,6 +64,15 @@ function getSortKey(event) {
   return 0;
 }
 
+
+function getEventHref(event) {
+  const direct = safeText(event && event.href);
+  if (direct) return direct;
+  const id = safeText(event && event.id);
+  if (!id) return "./timeline.html";
+  return `./events/${id}.html`;
+}
+
 function el(tag, attrs = {}, children = []) {
   const node = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) {
@@ -149,8 +158,12 @@ function renderEventCard(event) {
     addedAnyTag = true;
   }
 
-  const children = [header, hook, factList, addedAnyTag ? tagsRow : null].filter(Boolean);
-  return el("article", { class: "timelineCard", id: safeText(event.id) }, children);
+  const actions = el("div", { class: "timelineActions" }, []);
+actions.appendChild(el("a", { class: "btn ghost", href: getEventHref(event), text: "Open entry" }));
+actions.appendChild(el("a", { class: "btn ghost", href: `./search.html?q=${encodeURIComponent(safeText(event.title) || "")}`, text: "Search" }));
+
+const children = [header, hook, factList, addedAnyTag ? tagsRow : null, actions].filter(Boolean);
+return el("article", { class: "timelineCard", id: safeText(event.id) }, children);
 }
 
 function renderLockedCard(event, selectedTierId) {

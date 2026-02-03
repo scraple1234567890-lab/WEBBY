@@ -385,7 +385,7 @@ if (charactersJson && Array.isArray(charactersJson.characters)) {
           details: detailText,
           tags,
           aliases: [],
-          url: normalizeUrl(`timeline.html#${ev.id || ""}`),
+          url: normalizeUrl(`events/${ev.id || ""}.html`),
         });
       }
     }

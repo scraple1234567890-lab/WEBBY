@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+
+<html data-theme="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>StarSpell Academy | The replacement glasses</title>
+    <link rel="icon" sizes="any" href="../favicon.ico" />
+    <link rel="icon" type="image/png" href="../favicon.png" />
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="../timeline.css" />
+  </head>
+
+  <body
+    class="lorePage"
+    data-event-id="arc0-glasses"
+    data-unlock-badge="view_event:arc0-glasses"
+    data-unlock-title="Read: The replacement glasses"
+    data-unlock-desc="Viewed the timeline entry “The replacement glasses”."
+    data-unlock-icon="📜"
+  >
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div id="top"></div>
+
+    <header class="header" role="banner">
+      <nav class="nav container" aria-label="Primary">
+        <a class="brand" href="../index.html#top" aria-label="Home">
+          <span class="brandText">StarSpell Academy</span>
+        </a>
+
+        <button id="navToggle" class="iconBtn navToggle" aria-controls="navLinks" aria-expanded="false">
+          <span class="srOnly">Open menu</span>
+          <span class="hamburger" aria-hidden="true"></span>
+        </button>
+
+        <div class="navLinks" id="navLinks">
+          <a href="../quiz.html">Sorting quiz</a>
+          <a href="../posts.html">Posts</a>
+          <a href="../articles.html">Articles</a>
+          <a href="../search.html">Search</a>
+          <a href="../map.html">Map</a>
+          <a href="../characters.html">Characters</a>
+          <a href="../timeline.html">Timeline</a>
+          <a href="../game.html">Game</a>
+          <a class="btn ghost" href="../shop.html">Shop</a>
+
+          <form class="navSearch" action="../search.html" method="get" role="search">
+            <input class="navSearchInput" type="search" name="q" placeholder="Search…" aria-label="Search" />
+            <button class="navSearchBtn" type="submit" aria-label="Run search">Go</button>
+          </form>
+
+          <div id="profileMenu" class="profileMenu" data-default-display="inline-flex" style="display: none">
+            <button
+              id="profileMenuToggle"
+              type="button"
+              class="btn ghost profileTrigger"
+              aria-label="Open account menu"
+              aria-haspopup="menu"
+              aria-expanded="false"
+              aria-controls="profileMenuList"
+            >
+              <span class="srOnly">Profile</span>
+              <span class="profileAvatar profileAvatar--menu" id="profileAvatar">
+                <span class="profileAvatarPlaceholder" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                    <path
+                      fill="currentColor"
+                      d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5Zm0 2c-3.33 0-10 1.67-10 5v1h20v-1c0-3.33-6.67-5-10-5Z"
+                    ></path>
+                  </svg>
+                </span>
+                <img alt="" loading="lazy" />
+              </span>
+              <span class="profileCaret" aria-hidden="true">▾</span>
+            </button>
+
+            <div id="profileMenuList" class="profileMenuList" role="menu" aria-hidden="true">
+              <a class="profileMenuItem" href="../profile.html">Profile</a>
+              <a class="profileMenuItem" href="../login.html">Log in</a>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main id="main" class="container" role="main">
+      <section class="hero">
+        <h1 class="heroTitle" id="eventTitle">Loading…</h1>
+        <p class="heroSubtitle" id="eventSubtitle">Arc 0 • Before the Bell • Arc 0 • Event 02 • Unexplained</p>
+
+        <div class="heroActions" style="margin-top: 18px">
+          <a class="btn ghost" href="../timeline.html#arc0-glasses">← Back to timeline</a>
+          <a class="btn ghost" href="../search.html?q=The replacement glasses">Search</a>
+        </div>
+      </section>
+
+      <section aria-live="polite" class="timelineList" id="eventMount" style="margin-top: 18px">
+        <p class="muted">Loading the entry…</p>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footerRow">
+        <p class="muted small">© <span id="year"></span> StarSpell Academy. May your path stay bright.</p>
+        <a class="muted small" href="#top">Back to the stars ↑</a>
+      </div>
+    </footer>
+
+    <script defer src="../script.js"></script>
+    <script src="../js/app.js" type="module"></script>
+    <script defer src="../data/timeline-data.js"></script>
+    <script defer src="../data/characters-data.js"></script>
+    <script defer src="../js/eventDetail.js"></script>
+    <script defer src="../data/badges-data.js"></script>
+    <script defer src="../js/achievements.js"></script>
+  </body>
+</html>

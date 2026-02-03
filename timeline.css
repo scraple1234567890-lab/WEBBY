@@ -229,3 +229,11 @@ body.timelinePage::after {
   outline: 2px solid color-mix(in srgb, var(--accent2) 65%, transparent);
   box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent2) 18%, transparent);
 }
+
+
+.timelineActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
