@@ -78,6 +78,96 @@
     return String(id || "").trim();
   }
 
+
+  function emitBadgeUnlocked(id, unlockedAt, def) {
+    try {
+      window.dispatchEvent(
+        new CustomEvent("ssa:badgeUnlocked", {
+          detail: {
+            id: String(id || ""),
+            unlockedAt: String(unlockedAt || ""),
+            def: def || null,
+          },
+        }),
+      );
+    } catch {
+      // ignore
+    }
+  }
+
+  function emitBadgesUpdated() {
+    try {
+      const ids = getUnlockedIds();
+      window.dispatchEvent(new CustomEvent("ssa:badgesUpdated", { detail: { unlockedIds: ids } }));
+    } catch {
+      // ignore
+    }
+  }
+
+  function sanitizeUnlockedPayload(value) {
+    if (value === true) return { unlockedAt: null };
+    if (typeof value === "string") return { unlockedAt: value };
+    if (value && typeof value === "object") {
+      const ua = typeof value.unlockedAt === "string" ? value.unlockedAt : null;
+      return { unlockedAt: ua };
+    }
+    return { unlockedAt: null };
+  }
+
+  function sanitizeUnlockedMap(map) {
+    const out = {};
+    const obj = map && typeof map === "object" ? map : {};
+    Object.keys(obj).forEach((id) => {
+      const key = normalizeId(id);
+      if (!key) return;
+      out[key] = sanitizeUnlockedPayload(obj[id]);
+    });
+    return out;
+  }
+
+  function getUnlockedMap() {
+    const state = loadState();
+    const unlocked = state.unlocked && typeof state.unlocked === "object" ? state.unlocked : {};
+    // shallow clone (payloads are small)
+    return Object.assign({}, unlocked);
+  }
+
+  function setUnlockedMap(unlockedMap, opts) {
+    const options = opts && typeof opts === "object" ? opts : {};
+    const state = loadState();
+    state.unlocked = sanitizeUnlockedMap(unlockedMap);
+    saveState(state);
+    if (!options.silent) {
+      // No mass-toasts by default.
+    }
+    emitBadgesUpdated();
+  }
+
+  function mergeUnlockedMap(unlockedMap, opts) {
+    const options = opts && typeof opts === "object" ? opts : {};
+    const incoming = sanitizeUnlockedMap(unlockedMap);
+    const state = loadState();
+    if (!state.unlocked || typeof state.unlocked !== "object") state.unlocked = {};
+
+    let changed = false;
+    Object.keys(incoming).forEach((id) => {
+      if (!state.unlocked[id]) {
+        state.unlocked[id] = incoming[id];
+        changed = true;
+      }
+    });
+
+    if (changed) {
+      saveState(state);
+      if (!options.silent) {
+        // No mass-toasts by default.
+      }
+      emitBadgesUpdated();
+    }
+
+    return changed;
+  }
+
   function isUnlocked(id) {
     const key = normalizeId(id);
     if (!key) return false;
@@ -96,6 +186,10 @@
       unlockedAt: new Date().toISOString(),
     };
     saveState(state);
+
+    // Notify listeners (e.g., Supabase sync)
+    emitBadgeUnlocked(key, state.unlocked[key].unlockedAt, def);
+    emitBadgesUpdated();
 
     if (def) showToast(def);
     return true;
@@ -188,6 +282,9 @@
     isUnlocked,
     unlock,
     getUnlockedIds,
+    getUnlockedMap,
+    setUnlockedMap,
+    mergeUnlockedMap,
     autoUnlockFromBody,
     renderBadges,
     updateBadgesStats,

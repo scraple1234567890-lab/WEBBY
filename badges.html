@@ -105,10 +105,16 @@
       document.addEventListener("DOMContentLoaded", () => {
         const grid = document.getElementById("badgesGrid");
         const defs = window.SSA_BADGE_DEFS || [];
-        if (window.SSAchievements) {
+
+        const render = () => {
+          if (!window.SSAchievements) return;
           window.SSAchievements.renderBadges(grid, defs);
           window.SSAchievements.updateBadgesStats(defs);
-        }
+        };
+
+        render();
+        window.addEventListener("ssa:badgesUpdated", render);
+        window.addEventListener("ssa:badgesSynced", render);
       });
     </script>
   </body>
