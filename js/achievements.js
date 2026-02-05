@@ -10,6 +10,82 @@
   const STORAGE_KEY = "ssa:badges:v1";
   const TOAST_HOST_ID = "badgeToastHost";
 
+  // --- Optional: tiny "unlock" sound (Web Audio API, no asset needed) ---
+  let __ssaAudioCtx = null;
+  let __ssaUserInteracted = false;
+
+  function __ssaGetAudioCtx() {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return null;
+    if (!__ssaAudioCtx) __ssaAudioCtx = new Ctx();
+    return __ssaAudioCtx;
+  }
+
+  function __ssaUnlockAudioOnce() {
+    __ssaUserInteracted = true;
+    const ctx = __ssaGetAudioCtx();
+    if (!ctx) return;
+    if (ctx.state === "suspended") ctx.resume().catch(() => {});
+  }
+
+  // Try to unlock audio on first user gesture (required on many browsers)
+  ["pointerdown", "keydown", "touchstart"].forEach((evt) => {
+    window.addEventListener(evt, __ssaUnlockAudioOnce, { once: true, passive: true });
+  });
+
+  function playBadgeSound() {
+    const ctx = __ssaGetAudioCtx();
+    if (!ctx) return;
+
+    // If we haven't gotten a user gesture yet, this may be blocked.
+    // We'll still attempt it; worst case, it fails silently.
+    if (ctx.state === "suspended" && __ssaUserInteracted) {
+      ctx.resume().catch(() => {});
+    }
+
+    try {
+      const now = ctx.currentTime;
+
+      const master = ctx.createGain();
+      master.gain.setValueAtTime(0.0001, now);
+      master.gain.exponentialRampToValueAtTime(0.08, now + 0.02);
+      master.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
+      master.connect(ctx.destination);
+
+      // A quick two-tone "sparkle" (pleasant, short, quiet)
+      const o1 = ctx.createOscillator();
+      o1.type = "sine";
+      o1.frequency.setValueAtTime(520, now);
+      o1.frequency.exponentialRampToValueAtTime(1040, now + 0.18);
+
+      const o2 = ctx.createOscillator();
+      o2.type = "triangle";
+      o2.frequency.setValueAtTime(780, now + 0.01);
+      o2.frequency.exponentialRampToValueAtTime(1560, now + 0.20);
+
+      const g1 = ctx.createGain();
+      g1.gain.setValueAtTime(0.0001, now);
+      g1.gain.exponentialRampToValueAtTime(0.8, now + 0.02);
+      g1.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+
+      const g2 = ctx.createGain();
+      g2.gain.setValueAtTime(0.0001, now);
+      g2.gain.exponentialRampToValueAtTime(0.6, now + 0.03);
+      g2.gain.exponentialRampToValueAtTime(0.0001, now + 0.24);
+
+      o1.connect(g1); g1.connect(master);
+      o2.connect(g2); g2.connect(master);
+
+      o1.start(now);
+      o2.start(now);
+      o1.stop(now + 0.26);
+      o2.stop(now + 0.26);
+    } catch {
+      // fail quietly
+    }
+  }
+
+
   function safeJsonParse(text, fallback) {
     try {
       return JSON.parse(text);
@@ -67,6 +143,8 @@
     toast.appendChild(body);
     host.appendChild(toast);
 
+    playBadgeSound();
+
     // Auto-remove
     window.setTimeout(() => {
       toast.classList.add("badgeToast--out");
@@ -76,96 +154,6 @@
 
   function normalizeId(id) {
     return String(id || "").trim();
-  }
-
-
-  function emitBadgeUnlocked(id, unlockedAt, def) {
-    try {
-      window.dispatchEvent(
-        new CustomEvent("ssa:badgeUnlocked", {
-          detail: {
-            id: String(id || ""),
-            unlockedAt: String(unlockedAt || ""),
-            def: def || null,
-          },
-        }),
-      );
-    } catch {
-      // ignore
-    }
-  }
-
-  function emitBadgesUpdated() {
-    try {
-      const ids = getUnlockedIds();
-      window.dispatchEvent(new CustomEvent("ssa:badgesUpdated", { detail: { unlockedIds: ids } }));
-    } catch {
-      // ignore
-    }
-  }
-
-  function sanitizeUnlockedPayload(value) {
-    if (value === true) return { unlockedAt: null };
-    if (typeof value === "string") return { unlockedAt: value };
-    if (value && typeof value === "object") {
-      const ua = typeof value.unlockedAt === "string" ? value.unlockedAt : null;
-      return { unlockedAt: ua };
-    }
-    return { unlockedAt: null };
-  }
-
-  function sanitizeUnlockedMap(map) {
-    const out = {};
-    const obj = map && typeof map === "object" ? map : {};
-    Object.keys(obj).forEach((id) => {
-      const key = normalizeId(id);
-      if (!key) return;
-      out[key] = sanitizeUnlockedPayload(obj[id]);
-    });
-    return out;
-  }
-
-  function getUnlockedMap() {
-    const state = loadState();
-    const unlocked = state.unlocked && typeof state.unlocked === "object" ? state.unlocked : {};
-    // shallow clone (payloads are small)
-    return Object.assign({}, unlocked);
-  }
-
-  function setUnlockedMap(unlockedMap, opts) {
-    const options = opts && typeof opts === "object" ? opts : {};
-    const state = loadState();
-    state.unlocked = sanitizeUnlockedMap(unlockedMap);
-    saveState(state);
-    if (!options.silent) {
-      // No mass-toasts by default.
-    }
-    emitBadgesUpdated();
-  }
-
-  function mergeUnlockedMap(unlockedMap, opts) {
-    const options = opts && typeof opts === "object" ? opts : {};
-    const incoming = sanitizeUnlockedMap(unlockedMap);
-    const state = loadState();
-    if (!state.unlocked || typeof state.unlocked !== "object") state.unlocked = {};
-
-    let changed = false;
-    Object.keys(incoming).forEach((id) => {
-      if (!state.unlocked[id]) {
-        state.unlocked[id] = incoming[id];
-        changed = true;
-      }
-    });
-
-    if (changed) {
-      saveState(state);
-      if (!options.silent) {
-        // No mass-toasts by default.
-      }
-      emitBadgesUpdated();
-    }
-
-    return changed;
   }
 
   function isUnlocked(id) {
@@ -186,10 +174,6 @@
       unlockedAt: new Date().toISOString(),
     };
     saveState(state);
-
-    // Notify listeners (e.g., Supabase sync)
-    emitBadgeUnlocked(key, state.unlocked[key].unlockedAt, def);
-    emitBadgesUpdated();
 
     if (def) showToast(def);
     return true;
@@ -282,21 +266,10 @@
     isUnlocked,
     unlock,
     getUnlockedIds,
-    getUnlockedMap,
-    setUnlockedMap,
-    mergeUnlockedMap,
     autoUnlockFromBody,
     renderBadges,
     updateBadgesStats,
   };
-
-  // Signal that the achievements API is ready (useful for cross-device badge sync).
-  try {
-    window.dispatchEvent(new CustomEvent("ssa:achievementsReady"));
-  } catch {
-    // ignore
-  }
-
 
   // Auto-run after DOM is ready if badge defs are present
   document.addEventListener("DOMContentLoaded", () => {

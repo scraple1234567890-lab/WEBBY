@@ -24,9 +24,9 @@
 <div class="navLinks" id="navLinks">
 <a href="./quiz.html">Quizes</a>
 <a href="./posts.html">Posts</a>
-<a aria-current="page" href="./articles.html">Articles</a><a href="./search.html">Search</a>
+<a href="./articles.html">Articles</a><a href="./search.html">Search</a>
 <a href="./map.html">Map</a><a href="./game.html">Game</a>
-<a class="btn ghost" href="./shop.html">Shop</a>
+<a href="./shop.html">Shop</a>
 <form action="./search.html" class="navSearch" method="get" role="search"><input aria-label="Search" class="navSearchInput" name="q" placeholder="Search…" type="search"/><button aria-label="Run search" class="navSearchBtn" type="submit">Go</button></form><div class="profileMenu" data-default-display="inline-flex" id="profileMenu" style="display: none">
 <button aria-controls="profileMenuList" aria-expanded="false" aria-haspopup="menu" aria-label="Open account menu" class="btn ghost profileTrigger" id="profileMenuToggle" type="button">
 <span class="srOnly">Profile</span>
@@ -56,33 +56,12 @@
 <h1>Articles</h1>
 </div>
 <div class="actions" style="gap: 0.5rem; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
-<p aria-live="polite" class="muted" id="must-login" style="margin: 0">You must be logged in to publish.</p>
-<button aria-expanded="false" class="btn heroCta magentaGlow btnSm" id="share-post-btn" type="button">
-              Share a post
-            </button>
+<p aria-live="polite" class="muted" id="must-login" style="margin: 0">You must be logged in to publish articles.</p>
 <button aria-expanded="false" class="btn ghost btnSm" id="share-article-btn" type="button">
               Write an article
             </button>
 </div>
 </div>
-<!-- Post composer (short notes) -->
-<section class="card" hidden="" id="composer-card">
-<div class="postComposerHeader">
-<div>
-<p class="kicker">Share a post</p>
-<p class="muted small">Write a short note for the Lore Board. (2000 characters max)</p>
-</div>
-<button class="btn ghost" id="close-composer" type="button">Close</button>
-</div>
-<form class="postForm" id="new-post-form">
-<label class="muted small" for="post-content">What would you like to share?</label>
-<textarea id="post-content" maxlength="2000" name="content" required="" rows="4"></textarea>
-<div class="actions">
-<button class="btn primary" id="post-submit" type="submit">Post</button>
-</div>
-<p aria-live="polite" class="muted small" id="post-status"></p>
-</form>
-</section>
 <!-- Article composer -->
 <section class="card" hidden="" id="article-composer-card">
 <div class="postComposerHeader">
@@ -173,22 +152,10 @@
 </div>
 <div class="postFeed" id="articles"></div>
 </section>
-<!-- Lore Board feed -->
-<section aria-live="polite" class="card feedCard">
-<div class="sectionHead loreBoardHeader">
-<div class="loreTitleWrap">
-<span aria-hidden="true" class="loreSigil">✶</span>
-<h2 class="loreTitle">Lore Board</h2>
-<span aria-hidden="true" class="loreSigil">✶</span>
-</div>
-</div>
-<div class="postFeed" id="posts"></div>
-</section>
 </div>
 </main>
 <script defer="" src="./script.js"></script>
-<script src="./js/app.js?v=4" type="module"></script>
-<script src="./js/posts.js" type="module"></script>
+<script src="./js/app.js" type="module"></script>
 <script src="./js/articles.js" type="module"></script>
 </body>
 </html>

@@ -10,123 +10,6 @@ import { getSessionSafe, isAbortLikeError } from "./authSession.js";
 // Fallback seed data (used if the `products` table isn't set up yet)
 const FALLBACK_PRODUCTS = [
   {
-    id: "starlight-kit",
-    name: "Starlight Study Kit",
-    category: "Study tools",
-    collection: "Astral Study",
-    price: 96,
-    rating: 4.9,
-    stock: 9,
-    tag: "Bundle",
-    image: "./assets/images/hero-approach.png",
-    description: "Moonlit essentials for long-form spell theory sessions.",
-    details: ["Moonbeam ink vial", "Skyglass lamp", "Focus rune patch"],
-  },
-  {
-    id: "warding-satchel",
-    name: "Warding Satchel",
-    category: "Protection",
-    collection: "Wardcraft",
-    price: 74,
-    rating: 4.7,
-    stock: 4,
-    tag: "Best seller",
-    image: "./assets/images/These_are_the_202512031938.jpeg",
-    description: "Layered wards woven into a weatherproof field satchel.",
-    details: ["Triple-stitched wards", "Weather seal", "Notebook divider"],
-  },
-  {
-    id: "aurora-tea",
-    name: "Aurora Calm Tea",
-    category: "Wellness",
-    collection: "Restorative",
-    price: 32,
-    rating: 4.6,
-    stock: 18,
-    tag: "Soothing",
-    image: "./assets/images/Image_202512081359.jpeg",
-    description: "Herbal blend to steady focus before summoning practice.",
-    details: ["Juniper petals", "Lavender steam", "Honeyed cedar"],
-  },
-  {
-    id: "compass-charm",
-    name: "Northwind Compass Charm",
-    category: "Travel",
-    collection: "Fieldwork",
-    price: 58,
-    rating: 4.8,
-    stock: 7,
-    tag: "Field kit",
-    image: "./assets/images/Image_202512081305.jpeg",
-    description: "Guides you back to campus pathways and safe circles.",
-    details: ["Glow-in-dusk dial", "Anchor rune", "Adjustable chain"],
-  },
-  {
-    id: "ember-cloak",
-    name: "Emberlined Cloak",
-    category: "Apparel",
-    collection: "Wardcraft",
-    price: 140,
-    rating: 4.9,
-    stock: 2,
-    tag: "Limited",
-    image: "./assets/images/hero-approach.png",
-    description: "Lightweight warmth with flame-resistant lining.",
-    details: ["Heat-buffer weave", "Hidden pockets", "Storm fastenings"],
-  },
-  {
-    id: "inkstone",
-    name: "Runic Inkstone",
-    category: "Study tools",
-    collection: "Astral Study",
-    price: 44,
-    rating: 4.5,
-    stock: 12,
-    tag: "Classic",
-    image: "./assets/images/Image_202512081359.jpeg",
-    description: "Keeps glyph ink shimmering for late-night scripts.",
-    details: ["Self-stirring basin", "Spill ward", "Includes quill rest"],
-  },
-  {
-    id: "rift-lantern",
-    name: "Rift Lantern",
-    category: "Travel",
-    collection: "Fieldwork",
-    price: 88,
-    rating: 4.4,
-    stock: 0,
-    tag: "Sold out",
-    image: "./assets/images/These_are_the_202512031938.jpeg",
-    description: "Stable light source for inter-realm expeditions.",
-    details: ["Refraction cage", "Wind shield", "Two-day charge"],
-  },
-  {
-    id: "soothe-candle",
-    name: "Soothe Ember Candle",
-    category: "Wellness",
-    collection: "Restorative",
-    price: 28,
-    rating: 4.3,
-    stock: 15,
-    tag: "Restock",
-    image: "./assets/images/hero-approach.png",
-    description: "Gentle glow to reset your study focus rituals.",
-    details: ["Bergamot wax", "Low-spark wick", "Reusable tin"],
-  },
-  {
-    id: "sigil-gloves",
-    name: "Sigilweave Gloves",
-    category: "Apparel",
-    collection: "Wardcraft",
-    price: 68,
-    rating: 4.7,
-    stock: 6,
-    tag: "New",
-    image: "./assets/images/Image_202512081305.jpeg",
-    description: "Tactile gloves for rune carving and potion prep.",
-    details: ["Grip enchantment", "Cooling weave", "Lightweight lining"],
-  },
-  {
     id: "4-schools-sticker-set",
     name: "4 Schools Sticker Set",
     category: "Stickers",
@@ -144,6 +27,14 @@ const FALLBACK_PRODUCTS = [
 // Products we always want available in the UI, even if the database is enabled.
 // If you add the same `id` to the Supabase `products` table later, this won't duplicate.
 const PINNED_PRODUCT_IDS = ["4-schools-sticker-set"];
+
+// This page is currently curated to a single featured listing.
+const ALLOWED_PRODUCT_IDS = new Set(["4-schools-sticker-set"]);
+
+function isAllowedProduct(product) {
+  return ALLOWED_PRODUCT_IDS.size === 0 || ALLOWED_PRODUCT_IDS.has(product?.id);
+}
+
 
 function getPinnedProducts() {
   return FALLBACK_PRODUCTS.filter((product) => PINNED_PRODUCT_IDS.includes(product.id));
@@ -302,6 +193,7 @@ function getFilteredProducts() {
 
   return state.products
     .filter((product) => {
+      if (!isAllowedProduct(product)) return false;
       if (filters.category !== "all" && product.category !== filters.category) return false;
       if (filters.collection !== "all" && product.collection !== filters.collection) return false;
       if (filters.inStock && product.stock === 0) return false;
@@ -319,7 +211,7 @@ function getFilteredProducts() {
 
 function updateResultCount(count) {
   if (!shopResultCount) return;
-  shopResultCount.textContent = `${count} item${count === 1 ? "" : "s"} ready for pickup`;
+  shopResultCount.textContent = count === 1 ? "1 featured item available" : `${count} items available`;
 }
 
 function getCartItems() {
@@ -469,8 +361,10 @@ function updateMaxPriceLabel() {
 
 function syncMaxPriceRangeFromProducts() {
   if (!(shopMaxPrice instanceof HTMLInputElement)) return;
-  const max = Math.max(...state.products.map((p) => Number(p.price) || 0), 0);
-  const rounded = Math.max(20, Math.ceil(max / 5) * 5);
+  const visibleProducts = state.products.filter(isAllowedProduct);
+  const max = Math.max(...visibleProducts.map((p) => Number(p.price) || 0), 0);
+  // Keep the slider sensible for small drops (like stickers).
+  const rounded = Math.max(10, Math.ceil(max));
   shopMaxPrice.max = String(rounded);
   if (Number(shopMaxPrice.value) > rounded) shopMaxPrice.value = String(rounded);
   if (filters.maxPrice > rounded) filters.maxPrice = rounded;
@@ -670,7 +564,7 @@ function openOverlay(product = null, mode = "edit") {
   if (idInput instanceof HTMLInputElement) {
     idInput.value = next.id || "";
     idInput.disabled = mode !== "create";
-    idInput.placeholder = mode === "create" ? "e.g. starlight-kit" : "";
+    idInput.placeholder = mode === "create" ? "e.g. 4-schools-sticker-set" : "";
   }
   if (nameInput instanceof HTMLInputElement) nameInput.value = next.name || "";
   if (categoryInput instanceof HTMLInputElement) categoryInput.value = next.category || "";
@@ -835,7 +729,7 @@ function renderProducts() {
   if (products.length === 0) {
     const empty = document.createElement("div");
     empty.className = "shopEmpty";
-    empty.textContent = "No items match these filters. Try widening the range or clearing the search.";
+    empty.textContent = "No match. Try clearing the search or toggling in-stock.";
     shopGrid.appendChild(empty);
     return;
   }
@@ -954,13 +848,13 @@ async function refreshProductsFromDatabase() {
       const dbProducts = data.map(normalizeProductRow);
       const knownIds = new Set(dbProducts.map((p) => p.id));
       const pinned = getPinnedProducts().filter((p) => !knownIds.has(p.id));
-      state.products = [...dbProducts, ...pinned];
+      state.products = [...dbProducts, ...pinned].filter(isAllowedProduct);
       state.usingDatabase = true;
     }
   } catch (error) {
     // Table may not exist yet, or RLS prevents access. Keep fallback.
     console.warn("Using fallback shop products", error);
-    state.products = [...FALLBACK_PRODUCTS];
+    state.products = [...FALLBACK_PRODUCTS].filter(isAllowedProduct);
     state.usingDatabase = false;
   }
 }
@@ -1039,7 +933,7 @@ clearCart?.addEventListener("click", () => {
   renderCart();
 });
 
-featuredBundleBtn?.addEventListener("click", () => addToCart("starlight-kit"));
+featuredBundleBtn?.addEventListener("click", () => addToCart("4-schools-sticker-set"));
 
 [shopSearch, shopCategory, shopCollection, shopSort, shopMaxPrice, shopInStock].forEach((input) => {
   input?.addEventListener("input", updateFiltersFromInputs);

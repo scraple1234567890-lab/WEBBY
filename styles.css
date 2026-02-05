@@ -104,11 +104,6 @@ body.lorePage {
 }
 body.lorePage::before,
 body.lorePage::after { display: none; }
-.lorePage .header {
-  backdrop-filter: none;
-  background: #120c26;
-  border-bottom-color: var(--border);
-}
 .lorePage .section { background: var(--bg); }
 .lorePage .section.alt {
   background: #160e2e;
@@ -1902,6 +1897,56 @@ input:focus, textarea:focus {
 }
 .shopHeroActions { display: grid; gap: 6px; }
 
+.shopHeroProductImage {
+  width: 100%;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--border) 75%, var(--accent2) 25%);
+  background: rgba(255, 255, 255, 0.65);
+  padding: 12px;
+}
+
+.shopHeroProductHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.shopHeroProductTitle {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.shopHeroProductPrice {
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: color-mix(in srgb, var(--text) 80%, var(--accent2) 20%);
+}
+
+.shopPage--single .shopControls,
+.shopPage--single #resetShopFilters {
+  display: none;
+}
+
+.shopPage--single .shopResultsRow {
+  justify-content: flex-start;
+}
+
+.shopPage--single .shopResultsRow .btn.ghost {
+  display: none;
+}
+
+.shopPage--single .shopGrid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.shopPage--single .shopItemMedia img {
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+  background: rgba(255, 255, 255, 0.55);
+  padding: 10px;
+}
+
 .shopLayout {
   display: grid;
   grid-template-columns: minmax(0, 2.2fr) minmax(260px, 1fr);
@@ -2819,7 +2864,8 @@ body.searchPage .searchResult{
 .badgeToastHost{
   position: fixed;
   right: 18px;
-  bottom: 18px;
+
+  top: 18px;
   z-index: 10000;
   display: flex;
   flex-direction: column;
@@ -3040,6 +3086,176 @@ body.searchPage .searchResult{
 .quizChoiceDesc {
   display: block;
   line-height: 1.4;
+}
+
+
+
+/* Quiz chooser - extra visual flourishes */
+.quizChooser{
+  position: relative;
+  overflow: hidden;
+}
+
+.quizChooser::before{
+  content: "";
+  position: absolute;
+  inset: -1px;
+  background:
+    radial-gradient(520px 220px at 18% -10%, color-mix(in srgb, var(--accent2) 34%, transparent) 0%, transparent 70%),
+    radial-gradient(520px 220px at 88% 10%, color-mix(in srgb, var(--accent) 26%, transparent) 0%, transparent 70%);
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.quizChooser::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+  pointer-events: none;
+}
+
+.quizChooser > *{ position: relative; }
+
+.quizChooserHead{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.quizChooserText{ min-width: 0; }
+
+.quizChooserSigils{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.quizSigil{
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--border) 80%, var(--accent2) 26%);
+  background: color-mix(in srgb, var(--panel2) 86%, var(--panel) 14%);
+  color: color-mix(in srgb, var(--accent2) 72%, #ffffff 28%);
+  font-weight: 900;
+  letter-spacing: 0.6px;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.25);
+}
+
+.quizSigil[data-sigil="element"]{
+  border-color: color-mix(in srgb, var(--border) 80%, var(--accent) 28%);
+  color: color-mix(in srgb, var(--accent) 70%, #ffffff 30%);
+}
+
+.quizSigil[data-sigil="artifact"]{
+  border-color: color-mix(in srgb, var(--border) 80%, var(--accent3) 28%);
+  color: color-mix(in srgb, var(--accent3) 70%, #ffffff 30%);
+}
+
+.quizSigil[data-sigil="animal"]{
+  border-color: color-mix(in srgb, var(--border) 80%, var(--accent2) 18%, var(--accent3) 14%);
+  color: color-mix(in srgb, var(--accent2) 58%, var(--accent3) 18%, #ffffff 24%);
+}
+
+.quizChoiceCard{
+  position: relative;
+  overflow: hidden;
+}
+
+.quizChoiceCard::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(240px 120px at 14% 0%, rgba(255,255,255,0.08), transparent 60%),
+    linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.03) 40%, transparent 100%);
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.quizChoiceCard::after{
+  content: "";
+  position: absolute;
+  left: -30%;
+  top: -40%;
+  width: 70%;
+  height: 140%;
+  transform: rotate(18deg);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  opacity: 0;
+  transition: opacity 250ms ease, left 600ms ease;
+  pointer-events: none;
+}
+
+.quizChoiceCard:hover::after{
+  opacity: 1;
+  left: 60%;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .quizChoiceCard::after{ transition: none; }
+  .quizChoiceCard:hover::after{ opacity: 0; left: -30%; }
+}
+
+.quizChoiceGlyph{
+  position: absolute;
+  left: 14px;
+  top: 16px;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--border) 80%, var(--accent2) 26%);
+  background: color-mix(in srgb, var(--panel) 86%, var(--panel2) 14%);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.30);
+  font-weight: 900;
+  color: color-mix(in srgb, var(--accent2) 70%, #ffffff 30%);
+}
+
+.quizChoiceCard[data-quiz-choice="element"] .quizChoiceGlyph{
+  border-color: color-mix(in srgb, var(--border) 80%, var(--accent) 28%);
+  color: color-mix(in srgb, var(--accent) 70%, #ffffff 30%);
+}
+
+.quizChoiceCard[data-quiz-choice="artifact"] .quizChoiceGlyph{
+  border-color: color-mix(in srgb, var(--border) 80%, var(--accent3) 28%);
+  color: color-mix(in srgb, var(--accent3) 70%, #ffffff 30%);
+}
+
+.quizChoiceCard[data-quiz-choice="animal"] .quizChoiceGlyph{
+  border-color: color-mix(in srgb, var(--border) 80%, var(--accent2) 18%, var(--accent3) 14%);
+  color: color-mix(in srgb, var(--accent2) 58%, var(--accent3) 18%, #ffffff 24%);
+}
+
+.quizChoiceHint{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--border) 80%, var(--accent2) 22%);
+  background: color-mix(in srgb, var(--panel2) 86%, var(--panel) 14%);
+  font-weight: 800;
+  font-size: 0.86rem;
+  color: color-mix(in srgb, var(--accent2) 65%, #ffffff 35%);
+  width: fit-content;
+}
+
+.quizChoiceCard:hover .quizChoiceHint{
+  border-color: color-mix(in srgb, var(--border) 70%, var(--accent2) 38%);
+}
+
+@media (max-width: 640px){
+  .quizChooserHead{ flex-direction: column; align-items: flex-start; }
+  .quizChooserSigils{ justify-content: flex-start; }
 }
 
 .quizTopRow {

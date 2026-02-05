@@ -41,10 +41,6 @@ const QUIZ_RESULTS_PREFIX = "ssa:quizResults:";
 const GUEST_QUIZ_RESULTS_KEY = `${QUIZ_RESULTS_PREFIX}guest`;
 const QUIZ_TYPES_ORDER = ["sense", "element", "artifact", "animal"];
 
-const BADGES_STORAGE_KEY = "ssa:badges:v1";
-const BADGES_META_KEY = "badge_unlocks";
-const BADGES_SYNC_WAIT_MS = 15000;
-
 let currentSession = null;
 let postsChannel = null;
 let redirectingAfterLogin = false;
@@ -242,178 +238,6 @@ async function migrateGuestQuizResultsToUser(userId) {
 
   // Best effort: push to Supabase metadata too.
   await persistQuizResultsMapToSupabase(merged);
-}
-
-
-function readLocalBadgeUnlocks() {
-  const api = window.SSAchievements;
-  if (api && typeof api.getUnlockedMap === "function") {
-    const map = api.getUnlockedMap();
-    return map && typeof map === "object" ? map : {};
-  }
-
-  // Fallback: read directly from localStorage if achievements hasn't loaded yet.
-  try {
-    const raw = localStorage.getItem(BADGES_STORAGE_KEY) || "{}";
-    const state = safeJsonParse(raw, {});
-    const unlocked = state.unlocked && typeof state.unlocked === "object" ? state.unlocked : {};
-    return unlocked;
-  } catch {
-    return {};
-  }
-}
-
-function writeLocalBadgeUnlocks(unlockedMap) {
-  const api = window.SSAchievements;
-  if (api && typeof api.setUnlockedMap === "function") {
-    api.setUnlockedMap(unlockedMap, { silent: true });
-    return;
-  }
-
-  try {
-    localStorage.setItem(BADGES_STORAGE_KEY, JSON.stringify({ unlocked: unlockedMap || {} }));
-  } catch {
-    // ignore
-  }
-}
-
-function readRemoteBadgeUnlocks(user) {
-  const meta = user?.user_metadata;
-  if (!meta || typeof meta !== "object") return {};
-  const map = meta[BADGES_META_KEY];
-  return map && typeof map === "object" ? map : {};
-}
-
-function normalizeBadgePayload(value) {
-  if (value === true) return { unlockedAt: null };
-  if (typeof value === "string") return { unlockedAt: value };
-  if (value && typeof value === "object") {
-    return { unlockedAt: typeof value.unlockedAt === "string" ? value.unlockedAt : null };
-  }
-  return { unlockedAt: null };
-}
-
-function pickEarlierBadgePayload(a, b) {
-  const pa = normalizeBadgePayload(a);
-  const pb = normalizeBadgePayload(b);
-  const ta = pa.unlockedAt ? Date.parse(pa.unlockedAt) : Number.POSITIVE_INFINITY;
-  const tb = pb.unlockedAt ? Date.parse(pb.unlockedAt) : Number.POSITIVE_INFINITY;
-  if (ta === tb) return pa.unlockedAt ? pa : pb;
-  return ta < tb ? pa : pb;
-}
-
-function mergeBadgeUnlockMaps(localMap, remoteMap) {
-  const merged = {};
-  const local = localMap && typeof localMap === "object" ? localMap : {};
-  const remote = remoteMap && typeof remoteMap === "object" ? remoteMap : {};
-
-  const ids = new Set([...Object.keys(local), ...Object.keys(remote)]);
-  let localChanged = false;
-  let remoteChanged = false;
-
-  ids.forEach((id) => {
-    const hasLocal = Boolean(local[id]);
-    const hasRemote = Boolean(remote[id]);
-
-    if (hasLocal && hasRemote) {
-      merged[id] = pickEarlierBadgePayload(local[id], remote[id]);
-      const mergedAt = normalizeBadgePayload(merged[id]).unlockedAt || null;
-      const localAt = normalizeBadgePayload(local[id]).unlockedAt || null;
-      const remoteAt = normalizeBadgePayload(remote[id]).unlockedAt || null;
-      if (localAt !== mergedAt) localChanged = true;
-      if (remoteAt !== mergedAt) remoteChanged = true;
-      return;
-    }
-
-    if (hasLocal) {
-      merged[id] = normalizeBadgePayload(local[id]);
-      remoteChanged = true;
-      return;
-    }
-
-    if (hasRemote) {
-      merged[id] = normalizeBadgePayload(remote[id]);
-      localChanged = true;
-    }
-  });
-
-  return { merged, localChanged, remoteChanged };
-}
-
-async function persistBadgeUnlocksMapToSupabase(unlockedMap) {
-  const user = currentSession?.user;
-  if (!user?.id) return;
-  if (!unlockedMap || typeof unlockedMap !== "object") return;
-
-  try {
-    const existingMeta = user.user_metadata && typeof user.user_metadata === "object" ? user.user_metadata : {};
-    const existing =
-      existingMeta[BADGES_META_KEY] && typeof existingMeta[BADGES_META_KEY] === "object" ? existingMeta[BADGES_META_KEY] : {};
-
-    const next = { ...existing, ...unlockedMap };
-    const nextMeta = { ...existingMeta, [BADGES_META_KEY]: next };
-
-    const { error } = await supabase.auth.updateUser({ data: nextMeta });
-    if (error) throw error;
-
-    user.user_metadata = nextMeta;
-  } catch (error) {
-    console.warn("Unable to persist badge unlocks to Supabase metadata", error);
-  }
-}
-
-async function persistBadgeUnlockToSupabase(badgeId, unlockedAt) {
-  if (!badgeId) return;
-  const payload = {
-    [badgeId]: {
-      unlockedAt: unlockedAt || new Date().toISOString(),
-    },
-  };
-  await persistBadgeUnlocksMapToSupabase(payload);
-}
-
-function waitForAchievementsApi(timeoutMs = BADGES_SYNC_WAIT_MS) {
-  return new Promise((resolve) => {
-    const start = Date.now();
-
-    (function check() {
-      const api = window.SSAchievements;
-      if (api && typeof api.getUnlockedMap === "function" && typeof api.setUnlockedMap === "function") {
-        resolve(true);
-        return;
-      }
-      if (Date.now() - start > timeoutMs) {
-        resolve(false);
-        return;
-      }
-      setTimeout(check, 50);
-    })();
-  });
-}
-
-async function syncBadgesForCurrentUser() {
-  const user = currentSession?.user;
-  if (!user?.id) return;
-
-  const ready = await waitForAchievementsApi();
-  if (!ready) return;
-
-  const local = readLocalBadgeUnlocks();
-  const remote = readRemoteBadgeUnlocks(user);
-  const { merged, localChanged, remoteChanged } = mergeBadgeUnlockMaps(local, remote);
-
-  if (localChanged) {
-    writeLocalBadgeUnlocks(merged);
-  }
-  if (remoteChanged) {
-    await persistBadgeUnlocksMapToSupabase(merged);
-  }
-
-  try {
-    window.dispatchEvent(new CustomEvent("ssa:badgesSynced", { detail: { userId: user.id } }));
-  } catch {
-    // ignore
-  }
 }
 
 function loadStoredAvatar(userId) {
@@ -705,7 +529,6 @@ async function loadSession() {
     if (currentSession) {
       setStatus(authStatus, `Logged in as ${currentSession.user.email}`);
       updateAuthVisibility(true, currentSession.user.email, currentSession.user.id);
-      syncBadgesForCurrentUser();
     } else {
       setStatus(authStatus, "You are browsing as a guest.");
       updateAuthVisibility(false);
@@ -741,7 +564,6 @@ function initAuthListeners() {
       updateAuthVisibility(true, session?.user?.email || "your account", session?.user?.id || "");
     
       migrateGuestQuizResultsToUser(session?.user?.id || "");
-      syncBadgesForCurrentUser();
     }
     refreshPosts();
   });
@@ -808,27 +630,6 @@ function bindEvents() {
       persistQuizResultToSupabase(payload);
     }
   });
-
-
-  window.addEventListener("ssa:badgeUnlocked", (event) => {
-    const detail = event?.detail || {};
-    const badgeId = detail.id || detail.badgeId;
-    if (!badgeId) return;
-
-    const userId = currentSession?.user?.id || "";
-    if (!userId) return;
-
-    const unlockedAt = detail.unlockedAt || new Date().toISOString();
-    persistBadgeUnlockToSupabase(badgeId, unlockedAt);
-  });
-
-  // If achievements loads after app.js (slow devices), sync badges once the API is ready.
-  window.addEventListener("ssa:achievementsReady", () => {
-    if (currentSession?.user?.id) {
-      syncBadgesForCurrentUser();
-    }
-  });
-
 }
 
 function init() {

@@ -740,25 +740,6 @@ function init() {
   profileEditToggle?.addEventListener("click", handleProfileEditToggle);
   profileEditCancel?.addEventListener("click", handleProfileEditCancel);
 
-  // Refresh badges when badges change (e.g., sync from another device)
-  window.addEventListener("ssa:badgesUpdated", () => {
-    if (!activeUserId) return;
-    try {
-      renderProfileBadges();
-    } catch {
-      // ignore
-    }
-  });
-
-  window.addEventListener("ssa:badgesSynced", () => {
-    if (!activeUserId) return;
-    try {
-      renderProfileBadges();
-    } catch {
-      // ignore
-    }
-  });
-
   // Refresh badges when you come back to this tab (e.g., after unlocking one elsewhere)
   window.addEventListener("focus", () => {
     if (!activeUserId) return;

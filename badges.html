@@ -14,63 +14,42 @@
     <div id="top"></div>
 
     <header class="header" role="banner">
-      <nav class="nav container" aria-label="Primary">
-        <a class="brand" href="./index.html#top" aria-label="Home">
-          <span class="brandText">StarSpell Academy</span>
-        </a>
-
-        <button id="navToggle" class="iconBtn navToggle" aria-controls="navLinks" aria-expanded="false">
-          <span class="srOnly">Open menu</span>
-          <span class="hamburger" aria-hidden="true"></span>
-        </button>
-
-        <div class="navLinks" id="navLinks">
-          <a href="./quiz.html">Quizes</a>
-          <a href="./posts.html">Posts</a>
-          <a href="./articles.html">Articles</a>
-          <a href="./search.html">Search</a>
-          <a href="./map.html">Map</a><a href="./game.html">Game</a>
-          <a class="btn ghost" href="./shop.html">Shop</a>
-
-          <form class="navSearch" action="./search.html" method="get" role="search">
-            <input class="navSearchInput" type="search" name="q" placeholder="Search…" aria-label="Search" />
-            <button class="navSearchBtn" type="submit" aria-label="Run search">Go</button>
-          </form>
-
-          <div id="profileMenu" class="profileMenu" data-default-display="inline-flex" style="display: none">
-            <button
-              id="profileMenuToggle"
-              type="button"
-              class="btn ghost profileTrigger"
-              aria-label="Open account menu"
-              aria-haspopup="menu"
-              aria-expanded="false"
-              aria-controls="profileMenuList"
-            >
-              <span class="srOnly">Profile</span>
-              <span class="profileAvatar profileAvatar--menu" id="profileAvatar">
-                <span class="profileAvatarPlaceholder" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-                    <path
-                      fill="currentColor"
-                      d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5Zm0 2c-3.33 0-10 1.67-10 5v1h20v-1c0-3.33-6.67-5-10-5Z"
-                    ></path>
-                  </svg>
-                </span>
-              </span>
-            </button>
-
-            <div id="profileMenuList" class="profileMenuList" role="menu">
-              <a class="profileMenuItem" href="./profile.html" role="menuitem">Profile</a>
-              <a class="profileMenuItem" href="./post.html" role="menuitem">Write</a>
-              <button class="profileMenuItem" id="logoutBtn" role="menuitem" type="button">Log out</button>
-            </div>
-          </div>
-
-          <a class="btn" data-default-display="inline-flex" href="./login.html" id="loginBtn"> Login portal </a>
-        </div>
-      </nav>
-    </header>
+<nav aria-label="Primary" class="nav container">
+<a aria-label="Home" class="brand" href="./index.html#top">
+<span class="brandText">StarSpell Academy</span>
+</a>
+<button aria-controls="navLinks" aria-expanded="false" class="iconBtn navToggle" id="navToggle">
+<span class="srOnly">Open menu</span>
+<span aria-hidden="true" class="hamburger"></span>
+</button>
+<div class="navLinks" id="navLinks">
+<a href="./quiz.html">Quizes</a>
+<a href="./posts.html">Posts</a>
+<a href="./articles.html">Articles</a><a href="./search.html">Search</a>
+<a href="./map.html">Map</a><a href="./game.html">Game</a>
+<a href="./shop.html">Shop</a>
+<form action="./search.html" class="navSearch" method="get" role="search"><input aria-label="Search" class="navSearchInput" name="q" placeholder="Search…" type="search"/><button aria-label="Run search" class="navSearchBtn" type="submit">Go</button></form><div class="profileMenu" data-default-display="inline-flex" id="profileMenu" style="display: none">
+<button aria-controls="profileMenuList" aria-expanded="false" aria-haspopup="menu" aria-label="Open account menu" class="btn ghost profileTrigger" id="profileMenuToggle" type="button">
+<span class="srOnly">Profile</span>
+<span class="profileAvatar profileAvatar--menu" id="profileAvatar">
+<span aria-hidden="true" class="profileAvatarPlaceholder">
+<svg focusable="false" role="presentation" viewbox="0 0 24 24">
+<path d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5Zm0 2c-3.33 0-10 1.67-10 5v1h20v-1c0-3.33-6.67-5-10-5Z" fill="currentColor"></path>
+</svg>
+</span>
+<img alt="" loading="lazy"/>
+</span>
+<span aria-hidden="true" class="profileCaret">▾</span>
+</button>
+<div aria-hidden="true" class="profileMenuList" id="profileMenuList" role="menu">
+<a href="./profile.html" role="menuitem">View profile</a>
+<button id="logoutBtn" role="menuitem" type="button">Log out</button>
+</div>
+</div>
+<a class="btn primary magentaGlow" data-auth-target="login-cta" href="./login.html">Open the login portal</a>
+</div>
+</nav>
+</header>
 
     <main id="main" class="container" role="main">
       <section class="hero">
@@ -98,23 +77,17 @@
     </footer>
 
     <script defer src="./script.js"></script>
-    <script type="module" src="./js/app.js?v=4"></script>
-    <script src="./data/badges-data.js?v=4"></script>
-    <script src="./js/achievements.js?v=4"></script>
+    <script type="module" src="./js/app.js"></script>
+    <script src="./data/badges-data.js"></script>
+    <script src="./js/achievements.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         const grid = document.getElementById("badgesGrid");
         const defs = window.SSA_BADGE_DEFS || [];
-
-        const render = () => {
-          if (!window.SSAchievements) return;
+        if (window.SSAchievements) {
           window.SSAchievements.renderBadges(grid, defs);
           window.SSAchievements.updateBadgesStats(defs);
-        };
-
-        render();
-        window.addEventListener("ssa:badgesUpdated", render);
-        window.addEventListener("ssa:badgesSynced", render);
+        }
       });
     </script>
   </body>

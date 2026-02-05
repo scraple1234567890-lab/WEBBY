@@ -10,7 +10,7 @@
 <link href="./favicon.png" rel="icon" type="image/png"/>
 <link href="./styles.css" rel="stylesheet"/>
 </head>
-<body class="shopPage">
+<body class="shopPage shopPage--single">
 <a class="skip-link" href="#main">Skip to content</a>
 <div id="top"></div>
 <header class="header" role="banner">
@@ -27,7 +27,7 @@
 <a href="./posts.html">Posts</a>
 <a href="./articles.html">Articles</a><a href="./search.html">Search</a>
 <a href="./map.html">Map</a><a href="./game.html">Game</a>
-<a aria-current="page" class="btn ghost" href="./shop.html">Shop</a>
+<a href="./shop.html">Shop</a>
 <form action="./search.html" class="navSearch" method="get" role="search"><input aria-label="Search" class="navSearchInput" name="q" placeholder="Search…" type="search"/><button aria-label="Run search" class="navSearchBtn" type="submit">Go</button></form><div class="profileMenu" data-default-display="inline-flex" id="profileMenu" style="display: none">
 <button aria-controls="profileMenuList" aria-expanded="false" aria-haspopup="menu" aria-label="Open account menu" class="btn ghost profileTrigger" id="profileMenuToggle" type="button">
 <span class="srOnly">Profile</span>
@@ -51,7 +51,59 @@
 </nav>
 </header>
 <main id="main">
-<section class="section alt">
+<section class="section shopHero">
+  <div class="container shopHeroGrid">
+    <div class="shopHeroCopy">
+      <h1>Shop</h1>
+      <p class="lead">One drop on the shelves right now: the <strong>4 Schools Sticker Set</strong>. Clean vinyl, bold colors, and ready to claim notebooks, bottles, laptops, and spell journals.</p>
+      <div class="shopHeroChips">
+        <span class="chip">Premium vinyl</span>
+        <span class="chip">Water-resistant</span>
+        <span class="chip">Gloss finish</span>
+        <span class="chip">4 die-cut stickers</span>
+      </div>
+      <div class="shopHeroStats" aria-label="Sticker set highlights">
+        <div class="shopStatCard">
+          <p class="muted small">Includes</p>
+          <p class="statValue">4</p>
+          <p class="muted small">Academy emblems</p>
+        </div>
+        <div class="shopStatCard">
+          <p class="muted small">Price</p>
+          <p class="statValue">$7</p>
+          <p class="muted small">before tax + shipping</p>
+        </div>
+        <div class="shopStatCard">
+          <p class="muted small">Finish</p>
+          <p class="statValue">Gloss</p>
+          <p class="muted small">with durable adhesive</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="shopHeroCard shopHeroProduct">
+      <img class="shopHeroProductImage" src="./assets/images/4-schools-sticker-set.png" alt="4 Schools Sticker Set preview" loading="lazy" />
+      <div class="shopHeroProductHeader">
+        <div>
+          <h2 class="shopHeroProductTitle">4 Schools Sticker Set</h2>
+          <p class="muted small">A tidy set of four premium vinyl emblems.</p>
+        </div>
+        <div class="shopHeroProductPrice">$7</div>
+      </div>
+      <ul class="infoList">
+<li><span aria-hidden="true" class="dotIcon"></span>Works best on clean, dry surfaces</li>
+<li><span aria-hidden="true" class="dotIcon"></span>Water-resistant, not dishwasher-proof</li>
+<li><span aria-hidden="true" class="dotIcon"></span>Giftable: easy to mail</li>
+</ul>
+      <div class="shopHeroActions">
+        <button class="btn primary magentaGlow" id="featuredBundleBtn" type="button">Add sticker set to cart</button>
+        <a class="btn ghost" href="#catalog">View details below</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section alt" id="catalog">
 <div class="container shopLayout">
 <div class="shopCatalog">
 <div class="shopControls">
@@ -64,30 +116,22 @@
 <label for="shopCategory">Category</label>
 <select id="shopCategory">
 <option value="all">All categories</option>
-<option value="Study tools">Study tools</option>
 <option value="Stickers">Stickers</option>
-<option value="Protection">Protection</option>
-<option value="Wellness">Wellness</option>
-<option value="Travel">Travel</option>
-<option value="Apparel">Apparel</option>
 </select>
 </div>
 <div class="field">
 <label for="shopCollection">Collection</label>
 <select id="shopCollection">
 <option value="all">All collections</option>
-<option value="Wardcraft">Wardcraft</option>
 <option value="Astral Study">Astral Study</option>
-<option value="Fieldwork">Fieldwork</option>
-<option value="Restorative">Restorative</option>
 </select>
 </div>
 </div>
 <div class="shopControlsRow">
 <div class="field rangeField">
 <label for="shopMaxPrice">Max price</label>
-<input id="shopMaxPrice" max="160" min="20" step="5" type="range" value="160"/>
-<p class="muted small" id="shopMaxPriceValue">Up to $160</p>
+<input id="shopMaxPrice" min="0" max="10" step="1" type="range" value="10"/>
+<p class="muted small" id="shopMaxPriceValue">Up to $10</p>
 </div>
 <div class="field">
 <label for="shopSort">Sort by</label>
@@ -164,10 +208,9 @@
 <p class="muted small" id="checkoutStatus"></p>
 </div>
 <div class="shopSidebarCard">
-<h3>Quartermaster notes</h3>
+<h3>Sticker set notes</h3>
 <p class="muted">
-                Need a custom charm? Send a request before third bell. Our artisans can weave house colors, sigils, or
-                protective wards into most items.
+                These vinyl emblems love smooth, clean surfaces. For best results: wipe the spot, press firmly from the center out, and give it a few hours before running it through rain or dishwater.
               </p>
 <ul class="infoList">
 <li><span aria-hidden="true" class="dotIcon"></span>Custom orders: 5-7 days</li>
@@ -186,7 +229,7 @@
 </div>
 </footer>
 <script defer="" src="./script.js"></script>
-<script src="./js/app.js?v=4" type="module"></script>
+<script src="./js/app.js" type="module"></script>
 <script src="./js/shop.js" type="module"></script>
 </body>
 </html>
