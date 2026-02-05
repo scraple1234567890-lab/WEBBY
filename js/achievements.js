@@ -46,40 +46,128 @@
     try {
       const now = ctx.currentTime;
 
+      // --- master + a tiny "glimmer" delay (pseudo-reverb) ---
       const master = ctx.createGain();
       master.gain.setValueAtTime(0.0001, now);
-      master.gain.exponentialRampToValueAtTime(0.08, now + 0.02);
-      master.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
-      master.connect(ctx.destination);
+      master.gain.exponentialRampToValueAtTime(0.09, now + 0.02);
+      master.gain.exponentialRampToValueAtTime(0.0001, now + 0.46);
 
-      // A quick two-tone "sparkle" (pleasant, short, quiet)
-      const o1 = ctx.createOscillator();
-      o1.type = "sine";
-      o1.frequency.setValueAtTime(520, now);
-      o1.frequency.exponentialRampToValueAtTime(1040, now + 0.18);
+      const wet = ctx.createGain();
+      wet.gain.setValueAtTime(0.22, now);
+      const dry = ctx.createGain();
+      dry.gain.setValueAtTime(1.0, now);
 
-      const o2 = ctx.createOscillator();
-      o2.type = "triangle";
-      o2.frequency.setValueAtTime(780, now + 0.01);
-      o2.frequency.exponentialRampToValueAtTime(1560, now + 0.20);
+      const delay = ctx.createDelay();
+      delay.delayTime.setValueAtTime(0.085, now);
+      const fb = ctx.createGain();
+      fb.gain.setValueAtTime(0.28, now);
+      const lp = ctx.createBiquadFilter();
+      lp.type = "lowpass";
+      lp.frequency.setValueAtTime(1800, now);
 
-      const g1 = ctx.createGain();
-      g1.gain.setValueAtTime(0.0001, now);
-      g1.gain.exponentialRampToValueAtTime(0.8, now + 0.02);
-      g1.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+      master.connect(dry);
+      master.connect(delay);
+      delay.connect(lp);
+      lp.connect(fb);
+      fb.connect(delay);
+      lp.connect(wet);
 
-      const g2 = ctx.createGain();
-      g2.gain.setValueAtTime(0.0001, now);
-      g2.gain.exponentialRampToValueAtTime(0.6, now + 0.03);
-      g2.gain.exponentialRampToValueAtTime(0.0001, now + 0.24);
+      const out = ctx.destination;
+      dry.connect(out);
+      wet.connect(out);
 
-      o1.connect(g1); g1.connect(master);
-      o2.connect(g2); g2.connect(master);
+      // --- airy "spell whoosh" (filtered noise sweep) ---
+      const noiseLen = Math.floor(ctx.sampleRate * 0.22);
+      const noiseBuf = ctx.createBuffer(1, noiseLen, ctx.sampleRate);
+      const data = noiseBuf.getChannelData(0);
+      for (let i = 0; i < noiseLen; i++) {
+        // slightly softened white noise
+        data[i] = (Math.random() * 2 - 1) * 0.65;
+      }
+      const noise = ctx.createBufferSource();
+      noise.buffer = noiseBuf;
 
-      o1.start(now);
-      o2.start(now);
-      o1.stop(now + 0.26);
-      o2.stop(now + 0.26);
+      const bp = ctx.createBiquadFilter();
+      bp.type = "bandpass";
+      bp.Q.setValueAtTime(0.9, now);
+      bp.frequency.setValueAtTime(520, now);
+      bp.frequency.exponentialRampToValueAtTime(2100, now + 0.18);
+
+      const ng = ctx.createGain();
+      ng.gain.setValueAtTime(0.0001, now);
+      ng.gain.exponentialRampToValueAtTime(0.65, now + 0.025);
+      ng.gain.exponentialRampToValueAtTime(0.0001, now + 0.24);
+
+      noise.connect(bp);
+      bp.connect(ng);
+      ng.connect(master);
+
+      // --- chimey micro-arpeggio ("short spell") ---
+      // F#-A#-C# with a quick top sparkle
+      const notes = [740.0, 932.3, 1108.7, 1480.0];
+      const offsets = [0.00, 0.045, 0.09, 0.135];
+
+      const lfo = ctx.createOscillator();
+      lfo.type = "sine";
+      lfo.frequency.setValueAtTime(6.5, now); // gentle vibrato
+      const lfoGain = ctx.createGain();
+      lfoGain.gain.setValueAtTime(10, now); // cents-ish, routed to detune
+      lfo.connect(lfoGain);
+
+      const madeOsc = [];
+      notes.forEach((f, idx) => {
+        const t0 = now + offsets[idx];
+        const o = ctx.createOscillator();
+        o.type = idx === 0 ? "triangle" : "sine";
+        o.frequency.setValueAtTime(f, t0);
+        o.detune.setValueAtTime((Math.random() * 12 - 6), t0);
+
+        // connect vibrato to detune
+        lfoGain.connect(o.detune);
+
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0.0001, t0);
+        g.gain.exponentialRampToValueAtTime(0.75, t0 + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.20);
+
+        // slight "lift" on the first tone so it feels cast-y
+        if (idx === 0) {
+          o.frequency.exponentialRampToValueAtTime(f * 1.18, t0 + 0.11);
+        }
+
+        o.connect(g);
+        g.connect(master);
+        o.start(t0);
+        o.stop(t0 + 0.22);
+        madeOsc.push(o, g);
+
+        // a tiny octave sparkle on the last note
+        if (idx === 3) {
+          const o2 = ctx.createOscillator();
+          o2.type = "sine";
+          o2.frequency.setValueAtTime(f * 2, t0);
+          o2.detune.setValueAtTime((Math.random() * 14 - 7), t0);
+          lfoGain.connect(o2.detune);
+
+          const g2 = ctx.createGain();
+          g2.gain.setValueAtTime(0.0001, t0);
+          g2.gain.exponentialRampToValueAtTime(0.35, t0 + 0.008);
+          g2.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.14);
+
+          o2.connect(g2);
+          g2.connect(master);
+          o2.start(t0);
+          o2.stop(t0 + 0.16);
+          madeOsc.push(o2, g2);
+        }
+      });
+
+      // Start/stop shared nodes
+      lfo.start(now);
+      lfo.stop(now + 0.50);
+
+      noise.start(now);
+      noise.stop(now + 0.25);
     } catch {
       // fail quietly
     }
