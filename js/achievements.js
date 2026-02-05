@@ -10,9 +10,26 @@
   const STORAGE_KEY = "ssa:badges:v1";
   const TOAST_HOST_ID = "badgeToastHost";
 
-  // --- Optional: tiny "unlock" sound (Web Audio API, no asset needed) ---
+  // --- Optional: "unlock" sound ---
+  // Uses an audio file if present; falls back to a tiny procedural spell sound.
+  const BADGE_SFX_SRC = "assets/audio/badge-unlock.mp3";
+
+  let __ssaBadgeAudio = null;
   let __ssaAudioCtx = null;
   let __ssaUserInteracted = false;
+
+  function __ssaGetBadgeAudio() {
+    if (__ssaBadgeAudio) return __ssaBadgeAudio;
+    try {
+      const a = new Audio(BADGE_SFX_SRC);
+      a.preload = "auto";
+      a.volume = 0.75;
+      __ssaBadgeAudio = a;
+      return a;
+    } catch {
+      return null;
+    }
+  }
 
   function __ssaGetAudioCtx() {
     const Ctx = window.AudioContext || window.webkitAudioContext;
@@ -23,6 +40,33 @@
 
   function __ssaUnlockAudioOnce() {
     __ssaUserInteracted = true;
+
+    // Prime HTMLAudio (some browsers require a gesture)
+    const a = __ssaGetBadgeAudio();
+    if (a) {
+      try {
+        const prevMuted = a.muted;
+        a.muted = true;
+        const p = a.play();
+        if (p && typeof p.then === "function") {
+          p.then(() => {
+            a.pause();
+            a.currentTime = 0;
+            a.muted = prevMuted;
+          }).catch(() => {
+            a.muted = prevMuted;
+          });
+        } else {
+          a.pause();
+          a.currentTime = 0;
+          a.muted = prevMuted;
+        }
+      } catch {
+        // ignore
+      }
+    }
+
+    // Prime WebAudio fallback
     const ctx = __ssaGetAudioCtx();
     if (!ctx) return;
     if (ctx.state === "suspended") ctx.resume().catch(() => {});
@@ -34,6 +78,24 @@
   });
 
   function playBadgeSound() {
+    const a = __ssaGetBadgeAudio();
+    if (a) {
+      try {
+        // restart from the beginning each time
+        a.currentTime = 0;
+      } catch {
+        // ignore
+      }
+      const p = a.play();
+      if (p && typeof p.catch === "function") {
+        p.catch(() => playProceduralBadgeSound());
+      }
+      return;
+    }
+    playProceduralBadgeSound();
+  }
+
+  function playProceduralBadgeSound() {
     const ctx = __ssaGetAudioCtx();
     if (!ctx) return;
 
@@ -172,6 +234,9 @@
       // fail quietly
     }
   }
+
+
+  
 
 
   function safeJsonParse(text, fallback) {
