@@ -118,8 +118,12 @@
   }
 
   function buildCard(loc) {
-    const card = document.createElement("article");
-    card.className = "post mapCard";
+    // Under-map list: show ONLY the location title (no blurbs).
+    // Clicking the title previews the location (and the modal still offers "Read more").
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "post mapCard mapListItem";
+    card.setAttribute("aria-label", `Preview ${loc.title}`);
 
     const top = document.createElement("div");
     top.className = "mapCardTitle";
@@ -127,32 +131,13 @@
     const h = document.createElement("h3");
     h.textContent = loc.title;
 
-    const a = document.createElement("a");
-    a.href = loc.href;
-    a.textContent = "Read";
-    a.setAttribute("aria-label", `Read about ${loc.title}`);
-
     top.appendChild(h);
-    top.appendChild(a);
+    card.appendChild(top);
 
-    const p = document.createElement("p");
-    p.className = "muted";
-    p.style.margin = "8px 0 0";
-    p.textContent = loc.blurb;
-
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "btn ghost";
-    btn.style.marginTop = "10px";
-    btn.textContent = "Preview";
-    btn.addEventListener("click", () => {
+    card.addEventListener("click", () => {
       openModal(loc);
       stage?.scrollIntoView({ block: "start", behavior: "smooth" });
     });
-
-    card.appendChild(top);
-    card.appendChild(p);
-    card.appendChild(btn);
 
     return card;
   }

@@ -302,7 +302,7 @@
     window.setTimeout(() => {
       toast.classList.add("badgeToast--out");
       window.setTimeout(() => toast.remove(), 220);
-    }, 3200);
+    }, 5000);
   }
 
   function normalizeId(id) {

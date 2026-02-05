@@ -204,6 +204,22 @@ body.mapPage::after {
   padding: 14px;
 }
 
+/* Under-map list tiles (title only) */
+.mapListItem {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mapListItem:hover {
+  filter: brightness(1.06);
+}
+
+.mapListItem:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent2) 70%, white 30%);
+  outline-offset: 3px;
+}
+
 .mapCardTitle {
   display: flex;
   align-items: baseline;
