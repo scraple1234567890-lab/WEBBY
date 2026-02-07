@@ -1923,6 +1923,8 @@ input:focus, textarea:focus {
   color: color-mix(in srgb, var(--text) 80%, var(--accent2) 20%);
 }
 
+.shopPage--single .shopHeroGrid { grid-template-columns: 1fr; }
+
 .shopPage--single .shopControls,
 .shopPage--single #resetShopFilters {
   display: none;
