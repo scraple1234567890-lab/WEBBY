@@ -51,160 +51,59 @@
 </nav>
 </header>
 <main id="main">
-<section class="section shopHero">
-  <div class="container shopHeroGrid">
-    <div class="shopHeroCopy">
-      <h1>Shop</h1>
-      <p class="lead">One drop on the shelves right now: the <strong>4 Schools Sticker Set</strong>. Clean vinyl, bold colors, and ready to claim notebooks, bottles, laptops, and spell journals.</p>
-      <div class="shopHeroChips">
-        <span class="chip">Premium vinyl</span>
-        <span class="chip">Water-resistant</span>
-        <span class="chip">Gloss finish</span>
-        <span class="chip">4 die-cut stickers</span>
-      </div>
-      <div class="shopHeroStats" aria-label="Sticker set highlights">
-        <div class="shopStatCard">
-          <p class="muted small">Includes</p>
-          <p class="statValue">4</p>
-          <p class="muted small">Academy emblems</p>
+  <section class="section alt shopCatalogSection">
+    <div class="container">
+      <header class="shopHeaderCompact">
+        <div>
+          <h1 class="shopTitle">Shop</h1>
+          <p class="muted">Current drop: <strong>4 Schools Sticker Set</strong></p>
         </div>
-        <div class="shopStatCard">
-          <p class="muted small">Price</p>
-          <p class="statValue">$7</p>
-          <p class="muted small">before tax + shipping</p>
-        </div>
-        <div class="shopStatCard">
-          <p class="muted small">Finish</p>
-          <p class="statValue">Gloss</p>
-          <p class="muted small">with durable adhesive</p>
-        </div>
-      </div>
-          <div class="shopHeroActions">
-        <button class="btn primary magentaGlow" id="featuredBundleBtn" type="button">Add sticker set to cart</button>
-        <a class="btn ghost" href="#catalog">View the listing below</a>
+        <a class="btn primary magentaGlow" href="#" aria-label="Buy on Shopify (replace link)">Buy on Shopify</a>
+      </header>
+
+      <div class="shopGrid shopGrid--single" aria-label="Shop listings">
+        <article class="shopItem shopItem--featured" data-product-id="4-schools-sticker-set">
+          <div class="shopItemMedia">
+            <img src="./assets/images/4-schools-sticker-set.png" alt="4 Schools Sticker Set" loading="lazy" />
+            <span class="shopTag">Sticker set</span>
+          </div>
+
+          <div class="shopItemBody">
+            <div class="shopItemHeader">
+              <h3>4 Schools Sticker Set</h3>
+              <span class="shopPrice">$7</span>
+            </div>
+
+            <p class="muted">A premium vinyl set featuring the academy's four schools.</p>
+
+            <div class="shopMetaRow">
+              <span>★ 5.0</span>
+              <span>In stock</span>
+              <span>Astral Study</span>
+            </div>
+
+            <div class="shopItemDetailsInline">
+              <p class="muted small">Includes:</p>
+              <ul>
+                <li>4 die-cut vinyl stickers</li>
+                <li>Water-resistant</li>
+                <li>Gloss finish</li>
+              </ul>
+            </div>
+
+            <div class="shopCtaRow">
+              <a class="btn primary" href="#" aria-label="Buy on Shopify (replace link)">Buy on Shopify</a>
+              <a class="btn ghost" href="./posts.html">See drop announcements</a>
+            </div>
+
+            <p class="muted small shopNote">
+              Note: This page is a showcase. Purchases are handled on Shopify. Replace the “Buy on Shopify” links with your product URL.
+            </p>
+          </div>
+        </article>
       </div>
     </div>
-  </div>
-</section>
-
-<section class="section alt" id="catalog">
-<div class="container shopLayout">
-<div class="shopCatalog">
-<div class="shopControls">
-<div class="shopControlsRow">
-<div class="field">
-<label for="shopSearch">Search the shelves</label>
-<input id="shopSearch" placeholder="Search by item, use, or ingredient" type="search"/>
-</div>
-<div class="field">
-<label for="shopCategory">Category</label>
-<select id="shopCategory">
-<option value="all">All categories</option>
-<option value="Stickers">Stickers</option>
-</select>
-</div>
-<div class="field">
-<label for="shopCollection">Collection</label>
-<select id="shopCollection">
-<option value="all">All collections</option>
-<option value="Astral Study">Astral Study</option>
-</select>
-</div>
-</div>
-<div class="shopControlsRow">
-<div class="field rangeField">
-<label for="shopMaxPrice">Max price</label>
-<input id="shopMaxPrice" min="0" max="10" step="1" type="range" value="10"/>
-<p class="muted small" id="shopMaxPriceValue">Up to $10</p>
-</div>
-<div class="field">
-<label for="shopSort">Sort by</label>
-<select id="shopSort">
-<option value="featured">Featured picks</option>
-<option value="price-asc">Price: low to high</option>
-<option value="price-desc">Price: high to low</option>
-<option value="rating-desc">Top rated</option>
-<option value="name-asc">Alphabetical</option>
-</select>
-</div>
-<div class="shopToggle">
-<label>
-<input checked="" id="shopInStock" type="checkbox"/>
-                    Only show in stock
-                  </label>
-</div>
-</div>
-</div>
-<div class="shopResultsRow">
-<p aria-live="polite" class="muted" id="shopResultCount">Loading inventory...</p>
-<button class="btn ghost" id="resetShopFilters" type="button">Reset filters</button>
-</div>
-<div aria-live="polite" class="shopGrid" id="shopGrid"></div>
-</div>
-<aside class="shopSidebar">
-<div aria-live="polite" class="shopCart">
-<div class="shopCartHeader">
-<div>
-<h2>Your cart</h2>
-<p class="muted small" id="cartCount">0 items</p>
-</div>
-<button class="btn ghost" id="clearCart" type="button">Clear</button>
-</div>
-<div class="shopCartItems" id="cartItems"></div>
-<p class="muted small" id="cartStatus"></p>
-<div class="shopCartSummary">
-<div class="summaryRow">
-<span>Subtotal</span>
-<span id="cartSubtotal">0</span>
-</div>
-<div class="summaryRow">
-<span>Discount</span>
-<span id="cartDiscount">0</span>
-</div>
-<div class="summaryRow">
-<span>Shipping</span>
-<span id="cartShipping">0</span>
-</div>
-<div class="summaryRow">
-<span>Tax</span>
-<span id="cartTax">0</span>
-</div>
-<div class="summaryRow total">
-<span>Total</span>
-<span id="cartTotal">0</span>
-</div>
-</div>
-<form class="shopPromo" id="promoForm">
-<label for="promoCode">Promo rune</label>
-<div class="shopPromoRow">
-<input autocomplete="off" id="promoCode" placeholder="Enter code" type="text"/>
-<button class="btn ghost" type="submit">Apply</button>
-</div>
-<p class="muted small" id="promoStatus"></p>
-</form>
-<div class="shopShipping">
-<p class="muted small">Delivery ritual</p>
-<label><input checked="" name="shipping" type="radio" value="standard"/> Standard (2 days)</label>
-<label><input name="shipping" type="radio" value="express"/> Express (next bell)</label>
-<label><input name="shipping" type="radio" value="pickup"/> Hall pickup</label>
-</div>
-<button class="btn primary magentaGlow" id="checkoutBtn" type="button">Checkout ritual</button>
-<p class="muted small" id="checkoutStatus"></p>
-</div>
-<div class="shopSidebarCard">
-<h3>Sticker set notes</h3>
-<p class="muted">
-                These vinyl emblems love smooth, clean surfaces. For best results: wipe the spot, press firmly from the center out, and give it a few hours before running it through rain or dishwater.
-              </p>
-<ul class="infoList">
-<li><span aria-hidden="true" class="dotIcon"></span>Custom orders: 5-7 days</li>
-<li><span aria-hidden="true" class="dotIcon"></span>Gift wrapping available</li>
-<li><span aria-hidden="true" class="dotIcon"></span>Student discount: 8%</li>
-</ul>
-</div>
-</aside>
-</div>
-</section>
+  </section>
 </main>
 <footer class="footer">
 <div class="container footerRow">
@@ -214,6 +113,5 @@
 </footer>
 <script defer="" src="./script.js"></script>
 <script src="./js/app.js" type="module"></script>
-<script src="./js/shop.js" type="module"></script>
 </body>
 </html>
