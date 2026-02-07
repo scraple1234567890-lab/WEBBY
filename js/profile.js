@@ -270,7 +270,11 @@ function renderProfileBadges() {
     return bd - ad;
   });
 
-  const max = 12;
+  const max = (() => {
+    const raw = (profileBadgesSection && profileBadgesSection.dataset && (profileBadgesSection.dataset.maxBadges || profileBadgesSection.dataset.badgeLimit || profileBadgesSection.dataset.max)) || "";
+    const n = Number(raw);
+    return Number.isFinite(n) && n > 0 ? Math.floor(n) : 4;
+  })();
   unlockedDefs.slice(0, max).forEach((def) => {
     const pill = document.createElement("a");
     pill.className = "profileBadgePill";
