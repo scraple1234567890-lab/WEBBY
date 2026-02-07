@@ -1,6 +1,6 @@
-# StarSpell Academy site
+# Dragonstone site
 
-Static site for the StarSpell Academy experience with Supabase-backed community posts.
+Static site for the Dragonstone experience with Supabase-backed community posts.
 
 ## Supabase setup
 1) Copy `js/config.example.js` to `js/config.js`.

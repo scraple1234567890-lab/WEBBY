@@ -5,7 +5,7 @@
 
 window.CHARACTERS_DATA = {
   "meta": {
-    "title": "StarSpell Academy Characters",
+    "title": "Dragonstone Characters",
     "updated": "2026-02-02",
     "note": "Edit this file to add/remove characters. Spoiler tiers: public, book1, book2, full. If you open the site via file://, most browsers block JSON fetch, so use server.js or edit data/characters-data.js instead."
   },

@@ -1,5 +1,5 @@
 /*
-  StarSpell Academy: lightweight client-side achievements/badges
+  Dragonstone: lightweight client-side achievements/badges
   - No backend required
   - Stores unlocks in localStorage
   - Auto-unlocks based on <body data-unlock-badge="..."></body>

@@ -4,18 +4,18 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
-<meta content="StarSpell Academy — a welcoming magical school portal for curious minds." name="description"/>
-<title>StarSpell Academy</title>
+<meta content="A welcoming magical school portal: quizzes, interactive map, searchable library, and lore archive." name="description"/>
+<title>Dragonstone</title>
 <link href="./favicon.ico" rel="icon" sizes="any"/>
 <link href="./favicon.png" rel="icon" type="image/png"/>
 <link href="./styles.css" rel="stylesheet"/>
 </head>
-<body>
+<body class="homePage">
 <a class="skip-link" href="#main">Skip to content</a>
 <header class="header" role="banner">
 <nav aria-label="Primary" class="nav container">
 <a aria-label="Home" class="brand" href="./index.html#top">
-<span class="brandText">StarSpell Academy</span>
+<span class="brandText">Dragonstone</span>
 </a>
 <button aria-controls="navLinks" aria-expanded="false" class="iconBtn navToggle" id="navToggle">
 <span class="srOnly">Open menu</span>
@@ -50,63 +50,157 @@
 </nav>
 </header>
 <main id="main">
-<!-- LANDING -->
-<section class="landing" id="top">
-<div class="container landingGrid">
-<div class="landingCopy">
-<p class="kicker">StarSpell Academy</p>
-<h1>StarSpell Academy</h1>
-<div class="actionRow">
-<a class="btn heroCta magentaGlow" href="./quiz.html">Take the sorting quiz</a>
-</div>
-</div>
-</div>
-</section>
-<!-- LORE BOARD -->
-<section class="section alt" id="board">
-<div class="container">
-<div class="sectionHead">
-<h2>The Lore Board</h2>
-</div>
-<div aria-label="Lore board actions" class="actionRow">
-<a class="btn primary magentaGlow" href="./posts.html">Share a post</a>
-</div>
-<div aria-live="polite" class="postFeed" data-limit="3" data-lore-feed="" id="postFeed">
-<p class="muted">Fetching today's notices...</p>
-</div>
-</div>
-</section>
-<!-- CONTACT -->
-<section class="section alt" id="contact">
-<div class="container">
-<div class="contactGrid">
-<div class="contactCard">
-<h3>Send an owl</h3>
-<form id="contactForm" novalidate="">
-<div class="field">
-<label for="name">Name</label>
-<input autocomplete="name" id="name" minlength="2" name="name" required="" type="text"/>
-<p aria-live="polite" class="error" data-for="name"></p>
-</div>
-<div class="field">
-<label for="message">Message</label>
-<textarea id="message" minlength="10" name="message" required="" rows="5"></textarea>
-<p aria-live="polite" class="error" data-for="message"></p>
-</div>
-<div class="actions">
-<button class="btn primary" type="submit">Send</button>
-</div>
-<p aria-live="polite" class="muted small" id="formStatus"></p>
-</form>
-</div>
-</div>
-</div>
-</section>
+  <!-- HERO -->
+  <section class="landing" id="top">
+    <div class="container landingGrid">
+      <div class="landingCopy">
+        <p class="kicker">Dragonstone</p>
+        <h1>Dragonstone</h1>
+        <p class="whisper">Your portal to the lore</p>
+        <p class="lead">Quizzes, an interactive map, a searchable library, and a growing archive of characters, events, and places.</p>
+        <div class="actionRow">
+          <a class="btn heroCta magentaGlow" href="./quiz.html">Take a quiz</a>
+          <a class="btn" href="./map.html">Explore the map</a>
+          <a class="btn" href="./search.html">Search the library</a>
+        </div>
+        <p class="muted small homeHint">Tip: quiz results and unlocked badges can be viewed on your profile.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES / QUICK PATHS -->
+  <section class="section alt" id="services">
+    <div class="container">
+      <div class="sectionHead">
+        <h2>Start here</h2>
+        <p class="muted">Pick a path. Everything else branches from these.</p>
+      </div>
+
+      <div class="homeServiceGrid" role="list">
+        <a class="homeServiceCard" href="./quiz.html" role="listitem">
+          <div class="homeServiceIcon" aria-hidden="true">🧭</div>
+          <div class="homeServiceBody">
+            <h3>Quizzes</h3>
+            <p>Get sorted, discover affinities, and save results to your profile.</p>
+            <span class="homeServiceCta">Take a quiz →</span>
+          </div>
+        </a>
+
+        <a class="homeServiceCard" href="./map.html" role="listitem">
+          <div class="homeServiceIcon" aria-hidden="true">🗺️</div>
+          <div class="homeServiceBody">
+            <h3>Interactive Map</h3>
+            <p>Click pins to preview locations, then jump to full entries.</p>
+            <span class="homeServiceCta">Open map →</span>
+          </div>
+        </a>
+
+        <a class="homeServiceCard" href="./search.html" role="listitem">
+          <div class="homeServiceIcon" aria-hidden="true">🔎</div>
+          <div class="homeServiceBody">
+            <h3>Search</h3>
+            <p>Browse characters, locations, artifacts, animals, and more in one place.</p>
+            <span class="homeServiceCta">Search entries →</span>
+          </div>
+        </a>
+
+        <a class="homeServiceCard" href="./timeline.html" role="listitem">
+          <div class="homeServiceIcon" aria-hidden="true">🗓️</div>
+          <div class="homeServiceBody">
+            <h3>Timeline</h3>
+            <p>Follow major events and discover what connects across eras.</p>
+            <span class="homeServiceCta">View timeline →</span>
+          </div>
+        </a>
+
+        <a class="homeServiceCard" href="./characters.html" role="listitem">
+          <div class="homeServiceIcon" aria-hidden="true">🧑‍🎓</div>
+          <div class="homeServiceBody">
+            <h3>Characters</h3>
+            <p>Meet the cast, skim quick summaries, and dive into details.</p>
+            <span class="homeServiceCta">Browse characters →</span>
+          </div>
+        </a>
+
+        <a class="homeServiceCard" href="./posts.html" role="listitem">
+          <div class="homeServiceIcon" aria-hidden="true">📌</div>
+          <div class="homeServiceBody">
+            <h3>Posts</h3>
+            <p>Share theories, drop rumors, and leave notes for fellow readers.</p>
+            <span class="homeServiceCta">Open posts →</span>
+          </div>
+        </a>
+
+        <a class="homeServiceCard" href="./articles.html" role="listitem">
+          <div class="homeServiceIcon" aria-hidden="true">📜</div>
+          <div class="homeServiceBody">
+            <h3>Articles</h3>
+            <p>Longer reads: lore deep-dives, guides, and behind-the-scenes bits.</p>
+            <span class="homeServiceCta">Read articles →</span>
+          </div>
+        </a>
+
+        <a class="homeServiceCard" href="./shop.html" role="listitem">
+          <div class="homeServiceIcon" aria-hidden="true">🛍️</div>
+          <div class="homeServiceBody">
+            <h3>Shop</h3>
+            <p>Sticker sets, themed drops, and merch tied to the world.</p>
+            <span class="homeServiceCta">Browse shop →</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="homeCallout" role="region" aria-label="Account callout">
+        <div class="homeCalloutInner">
+          <div class="homeCalloutCopy">
+            <h3>Track your progress</h3>
+            <p class="muted">Log in to see your saved quiz results and a tidy selection of unlocked badges.</p>
+          </div>
+          <div class="actionRow">
+            <a class="btn primary magentaGlow" href="./login.html">Log in</a>
+            <a class="btn" href="./profile.html">View profile</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="section" id="contact">
+    <div class="container">
+      <div class="sectionHead">
+        <h2>Send an owl</h2>
+        <p class="muted">Questions, feedback, or a suspiciously specific rumor? Drop a note.</p>
+      </div>
+
+      <div class="contactGrid">
+        <div class="contactCard">
+          <form id="contactForm" novalidate="">
+            <div class="field">
+              <label for="name">Name</label>
+              <input autocomplete="name" id="name" minlength="2" name="name" required="" type="text"/>
+              <p aria-live="polite" class="error" data-for="name"></p>
+            </div>
+            <div class="field">
+              <label for="message">Message</label>
+              <textarea id="message" minlength="10" name="message" required="" rows="4"></textarea>
+              <p aria-live="polite" class="error" data-for="message"></p>
+            </div>
+            <div class="actions">
+              <button class="btn primary" type="submit">Send</button>
+            </div>
+            <p aria-live="polite" class="muted small" id="formStatus"></p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
 </main>
 <footer class="footer">
 <div class="container footerRow">
-<p class="muted small">© <span id="year"></span> StarSpell Academy. May your path stay bright.</p>
-<a class="muted small" href="#top">Back to the stars ↑</a>
+<p class="muted small">© <span id="year"></span> Dragonstone. May your path stay bright.</p>
+<a class="muted small" href="#top">Back to the top ↑</a>
 </div>
 </footer>
 <script defer="" src="./script.js"></script>

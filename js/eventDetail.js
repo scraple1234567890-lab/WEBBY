@@ -121,7 +121,7 @@
     const subtitleParts = [safeText(ev.arc), safeText(ev.when), safeText(ev.mystery_tag)].filter(Boolean);
     if (subtitleEl) subtitleEl.textContent = subtitleParts.join(" • ");
 
-    document.title = `StarSpell Academy | ${title}`;
+    document.title = `Dragonstone | ${title}`;
 
     // Build card content
     mount.innerHTML = "";

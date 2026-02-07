@@ -1,4 +1,4 @@
-// Badge definitions for StarSpell Academy (client-side)
+// Badge definitions for Dragonstone (client-side)
 // Add more entries here as your universe grows.
 
 window.SSA_BADGE_DEFS = [
