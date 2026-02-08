@@ -3573,6 +3573,14 @@ body.homePage .contactCard{
 }
 body.homePage .field{ margin-top: 10px; }
 
+/* Home: make "Send an owl" header text fully readable */
+body.homePage #contact .sectionHead h2,
+body.homePage #contact .sectionHead p,
+body.homePage #contact .sectionHead p.muted{
+  color: #fff;
+  opacity: 1;
+}
+
 
 
 .footer{
