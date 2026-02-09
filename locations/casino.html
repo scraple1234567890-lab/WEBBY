@@ -80,11 +80,28 @@
 </article>
 </div>
 </main>
-<footer class="footer">
-<div class="container footerRow">
-<p class="muted small">© <span id="year"></span> Dragonstone.</p>
-<a class="muted small" href="#top">Back to top ↑</a>
-</div>
+<footer class="footer" role="contentinfo">
+  <div class="container footerInner">
+    <a class="footerMark" href="../index.html#top" aria-label="Dragonstone home">
+      <span class="footerMarkText">Dragonstone</span>
+    </a>
+
+    <nav class="footerNav" aria-label="Footer">
+      <a href="../map.html">Map</a>
+      <a href="../search.html">Search</a>
+      <a href="../quiz.html">Quizzes</a>
+      <a href="../timeline.html">Timeline</a>
+      <a href="../shop.html">Shop</a>
+    </nav>
+  </div>
+
+  <div class="container footerBottom">
+    <p class="muted small">© <span id="year"></span> Dragonstone.</p>
+    <div class="footerBottomLinks">
+      <a class="muted small" href="#top">Back to top ↑</a>
+      <a class="muted small" href="../index.html#contact">Contact</a>
+    </div>
+  </div>
 </footer>
 <script defer="" src="../script.js"></script>
 <script src="../js/app.js" type="module"></script>
