@@ -220,6 +220,16 @@ body.mapPage::after {
   outline-offset: 3px;
 }
 
+/*
+  Map page uses the "light" theme on <html>, which makes default text dark.
+  The under-map list tiles use the standard .post card surface (dark), so
+  their titles should be light for contrast.
+*/
+body.mapPage .mapListItem,
+body.mapPage .mapListItem h3 {
+  color: #ffffff;
+}
+
 .mapCardTitle {
   display: flex;
   align-items: baseline;
