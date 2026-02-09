@@ -2918,6 +2918,14 @@ body.searchPage .searchResult{
   height: fit-content;
 }
 
+/* When a result expands inside a multi-column grid, let it take the full row.
+   This prevents expanded cards from being squeezed into 1/2 or 1/4 width. */
+body.searchPage details.searchResult[open]{
+  grid-column: 1 / -1;
+  position: relative;
+  z-index: 1;
+}
+
 @media (max-width: 520px){
   body.searchPage .searchResults,
   body.searchPage .searchGroup{
