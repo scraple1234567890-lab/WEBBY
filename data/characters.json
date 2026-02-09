@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Dragonstone Characters",
-    "updated": "2026-02-08",
+    "updated": "2026-02-09",
     "note": "Edit this file to add/remove characters. Spoiler tiers: public, book1, book2, full. If you open the site via file://, most browsers block JSON fetch, so use server.js or edit data/characters-data.js instead."
   },
   "characters": [
@@ -101,7 +101,7 @@
       "element": "None",
       "school": "Touch",
       "facts": [
-        "Magic: Friction Weave (Touch) — can increase or reduce friction with a touch to cling, slide, or halt momentum.",
+        "Magic: Friction Weave (Touch) \u2014 can increase or reduce friction with a touch to cling, slide, or halt momentum.",
         "Never repeats the same route twice in a week; the city is safer when it can't predict him.",
         "Panic makes his power overcorrect: too much grip, not enough release.",
         "Carries two pairs of gloves: one for climbing, one for shaking hands.",
@@ -118,9 +118,9 @@
       ],
       "aliases": [
         "The Runner",
-        "Axel “Stillpoint”"
+        "Axel \u201cStillpoint\u201d"
       ],
-      "image": "",
+      "image": "./assets/images/characters/axel.png",
       "href": "./characters/axel.html",
       "related_events": [
         {
@@ -158,7 +158,7 @@
       "element": "None",
       "school": "Sound",
       "facts": [
-        "Magic: Resonance Mapping (Sound) — a low hum returns as a mental “map” of rooms, hollow walls, and hidden doors.",
+        "Magic: Resonance Mapping (Sound) \u2014 a low hum returns as a mental \u201cmap\u201d of rooms, hollow walls, and hidden doors.",
         "Can dampen a small area into a Quiet Halo to calm panic or hide conversation.",
         "Loud chaos triggers migraines; he keeps earwraps and speaks softly on purpose.",
         "Protective of younger students and often shows up where help is needed before anyone asks.",
@@ -176,7 +176,7 @@
         "Dev",
         "The Tuning Fork"
       ],
-      "image": "",
+      "image": "./assets/images/characters/devante.png",
       "href": "./characters/devante.html",
       "related_events": [
         {
@@ -215,7 +215,7 @@
       "school": "Sight",
       "facts": [
         "Age 24 and already named Headmaster of the School of Sight, a decision that still splits the faculty.",
-        "Primary magic: Hardlight Construction (Sight) — forms solid light into tools, restraints, and barriers.",
+        "Primary magic: Hardlight Construction (Sight) \u2014 forms solid light into tools, restraints, and barriers.",
         "Signature construct: luminous chains that can bind, pull, or form lattices midair.",
         "Known citywide as the \"prodigy of the city\"; praised publicly, watched privately.",
         "His control is surgical: faster to lock something down than to destroy it."
@@ -233,7 +233,7 @@
         "Headmaster Relen",
         "The Chainwright"
       ],
-      "image": "",
+      "image": "./assets/images/characters/relen.png",
       "href": "./characters/relen.html",
       "related_events": [
         {
@@ -275,7 +275,7 @@
       "aliases": [
         "Mira (expelled student)"
       ],
-      "image": "",
+      "image": "./assets/images/characters/mira.png",
       "href": "./characters/mira.html",
       "related_events": [],
       "related_locations": []
