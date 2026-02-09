@@ -1625,6 +1625,45 @@ input:focus, textarea:focus {
   line-height: 1.6;
 }
 
+/* =========================
+   Character dossiers
+   (Character pages use .postCard)
+   ========================= */
+.postShell { display: grid; gap: 12px; }
+
+/* Alias .postCard to match the standard post card styling so text stays readable
+   even when the page background is busy.
+*/
+.postCard {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--border) 82%, rgba(255, 255, 255, 0.18));
+  border-radius: var(--radius2);
+  background: linear-gradient(
+    150deg,
+    color-mix(in srgb, var(--panel) 92%, #05030f 8%),
+    color-mix(in srgb, var(--panel2) 92%, #08051a 8%)
+  );
+  box-shadow: var(--shadow), 0 12px 40px rgba(0, 0, 0, 0.28);
+  padding: 16px;
+  display: grid;
+  gap: 8px;
+  backdrop-filter: none;
+  isolation: isolate;
+}
+.postCard::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: none;
+}
+.postCard > * {
+  position: relative;
+  z-index: 1;
+}
+
 /* Mobile */
 @media (max-width: 980px) {
   .landingGrid { grid-template-columns: 1fr; }
