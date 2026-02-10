@@ -100,6 +100,13 @@
 <button class="btn primary" id="attackBtn" type="button">Attack</button>
 <button class="btn secondary" id="healBtn" type="button">Heal</button>
 <button class="btn ghost" id="guardBtn" type="button">Guard</button>
+<div class="rpgMagicWrap">
+  <button class="btn ghost rpgMagicToggle" id="magicToggle" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="magicMenu">Magic</button>
+  <div class="rpgMagicMenu" id="magicMenu" role="menu" hidden>
+    <button class="btn secondary rpgMagicItem" id="windBtn" type="button" role="menuitem">Wind attack</button>
+    <button class="btn primary rpgMagicItem" id="fireBtn" type="button" role="menuitem">Fire attack</button>
+  </div>
+</div>
 <button class="btn ghost" id="restartBtn" type="button">Restart</button>
 </div>
 <article aria-label="Battle log" class="post rpgLogCard">

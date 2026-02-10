@@ -19,6 +19,10 @@ if (root) {
     healBtn: document.getElementById("healBtn"),
     guardBtn: document.getElementById("guardBtn"),
     restartBtn: document.getElementById("restartBtn"),
+    magicToggle: document.getElementById("magicToggle"),
+    magicMenu: document.getElementById("magicMenu"),
+    windBtn: document.getElementById("windBtn"),
+    fireBtn: document.getElementById("fireBtn"),
     playerSprite: document.getElementById("playerSprite"),
     enemySprite: document.getElementById("enemySprite"),
   };
@@ -46,6 +50,44 @@ if (root) {
     window.setTimeout(() => el.classList.remove(cls), 600);
   }
 
+/**
+ * Magic menu helpers (dropdown)
+ */
+function setMagicMenuOpen(open) {
+  if (els.magicMenu instanceof HTMLElement) {
+    els.magicMenu.hidden = !open;
+  }
+  if (els.magicToggle instanceof HTMLButtonElement) {
+    els.magicToggle.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+}
+
+function toggleMagicMenu() {
+  if (!(els.magicMenu instanceof HTMLElement)) return;
+  setMagicMenuOpen(els.magicMenu.hidden);
+}
+
+function closeMagicMenu() {
+  setMagicMenuOpen(false);
+}
+
+// Close the magic menu when clicking outside or pressing Escape.
+document.addEventListener("click", (e) => {
+  if (!(els.magicMenu instanceof HTMLElement)) return;
+  if (!(els.magicToggle instanceof HTMLElement)) return;
+
+  const t = e.target;
+  if (t instanceof Node) {
+    const inMenu = els.magicMenu.contains(t);
+    const inToggle = els.magicToggle.contains(t);
+    if (!inMenu && !inToggle) closeMagicMenu();
+  }
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeMagicMenu();
+});
+
   /** @param {number} min @param {number} max */
   function randInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -58,7 +100,7 @@ if (root) {
 
   const INITIAL = {
     player: { hp: 20, max: 20, guarding: false },
-    enemy: { hp: 18, max: 18 },
+    enemy: { hp: 18, max: 18, gusted: false },
     over: false,
     log: ["A rival mage steps into view.", "Your turn."],
   };
@@ -123,7 +165,8 @@ if (root) {
     }
 
     const disableActions = state.over;
-    [els.attackBtn, els.healBtn, els.guardBtn].forEach((btn) => {
+    if (disableActions) closeMagicMenu();
+    [els.attackBtn, els.healBtn, els.guardBtn, els.magicToggle, els.windBtn, els.fireBtn].forEach((btn) => {
       if (!(btn instanceof HTMLButtonElement)) return;
       btn.disabled = disableActions;
     });
@@ -147,8 +190,13 @@ if (root) {
     playAnim(els.enemySprite, "rpgAnim-attack");
 
     const wasGuarding = !!state.player.guarding;
-    const raw = randInt(2, 6);
-    let dmg = raw;
+    let raw = randInt(2, 6);
+if (state.enemy.gusted) {
+  raw = Math.max(1, raw - 2);
+  state.enemy.gusted = false;
+  addLog("A lingering gust throws off the Rival Mage’s aim (−2 damage).");
+}
+let dmg = raw;
 
     if (state.player.guarding) {
       dmg = Math.floor(raw / 2);
@@ -172,6 +220,7 @@ if (root) {
 
   function playerAttack() {
     if (isGameOver()) return;
+    closeMagicMenu();
 
     playAnim(els.playerSprite, "rpgAnim-attack");
 
@@ -187,9 +236,53 @@ if (root) {
 
     enemyTurn();
   }
+function playerWindAttack() {
+  if (isGameOver()) return;
+  closeMagicMenu();
+
+  playAnim(els.playerSprite, "rpgAnim-attack");
+
+  const dmg = randInt(2, 6);
+  state.enemy.hp = clamp(state.enemy.hp - dmg, 0, state.enemy.max);
+  addLog(`You slice the air, sending a wind blade for ${dmg} damage.`);
+  playAnim(els.enemySprite, "rpgAnim-hit");
+
+  // 35% chance to weaken the enemy’s next attack.
+  if (Math.random() < 0.35) {
+    state.enemy.gusted = true;
+    addLog("The wind rattles their focus. Next enemy hit is weakened.");
+  }
+
+  if (state.enemy.hp <= 0) {
+    endGame("The Rival Mage falls. You win!");
+    return;
+  }
+
+  enemyTurn();
+}
+
+function playerFireAttack() {
+  if (isGameOver()) return;
+  closeMagicMenu();
+
+  playAnim(els.playerSprite, "rpgAnim-attack");
+
+  const dmg = randInt(4, 9);
+  state.enemy.hp = clamp(state.enemy.hp - dmg, 0, state.enemy.max);
+  addLog(`You hurl a burst of flame for ${dmg} damage.`);
+  playAnim(els.enemySprite, "rpgAnim-hit");
+
+  if (state.enemy.hp <= 0) {
+    endGame("The Rival Mage falls. You win!");
+    return;
+  }
+
+  enemyTurn();
+}
 
   function playerHeal() {
     if (isGameOver()) return;
+    closeMagicMenu();
 
     playAnim(els.playerSprite, "rpgAnim-heal");
 
@@ -205,6 +298,7 @@ if (root) {
 
   function playerGuard() {
     if (isGameOver()) return;
+    closeMagicMenu();
 
     if (!state.player.guarding) {
       state.player.guarding = true;
@@ -218,6 +312,7 @@ if (root) {
   }
 
   function restart() {
+    closeMagicMenu();
     state = (typeof structuredClone === "function") ? structuredClone(INITIAL) : JSON.parse(JSON.stringify(INITIAL));
     const clear = ["rpgAnim-attack", "rpgAnim-hit", "rpgAnim-heal", "rpgAnim-guard", "rpgAnim-faint"]; 
     if (els.enemySprite instanceof HTMLElement) {
@@ -230,7 +325,13 @@ if (root) {
     render();
   }
 
-  if (els.attackBtn instanceof HTMLButtonElement) els.attackBtn.addEventListener("click", playerAttack);
+  if (els.magicToggle instanceof HTMLButtonElement) {
+  els.magicToggle.addEventListener("click", toggleMagicMenu);
+}
+if (els.windBtn instanceof HTMLButtonElement) els.windBtn.addEventListener("click", playerWindAttack);
+if (els.fireBtn instanceof HTMLButtonElement) els.fireBtn.addEventListener("click", playerFireAttack);
+
+if (els.attackBtn instanceof HTMLButtonElement) els.attackBtn.addEventListener("click", playerAttack);
   if (els.healBtn instanceof HTMLButtonElement) els.healBtn.addEventListener("click", playerHeal);
   if (els.guardBtn instanceof HTMLButtonElement) els.guardBtn.addEventListener("click", playerGuard);
   if (els.restartBtn instanceof HTMLButtonElement) els.restartBtn.addEventListener("click", restart);

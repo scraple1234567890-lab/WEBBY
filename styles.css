@@ -2477,6 +2477,47 @@ body.isEditingShopProduct {
   min-width: 120px;
 }
 
+/* Tiny Turn RPG: Magic dropdown */
+.rpgMagicWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.rpgMagicMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 60;
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  min-width: 200px;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
+  background: color-mix(in srgb, var(--panel) 92%, rgba(0, 0, 0, 0.16));
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(10px);
+}
+
+.rpgMagicMenu[hidden] { display: none; }
+
+.rpgMagicMenu .btn {
+  width: 100%;
+  min-width: unset;
+  justify-content: center;
+}
+
+@media (max-width: 520px) {
+  .rpgMagicWrap { width: 100%; }
+  .rpgMagicToggle { width: 100%; }
+  .rpgMagicMenu {
+    position: static;
+    width: 100%;
+    margin-top: 8px;
+  }
+}
+
 .rpgLogCard {
   padding: 18px;
 }
@@ -3620,16 +3661,15 @@ body.homePage .contactCard{
 }
 body.homePage .field{ margin-top: 10px; }
 
-/* Home: make "Send an owl" header text fully readable */
-body.homePage #contact .sectionHead h2,
+/* Home: Contact header readability (keep background, make text solid white) */
+body.homePage #contact .sectionHead h2{
+  color: #fff;
+}
 body.homePage #contact .sectionHead p,
 body.homePage #contact .sectionHead p.muted{
   color: #fff;
   opacity: 1;
 }
-
-
-
 .footer{
   background: color-mix(in srgb, var(--panel) 55%, transparent);
   backdrop-filter: blur(10px);
@@ -3721,3 +3761,11 @@ body.homePage #contact .sectionHead p.muted{
 @media (max-width: 640px){
   .footerNav{ justify-content: flex-start; }
 }
+
+
+
+/* Ensure Contact section heading sits above its background overlays and stays bright white */
+#contact .sectionHead { position: relative; z-index: 1; }
+#contact .sectionHead h2 { color: #ffffff; }
+#contact .sectionHead p,
+#contact .sectionHead p.muted { color: #ffffff; }
