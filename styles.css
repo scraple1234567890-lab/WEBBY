@@ -2854,6 +2854,231 @@ body.modalOpen {
   opacity: 0.9;
 }
 
+/* ============================
+   Battle FX layer (type-based)
+   ============================ */
+
+.rpgFxLayer{
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 6;
+}
+
+.rpgFx{
+  position: absolute;
+  width: 260px;
+  height: 200px;
+  opacity: 0;
+  filter: blur(0.2px);
+}
+
+.rpgFx--player{ left: 34px; top: 52%; transform: translateY(-50%); }
+.rpgFx--enemy{ right: 34px; top: 52%; transform: translateY(-50%); }
+.rpgFx--center{ left: 50%; top: 52%; transform: translate(-50%, -50%); }
+
+/* Float text (damage/heal pop) */
+.rpgFloat{
+  position: absolute;
+  z-index: 7;
+  font-weight: 950;
+  letter-spacing: 0.2px;
+  font-size: 1.06rem;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.52);
+  border: 1px solid rgba(255,255,255,0.16);
+  text-shadow: 0 1px 0 rgba(0,0,0,0.4);
+  opacity: 0;
+  animation: rpg-float 900ms ease-out 1 forwards;
+}
+
+.rpgFloat--player{ left: 72px; top: 54%; }
+.rpgFloat--enemy{ right: 72px; top: 54%; }
+
+.rpgFloat--dmg{ color: rgba(255,255,255,0.98); }
+.rpgFloat--heal{ color: color-mix(in srgb, var(--type-earth) 70%, white 30%); border-color: color-mix(in srgb, var(--type-earth) 55%, rgba(255,255,255,0.25)); }
+.rpgFloat--super{ border-color: color-mix(in srgb, var(--type-sight) 70%, rgba(255,255,255,0.22)); }
+.rpgFloat--weak{ border-color: color-mix(in srgb, var(--muted) 55%, rgba(255,255,255,0.18)); opacity: 0.95; }
+
+@keyframes rpg-float{
+  0%{ transform: translateY(10px) scale(0.98); opacity: 0; }
+  20%{ opacity: 1; }
+  100%{ transform: translateY(-22px) scale(1); opacity: 0; }
+}
+
+/* Camera shake for heavy earth moves */
+.rpgStageInner.isShaking{
+  animation: rpg-shake 240ms ease-in-out 1;
+}
+
+@keyframes rpg-shake{
+  0%{ transform: translate(0,0); }
+  20%{ transform: translate(-2px, 1px); }
+  40%{ transform: translate(2px, -1px); }
+  60%{ transform: translate(-2px, -1px); }
+  80%{ transform: translate(2px, 1px); }
+  100%{ transform: translate(0,0); }
+}
+
+/* --- Wind --- */
+.rpgFx--wind::before,
+.rpgFx--wind::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  background:
+    repeating-linear-gradient(115deg,
+      color-mix(in srgb, var(--type-wind) 65%, transparent) 0 10px,
+      transparent 10px 18px);
+  mask-image: radial-gradient(circle at 40% 60%, black 0 60%, transparent 72%);
+  opacity: 0;
+  animation: rpg-wind 520ms ease-out 1;
+}
+
+.rpgFx--wind::after{
+  filter: blur(1.2px);
+  opacity: 0;
+  animation-duration: 620ms;
+  animation-delay: 40ms;
+}
+
+@keyframes rpg-wind{
+  0%{ transform: translateX(-22px) rotate(-3deg); opacity: 0; }
+  18%{ opacity: 0.9; }
+  100%{ transform: translateX(24px) rotate(3deg); opacity: 0; }
+}
+
+/* --- Fire --- */
+.rpgFx--fire::before{
+  content: "";
+  position: absolute;
+  inset: -10px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 45% 55%, color-mix(in srgb, var(--type-fire) 85%, white 15%), transparent 55%),
+    radial-gradient(circle at 60% 45%, color-mix(in srgb, var(--type-fire) 55%, black 45%), transparent 62%),
+    radial-gradient(circle at 50% 80%, rgba(255,255,255,0.10), transparent 60%);
+  opacity: 0;
+  transform: scale(0.85);
+  animation: rpg-fire 520ms ease-out 1;
+}
+
+@keyframes rpg-fire{
+  0%{ opacity: 0; transform: scale(0.78); filter: blur(1px); }
+  25%{ opacity: 1; }
+  100%{ opacity: 0; transform: scale(1.10); filter: blur(0.2px); }
+}
+
+/* --- Sight (flash / beam) --- */
+.rpgFx--sight::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  background:
+    linear-gradient(90deg, transparent, color-mix(in srgb, var(--type-sight) 82%, white 18%), transparent),
+    radial-gradient(circle at 55% 45%, color-mix(in srgb, var(--type-sight) 55%, transparent), transparent 62%);
+  opacity: 0;
+  transform: skewX(-10deg) scaleX(0.7);
+  animation: rpg-sight 360ms ease-out 1;
+}
+
+@keyframes rpg-sight{
+  0%{ opacity: 0; transform: translateX(-20px) skewX(-10deg) scaleX(0.65); }
+  22%{ opacity: 0.95; }
+  100%{ opacity: 0; transform: translateX(20px) skewX(-10deg) scaleX(0.95); }
+}
+
+/* --- Earth (dust ring) --- */
+.rpgFx--earth::before{
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border-radius: 999px;
+  border: 2px solid color-mix(in srgb, var(--type-earth) 65%, rgba(255,255,255,0.18));
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.22) inset;
+  background: radial-gradient(circle at 50% 60%, color-mix(in srgb, var(--type-earth) 25%, transparent), transparent 66%);
+  opacity: 0;
+  transform: scale(0.88);
+  animation: rpg-earth 520ms ease-out 1;
+}
+
+@keyframes rpg-earth{
+  0%{ opacity: 0; transform: scale(0.82); filter: blur(0.8px); }
+  30%{ opacity: 0.95; }
+  100%{ opacity: 0; transform: scale(1.10); filter: blur(0.1px); }
+}
+
+/* --- Touch (binding rings) --- */
+.rpgFx--touch::before,
+.rpgFx--touch::after{
+  content: "";
+  position: absolute;
+  inset: 18px;
+  border-radius: 999px;
+  background:
+    repeating-linear-gradient(45deg,
+      color-mix(in srgb, var(--type-touch) 70%, rgba(255,255,255,0.18)) 0 10px,
+      transparent 10px 18px);
+  border: 2px solid color-mix(in srgb, var(--type-touch) 70%, rgba(255,255,255,0.12));
+  opacity: 0;
+  transform: scale(0.92) rotate(0deg);
+  animation: rpg-touch 620ms ease-out 1;
+}
+
+.rpgFx--touch::after{
+  inset: 34px;
+  filter: blur(1px);
+  animation-delay: 60ms;
+}
+
+@keyframes rpg-touch{
+  0%{ opacity: 0; transform: scale(0.84) rotate(-10deg); }
+  25%{ opacity: 0.9; }
+  100%{ opacity: 0; transform: scale(1.06) rotate(14deg); }
+}
+
+/* --- Heal (green glow) --- */
+.rpgFx--heal::before{
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 50% 60%, color-mix(in srgb, var(--type-earth) 55%, white 45%), transparent 58%),
+    radial-gradient(circle at 50% 40%, rgba(255,255,255,0.10), transparent 55%);
+  opacity: 0;
+  transform: scale(0.9);
+  animation: rpg-healfx 560ms ease-out 1;
+}
+
+@keyframes rpg-healfx{
+  0%{ opacity: 0; transform: scale(0.86); filter: blur(1.2px); }
+  25%{ opacity: 1; }
+  100%{ opacity: 0; transform: scale(1.08); filter: blur(0.15px); }
+}
+
+/* --- Guard shimmer --- */
+.rpgFx--guard::before{
+  content: "";
+  position: absolute;
+  inset: 14px;
+  border-radius: 999px;
+  border: 2px solid color-mix(in srgb, var(--accent) 60%, rgba(255,255,255,0.22));
+  box-shadow: 0 0 24px color-mix(in srgb, var(--accent) 22%, transparent);
+  opacity: 0;
+  transform: scale(0.92);
+  animation: rpg-guardfx 520ms ease-out 1;
+}
+
+@keyframes rpg-guardfx{
+  0%{ opacity: 0; transform: scale(0.88); }
+  25%{ opacity: 0.95; }
+  100%{ opacity: 0; transform: scale(1.10); }
+}
+
 .rpgFoe {
   position: absolute;
   bottom: 18px;
@@ -3027,12 +3252,19 @@ body.modalOpen {
 @media (prefers-reduced-motion: reduce) {
   .rpgFoe--enemy { animation: none; }
   .rpgHpFill { transition: none; }
+  .rpgStageInner.isShaking{ animation: none; }
   .rpgAnim-attack,
   .rpgAnim-hit,
   .rpgAnim-heal,
   .rpgAnim-guard,
   .rpgAnim-faint {
     animation: none;
+  }
+  .rpgFx::before,
+  .rpgFx::after,
+  .rpgFloat{
+    animation: none;
+    opacity: 0;
   }
 }
 

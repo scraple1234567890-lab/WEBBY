@@ -54,6 +54,10 @@ if (root) {
     playerSpriteImg: document.getElementById("playerSpriteImg"),
     enemySpriteImg: document.getElementById("enemySpriteImg"),
 
+    // FX layer (type-based visuals)
+    stageInner: document.querySelector(".rpgStageInner"),
+    fxLayer: document.getElementById("fxLayer"),
+
     playerTypePills: document.getElementById("playerTypePills"),
     enemyTypePills: document.getElementById("enemyTypePills"),
     atkVsEnemyList: document.getElementById("atkVsEnemyList"),
@@ -61,6 +65,8 @@ if (root) {
     effectBanner: document.getElementById("effectBanner"),
     buildTag: document.getElementById("buildTag"),
   };
+
+  const prefersReducedMotion = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 
   /** Effect preview state (updates on hover/focus/click). */
   let previewMove = /** @type {{name:string, type: MagicType, baseCost:number}} */ ({
@@ -90,6 +96,62 @@ if (root) {
       { once: true }
     );
     window.setTimeout(() => el.classList.remove(cls), 650);
+  }
+
+  /**
+   * Spawn a one-shot type FX overlay.
+   * @param {"wind"|"fire"|"earth"|"sight"|"touch"|"heal"|"guard"} kind
+   * @param {"player"|"enemy"|"center"} side
+   */
+  function spawnFx(kind, side) {
+    if (prefersReducedMotion) return;
+    if (!(els.fxLayer instanceof HTMLElement)) return;
+    const fx = document.createElement("div");
+    fx.className = `rpgFx rpgFx--${kind} rpgFx--${side}`;
+    els.fxLayer.appendChild(fx);
+    const kill = () => {
+      fx.removeEventListener("animationend", kill);
+      if (fx.parentElement) fx.parentElement.removeChild(fx);
+    };
+    // In case no animationend fires (rare), remove anyway.
+    fx.addEventListener("animationend", kill, { once: true });
+    window.setTimeout(kill, 900);
+  }
+
+  /**
+   * Floating text pop (damage/heal).
+   * @param {string} text
+   * @param {"player"|"enemy"} side
+   * @param {"dmg"|"heal"} variant
+   * @param {number|null} overallMult
+   */
+  function spawnFloat(text, side, variant = "dmg", overallMult = null) {
+    if (prefersReducedMotion) return;
+    if (!(els.fxLayer instanceof HTMLElement)) return;
+    const f = document.createElement("div");
+    f.className = `rpgFloat rpgFloat--${side} rpgFloat--${variant}`;
+    if (typeof overallMult === "number") {
+      if (overallMult >= 1.30) f.classList.add("rpgFloat--super");
+      else if (overallMult <= 0.90) f.classList.add("rpgFloat--weak");
+    }
+    f.textContent = text;
+    els.fxLayer.appendChild(f);
+    const kill = () => {
+      f.removeEventListener("animationend", kill);
+      if (f.parentElement) f.parentElement.removeChild(f);
+    };
+    f.addEventListener("animationend", kill, { once: true });
+    window.setTimeout(kill, 950);
+  }
+
+  function stageShake() {
+    if (prefersReducedMotion) return;
+    if (!(els.stageInner instanceof HTMLElement)) return;
+    els.stageInner.classList.remove("isShaking");
+    // eslint-disable-next-line no-unused-expressions
+    els.stageInner.offsetWidth;
+    els.stageInner.classList.add("isShaking");
+    window.setTimeout(() => els.stageInner && els.stageInner.classList.remove("isShaking"), 260);
   }
 
 // --------------------
@@ -207,6 +269,13 @@ const TYPE_META = /** @type {Record<MagicType, {icon: string, label: string}>} *
 /** @param {MagicType} t */
 function typeIcon(t) {
   return TYPE_META[t]?.icon ?? "✦";
+}
+
+/** @param {MagicType} t */
+function fxKindForType(t) {
+  /** @type {Record<MagicType, "wind"|"fire"|"earth"|"sight"|"touch">} */
+  const m = { Wind: "wind", Fire: "fire", Earth: "earth", Sight: "sight", Touch: "touch" };
+  return m[t] || "sight";
 }
 
 /** @param {MagicType[]} types */
@@ -840,6 +909,7 @@ function setPreviewMove(name, type, baseCost) {
       state.enemy.ward = 0;
       addLog(`A mirror ward bends the strike (${before} → ${final}) and bites back (${reflected}).`);
       playAnim(els.enemySprite, "rpgAnim-guard");
+      spawnFx("guard", "enemy");
     }
 
     // Fortify: 30% reduction
@@ -849,6 +919,7 @@ function setPreviewMove(name, type, baseCost) {
       state.enemy.fortified = 0;
       addLog(`${state.enemy.name} is fortified (${before} → ${final}).`);
       playAnim(els.enemySprite, "rpgAnim-guard");
+      spawnFx("guard", "enemy");
     }
 
     // Brace: 50% reduction
@@ -858,6 +929,7 @@ function setPreviewMove(name, type, baseCost) {
       state.enemy.guarding = false;
       addLog(`${state.enemy.name} braces (${before} → ${final}).`);
       playAnim(els.enemySprite, "rpgAnim-guard");
+      spawnFx("guard", "enemy");
     }
 
     return { final, reflected };
@@ -1149,6 +1221,8 @@ function setPreviewMove(name, type, baseCost) {
       e.healCharges = Math.max(0, e.healCharges - 1);
       addLog(actual > 0 ? `${e.name} mends for ${actual} HP.` : `${e.name} tries to mend, but is already at full HP.`);
       playAnim(els.enemySprite, "rpgAnim-heal");
+      spawnFx("heal", "enemy");
+      if (actual > 0) spawnFloat(`+${actual}`, "enemy", "heal", null);
       beginPlayerTurn();
       return;
     }
@@ -1157,6 +1231,7 @@ function setPreviewMove(name, type, baseCost) {
       e.ward = 1;
       addLog(`${e.name} conjures a mirror ward.`);
       playAnim(els.enemySprite, "rpgAnim-guard");
+      spawnFx("guard", "enemy");
       beginPlayerTurn();
       return;
     }
@@ -1165,12 +1240,19 @@ function setPreviewMove(name, type, baseCost) {
       e.fortified = 1;
       addLog(`${e.name} fortifies their stance.`);
       playAnim(els.enemySprite, "rpgAnim-guard");
+      spawnFx("guard", "enemy");
       beginPlayerTurn();
       return;
     }
 
     // Damage moves
     playAnim(els.enemySprite, "rpgAnim-attack");
+
+    // Type FX telegraph (visual, not random)
+    if (intent.id === "quake" || intent.id === "shatter") {
+      stageShake();
+      spawnFx("earth", "center");
+    }
 
     let base = intent.base + (e.enraged ? 1 : 0);
 
@@ -1183,6 +1265,9 @@ function setPreviewMove(name, type, baseCost) {
 
     const moveType = /** @type {MagicType} */ (intent.type || "Sight");
     const typed = computeTypedDamage("enemy", "player", base, moveType);
+
+    // Visual: show the type of what hits you.
+    spawnFx(fxKindForType(moveType), "player");
 
     // Special flags for certain moves
     const flags = {
@@ -1198,6 +1283,7 @@ function setPreviewMove(name, type, baseCost) {
     if (typed.note) addLog(typed.note);
     setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
     playAnim(els.playerSprite, "rpgAnim-hit");
+    spawnFloat(`-${afterDef}`, "player", "dmg", typed.overall);
 
     // Apply deterministic status effects
     if (intent.id === "ignite") {
@@ -1212,6 +1298,8 @@ function setPreviewMove(name, type, baseCost) {
       const heal = 3;
       e.hp = clamp(e.hp + heal, 0, e.max);
       addLog(`${e.name} siphons power and heals for ${heal}.`);
+      spawnFx("heal", "enemy");
+      spawnFloat(`+${heal}`, "enemy", "heal", null);
     }
 
     if (p.hp <= 0) {
@@ -1271,12 +1359,20 @@ function setPreviewMove(name, type, baseCost) {
     if (typed.note) addLog(typed.note);
     setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
     playAnim(els.enemySprite, "rpgAnim-hit");
+    spawnFx("fire", "enemy");
+    spawnFloat(`-${def.final}`, "enemy", "dmg", typed.overall);
+    spawnFx("wind", "enemy");
+    spawnFloat(`-${def.final}`, "enemy", "dmg", typed.overall);
+    spawnFx("sight", "enemy");
+    spawnFloat(`-${def.final}`, "enemy", "dmg", typed.overall);
 
     // Mirror reflect
     if (def.reflected > 0) {
       state.player.hp = clamp(state.player.hp - def.reflected, 0, state.player.max);
       addLog(`Reflected magic nicks you for ${def.reflected}.`);
       playAnim(els.playerSprite, "rpgAnim-hit");
+      spawnFx("sight", "player");
+      spawnFloat(`-${def.reflected}`, "player", "dmg", null);
       if (state.player.hp <= 0) {
         endGame("Reflected magic drops you. Game over.");
         return;
@@ -1328,6 +1424,8 @@ function setPreviewMove(name, type, baseCost) {
       state.player.hp = clamp(state.player.hp - def.reflected, 0, state.player.max);
       addLog(`Reflected magic nicks you for ${def.reflected}.`);
       playAnim(els.playerSprite, "rpgAnim-hit");
+      spawnFx("sight", "player");
+      spawnFloat(`-${def.reflected}`, "player", "dmg", null);
       if (state.player.hp <= 0) {
         endGame("Reflected magic drops you. Game over.");
         return;
@@ -1339,6 +1437,7 @@ function setPreviewMove(name, type, baseCost) {
     state.player.evading = true;     // next hit reduced
     addLog("Gust rattles their aim (next enemy hit −2).");
     addLog("An evasive veil surrounds you (next hit softened).");
+    spawnFx("wind", "player");
 
     spendFocus(cost);
 
@@ -1385,6 +1484,8 @@ function setPreviewMove(name, type, baseCost) {
       state.player.hp = clamp(state.player.hp - def.reflected, 0, state.player.max);
       addLog(`Reflected magic nicks you for ${def.reflected}.`);
       playAnim(els.playerSprite, "rpgAnim-hit");
+      spawnFx("sight", "player");
+      spawnFloat(`-${def.reflected}`, "player", "dmg", null);
       if (state.player.hp <= 0) {
         endGame("Reflected magic drops you. Game over.");
         return;
@@ -1424,11 +1525,14 @@ function setPreviewMove(name, type, baseCost) {
     }
 
     playAnim(els.playerSprite, "rpgAnim-heal");
+    spawnFx("heal", "player");
 
     const heal = 5;
     const before = state.player.hp;
     state.player.hp = clamp(state.player.hp + heal, 0, state.player.max);
     const actual = state.player.hp - before;
+
+    if (actual > 0) spawnFloat(`+${actual}`, "player", "heal", null);
 
     state.player.healCharges = Math.max(0, state.player.healCharges - 1);
     spendFocus(cost);
@@ -1453,6 +1557,7 @@ function setPreviewMove(name, type, baseCost) {
       state.player.guarding = true;
       addLog("You raise your guard (+1 Focus).");
       playAnim(els.playerSprite, "rpgAnim-guard");
+      spawnFx("guard", "player");
       gainFocus(1);
 
       // Guarding breaks bind immediately (a clear decision).
