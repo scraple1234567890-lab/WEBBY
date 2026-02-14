@@ -2457,7 +2457,7 @@ body.isEditingShopProduct {
   height: 100%;
   width: 0%;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--accent) 55%, white);
+  background: linear-gradient(90deg, var(--focus-1), var(--focus-2));
   transition: width 180ms ease;
 }
 
@@ -2524,8 +2524,8 @@ body.isEditingShopProduct {
   height: 100%;
   width: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--accent2) 72%, transparent), color-mix(in srgb, var(--accent) 72%, transparent));
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+  background: linear-gradient(90deg, var(--hp-green-1), var(--hp-green-2));
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08) inset, 0 0 14px rgba(60,220,110,0.14);
   transition: width 180ms ease;
 }
 
@@ -2535,13 +2535,20 @@ body.gamePage {
   --panel2: rgb(26 16 48);
   --border: rgba(255, 255, 255, 0.20);
 
-  /* Type palette (bright + readable) */
+  /* Core bars */
+  --hp-green-1: rgb(60 220 110);
+  --hp-green-2: rgb(150 255 140);
+  --focus-1: rgb(85 205 255);
+  --focus-2: rgb(80 170 255);
+
+  /* Type palette (intuitive + readable) */
   --type-wind: rgb(80 170 255);
   --type-fire: rgb(255 120 80);
-  --type-earth: rgb(120 255 150);
+  --type-earth: rgb(190 140 90);
   --type-sight: rgb(255 215 0);
-  --type-touch: rgb(210 160 255);
+  --type-touch: rgb(255 140 210);
 }
+
 
 
 .rpgActions {
@@ -2559,6 +2566,63 @@ body.gamePage {
 
 .rpgActions .btn {
   min-width: 120px;
+}
+
+
+/* Game buttons: color that matches what they do */
+body.gamePage #attackBtn{
+  background: linear-gradient(180deg, color-mix(in srgb, var(--type-sight) 92%, white 8%), color-mix(in srgb, var(--type-sight) 65%, black 35%));
+  border-color: color-mix(in srgb, var(--type-sight) 85%, white 15%);
+  color: rgb(20 14 32);
+  font-weight: 900;
+}
+body.gamePage #attackBtn:hover{ filter: brightness(1.03); }
+
+body.gamePage #healBtn{
+  background: linear-gradient(180deg, var(--hp-green-2), var(--hp-green-1));
+  border-color: color-mix(in srgb, var(--hp-green-1) 78%, white 22%);
+  color: rgb(12 10 18);
+  font-weight: 900;
+}
+
+body.gamePage #guardBtn,
+body.gamePage #magicToggle{
+  border-color: rgba(255,255,255,0.22);
+}
+body.gamePage #guardBtn{
+  background: color-mix(in srgb, var(--type-wind) 18%, rgba(0,0,0,0.28));
+  border-color: color-mix(in srgb, var(--type-wind) 55%, rgba(255,255,255,0.22));
+  color: rgba(255,255,255,0.96);
+}
+body.gamePage #magicToggle{
+  background: color-mix(in srgb, var(--type-touch) 16%, rgba(0,0,0,0.28));
+  border-color: color-mix(in srgb, var(--type-touch) 55%, rgba(255,255,255,0.22));
+  color: rgba(255,255,255,0.96);
+}
+
+/* Magic menu items */
+body.gamePage #windBtn{
+  background: linear-gradient(180deg, color-mix(in srgb, var(--type-wind) 90%, white 10%), color-mix(in srgb, var(--type-wind) 65%, black 35%));
+  border-color: color-mix(in srgb, var(--type-wind) 80%, white 20%);
+  color: rgb(10 10 18);
+  font-weight: 900;
+}
+body.gamePage #fireBtn{
+  background: linear-gradient(180deg, color-mix(in srgb, var(--type-fire) 90%, white 10%), color-mix(in srgb, var(--type-fire) 65%, black 35%));
+  border-color: color-mix(in srgb, var(--type-fire) 80%, white 20%);
+  color: rgb(10 10 18);
+  font-weight: 900;
+}
+
+body.gamePage #explainBtn{
+  background: color-mix(in srgb, var(--type-sight) 12%, rgba(0,0,0,0.28));
+  border-color: color-mix(in srgb, var(--type-sight) 45%, rgba(255,255,255,0.22));
+  color: rgba(255,255,255,0.96);
+}
+body.gamePage #restartBtn{
+  background: rgba(0,0,0,0.18);
+  border-color: rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.92);
 }
 
 /* Effectiveness preview (before you click) */
@@ -4219,29 +4283,29 @@ body.homePage #contact .sectionHead p.muted{
 }
 
 .typePill--Wind{
-  background: rgba(80,170,255,0.65);
-  border-color: rgba(80,170,255,0.92);
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.20) inset, 0 10px 22px rgba(80,170,255,0.18);
+  background: color-mix(in srgb, var(--type-wind, rgb(80 170 255)) 70%, transparent);
+  border-color: color-mix(in srgb, var(--type-wind, rgb(80 170 255)) 92%, white 8%);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.20) inset, 0 10px 22px color-mix(in srgb, var(--type-wind, rgb(80 170 255)) 26%, transparent);
 }
 .typePill--Fire{
-  background: rgba(255,120,80,0.68);
-  border-color: rgba(255,120,80,0.92);
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.20) inset, 0 10px 22px rgba(255,120,80,0.18);
+  background: color-mix(in srgb, var(--type-fire, rgb(255 120 80)) 70%, transparent);
+  border-color: color-mix(in srgb, var(--type-fire, rgb(255 120 80)) 92%, white 8%);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.20) inset, 0 10px 22px color-mix(in srgb, var(--type-fire, rgb(255 120 80)) 26%, transparent);
 }
 .typePill--Sight{
-  background: rgba(255,215,0,0.62);
-  border-color: rgba(255,215,0,0.90);
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.20) inset, 0 10px 22px rgba(255,215,0,0.16);
+  background: color-mix(in srgb, var(--type-sight, rgb(255 215 0)) 70%, transparent);
+  border-color: color-mix(in srgb, var(--type-sight, rgb(255 215 0)) 92%, white 8%);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.20) inset, 0 10px 22px color-mix(in srgb, var(--type-sight, rgb(255 215 0)) 26%, transparent);
 }
 .typePill--Earth{
-  background: rgba(120,255,150,0.60);
-  border-color: rgba(120,255,150,0.90);
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.20) inset, 0 10px 22px rgba(120,255,150,0.16);
+  background: color-mix(in srgb, var(--type-earth, rgb(190 140 90)) 70%, transparent);
+  border-color: color-mix(in srgb, var(--type-earth, rgb(190 140 90)) 92%, white 8%);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.20) inset, 0 10px 22px color-mix(in srgb, var(--type-earth, rgb(190 140 90)) 26%, transparent);
 }
 .typePill--Touch{
-  background: rgba(210,160,255,0.62);
-  border-color: rgba(210,160,255,0.90);
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.20) inset, 0 10px 22px rgba(210,160,255,0.16);
+  background: color-mix(in srgb, var(--type-touch, rgb(255 140 210)) 70%, transparent);
+  border-color: color-mix(in srgb, var(--type-touch, rgb(255 140 210)) 92%, white 8%);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.20) inset, 0 10px 22px color-mix(in srgb, var(--type-touch, rgb(255 140 210)) 26%, transparent);
 }
 
 /* Inline type chips used in the player/enemy cards */
@@ -4274,11 +4338,11 @@ body.homePage #contact .sectionHead p.muted{
   text-shadow: 0 1px 0 rgba(0,0,0,0.35);
 }
 
-.typeInline--Wind{ background: rgba(80,170,255,0.55); border-color: rgba(80,170,255,0.85); }
-.typeInline--Fire{ background: rgba(255,120,80,0.56); border-color: rgba(255,120,80,0.85); }
-.typeInline--Sight{ background: rgba(255,215,0,0.52); border-color: rgba(255,215,0,0.84); }
-.typeInline--Earth{ background: rgba(120,255,150,0.50); border-color: rgba(120,255,150,0.82); }
-.typeInline--Touch{ background: rgba(210,160,255,0.52); border-color: rgba(210,160,255,0.84); }
+.typeInline--Wind{ background: color-mix(in srgb, var(--type-wind, rgb(80 170 255)) 62%, transparent); border-color: color-mix(in srgb, var(--type-wind, rgb(80 170 255)) 86%, white 14%); }
+.typeInline--Fire{ background: color-mix(in srgb, var(--type-fire, rgb(255 120 80)) 62%, transparent); border-color: color-mix(in srgb, var(--type-fire, rgb(255 120 80)) 86%, white 14%); }
+.typeInline--Sight{ background: color-mix(in srgb, var(--type-sight, rgb(255 215 0)) 58%, transparent); border-color: color-mix(in srgb, var(--type-sight, rgb(255 215 0)) 84%, white 16%); }
+.typeInline--Earth{ background: color-mix(in srgb, var(--type-earth, rgb(190 140 90)) 58%, transparent); border-color: color-mix(in srgb, var(--type-earth, rgb(190 140 90)) 84%, white 16%); }
+.typeInline--Touch{ background: color-mix(in srgb, var(--type-touch, rgb(255 140 210)) 60%, transparent); border-color: color-mix(in srgb, var(--type-touch, rgb(255 140 210)) 84%, white 16%); }
 
 .rpgTypeChart{
   display: flex;
