@@ -65,6 +65,8 @@ if (root) {
     atkVsEnemyList: document.getElementById("atkVsEnemyList"),
     enemyVsYouList: document.getElementById("enemyVsYouList"),
     effectBanner: document.getElementById("effectBanner"),
+    moveBanner: document.getElementById("moveBanner"),
+    moveBannerText: document.getElementById("moveBannerText"),
     buildTag: document.getElementById("buildTag"),
   };
 
@@ -145,6 +147,33 @@ if (root) {
     f.addEventListener("animationend", kill, { once: true });
     window.setTimeout(kill, 950);
   }
+
+  // Center banner: show the move/action name on the battlefield, then fade away.
+  let moveBannerTimer = 0;
+
+  /**
+   * @param {string} name
+   * @param {MagicType} type
+   */
+  function showMoveBanner(name, type) {
+    if (prefersReducedMotion) return;
+    const banner = els.moveBanner;
+    const textEl = els.moveBannerText;
+    if (!(banner instanceof HTMLElement) || !(textEl instanceof HTMLElement)) return;
+
+    textEl.textContent = name || "";
+    banner.setAttribute("data-type", String(type || "Sight"));
+    banner.classList.remove("isShow");
+    // Force reflow to restart the animation reliably.
+    // eslint-disable-next-line no-unused-expressions
+    banner.offsetWidth;
+    banner.classList.add("isShow");
+
+    if (moveBannerTimer) window.clearTimeout(moveBannerTimer);
+    moveBannerTimer = window.setTimeout(() => banner.classList.remove("isShow"), 560);
+  }
+
+
 
   function stageShake() {
     if (prefersReducedMotion) return;
@@ -1312,6 +1341,9 @@ function setPreviewMove(name, type, baseCost) {
     /** @type {Intent} */
     const intent = e.intent || computeEnemyIntent();
 
+    // Show the enemy move name in the center (clear turn readability)
+    showMoveBanner(intent.name || "Enemy action", /** @type {MagicType} */ (intent.type || "Sight"));
+
     // Consume the step after deciding the intent (keeps the pattern stable)
     e.aiStep += 1;
 
@@ -1445,9 +1477,8 @@ function setPreviewMove(name, type, baseCost) {
   function playerAttack() {
     if (isGameOver()) return;
     if (state.phase !== "player") return;
-    closeMagicMenu();
-
-    playAnim(els.playerSprite, "rpgAnim-attack");
+    closeMagicMenu();    showMoveBanner("Attack", "Sight");
+playAnim(els.playerSprite, "rpgAnim-attack");
 
     // Attack: fixed base, generates Focus
     let base = 5;
@@ -1512,6 +1543,7 @@ function setPreviewMove(name, type, baseCost) {
       return;
     }
 
+    showMoveBanner("Wind attack", "Wind");
     playAnim(els.playerSprite, "rpgAnim-attack");
 
     let base = 4;
@@ -1575,6 +1607,7 @@ function setPreviewMove(name, type, baseCost) {
       return;
     }
 
+    showMoveBanner("Fire attack", "Fire");
     playAnim(els.playerSprite, "rpgAnim-attack");
 
     let base = 6;
@@ -1639,9 +1672,8 @@ function setPreviewMove(name, type, baseCost) {
       addLog("Not enough Focus.");
       render();
       return;
-    }
-
-    playAnim(els.playerSprite, "rpgAnim-heal");
+    }    showMoveBanner("Heal", "Touch");
+playAnim(els.playerSprite, "rpgAnim-heal");
     spawnFx("heal", "player");
 
     const heal = 5;
@@ -1675,6 +1707,7 @@ function setPreviewMove(name, type, baseCost) {
 
     if (!state.player.guarding) {
       state.player.guarding = true;
+      showMoveBanner("Guard", "Wind");
       addLog("You raise your guard (+1 Focus).");
       playAnim(els.playerSprite, "rpgAnim-guard");
       spawnFx("guard", "player");

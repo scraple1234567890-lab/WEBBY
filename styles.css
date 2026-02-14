@@ -2895,6 +2895,52 @@ body.modalOpen {
   z-index: 6;
 }
 
+
+
+/* Center move-name banner (shows what was used, then fades quickly) */
+.rpgMoveBanner{
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  transform: translate(-50%, -50%);
+  z-index: 7;
+  pointer-events: none;
+  opacity: 0;
+  --accent: var(--type-sight);
+}
+
+.rpgMoveBannerText{
+  display: inline-block;
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-weight: 850;
+  letter-spacing: 0.02em;
+  font-size: clamp(14px, 2.2vw, 18px);
+  line-height: 1.1;
+  color: rgb(10 14 22);
+  background: rgba(255,255,255,0.92);
+  border: 2px solid var(--accent);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.25);
+  text-transform: none;
+}
+
+.rpgMoveBanner.isShow{
+  animation: rpgMoveBanner 520ms ease-in-out forwards;
+}
+
+@keyframes rpgMoveBanner{
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.98); filter: blur(0.3px); }
+  14%  { opacity: 1; transform: translate(-50%, -50%) scale(1.00); filter: blur(0px); }
+  72%  { opacity: 1; transform: translate(-50%, -50%) scale(1.00); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.03); }
+}
+
+.rpgMoveBanner[data-type="Wind"]{ --accent: var(--type-wind); }
+.rpgMoveBanner[data-type="Fire"]{ --accent: var(--type-fire); }
+.rpgMoveBanner[data-type="Earth"]{ --accent: var(--type-earth); }
+.rpgMoveBanner[data-type="Sight"]{ --accent: var(--type-sight); }
+.rpgMoveBanner[data-type="Touch"]{ --accent: var(--type-touch); }
+
 .rpgFx{
   position: absolute;
   width: 260px;
