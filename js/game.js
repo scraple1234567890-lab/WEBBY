@@ -39,6 +39,7 @@ if (root) {
     magicMenu: document.getElementById("magicMenu"),
     windBtn: document.getElementById("windBtn"),
     fireBtn: document.getElementById("fireBtn"),
+    effectPreview: document.getElementById("effectPreview"),
 
     explainBtn: document.getElementById("explainBtn"),
     explainModal: document.getElementById("explainModal"),
@@ -57,6 +58,14 @@ if (root) {
     effectBanner: document.getElementById("effectBanner"),
     buildTag: document.getElementById("buildTag"),
   };
+
+  /** Effect preview state (updates on hover/focus/click). */
+  let previewMove = /** @type {{name:string, type: MagicType, baseCost:number}} */ ({
+    name: "Attack",
+    type: "Sight",
+    baseCost: 0,
+  });
+
 
   /**
    * Play a one-shot CSS animation class by toggling it.
@@ -252,6 +261,49 @@ function setTypeAccent(el, types) {
     if (mult >= 1.30) return "Super effective!";
     if (mult <= 0.85) return "Not very effective…";
     return "";
+  }
+
+
+  /** @param {number} mult */
+  function effectivenessTierLabel(mult) {
+    if (mult >= 1.30) return { label: "Extra effective", tone: "good" };
+    if (mult <= 0.85) return { label: "Weak", tone: "bad" };
+    return { label: "Normal", tone: "neutral" };
+  }
+
+  /**
+   * Render the "before you click" effectiveness preview line.
+   * @param {{name:string, type: MagicType, baseCost:number}} move
+   */
+  function renderEffectPreview(move) {
+    if (!(els.effectPreview instanceof HTMLElement)) return;
+
+    const eff = typeMultiplier(move.type, state.enemy.types);
+    const tier = effectivenessTierLabel(eff);
+
+    els.effectPreview.classList.remove("isGood", "isBad", "isNeutral");
+    if (tier.tone === "good") els.effectPreview.classList.add("isGood");
+    else if (tier.tone === "bad") els.effectPreview.classList.add("isBad");
+    else els.effectPreview.classList.add("isNeutral");
+
+    // Focus cost note (only for magic)
+    const extra = state.player.bound > 0 ? 1 : 0;
+    const cost = move.baseCost > 0 ? move.baseCost + extra : 0;
+    const needs = cost > 0 && state.player.focus < cost;
+
+    const needText = needs ? `Need ${cost} Focus` : (cost > 0 ? `${cost} Focus` : "+1 Focus");
+    const meta = move.baseCost > 0 ? needText : "+1 Focus";
+
+    // Keep it short and readable
+    els.effectPreview.innerHTML =
+      `${move.name}: <span class="rpgEffectPreviewText">${tier.label}</span> ` +
+      `<span class="rpgEffectPreviewMeta">(x${fmtMult(eff)} • ${meta})</span>`;
+  }
+
+  /** @param {string} name @param {MagicType} type @param {number} baseCost */
+  function setPreviewMove(name, type, baseCost) {
+    previewMove = { name, type, baseCost };
+    renderEffectPreview(previewMove);
   }
 
   /** @param {MagicType[]} types */
@@ -483,7 +535,7 @@ function setTypeAccent(el, types) {
     };
   }
 
-  const GAME_BUILD = "2026-02-14j";
+  const GAME_BUILD = "2026-02-14k";
 
   /** @type {ReturnType<typeof makeInitialState>} */
   let state = makeInitialState();
@@ -1292,7 +1344,20 @@ function setTypeAccent(el, types) {
   if (els.guardBtn instanceof HTMLButtonElement) els.guardBtn.addEventListener("click", playerGuard);
   if (els.restartBtn instanceof HTMLButtonElement) els.restartBtn.addEventListener("click", restart);
 
-  // Initialize
+  
+  // Effectiveness preview (hover/focus shows Extra/Normal/Weak before you click)
+  const wirePreview = (btn, name, type, baseCost) => {
+    if (!(btn instanceof HTMLElement)) return;
+    btn.addEventListener("mouseenter", () => setPreviewMove(name, type, baseCost));
+    btn.addEventListener("focus", () => setPreviewMove(name, type, baseCost));
+    // Also update on click, since some users go straight to clicking.
+    btn.addEventListener("click", () => setPreviewMove(name, type, baseCost));
+  };
+  wirePreview(els.attackBtn, "Attack", "Sight", 0);
+  wirePreview(els.windBtn, "Wind attack", "Wind", 2);
+  wirePreview(els.fireBtn, "Fire attack", "Fire", 3);
+
+// Initialize
   state.enemy.intent = computeEnemyIntent();
   renderIntent(state.enemy.intent);
   setEffectBanner("—", "neutral");

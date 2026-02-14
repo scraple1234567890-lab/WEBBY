@@ -2503,6 +2503,37 @@ body.gamePage {
   min-width: 120px;
 }
 
+/* Effectiveness preview (before you click) */
+.rpgEffectPreview{
+  flex-basis: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(0,0,0,0.42);
+  border: 1px solid rgba(255,255,255,0.16);
+  color: rgba(255,255,255,0.95);
+  font-weight: 900;
+  letter-spacing: 0.2px;
+}
+
+.rpgEffectPreviewText{ opacity: 0.92; font-weight: 800; }
+.rpgEffectPreviewMeta{ opacity: 0.82; font-weight: 800; font-size: 0.88rem; }
+.rpgEffectPreview.isGood{
+  border-color: color-mix(in srgb, #6be28b 75%, var(--border));
+  box-shadow: 0 0 0 1px rgba(107,226,139,0.18) inset, 0 10px 24px rgba(107,226,139,0.10);
+}
+.rpgEffectPreview.isBad{
+  border-color: color-mix(in srgb, #ff4d4d 70%, var(--border));
+  box-shadow: 0 0 0 1px rgba(255,77,77,0.15) inset, 0 10px 24px rgba(255,77,77,0.08);
+}
+.rpgEffectPreview.isNeutral{
+  border-color: rgba(255,255,255,0.16);
+}
+
 /* Explain modal (Focus + Types) */
 body.modalOpen {
   overflow: hidden;
