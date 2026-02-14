@@ -37,6 +37,11 @@ if (root) {
     windBtn: document.getElementById("windBtn"),
     fireBtn: document.getElementById("fireBtn"),
 
+    explainBtn: document.getElementById("explainBtn"),
+    explainModal: document.getElementById("explainModal"),
+    explainClose: document.getElementById("explainClose"),
+    explainOk: document.getElementById("explainOk"),
+
     playerSprite: document.getElementById("playerSprite"),
     enemySprite: document.getElementById("enemySprite"),
     playerSpriteImg: document.getElementById("playerSpriteImg"),
@@ -108,8 +113,58 @@ if (root) {
   });
 
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeMagicMenu();
+    if (e.key === "Escape") {
+      if (isExplainOpen()) closeExplain();
+      closeMagicMenu();
+    }
   });
+
+  // --------------------
+  // Explain modal helpers
+  // --------------------
+
+  let explainLastFocus = null;
+
+  function isExplainOpen() {
+    return (els.explainModal instanceof HTMLElement) && !els.explainModal.hasAttribute("hidden");
+  }
+
+  function openExplain() {
+    if (!(els.explainModal instanceof HTMLElement)) return;
+    closeMagicMenu();
+    els.explainModal.removeAttribute("hidden");
+    document.body.classList.add("modalOpen");
+    explainLastFocus = document.activeElement;
+    // focus close button for keyboard users
+    if (els.explainClose instanceof HTMLButtonElement) els.explainClose.focus();
+  }
+
+  function closeExplain() {
+    if (!(els.explainModal instanceof HTMLElement)) return;
+    els.explainModal.setAttribute("hidden", "");
+    document.body.classList.remove("modalOpen");
+    const prev = explainLastFocus;
+    explainLastFocus = null;
+    if (prev && prev instanceof HTMLElement) prev.focus();
+  }
+
+  // Open/close wiring
+  if (els.explainBtn instanceof HTMLButtonElement) {
+    els.explainBtn.addEventListener("click", () => openExplain());
+  }
+  if (els.explainClose instanceof HTMLButtonElement) {
+    els.explainClose.addEventListener("click", () => closeExplain());
+  }
+  if (els.explainOk instanceof HTMLButtonElement) {
+    els.explainOk.addEventListener("click", () => closeExplain());
+  }
+
+  // Click outside modal content closes it
+  if (els.explainModal instanceof HTMLElement) {
+    els.explainModal.addEventListener("click", (e) => {
+      if (e.target === els.explainModal) closeExplain();
+    });
+  }
 
   /** @param {number} value @param {number} min @param {number} max */
   function clamp(value, min, max) {
@@ -384,7 +439,7 @@ if (root) {
     };
   }
 
-  const GAME_BUILD = "2026-02-14h";
+  const GAME_BUILD = "2026-02-14i";
 
   /** @type {ReturnType<typeof makeInitialState>} */
   let state = makeInitialState();

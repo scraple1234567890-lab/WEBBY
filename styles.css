@@ -2496,6 +2496,86 @@ body.gamePage {
   min-width: 120px;
 }
 
+/* Explain modal (Focus + Types) */
+body.modalOpen {
+  overflow: hidden;
+}
+
+.rpgModal[hidden] { display: none; }
+
+.rpgModal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.rpgModalInner {
+  width: min(760px, 100%);
+  max-height: 86vh;
+  overflow: auto;
+}
+
+.rpgModalHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.rpgModalBody {
+  display: grid;
+  gap: 10px;
+}
+
+.rpgModalH {
+  font-size: 1.05rem;
+  margin: 6px 0 0;
+}
+
+.rpgModalList {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 8px;
+}
+
+.rpgFormula {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: color-mix(in srgb, var(--panel2) 85%, transparent);
+}
+
+.rpgMiniChart {
+  margin-top: 4px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: color-mix(in srgb, var(--panel2) 85%, transparent);
+  display: grid;
+  gap: 8px;
+}
+
+.rpgMiniChartRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.rpgModalFoot {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+}
+
 /* Tiny Turn RPG: Magic dropdown */
 .rpgMagicWrap {
   position: relative;

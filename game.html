@@ -8,7 +8,7 @@
 <title>Dragonstone | Tiny Turn RPG</title>
 <link href="./favicon.ico" rel="icon" sizes="any"/>
 <link href="./favicon.png" rel="icon" type="image/png"/>
-<link href="./styles.css?v=2026-02-14h" rel="stylesheet"/>
+<link href="./styles.css?v=2026-02-14i" rel="stylesheet"/>
 </head>
 <body class="gamePage">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -57,7 +57,7 @@
 <p class="kicker">Minigame</p>
 <h1>Tiny Turn RPG</h1>
 <p class="muted">Pick an action, watch your rival respond, and keep your HP above zero.</p>
-<p class="muted small" id="buildTag">Build: 2026-02-14f</p>
+<p class="muted small" id="buildTag">Build: 2026-02-14i</p>
 </div>
 <div class="rpgWrap" id="rpgRoot">
 <div aria-label="Battlefield" class="rpgGrid" role="group">
@@ -114,7 +114,54 @@
     <button class="btn primary rpgMagicItem" id="fireBtn" type="button" role="menuitem">Fire attack</button>
   </div>
 </div>
+<button class="btn ghost" id="explainBtn" type="button">Explain</button>
 <button class="btn ghost" id="restartBtn" type="button">Restart</button>
+</div>
+
+<div class="rpgModal" id="explainModal" role="dialog" aria-modal="true" aria-labelledby="explainTitle" hidden>
+  <div class="post rpgModalInner" role="document">
+    <div class="rpgModalHead">
+      <h2 class="rpgLogTitle" id="explainTitle">How Focus and Types work</h2>
+      <button class="iconBtn" id="explainClose" type="button" aria-label="Close explanation">✕</button>
+    </div>
+    <div class="rpgModalBody">
+      <h3 class="rpgModalH">Focus</h3>
+      <ul class="rpgModalList">
+        <li><strong>Focus</strong> is your resource (0 to 6). You spend it on bigger actions.</li>
+        <li><strong>Attack</strong> always gives <strong>+1 Focus</strong> (and deals Sight damage).</li>
+        <li><strong>Guard</strong> gives <strong>+1 Focus</strong> and makes the next hit deal <strong>50% less</strong>.</li>
+        <li><strong>Wind</strong> costs <strong>2 Focus</strong>. <strong>Fire</strong> costs <strong>3 Focus</strong>.</li>
+        <li><strong>Heal</strong> costs <strong>1 Focus</strong> (or <strong>2</strong> if you are <strong>Bound</strong>). You have limited charges.</li>
+        <li>If you are <strong>Bound</strong> (Touch effect), your <strong>magic costs +1 Focus</strong> until it wears off. Guard breaks Bind.</li>
+      </ul>
+
+      <h3 class="rpgModalH">Types</h3>
+      <p class="muted">Damage is calculated like this:</p>
+      <p class="rpgFormula"><strong>Damage</strong> = Base × <strong>STAB</strong> × <strong>Effectiveness</strong> (rounded)</p>
+      <ul class="rpgModalList">
+        <li><strong>Move type</strong>: each action is a type (Wind / Fire / Sight / Earth / Touch).</li>
+        <li><strong>STAB</strong> (Same Type Attack Bonus): if the move matches one of your types, it gets <strong>×1.2</strong>.</li>
+        <li><strong>Effectiveness</strong>: some types hit harder or softer into other types.</li>
+        <li><strong>Dual types</strong> multiply together (example: Wind vs Fire+Sight uses both matchups).</li>
+      </ul>
+      <div class="rpgMiniChart" aria-label="Quick type hints">
+        <div class="muted small">Quick hints:</div>
+        <div class="rpgMiniChartRow">
+          <span class="typePill typePill--Wind">Wind</span><span class="rpgArrow">▶</span><span class="typePill typePill--Fire">Fire</span><span class="rpgDot">•</span>
+          <span class="typePill typePill--Fire">Fire</span><span class="rpgArrow">▶</span><span class="typePill typePill--Earth">Earth</span><span class="rpgDot">•</span>
+          <span class="typePill typePill--Earth">Earth</span><span class="rpgArrow">▶</span><span class="typePill typePill--Wind">Wind</span>
+        </div>
+        <div class="rpgMiniChartRow">
+          <span class="typePill typePill--Touch">Touch</span><span class="rpgArrow">▶</span><span class="typePill typePill--Sight">Sight</span><span class="rpgDot">•</span>
+          <span class="typePill typePill--Sight">Sight</span><span class="rpgArrow">▶</span><span class="typePill typePill--Fire">Fire</span>
+        </div>
+      </div>
+      <p class="muted small">Tip: the move buttons show the multiplier (x1.44, x0.81, etc.) so you can plan before committing.</p>
+    </div>
+    <div class="rpgModalFoot">
+      <button class="btn primary" id="explainOk" type="button">Got it</button>
+    </div>
+  </div>
 </div>
 
 <article aria-label="Type matchup" class="post rpgTypeCard">
@@ -215,6 +262,6 @@
 </footer>
 <script defer="" src="./script.js"></script>
 <script src="./js/app.js" type="module"></script>
-<script defer src="./js/game.js?v=2026-02-14h"></script>
+<script defer src="./js/game.js?v=2026-02-14i"></script>
 </body>
 </html>
