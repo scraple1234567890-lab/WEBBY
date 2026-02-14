@@ -2564,6 +2564,36 @@ body.gamePage {
   border-radius: 18px;
 }
 
+/* Turn indicator: makes it obvious whose turn it is */
+.rpgTurnBanner{
+  flex: 1 0 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
+  font-weight: 900;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  user-select: none;
+}
+.rpgTurnBanner.isPlayer{
+  background: linear-gradient(180deg, var(--hp-green-2), var(--hp-green-1));
+  color: rgb(18 12 28);
+}
+.rpgTurnBanner.isEnemy{
+  background: linear-gradient(180deg, color-mix(in srgb, var(--type-fire) 85%, white 15%), color-mix(in srgb, var(--type-fire) 60%, black 40%));
+  color: rgb(22 14 28);
+}
+.rpgActions.isLocked .btn:not(#restartBtn){
+  opacity: .7;
+}
+.rpgActions.isLocked .btn:not(#restartBtn):disabled{
+  cursor: not-allowed;
+}
+
 .rpgActions .btn {
   min-width: 120px;
 }

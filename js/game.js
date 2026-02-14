@@ -32,6 +32,8 @@ if (root) {
     enemyIntentText: document.getElementById("enemyIntentText"),
 
     log: document.getElementById("battleLog"),
+    turnBanner: document.getElementById("turnBanner"),
+    actionsWrap: document.querySelector(".rpgActions"),
     attackBtn: document.getElementById("attackBtn"),
     healBtn: document.getElementById("healBtn"),
     guardBtn: document.getElementById("guardBtn"),
@@ -718,6 +720,7 @@ function setPreviewMove(name, type, baseCost) {
   function makeInitialState() {
     return {
       turn: 1,
+      phase: "player",
       wave: 0,
       player: {
         name: PLAYER_TEMPLATE.name,
@@ -745,7 +748,7 @@ function setPreviewMove(name, type, baseCost) {
     };
   }
 
-  const GAME_BUILD = "2026-02-14p";
+  const GAME_BUILD = "2026-02-14r";
 
   /** @type {ReturnType<typeof makeInitialState>} */
   let state = makeInitialState();
@@ -1096,12 +1099,13 @@ function setPreviewMove(name, type, baseCost) {
     }
 
     // Enable/disable actions
-    const disableActions = state.over;
+    const isPlayerTurn = !state.over && state.phase === "player";
+    const disableActions = !isPlayerTurn;
     if (disableActions) closeMagicMenu();
 
-    const canWind = !state.over && focus >= (2 + boundExtra);
-    const canFire = !state.over && focus >= (3 + boundExtra);
-    const canHeal = !state.over && state.player.healCharges > 0 && focus >= healCost;
+    const canWind = isPlayerTurn && focus >= (2 + boundExtra);
+    const canFire = isPlayerTurn && focus >= (3 + boundExtra);
+    const canHeal = isPlayerTurn && state.player.healCharges > 0 && focus >= healCost;
 
     if (els.attackBtn instanceof HTMLButtonElement) els.attackBtn.disabled = disableActions;
     if (els.guardBtn instanceof HTMLButtonElement) els.guardBtn.disabled = disableActions;
@@ -1155,6 +1159,8 @@ function setPreviewMove(name, type, baseCost) {
     addLog(`Wave ${state.wave + 1}: ${state.enemy.name} arrives.`);
     addLog("Your turn.");
 
+    setPhase("player");
+
     // Set new intent for readability.
     state.enemy.intent = computeEnemyIntent();
     renderIntent(state.enemy.intent);
@@ -1166,6 +1172,68 @@ function setPreviewMove(name, type, baseCost) {
   // --------------------
   // Turn flow
   // --------------------
+
+  // Turn pacing: slow enough to read, fast enough to feel snappy.
+  const TURN_DELAY_MS = prefersReducedMotion ? 120 : 650;      // after you act, before enemy acts
+  const BETWEEN_TURN_MS = prefersReducedMotion ? 120 : 450;    // after enemy acts, before your turn begins
+
+  function setTurnBanner(text, who) {
+    if (!(els.turnBanner instanceof HTMLElement)) return;
+    els.turnBanner.textContent = text;
+    els.turnBanner.classList.toggle("isPlayer", who === "player");
+    els.turnBanner.classList.toggle("isEnemy", who === "enemy");
+  }
+
+  function setPhase(phase) {
+    state.phase = phase;
+    const locked = phase !== "player" && !state.over;
+
+    if (els.actionsWrap instanceof HTMLElement) {
+      els.actionsWrap.classList.toggle("isLocked", locked);
+    }
+
+    // Lock/unlock action controls (Restart stays available).
+    const lockBtn = (b, on) => {
+      if (b instanceof HTMLButtonElement && b.id !== "restartBtn") b.disabled = on;
+    };
+    lockBtn(els.attackBtn, locked);
+    lockBtn(els.healBtn, locked);
+    lockBtn(els.guardBtn, locked);
+    lockBtn(els.magicToggle, locked);
+    lockBtn(els.windBtn, locked);
+    lockBtn(els.fireBtn, locked);
+    lockBtn(els.explainBtn, locked);
+
+    if (locked) closeMagicMenu();
+
+    if (phase === "player") setTurnBanner("Your turn", "player");
+    else if (phase === "enemy") setTurnBanner("Enemy turn", "enemy");
+    else setTurnBanner("Resolving…", "enemy");
+  }
+
+  function queueEnemyTurn() {
+    if (isGameOver()) return;
+    if (state.enemy.hp <= 0) return;
+
+    setPhase("enemy");
+    addLog("Enemy turn.");
+    render();
+    // This tiny pause is the whole point: it visually separates turns.
+    window.setTimeout(() => {
+      enemyTurn();
+    }, TURN_DELAY_MS);
+  }
+
+  function queuePlayerTurn() {
+    if (isGameOver()) return;
+    if (state.enemy.hp <= 0) return;
+
+    setPhase("player");
+    window.setTimeout(() => {
+      beginPlayerTurn();
+    }, BETWEEN_TURN_MS);
+  }
+
 
   function beginPlayerTurn() {
     if (isGameOver()) return;
@@ -1223,7 +1291,8 @@ function setPreviewMove(name, type, baseCost) {
       playAnim(els.enemySprite, "rpgAnim-heal");
       spawnFx("heal", "enemy");
       if (actual > 0) spawnFloat(`+${actual}`, "enemy", "heal", null);
-      beginPlayerTurn();
+      render();
+      queuePlayerTurn();
       return;
     }
 
@@ -1232,7 +1301,8 @@ function setPreviewMove(name, type, baseCost) {
       addLog(`${e.name} conjures a mirror ward.`);
       playAnim(els.enemySprite, "rpgAnim-guard");
       spawnFx("guard", "enemy");
-      beginPlayerTurn();
+      render();
+      queuePlayerTurn();
       return;
     }
 
@@ -1241,7 +1311,8 @@ function setPreviewMove(name, type, baseCost) {
       addLog(`${e.name} fortifies their stance.`);
       playAnim(els.enemySprite, "rpgAnim-guard");
       spawnFx("guard", "enemy");
-      beginPlayerTurn();
+      render();
+      queuePlayerTurn();
       return;
     }
 
@@ -1307,7 +1378,8 @@ function setPreviewMove(name, type, baseCost) {
       return;
     }
 
-    beginPlayerTurn();
+    render();
+    queuePlayerTurn();
   }
 
   // --------------------
@@ -1337,6 +1409,7 @@ function setPreviewMove(name, type, baseCost) {
 
   function playerAttack() {
     if (isGameOver()) return;
+    if (state.phase !== "player") return;
     closeMagicMenu();
 
     playAnim(els.playerSprite, "rpgAnim-attack");
@@ -1386,11 +1459,14 @@ function setPreviewMove(name, type, baseCost) {
       return;
     }
 
-    enemyTurn();
+    render();
+
+    queueEnemyTurn();
   }
 
   function playerWindAttack() {
     if (isGameOver()) return;
+    if (state.phase !== "player") return;
     closeMagicMenu();
 
     const extra = state.player.bound > 0 ? 1 : 0;
@@ -1446,11 +1522,14 @@ function setPreviewMove(name, type, baseCost) {
       return;
     }
 
-    enemyTurn();
+    render();
+
+    queueEnemyTurn();
   }
 
   function playerFireAttack() {
     if (isGameOver()) return;
+    if (state.phase !== "player") return;
     closeMagicMenu();
 
     const extra = state.player.bound > 0 ? 1 : 0;
@@ -1503,11 +1582,14 @@ function setPreviewMove(name, type, baseCost) {
       return;
     }
 
-    enemyTurn();
+    render();
+
+    queueEnemyTurn();
   }
 
   function playerHeal() {
     if (isGameOver()) return;
+    if (state.phase !== "player") return;
     closeMagicMenu();
 
     const extra = state.player.bound > 0 ? 1 : 0;
@@ -1546,11 +1628,14 @@ function setPreviewMove(name, type, baseCost) {
 
     addLog(actual > 0 ? `You heal for ${actual} HP.` : "You try to heal, but you're already at full HP.");
 
-    enemyTurn();
+    render();
+
+    queueEnemyTurn();
   }
 
   function playerGuard() {
     if (isGameOver()) return;
+    if (state.phase !== "player") return;
     closeMagicMenu();
 
     if (!state.player.guarding) {
@@ -1566,7 +1651,9 @@ function setPreviewMove(name, type, baseCost) {
       addLog("You're already guarding.");
     }
 
-    enemyTurn();
+    render();
+
+    queueEnemyTurn();
   }
 
   function restart() {
@@ -1629,6 +1716,7 @@ function setPreviewMove(name, type, baseCost) {
 
 // Initialize
   state.enemy.intent = computeEnemyIntent();
+  setPhase("player");
   renderIntent(state.enemy.intent);
   setEffectBanner("—", "neutral");
   render();
