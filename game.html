@@ -8,7 +8,7 @@
 <title>Dragonstone | Tiny Turn RPG</title>
 <link href="./favicon.ico" rel="icon" sizes="any"/>
 <link href="./favicon.png" rel="icon" type="image/png"/>
-<link href="./styles.css" rel="stylesheet"/>
+<link href="./styles.css?v=2026-02-14e" rel="stylesheet"/>
 </head>
 <body class="gamePage">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -57,7 +57,7 @@
 <p class="kicker">Minigame</p>
 <h1>Tiny Turn RPG</h1>
 <p class="muted">Pick an action, watch your rival respond, and keep your HP above zero.</p>
-<p class="muted small" id="buildTag">Build: 2026-02-14c</p>
+<p class="muted small" id="buildTag">Build: 2026-02-14d</p>
 </div>
 <div class="rpgWrap" id="rpgRoot">
 <div aria-label="Battlefield" class="rpgGrid" role="group">
@@ -100,6 +100,20 @@
 </div>
 </div>
 </article>
+
+<div aria-label="Actions" class="rpgActions">
+<button class="btn primary" id="attackBtn" type="button">Attack</button>
+<button class="btn secondary" id="healBtn" type="button">Heal</button>
+<button class="btn ghost" id="guardBtn" type="button">Guard</button>
+<div class="rpgMagicWrap">
+  <button class="btn ghost rpgMagicToggle" id="magicToggle" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="magicMenu">Magic</button>
+  <div class="rpgMagicMenu" id="magicMenu" role="menu" hidden>
+    <button class="btn secondary rpgMagicItem" id="windBtn" type="button" role="menuitem">Wind attack</button>
+    <button class="btn primary rpgMagicItem" id="fireBtn" type="button" role="menuitem">Fire attack</button>
+  </div>
+</div>
+<button class="btn ghost" id="restartBtn" type="button">Restart</button>
+</div>
 
 <article aria-label="Type matchup" class="post rpgTypeCard">
   <div class="rpgTypeHead">
@@ -146,19 +160,7 @@
   </div>
 </article>
 
-<div aria-label="Actions" class="rpgActions">
-<button class="btn primary" id="attackBtn" type="button">Attack</button>
-<button class="btn secondary" id="healBtn" type="button">Heal</button>
-<button class="btn ghost" id="guardBtn" type="button">Guard</button>
-<div class="rpgMagicWrap">
-  <button class="btn ghost rpgMagicToggle" id="magicToggle" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="magicMenu">Magic</button>
-  <div class="rpgMagicMenu" id="magicMenu" role="menu" hidden>
-    <button class="btn secondary rpgMagicItem" id="windBtn" type="button" role="menuitem">Wind attack</button>
-    <button class="btn primary rpgMagicItem" id="fireBtn" type="button" role="menuitem">Fire attack</button>
-  </div>
-</div>
-<button class="btn ghost" id="restartBtn" type="button">Restart</button>
-</div>
+
 <article aria-label="Battle log" class="post rpgLogCard">
 <div class="rpgLogHead">
 <h2 class="rpgLogTitle">Battle log</h2>
@@ -195,6 +197,6 @@
 </footer>
 <script defer="" src="./script.js"></script>
 <script src="./js/app.js" type="module"></script>
-<script defer src="./js/game.js?v=2026-02-14c"></script>
+<script defer src="./js/game.js?v=2026-02-14e"></script>
 </body>
 </html>
