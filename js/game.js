@@ -300,7 +300,7 @@ if (root) {
     };
   }
 
-  const GAME_BUILD = "2026-02-14f";
+  const GAME_BUILD = "2026-02-14g";
 
   /** @type {ReturnType<typeof makeInitialState>} */
   let state = makeInitialState();
@@ -535,6 +535,11 @@ if (root) {
     const playerHp = clamp(state.player.hp, 0, state.player.max);
     const enemyHp = clamp(state.enemy.hp, 0, state.enemy.max);
 
+    // Resource helpers (used throughout render)
+    const focus = state.player.focus;
+    const boundExtra = state.player.bound > 0 ? 1 : 0;
+    const healCost = 1 + boundExtra;
+
     // Names + types
     setText(els.playerName, state.player.name);
     setText(els.enemyName, `${state.enemy.name} (Wave ${state.wave + 1}/${ENEMIES.length})`);
@@ -543,7 +548,7 @@ if (root) {
 
     // Focus + intent
     if (els.playerFocusText instanceof HTMLElement) {
-      els.playerFocusText.textContent = `Focus: ${state.player.focus} / ${state.player.focusMax}`;
+      els.playerFocusText.textContent = `Focus: ${focus} / ${state.player.focusMax}`;
     }
     renderIntent(state.enemy.intent);
 
@@ -576,7 +581,7 @@ if (root) {
     }
 
     if (els.healBtn instanceof HTMLButtonElement) {
-      els.healBtn.textContent = `Heal (3 Focus, ${state.player.healCharges})`;
+      els.healBtn.textContent = `Heal (${healCost} Focus, ${state.player.healCharges})`;
     }
 
     // HP
@@ -617,12 +622,9 @@ if (root) {
     const disableActions = state.over;
     if (disableActions) closeMagicMenu();
 
-    const focus = state.player.focus;
-    const boundExtra = state.player.bound > 0 ? 1 : 0;
-
     const canWind = !state.over && focus >= (2 + boundExtra);
     const canFire = !state.over && focus >= (3 + boundExtra);
-    const canHeal = !state.over && state.player.healCharges > 0 && focus >= 3;
+    const canHeal = !state.over && state.player.healCharges > 0 && focus >= healCost;
 
     if (els.attackBtn instanceof HTMLButtonElement) els.attackBtn.disabled = disableActions;
     if (els.guardBtn instanceof HTMLButtonElement) els.guardBtn.disabled = disableActions;
@@ -998,12 +1000,15 @@ if (root) {
     if (isGameOver()) return;
     closeMagicMenu();
 
+    const extra = state.player.bound > 0 ? 1 : 0;
+    const cost = 1 + extra;
+
     if (state.player.healCharges <= 0) {
       addLog("Your healing focus is spent.");
       render();
       return;
     }
-    if (state.player.focus < 3) {
+    if (state.player.focus < cost) {
       addLog("Not enough Focus.");
       render();
       return;
@@ -1011,13 +1016,13 @@ if (root) {
 
     playAnim(els.playerSprite, "rpgAnim-heal");
 
-    const heal = 6;
+    const heal = 5;
     const before = state.player.hp;
     state.player.hp = clamp(state.player.hp + heal, 0, state.player.max);
     const actual = state.player.hp - before;
 
     state.player.healCharges = Math.max(0, state.player.healCharges - 1);
-    spendFocus(3);
+    spendFocus(cost);
 
     // Cleanse one negative (strategy lever)
     if (state.player.burn > 0) {
