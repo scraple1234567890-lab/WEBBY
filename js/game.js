@@ -92,6 +92,74 @@ if (root) {
     window.setTimeout(() => el.classList.remove(cls), 650);
   }
 
+// --------------------
+// SFX: Wave clear (uses the same sound as badge unlock)
+// --------------------
+const WAVE_CLEAR_SFX_SRC = "assets/audio/badge-unlock.mp3";
+let __waveClearAudio = null;
+let __waveClearPrimed = false;
+
+function __getWaveClearAudio() {
+  if (__waveClearAudio) return __waveClearAudio;
+  try {
+    const a = new Audio(WAVE_CLEAR_SFX_SRC);
+    a.preload = "auto";
+    a.volume = 0.75;
+    __waveClearAudio = a;
+    return a;
+  } catch {
+    return null;
+  }
+}
+
+function __primeWaveClearAudioOnce() {
+  if (__waveClearPrimed) return;
+  __waveClearPrimed = true;
+
+  const a = __getWaveClearAudio();
+  if (!a) return;
+
+  try {
+    const prevMuted = a.muted;
+    a.muted = true;
+    const p = a.play();
+    if (p && typeof p.then === "function") {
+      p.then(() => {
+        a.pause();
+        a.currentTime = 0;
+        a.muted = prevMuted;
+      }).catch(() => {
+        a.muted = prevMuted;
+      });
+    } else {
+      a.pause();
+      a.currentTime = 0;
+      a.muted = prevMuted;
+    }
+  } catch {
+    // ignore
+  }
+}
+
+// Prime audio on the first user gesture (needed on many browsers)
+["pointerdown", "keydown", "touchstart"].forEach((evt) => {
+  window.addEventListener(evt, __primeWaveClearAudioOnce, { once: true, passive: true });
+});
+
+function playWaveClearSfx() {
+  const a = __getWaveClearAudio();
+  if (!a) return;
+  try {
+    a.currentTime = 0;
+  } catch {
+    // ignore
+  }
+  const p = a.play();
+  if (p && typeof p.catch === "function") {
+    p.catch(() => {});
+  }
+}
+
   // --------------------
   // Magic menu helpers
   // --------------------
@@ -608,7 +676,7 @@ function setPreviewMove(name, type, baseCost) {
     };
   }
 
-  const GAME_BUILD = "2026-02-14l";
+  const GAME_BUILD = "2026-02-14p";
 
   /** @type {ReturnType<typeof makeInitialState>} */
   let state = makeInitialState();
@@ -985,6 +1053,10 @@ function setPreviewMove(name, type, baseCost) {
    */
   function advanceWave(defeatMessage) {
     addLog(defeatMessage);
+
+    // Play the badge-unlock SFX when you clear Wave 1.
+    if (state.wave === 0) playWaveClearSfx();
+
     playAnim(els.enemySprite, "rpgAnim-faint");
 
     const nextIndex = state.wave + 1;
