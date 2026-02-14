@@ -3853,6 +3853,8 @@ body.homePage #contact .sectionHead p.muted{
 .typePill--Wind{ background: rgba(80,170,255,0.28); }
 .typePill--Fire{ background: rgba(255,120,80,0.26); }
 .typePill--Sight{ background: rgba(255,215,0,0.20); }
+.typePill--Earth{ background: rgba(120,255,150,0.18); }
+.typePill--Touch{ background: rgba(210,160,255,0.20); }
 
 .rpgTypeChart{
   display: flex;
