@@ -1011,11 +1011,14 @@ function setPreviewMove(name, type, baseCost) {
    */
   function tickBurn(who) {
     const unit = state[who];
-    if (!unit || unit.burn <= 0) return;
+    if (!unit || unit.burn <= 0) return false;
 
     const dmg = 2;
     unit.hp = clamp(unit.hp - dmg, 0, unit.max);
     unit.burn = Math.max(0, unit.burn - 1);
+
+    // Show burn as a center-screen "move" so it reads like an event.
+    showMoveBanner("Burn", "Fire");
 
     const label = who === "player" ? "You" : state.enemy.name;
     // Make it visually obvious this is a status tick, not a second attack.
@@ -1030,6 +1033,8 @@ function setPreviewMove(name, type, baseCost) {
       spawnFx("fire", "enemy");
       spawnFloat(`-${dmg}`, "enemy", "dmg", null);
     }
+
+    return true;
   }
 
   // --------------------
@@ -1323,11 +1328,16 @@ function setPreviewMove(name, type, baseCost) {
     if (state.enemy.hp <= 0) return;
 
     // Start-of-turn effects on enemy
-    tickBurn("enemy");
+    const didBurnTick = tickBurn("enemy");
+    if (didBurnTick) render();
     if (state.enemy.hp <= 0) {
       advanceWave(`${state.enemy.name} collapses from lingering flame.`);
       return;
     }
+
+    // If a burn tick happened, give it a brief moment to read before
+    // the enemy's action banner appears (otherwise it gets overwritten).
+    const continueEnemyTurn = () => {
 
     // Enrage phase (deterministic)
     if (!state.enemy.enraged && state.enemy.hp <= Math.ceil(state.enemy.max * 0.4)) {
@@ -1447,6 +1457,13 @@ function setPreviewMove(name, type, baseCost) {
 
     render();
     queuePlayerTurn();
+  }
+
+    if (didBurnTick && STATUS_WINDOW_MS > 0) {
+      window.setTimeout(continueEnemyTurn, STATUS_WINDOW_MS);
+      return;
+    }
+    continueEnemyTurn();
   }
 
   // --------------------
