@@ -3,16 +3,21 @@
  * UI-only, single-player, turn-based battle loop.
  * Runs fully in-browser (no backend).
  *
- * Updates in this version:
- * - More varied enemy AI (attack / ignite / siphon / ward / heal).
- * - Status effects (burn, evasion, gust) + crits + misses for unpredictability.
- * - Limited player heals (charges) so wins aren't automatic.
+ * This version adds:
+ * - Two-wave battle: a second enemy appears after the first is defeated.
+ * - A simple "Pokemon-like" type system (Wind / Fire / Sight) with effectiveness + STAB.
+ * - Existing unpredictability: enemy AI variety, crits, misses, and status effects.
  */
 
 const root = document.getElementById("rpgRoot");
 
 if (root) {
   const els = {
+    playerName: document.getElementById("playerName"),
+    enemyName: document.getElementById("enemyName"),
+    playerTypeText: document.getElementById("playerTypeText"),
+    enemyTypeText: document.getElementById("enemyTypeText"),
+
     playerHpText: document.getElementById("playerHpText"),
     enemyHpText: document.getElementById("enemyHpText"),
     playerHpFill: document.getElementById("playerHpFill"),
@@ -107,46 +112,150 @@ if (root) {
     return Math.min(max, Math.max(min, value));
   }
 
-  const INITIAL = {
-    turn: 1,
-    player: {
-      hp: 20,
-      max: 20,
-      guarding: false,
-      evading: false,
-      burn: 0,
-      healCharges: 3,
+  // --------------------
+  // Type system
+  // --------------------
+
+  /** @typedef {"Wind"|"Fire"|"Sight"} MagicType */
+
+  /**
+   * Type effectiveness chart: attackType -> defenderType -> multiplier.
+   * Dual types multiply.
+   *
+   * Design goal: noticeable, not swingy.
+   */
+  const TYPE_CHART = /** @type {Record<MagicType, Record<MagicType, number>>} */ ({
+    Wind: { Wind: 1.0, Fire: 1.35, Sight: 0.85 },
+    Fire: { Fire: 0.75, Wind: 1.35, Sight: 0.85 },
+    Sight: { Sight: 1.0, Wind: 1.15, Fire: 1.15 },
+  });
+
+  /** @param {MagicType} attackType @param {MagicType[]} defenderTypes */
+  function typeMultiplier(attackType, defenderTypes) {
+    let mult = 1;
+    for (const dt of defenderTypes) {
+      mult *= TYPE_CHART[attackType]?.[dt] ?? 1;
+    }
+    return mult;
+  }
+
+  /** @param {number} mult */
+  function effectivenessText(mult) {
+    if (mult >= 1.25) return "It's super effective!";
+    if (mult <= 0.85) return "Not very effective…";
+    return "";
+  }
+
+  /** @param {MagicType[]} types */
+  function formatTypes(types) {
+    return `Type: ${types.join(" • ")}`;
+  }
+
+  /**
+   * Compute typed damage.
+   * - Applies STAB (same-type attack bonus) when move type matches attacker types.
+   * - Applies effectiveness vs defender types.
+   * Returns the scaled base damage (defenses are applied after this).
+   */
+  function computeTypedDamage(attackerKey, defenderKey, base, moveType) {
+    const attacker = state[attackerKey];
+    const defender = state[defenderKey];
+
+    const stab = attacker.types.includes(moveType) ? 1.2 : 1.0;
+    const eff = typeMultiplier(moveType, defender.types);
+
+    const scaled = Math.max(1, Math.round(base * stab * eff));
+
+    return {
+      scaled,
+      eff,
+      stab,
+      note: effectivenessText(eff),
+    };
+  }
+
+  // --------------------
+  // Combatants (player + two enemies)
+  // --------------------
+
+  const PLAYER_TEMPLATE = {
+    name: "Player",
+    types: /** @type {MagicType[]} */ (["Wind", "Sight"]),
+    maxHp: 20,
+    healCharges: 3,
+  };
+
+  const ENEMIES = [
+    {
+      name: "Rival Mage",
+      types: /** @type {MagicType[]} */ (["Fire", "Sight"]),
+      maxHp: 22,
+      healCharges: 2,
+      profile: "standard",
     },
-    enemy: {
-      hp: 22,
-      max: 22,
+    {
+      name: "Cinder Seer",
+      types: /** @type {MagicType[]} */ (["Fire", "Sight"]),
+      maxHp: 28,
+      healCharges: 2,
+      profile: "aggressive",
+    },
+  ];
+
+  /**
+   * Create a fresh enemy state from template.
+   * @param {number} waveIndex
+   */
+  function makeEnemy(waveIndex) {
+    const t = ENEMIES[waveIndex] ?? ENEMIES[0];
+    return {
+      name: t.name,
+      types: t.types,
+      hp: t.maxHp,
+      max: t.maxHp,
       guarding: false,
       gusted: false,
       burn: 0,
       ward: 0, // mirror ward: reduces next hit and reflects a bit
-      healCharges: 2,
+      healCharges: t.healCharges,
       enraged: false,
-    },
-    over: false,
-    log: [
-      "A rival mage steps into view.",
-      "The air tastes like ozone. Your turn.",
-    ],
-  };
+      profile: t.profile,
+    };
+  }
 
-  let state =
-    typeof structuredClone === "function"
-      ? structuredClone(INITIAL)
-      : JSON.parse(JSON.stringify(INITIAL));
+  function makeInitialState() {
+    return {
+      turn: 1,
+      wave: 0, // 0-based index into ENEMIES
+      player: {
+        name: PLAYER_TEMPLATE.name,
+        types: PLAYER_TEMPLATE.types,
+        hp: PLAYER_TEMPLATE.maxHp,
+        max: PLAYER_TEMPLATE.maxHp,
+        guarding: false,
+        evading: false,
+        burn: 0,
+        healCharges: PLAYER_TEMPLATE.healCharges,
+      },
+      enemy: makeEnemy(0),
+      over: false,
+      log: [
+        `Wave 1: ${ENEMIES[0].name} steps into view.`,
+        "The air tastes like ozone. Your turn.",
+      ],
+    };
+  }
+
+  let state = makeInitialState();
 
   /** @param {string} message */
   function addLog(message) {
     state.log.unshift(message);
-    if (state.log.length > 14) state.log = state.log.slice(0, 14);
+    if (state.log.length > 16) state.log = state.log.slice(0, 16);
   }
 
   function isGameOver() {
-    return state.over || state.player.hp <= 0 || state.enemy.hp <= 0;
+    return state.over || state.player.hp <= 0;
   }
 
   /** @param {HTMLElement|null} el @param {string} text */
@@ -180,20 +289,36 @@ if (root) {
     return parts.length ? parts.join(" • ") : "Channeling";
   }
 
+  function setEnemyVisuals() {
+    if (!(els.enemySprite instanceof HTMLElement)) return;
+    els.enemySprite.classList.toggle("is-phase2", state.wave >= 1);
+  }
+
   function render() {
     const playerHp = clamp(state.player.hp, 0, state.player.max);
     const enemyHp = clamp(state.enemy.hp, 0, state.enemy.max);
 
+    // Names + types
+    setText(els.playerName, state.player.name);
+    setText(
+      els.enemyName,
+      `${state.enemy.name} (Wave ${state.wave + 1}/${ENEMIES.length})`
+    );
+    setText(els.playerTypeText, formatTypes(state.player.types));
+    setText(els.enemyTypeText, formatTypes(state.enemy.types));
+
+    // HP
     setText(els.playerHpText, `HP ${playerHp} / ${state.player.max}`);
     setText(els.enemyHpText, `HP ${enemyHp} / ${state.enemy.max}`);
 
     setBar(els.playerHpFill, playerHp / state.player.max);
     setBar(els.enemyHpFill, enemyHp / state.enemy.max);
 
+    // Status
     if (state.over) {
       setText(
         els.playerStatus,
-        playerHp <= 0 ? "Defeated" : state.enemy.hp <= 0 ? "Victorious" : "Finished"
+        playerHp <= 0 ? "Defeated" : "Victorious"
       );
       setText(els.enemyStatus, enemyHp <= 0 ? "Defeated" : "Silent");
     } else {
@@ -201,13 +326,16 @@ if (root) {
       setText(els.enemyStatus, statusLineForEnemy());
     }
 
+    // Sprite states
     if (els.playerSprite) {
       els.playerSprite.classList.toggle("is-guarding", !state.over && state.player.guarding);
     }
     if (els.enemySprite) {
       els.enemySprite.classList.toggle("is-guarding", !state.over && state.enemy.guarding);
     }
+    setEnemyVisuals();
 
+    // Log
     if (els.log) {
       els.log.innerHTML = "";
       state.log.forEach((line) => {
@@ -222,10 +350,14 @@ if (root) {
       els.healBtn.textContent = `Heal (${state.player.healCharges})`;
     }
 
+    // Make it obvious Fire is off-type for the player.
+    if (els.fireBtn instanceof HTMLButtonElement) {
+      els.fireBtn.textContent = "Fire attack (off-type)";
+    }
+
     const disableActions = state.over;
     if (disableActions) closeMagicMenu();
 
-    // Disable heal when out of charges.
     const healDisabled = state.over || state.player.healCharges <= 0;
 
     [els.attackBtn, els.guardBtn, els.magicToggle, els.windBtn, els.fireBtn].forEach((btn) => {
@@ -250,6 +382,42 @@ if (root) {
   }
 
   /**
+   * Transition to the next wave (second enemy) if available.
+   * The player keeps current HP and heal charges, but gets a small "second wind".
+   */
+  function advanceWave(defeatMessage) {
+    // Defeat message from the moment the enemy hits 0.
+    addLog(defeatMessage);
+    playAnim(els.enemySprite, "rpgAnim-faint");
+
+    const nextIndex = state.wave + 1;
+    if (nextIndex >= ENEMIES.length) {
+      endGame("The duel ends. You win!");
+      return;
+    }
+
+    // Small between-wave breather.
+    const bonus = 3;
+    const before = state.player.hp;
+    state.player.hp = clamp(state.player.hp + bonus, 0, state.player.max);
+    const actual = state.player.hp - before;
+    if (actual > 0) addLog(`You catch a second wind (+${actual} HP).`);
+
+    // Clear one-turn tactical states.
+    state.player.guarding = false;
+    state.player.evading = false;
+
+    // Spawn next enemy.
+    state.wave = nextIndex;
+    state.enemy = makeEnemy(state.wave);
+
+    addLog(`Wave ${state.wave + 1}: ${state.enemy.name} arrives.`);
+    addLog("Your turn.");
+
+    render();
+  }
+
+  /**
    * Apply burn at the start of a unit's turn.
    * Burn ticks for 2 damage and reduces its counter by 1.
    * @param {"player"|"enemy"} who
@@ -262,7 +430,7 @@ if (root) {
     unit.hp = clamp(unit.hp - dmg, 0, unit.max);
     unit.burn = Math.max(0, unit.burn - 1);
 
-    const label = who === "player" ? "You" : "Rival Mage";
+    const label = who === "player" ? "You" : state.enemy.name;
     addLog(`${label} take${who === "player" ? "" : "s"} ${dmg} burn damage.`);
 
     if (who === "player") playAnim(els.playerSprite, "rpgAnim-hit");
@@ -298,7 +466,6 @@ if (root) {
     let reflected = 0;
 
     if (targetKey === "player") {
-      // Guard halves the next hit.
       if (state.player.guarding) {
         const before = final;
         final = Math.floor(final / 2);
@@ -315,7 +482,9 @@ if (root) {
       final = Math.ceil(final * 0.6);
       reflected = Math.max(1, Math.floor(before * 0.25));
       state.enemy.ward = 0;
-      addLog(`A mirror ward bends your strike (${before} → ${final}) and bites back (${reflected}).`);
+      addLog(
+        `A mirror ward bends your strike (${before} → ${final}) and bites back (${reflected}).`
+      );
       playAnim(els.enemySprite, "rpgAnim-guard");
     }
 
@@ -323,50 +492,62 @@ if (root) {
       const before = final;
       final = Math.floor(final / 2);
       state.enemy.guarding = false;
-      addLog(`The Rival Mage braces (${before} → ${final}).`);
+      addLog(`${state.enemy.name} braces (${before} → ${final}).`);
       playAnim(els.enemySprite, "rpgAnim-guard");
     }
 
     return { final, reflected };
   }
 
-  /**
-   * Enemy turn logic (apply statuses, choose an action, execute it).
-   */
+  // --------------------
+  // Enemy AI + turn
+  // --------------------
+
   function enemyTurn() {
     if (isGameOver()) return;
+    if (state.enemy.hp <= 0) return; // Wave swap safety
 
     // Start-of-turn effects on enemy
     tickBurn("enemy");
     if (state.enemy.hp <= 0) {
-      endGame("The Rival Mage crumples from lingering flame. You win!");
+      advanceWave(`${state.enemy.name} crumples from lingering flame.`);
       return;
     }
 
     // Enrage phase (happens once)
     if (!state.enemy.enraged && state.enemy.hp <= Math.ceil(state.enemy.max * 0.4)) {
       state.enemy.enraged = true;
-      addLog("The Rival Mage snarls. Their aura sharpens (enraged).");
+      addLog(`${state.enemy.name} snarls. Their aura sharpens (enraged).`);
     }
 
-    // Decide action
     const e = state.enemy;
     const p = state.player;
 
-    // Heals are a big swing, but limited.
     const lowEnemy = e.hp <= Math.ceil(e.max * 0.35);
     const lowPlayer = p.hp <= Math.ceil(p.max * 0.35);
 
+    // Action selection varies by profile.
     let action = "attack";
-    if (lowEnemy && e.healCharges > 0 && chance(0.6)) action = "heal";
-    else if (lowPlayer && chance(0.35)) action = chance(0.5) ? "lance" : "ignite";
-    else {
+
+    if (lowEnemy && e.healCharges > 0 && chance(e.profile === "aggressive" ? 0.55 : 0.6)) {
+      action = "heal";
+    } else if (lowPlayer && chance(e.profile === "aggressive" ? 0.42 : 0.35)) {
+      action = chance(0.55) ? "lance" : "ignite";
+    } else {
       const r = Math.random();
-      if (r < 0.10) action = "ward";
-      else if (r < 0.25) action = "siphon";
-      else if (r < 0.42) action = "ignite";
-      else if (r < 0.54) action = "lance";
-      else action = "attack";
+      if (e.profile === "aggressive") {
+        if (r < 0.12) action = "ward";
+        else if (r < 0.26) action = "siphon";
+        else if (r < 0.50) action = "ignite";
+        else if (r < 0.70) action = "lance";
+        else action = "attack";
+      } else {
+        if (r < 0.10) action = "ward";
+        else if (r < 0.25) action = "siphon";
+        else if (r < 0.42) action = "ignite";
+        else if (r < 0.54) action = "lance";
+        else action = "attack";
+      }
     }
 
     // Execute
@@ -377,14 +558,18 @@ if (root) {
       e.hp = clamp(e.hp + heal, 0, e.max);
       const actual = e.hp - before;
       e.healCharges = Math.max(0, e.healCharges - 1);
-      addLog(actual > 0 ? `Rival Mage mends for ${actual} HP.` : "Rival Mage tries to mend, but is already at full HP.");
+      addLog(
+        actual > 0
+          ? `${e.name} mends for ${actual} HP.`
+          : `${e.name} tries to mend, but is already at full HP.`
+      );
       beginPlayerTurn();
       return;
     }
 
     if (action === "ward") {
       e.ward = 1;
-      addLog("Rival Mage conjures a mirror ward.");
+      addLog(`${e.name} conjures a mirror ward.`);
       playAnim(els.enemySprite, "rpgAnim-guard");
       beginPlayerTurn();
       return;
@@ -392,6 +577,7 @@ if (root) {
 
     if (action === "siphon") {
       playAnim(els.enemySprite, "rpgAnim-attack");
+
       const roll = rollHit({
         min: 2,
         max: 6,
@@ -400,31 +586,37 @@ if (root) {
         critMult: 1.8,
       });
 
-      // Evasion only applies to one enemy move, hit or miss.
       if (p.evading) p.evading = false;
 
       if (!roll.hit) {
-        addLog("Rival Mage reaches for your vitality... and misses.");
+        addLog(`${e.name} reaches for your vitality... and misses.`);
         playAnim(els.playerSprite, "rpgAnim-guard");
         beginPlayerTurn();
         return;
       }
 
-      let dmg = roll.amount;
+      let base = roll.amount;
       if (e.gusted) {
-        dmg = Math.max(1, dmg - 2);
+        base = Math.max(1, base - 2);
         e.gusted = false;
         addLog("A lingering gust throws off the siphon (−2 damage).");
       }
 
-      const def = applyDefenses("player", dmg);
+      // Siphon is Sight-type.
+      const typed = computeTypedDamage("enemy", "player", base, "Sight");
+      const def = applyDefenses("player", typed.scaled);
       const final = def.final;
 
       p.hp = clamp(p.hp - final, 0, p.max);
       const heal = Math.max(1, Math.floor(final * 0.6));
       e.hp = clamp(e.hp + heal, 0, e.max);
 
-      addLog(roll.crit ? `Rival Mage lands a critical siphon for ${final} damage and steals ${heal} HP!` : `Rival Mage siphons ${final} HP and steals ${heal}.`);
+      addLog(
+        roll.crit
+          ? `${e.name} lands a critical siphon for ${final} damage and steals ${heal} HP!`
+          : `${e.name} siphons ${final} HP and steals ${heal}.`
+      );
+      if (typed.note) addLog(typed.note);
       if (!state.over) playAnim(els.playerSprite, "rpgAnim-hit");
 
       if (p.hp <= 0) {
@@ -450,23 +642,26 @@ if (root) {
       if (p.evading) p.evading = false;
 
       if (!roll.hit) {
-        addLog("Rival Mage snaps their fingers. Sparks fizzle harmlessly.");
+        addLog(`${e.name} snaps their fingers. Sparks fizzle harmlessly.`);
         beginPlayerTurn();
         return;
       }
 
-      let dmg = roll.amount;
+      let base = roll.amount;
       if (e.gusted) {
-        dmg = Math.max(1, dmg - 2);
+        base = Math.max(1, base - 2);
         e.gusted = false;
         addLog("A lingering gust scatters the sparks (−2 damage).");
       }
 
-      const def = applyDefenses("player", dmg);
+      // Ignite is Fire-type.
+      const typed = computeTypedDamage("enemy", "player", base, "Fire");
+      const def = applyDefenses("player", typed.scaled);
       const final = def.final;
 
       p.hp = clamp(p.hp - final, 0, p.max);
       addLog(roll.crit ? `A critical ignition scorches you for ${final} damage!` : `Ignition scorches you for ${final} damage.`);
+      if (typed.note) addLog(typed.note);
       playAnim(els.playerSprite, "rpgAnim-hit");
 
       // 45% chance to apply burn for 2 turns.
@@ -499,33 +694,32 @@ if (root) {
     if (p.evading) p.evading = false;
 
     if (!roll.hit) {
-      addLog(isLance ? "Rival Mage fires an arcane lance... but it misses." : "Rival Mage strikes, but misses.");
+      addLog(isLance ? `${e.name} fires an arcane lance... but it misses.` : `${e.name} strikes, but misses.`);
       playAnim(els.playerSprite, "rpgAnim-guard");
       beginPlayerTurn();
       return;
     }
 
-    let dmg = roll.amount + (e.enraged ? 1 : 0);
+    let base = roll.amount + (e.enraged ? 1 : 0);
 
     if (e.gusted) {
-      dmg = Math.max(1, dmg - 2);
+      base = Math.max(1, base - 2);
       e.gusted = false;
-      addLog("A lingering gust throws off the Rival Mage’s aim (−2 damage).");
+      addLog("A lingering gust throws off their aim (−2 damage).");
     }
 
-    const def = applyDefenses("player", dmg);
+    // Both attack and lance are Sight-type.
+    const typed = computeTypedDamage("enemy", "player", base, "Sight");
+    const def = applyDefenses("player", typed.scaled);
     const final = def.final;
 
     p.hp = clamp(p.hp - final, 0, p.max);
     addLog(
       roll.crit
-        ? (isLance
-            ? `A critical arcane lance hits for ${final} damage!`
-            : `A critical strike hits for ${final} damage!`)
-        : (isLance
-            ? `Arcane lance hits for ${final} damage.`
-            : `Rival Mage hits you for ${final} damage.`)
+        ? (isLance ? `A critical arcane lance hits for ${final} damage!` : `A critical strike hits for ${final} damage!`)
+        : (isLance ? `Arcane lance hits for ${final} damage.` : `${e.name} hits you for ${final} damage.`)
     );
+    if (typed.note) addLog(typed.note);
     playAnim(els.playerSprite, "rpgAnim-hit");
 
     if (p.hp <= 0) {
@@ -541,6 +735,7 @@ if (root) {
    */
   function beginPlayerTurn() {
     if (isGameOver()) return;
+    if (state.enemy.hp <= 0) return;
 
     state.turn += 1;
 
@@ -554,12 +749,23 @@ if (root) {
     render();
   }
 
+  // --------------------
+  // Player actions
+  // --------------------
+
+  function onEnemyDown(message) {
+    closeMagicMenu();
+    if (state.enemy.hp > 0) return;
+    advanceWave(message);
+  }
+
   function playerAttack() {
     if (isGameOver()) return;
     closeMagicMenu();
 
     playAnim(els.playerSprite, "rpgAnim-attack");
 
+    // Basic attack is Sight-type (precision / light construct).
     const roll = rollHit({
       min: 3,
       max: 7,
@@ -574,15 +780,16 @@ if (root) {
       return;
     }
 
-    let dmg = roll.amount;
-    const def = applyDefenses("enemy", dmg);
+    const typed = computeTypedDamage("player", "enemy", roll.amount, "Sight");
+    const def = applyDefenses("enemy", typed.scaled);
     state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
 
     addLog(
       roll.crit
         ? `Critical hit! You strike for ${def.final} damage.`
-        : `You strike the Rival Mage for ${def.final} damage.`
+        : `You strike ${state.enemy.name} for ${def.final} damage.`
     );
+    if (typed.note) addLog(typed.note);
     playAnim(els.enemySprite, "rpgAnim-hit");
 
     if (def.reflected > 0) {
@@ -596,7 +803,7 @@ if (root) {
     }
 
     if (state.enemy.hp <= 0) {
-      endGame("The Rival Mage falls. You win!");
+      onEnemyDown(`${state.enemy.name} falls.`);
       return;
     }
 
@@ -623,10 +830,16 @@ if (root) {
       return;
     }
 
-    const def = applyDefenses("enemy", roll.amount);
+    const typed = computeTypedDamage("player", "enemy", roll.amount, "Wind");
+    const def = applyDefenses("enemy", typed.scaled);
     state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
 
-    addLog(roll.crit ? `Critical gust! Wind blade deals ${def.final} damage.` : `You send a wind blade for ${def.final} damage.`);
+    addLog(
+      roll.crit
+        ? `Critical gust! Wind blade deals ${def.final} damage.`
+        : `You send a wind blade for ${def.final} damage.`
+    );
+    if (typed.note) addLog(typed.note);
     playAnim(els.enemySprite, "rpgAnim-hit");
 
     if (def.reflected > 0) {
@@ -652,7 +865,7 @@ if (root) {
     }
 
     if (state.enemy.hp <= 0) {
-      endGame("The Rival Mage falls. You win!");
+      onEnemyDown(`${state.enemy.name} falls.`);
       return;
     }
 
@@ -679,10 +892,17 @@ if (root) {
       return;
     }
 
-    const def = applyDefenses("enemy", roll.amount);
+    // Off-type Fire: no STAB for the player.
+    const typed = computeTypedDamage("player", "enemy", roll.amount, "Fire");
+    const def = applyDefenses("enemy", typed.scaled);
     state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
 
-    addLog(roll.crit ? `Critical flame! You hurl fire for ${def.final} damage.` : `You hurl a burst of flame for ${def.final} damage.`);
+    addLog(
+      roll.crit
+        ? `Critical flame! You hurl fire for ${def.final} damage.`
+        : `You hurl a burst of flame for ${def.final} damage.`
+    );
+    if (typed.note) addLog(typed.note);
     playAnim(els.enemySprite, "rpgAnim-hit");
 
     if (def.reflected > 0) {
@@ -698,7 +918,7 @@ if (root) {
     // 35% chance to apply burn for 2 turns.
     if (chance(0.35)) {
       state.enemy.burn = Math.max(state.enemy.burn, 2);
-      addLog("The Rival Mage catches flame (burn).");
+      addLog(`${state.enemy.name} catches flame (burn).`);
     }
 
     // Small chance of backlash to keep it spicy.
@@ -714,7 +934,7 @@ if (root) {
     }
 
     if (state.enemy.hp <= 0) {
-      endGame("The Rival Mage falls. You win!");
+      onEnemyDown(`${state.enemy.name} falls.`);
       return;
     }
 
@@ -762,10 +982,7 @@ if (root) {
 
   function restart() {
     closeMagicMenu();
-    state =
-      typeof structuredClone === "function"
-        ? structuredClone(INITIAL)
-        : JSON.parse(JSON.stringify(INITIAL));
+    state = makeInitialState();
 
     const clear = [
       "rpgAnim-attack",
@@ -778,13 +995,19 @@ if (root) {
     if (els.enemySprite instanceof HTMLElement) {
       clear.forEach((c) => els.enemySprite.classList.remove(c));
       els.enemySprite.classList.remove("is-guarding");
+      els.enemySprite.classList.remove("is-phase2");
     }
     if (els.playerSprite instanceof HTMLElement) {
       clear.forEach((c) => els.playerSprite.classList.remove(c));
       els.playerSprite.classList.remove("is-guarding");
     }
+
     render();
   }
+
+  // --------------------
+  // Wire up events
+  // --------------------
 
   if (els.magicToggle instanceof HTMLButtonElement) {
     els.magicToggle.addEventListener("click", toggleMagicMenu);

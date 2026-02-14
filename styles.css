@@ -2441,6 +2441,11 @@ body.isEditingShopProduct {
   font-size: 1.3rem;
 }
 
+.rpgTypeLine {
+  margin: 2px 0 0;
+  opacity: 0.92;
+}
+
 .rpgHpText {
   margin: 0;
   font-weight: 700;
@@ -2621,6 +2626,11 @@ body.gamePage {
 
 .rpgFoe--enemy {
   right: 20px;
+}
+
+/* Visual cue for a second-wave foe (same sprite, different vibe) */
+.rpgFoe--enemy.is-phase2 .rpgSpriteImg {
+  filter: hue-rotate(120deg) saturate(1.25) contrast(1.05);
 }
 
 .rpgSvg {
