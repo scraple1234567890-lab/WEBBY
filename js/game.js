@@ -51,6 +51,10 @@ if (root) {
     explainClose: document.getElementById("explainClose"),
     explainOk: document.getElementById("explainOk"),
 
+    // Location picker (pre-combat)
+    locationModal: document.getElementById("locationModal"),
+    locationChoices: document.getElementById("locationChoices"),
+
     playerSprite: document.getElementById("playerSprite"),
     enemySprite: document.getElementById("enemySprite"),
     playerSpriteImg: document.getElementById("playerSpriteImg"),
@@ -354,23 +358,124 @@ function setTypeAccent(el, types) {
   }
 
   function openExplain() {
-    if (!(els.explainModal instanceof HTMLElement)) return;
-    closeMagicMenu();
-    els.explainModal.removeAttribute("hidden");
-    document.body.classList.add("modalOpen");
-    explainLastFocus = document.activeElement;
-    // focus close button for keyboard users
-    if (els.explainClose instanceof HTMLButtonElement) els.explainClose.focus();
-  }
+  if (!(els.explainModal instanceof HTMLElement)) return;
+  closeMagicMenu();
+  els.explainModal.removeAttribute("hidden");
+  explainLastFocus = document.activeElement;
+  updateBodyModalOpen();
+
+  // focus close button for keyboard users
+  if (els.explainClose instanceof HTMLButtonElement) els.explainClose.focus();
+}
+
 
   function closeExplain() {
-    if (!(els.explainModal instanceof HTMLElement)) return;
-    els.explainModal.setAttribute("hidden", "");
-    document.body.classList.remove("modalOpen");
-    const prev = explainLastFocus;
-    explainLastFocus = null;
-    if (prev && prev instanceof HTMLElement) prev.focus();
+  if (!(els.explainModal instanceof HTMLElement)) return;
+  els.explainModal.setAttribute("hidden", "");
+  const prev = explainLastFocus;
+  explainLastFocus = null;
+  updateBodyModalOpen();
+  if (prev && prev instanceof HTMLElement) prev.focus();
+}
+// --------------------
+// Location picker (pre-combat)
+// --------------------
+let locationLastFocus = null;
+
+function isLocationOpen() {
+  return (els.locationModal instanceof HTMLElement) && !els.locationModal.hasAttribute("hidden");
+}
+
+function updateBodyModalOpen() {
+  const any = isExplainOpen() || isLocationOpen();
+  document.body.classList.toggle("modalOpen", any);
+}
+
+function renderLocationChoices() {
+  if (!(els.locationChoices instanceof HTMLElement)) return;
+
+  els.locationChoices.innerHTML = LOCATIONS.map((loc) => {
+    const set = loc.enemySet.map((i) => ENEMIES[i]);
+    const w1 = set[0];
+    const w2 = set[1];
+
+    return `
+      <button type="button" class="btn ghost rpgLocChoice" data-loc="${loc.id}">
+        <div class="rpgLocTitle">${loc.name}</div>
+        <div class="muted small">${loc.subtitle}</div>
+        <div class="rpgLocMeta muted small">Wave 1: <strong>${w1.name}</strong> <span class="rpgTypeInline">(${formatTypesDisplay(w1.types)})</span></div>
+        <div class="rpgLocMeta muted small">Wave 2: <strong>${w2.name}</strong> <span class="rpgTypeInline">(${formatTypesDisplay(w2.types)})</span></div>
+      </button>
+    `;
+  }).join("");
+}
+
+function openLocationPicker() {
+  if (!(els.locationModal instanceof HTMLElement)) return;
+  closeMagicMenu();
+
+  renderLocationChoices();
+  els.locationModal.removeAttribute("hidden");
+  locationLastFocus = document.activeElement;
+  updateBodyModalOpen();
+
+  setPhase("select");
+  renderIntent(null);
+  setEffectBanner("—", "neutral");
+  render();
+
+  // Focus the first choice for keyboard users.
+  const first = els.locationModal.querySelector("button[data-loc]");
+  if (first instanceof HTMLButtonElement) first.focus();
+}
+
+function closeLocationPicker() {
+  if (!(els.locationModal instanceof HTMLElement)) return;
+  els.locationModal.setAttribute("hidden", "");
+  const prev = locationLastFocus;
+  locationLastFocus = null;
+  updateBodyModalOpen();
+  if (prev && prev instanceof HTMLElement) prev.focus();
+}
+
+function resetVisuals() {
+  const clear = [
+    "rpgAnim-attack",
+    "rpgAnim-hit",
+    "rpgAnim-heal",
+    "rpgAnim-guard",
+    "rpgAnim-faint",
+  ];
+
+  if (els.enemySprite instanceof HTMLElement) {
+    clear.forEach((c) => els.enemySprite.classList.remove(c));
+    els.enemySprite.classList.remove("is-guarding");
+    els.enemySprite.classList.remove("is-phase2");
   }
+  if (els.playerSprite instanceof HTMLElement) {
+    clear.forEach((c) => els.playerSprite.classList.remove(c));
+    els.playerSprite.classList.remove("is-guarding");
+  }
+}
+
+function startBattleWithLocation(locId) {
+  const loc = setActiveLocation(locId);
+
+  closeMagicMenu();
+  closeLocationPicker();
+
+  resetVisuals();
+
+  state = makeInitialState(activeEnemySet, loc.id);
+  state.enemy.intent = computeEnemyIntent();
+  renderIntent(state.enemy.intent);
+
+  setEffectBanner("—", "neutral");
+  setPhase("player");
+  render();
+}
+
+
 
   // Open/close wiring
   if (els.explainBtn instanceof HTMLButtonElement) {
@@ -699,83 +804,170 @@ function setPreviewMove(name, type, baseCost) {
   };
 
   const ENEMIES = [
-    {
-      name: "Rival Mage",
-      types: /** @type {MagicType[]} */ (["Fire", "Sight"]),
-      maxHp: 22,
-      healCharges: 2,
-      profile: "fireSight",
-      sprite: "./assets/images/enemy-blue.png",
-    },
-    {
-      name: "Stonebound Seer",
-      types: /** @type {MagicType[]} */ (["Earth", "Touch"]),
-      maxHp: 28,
-      healCharges: 2,
-      profile: "earthTouch",
-      sprite: "./assets/images/enemy-blonde.png",
-    },
-  ];
+  {
+    name: "Rival Mage",
+    types: /** @type {MagicType[]} */ (["Fire", "Sight"]),
+    maxHp: 22,
+    healCharges: 2,
+    profile: "fireSight",
+    sprite: "./assets/images/enemy-blue.png",
+  },
+  {
+    name: "Stonebound Seer",
+    types: /** @type {MagicType[]} */ (["Earth", "Touch"]),
+    maxHp: 28,
+    healCharges: 2,
+    profile: "earthTouch",
+    sprite: "./assets/images/enemy-blonde.png",
+  },
+  {
+    name: "Skyline Duelist",
+    types: /** @type {MagicType[]} */ (["Wind", "Sight"]),
+    maxHp: 24,
+    healCharges: 1,
+    profile: "windSight",
+    sprite: "./assets/images/enemy-green.png",
+  },
+  {
+    name: "Mirrorbind Adept",
+    types: /** @type {MagicType[]} */ (["Touch", "Sight"]),
+    maxHp: 26,
+    healCharges: 1,
+    profile: "mirrorTouch",
+    sprite: "./assets/images/enemy-red.png",
+  },
+];
+
+const LOCATIONS = [
+  { id: "ember_plaza", name: "Ember Plaza", subtitle: "Warm stones. Hot tempers.", enemySet: [0, 1] },
+  { id: "quartz_library", name: "Quartz Library", subtitle: "Quiet halls. Heavy secrets.", enemySet: [1, 2] },
+  { id: "gale_rooftops", name: "Gale Rooftops", subtitle: "Open sky. Unstable footing.", enemySet: [2, 3] },
+  { id: "mirror_tunnels", name: "Mirror Tunnels", subtitle: "Dim lights. Echoing steps.", enemySet: [3, 0] },
+];
+
+/** @type {string|null} */
+let activeLocationId = null;
+
+/** @type {typeof ENEMIES} */
+let activeEnemySet = [ENEMIES[0], ENEMIES[1]];
+
+function getLocationById(id) {
+  return LOCATIONS.find((l) => l.id === id) || LOCATIONS[0];
+}
+
+function setActiveLocation(id) {
+  const loc = getLocationById(id);
+  activeLocationId = loc.id;
+  activeEnemySet = loc.enemySet.map((i) => ENEMIES[i]);
+  return loc;
+}
+
 
   /**
    * Create a fresh enemy state from template.
    * @param {number} waveIndex
    */
-  function makeEnemy(waveIndex) {
-    const t = ENEMIES[waveIndex] ?? ENEMIES[0];
-    return {
-      name: t.name,
-      types: t.types,
-      hp: t.maxHp,
-      max: t.maxHp,
-      healCharges: t.healCharges,
+  function makeEnemy(waveIndex, enemySet) {
+  const set = enemySet || activeEnemySet || ENEMIES;
+  const t = set[waveIndex] ?? set[0] ?? ENEMIES[0];
+
+  return {
+    name: t.name,
+    types: t.types,
+    hp: t.maxHp,
+    max: t.maxHp,
+    healCharges: t.healCharges,
+
+    // statuses
+    guarding: false,     // brace (50% next hit)
+    ward: 0,             // mirror ward: 40% reduction + reflect
+    fortified: 0,        // earth fortify: 30% reduction
+    gusted: false,       // next damage -2
+    burn: 0,             // ticks 2 at start of turn
+    enraged: false,
+
+    // AI
+    profile: t.profile,
+    aiStep: 0,
+    intent: null,        // filled at start of player's turn
+    sprite: t.sprite,
+  };
+}
+
+
+  function makeInitialState(enemySet = activeEnemySet, locationId = activeLocationId) {
+  const set = enemySet || activeEnemySet || [ENEMIES[0], ENEMIES[1]];
+  const loc = locationId ? getLocationById(locationId) : null;
+
+  return {
+    turn: 1,
+    phase: "player",
+    wave: 0,
+    locationId: loc ? loc.id : null,
+    enemySet: set,
+    player: {
+      name: PLAYER_TEMPLATE.name,
+      types: PLAYER_TEMPLATE.types,
+      hp: PLAYER_TEMPLATE.maxHp,
+      max: PLAYER_TEMPLATE.maxHp,
 
       // statuses
-      guarding: false,     // brace (50% next hit)
-      ward: 0,             // mirror ward: 40% reduction + reflect
-      fortified: 0,        // earth fortify: 30% reduction
-      gusted: false,       // next damage -2
-      burn: 0,             // ticks 2 at start of turn
-      enraged: false,
+      guarding: false,
+      evading: false,   // next hit reduced
+      burn: 0,
+      bound: 0,         // touch bind: next attack weakened + magic costs +1 focus
 
-      // AI
-      profile: t.profile,
-      aiStep: 0,
-      intent: null,        // filled at start of player's turn
-      sprite: t.sprite,
-    };
-  }
+      // resources
+      healCharges: PLAYER_TEMPLATE.healCharges,
+      focus: PLAYER_TEMPLATE.focusStart,
+      focusMax: PLAYER_TEMPLATE.focusMax,
+    },
+    enemy: makeEnemy(0, set),
+    over: false,
+    log: [
+      `Location: ${loc ? loc.name : "—"}.`,
+      `Wave 1: ${set[0].name} steps into view.`,
+      "Your turn.",
+    ],
+  };
+}
 
-  function makeInitialState() {
-    return {
-      turn: 1,
-      phase: "player",
-      wave: 0,
-      player: {
-        name: PLAYER_TEMPLATE.name,
-        types: PLAYER_TEMPLATE.types,
-        hp: PLAYER_TEMPLATE.maxHp,
-        max: PLAYER_TEMPLATE.maxHp,
+function makeLobbyState() {
+  const loc = LOCATIONS[0];
+  const set = loc.enemySet.map((i) => ENEMIES[i]);
 
-        // statuses
-        guarding: false,
-        evading: false,   // next hit reduced
-        burn: 0,
-        bound: 0,         // touch bind: next attack weakened + magic costs +1 focus
+  return {
+    turn: 1,
+    phase: "select",
+    wave: 0,
+    locationId: null,
+    enemySet: set,
+    player: {
+      name: PLAYER_TEMPLATE.name,
+      types: PLAYER_TEMPLATE.types,
+      hp: PLAYER_TEMPLATE.maxHp,
+      max: PLAYER_TEMPLATE.maxHp,
 
-        // resources
-        healCharges: PLAYER_TEMPLATE.healCharges,
-        focus: PLAYER_TEMPLATE.focusStart,
-        focusMax: PLAYER_TEMPLATE.focusMax,
-      },
-      enemy: makeEnemy(0),
-      over: false,
-      log: [
-        `Wave 1: ${ENEMIES[0].name} steps into view.`,
-        "Your turn.",
-      ],
-    };
-  }
+      // statuses
+      guarding: false,
+      evading: false,
+      burn: 0,
+      bound: 0,
+
+      // resources
+      healCharges: PLAYER_TEMPLATE.healCharges,
+      focus: PLAYER_TEMPLATE.focusStart,
+      focusMax: PLAYER_TEMPLATE.focusMax,
+    },
+    enemy: makeEnemy(0, set),
+    over: false,
+    log: [
+      "Choose a location to begin.",
+      "Pick a battleground to determine your encounter.",
+    ],
+  };
+}
+
 
   const GAME_BUILD = "2026-02-14s";
 
@@ -867,41 +1059,66 @@ function setPreviewMove(name, type, baseCost) {
    * @returns {Intent}
    */
   function computeEnemyIntent() {
-    const e = state.enemy;
-    const p = state.player;
+  const p = state.player;
+  const e = state.enemy;
 
-    // Emergency heal takes priority (still deterministic).
-    if (e.hp <= Math.ceil(e.max * 0.35) && e.healCharges > 0) {
-      return { id: "heal", name: "Mend", type: null, base: 0, note: "Heals 6 HP" };
-    }
+  // Emergency heal if low.
+  if (e.hp > 0 && e.hp < e.max && e.healCharges > 0) {
+    const ratio = e.hp / e.max;
+    if (ratio <= 0.32) return { id: "heal", name: "Heal", type: null, base: 0, note: "Heals for 8" };
+  }
 
-    // Wave 1: Fire/Sight pattern.
-    if (e.profile === "fireSight") {
-      const pattern = ["ignite", "lance", "ward", "siphon", "attack"];
-      let next = pattern[e.aiStep % pattern.length];
+  // Profiles (deterministic patterns)
+  if (e.profile === "fireSight") {
+    const pattern = ["ignite", "lance", "ward", "siphon", "attack"];
+    let next = pattern[e.aiStep % pattern.length];
 
-      // If you're already burning, they don't waste a turn re-igniting.
-      if (next === "ignite" && p.burn > 0) next = "lance";
+    // If you're already burning, they don't waste a turn re-igniting.
+    if (next === "ignite" && p.burn > 0) next = "lance";
 
-      if (next === "ignite") return { id: "ignite", name: "Ignite", type: "Fire", base: 4, note: "Applies Burn (2)" };
-      if (next === "lance") return { id: "lance", name: "Arcane Lance", type: "Sight", base: 6, note: "" };
-      if (next === "ward") return { id: "ward", name: "Mirror Ward", type: null, base: 0, note: "Next hit reduced + reflects" };
-      if (next === "siphon") return { id: "siphon", name: "Siphon", type: "Sight", base: 4, note: "Heals enemy for 3" };
-      return { id: "attack", name: "Strike", type: "Sight", base: 4, note: "" };
-    }
+    if (next === "ignite") return { id: "ignite", name: "Ignite", type: "Fire", base: 4, note: "Applies Burn (2)" };
+    if (next === "lance") return { id: "lance", name: "Arcane Lance", type: "Sight", base: 6, note: "" };
+    if (next === "ward") return { id: "ward", name: "Mirror Ward", type: null, base: 0, note: "Next hit reduced + reflects" };
+    if (next === "siphon") return { id: "siphon", name: "Siphon", type: "Sight", base: 4, note: "Heals enemy for 3" };
+    return { id: "attack", name: "Strike", type: "Sight", base: 4, note: "" };
+  }
 
-    // Wave 2: Earth/Touch pattern.
-    const pattern = ["stonebind", "quake", "fortify", "shatter", "quake"];
+  if (e.profile === "windSight") {
+    const pattern = ["squall", "lance", "ward", "squall", "attack"];
+    const next = pattern[e.aiStep % pattern.length];
+
+    if (next === "squall") return { id: "squall", name: "Squall", type: "Wind", base: 5, note: "" };
+    if (next === "lance") return { id: "lance", name: "Arcane Lance", type: "Sight", base: 6, note: "" };
+    if (next === "ward") return { id: "ward", name: "Mirror Ward", type: null, base: 0, note: "Next hit reduced + reflects" };
+    return { id: "attack", name: "Strike", type: "Sight", base: 4, note: "" };
+  }
+
+  if (e.profile === "mirrorTouch") {
+    const pattern = ["mirrorbind", "glare", "fortify", "glare", "attack"];
     let next = pattern[e.aiStep % pattern.length];
 
     // If you're already bound, they pivot to damage.
-    if (next === "stonebind" && p.bound > 0) next = "quake";
+    if (next === "mirrorbind" && p.bound > 0) next = "glare";
 
-    if (next === "stonebind") return { id: "stonebind", name: "Stonebind", type: "Touch", base: 3, note: "Applies Bind" };
-    if (next === "quake") return { id: "quake", name: "Quake", type: "Earth", base: 6, note: "Shakes through guard" };
+    if (next === "mirrorbind") return { id: "mirrorbind", name: "Mirrorbind", type: "Touch", base: 3, note: "Applies Bind" };
+    if (next === "glare") return { id: "glare", name: "Glare", type: "Sight", base: 5, note: "" };
     if (next === "fortify") return { id: "fortify", name: "Fortify", type: null, base: 0, note: "Next hit reduced" };
-    return { id: "shatter", name: "Shatter", type: "Earth", base: 5, note: "Punishes Guard" };
+    return { id: "attack", name: "Strike", type: "Sight", base: 4, note: "" };
   }
+
+  // Default: Earth/Touch pattern.
+  const pattern = ["stonebind", "quake", "fortify", "shatter", "quake"];
+  let next = pattern[e.aiStep % pattern.length];
+
+  // If you're already bound, they pivot to damage.
+  if (next === "stonebind" && p.bound > 0) next = "quake";
+
+  if (next === "stonebind") return { id: "stonebind", name: "Stonebind", type: "Touch", base: 3, note: "Applies Bind" };
+  if (next === "quake") return { id: "quake", name: "Quake", type: "Earth", base: 6, note: "Shakes through guard" };
+  if (next === "fortify") return { id: "fortify", name: "Fortify", type: null, base: 0, note: "Next hit reduced" };
+  return { id: "shatter", name: "Shatter", type: "Earth", base: 5, note: "Punishes Guard" };
+}
+
 
   /** @param {Intent|null} intent */
   function renderIntent(intent) {
@@ -1052,7 +1269,7 @@ function setPreviewMove(name, type, baseCost) {
 
     // Names + types
     setText(els.playerName, state.player.name);
-    setText(els.enemyName, `${state.enemy.name} (Wave ${state.wave + 1}/${ENEMIES.length})`);
+    setText(els.enemyName, `${state.enemy.name} (Wave ${state.wave + 1}/${state.enemySet.length})`);
     setTypeLine(els.playerTypeText, state.player.types);
     setTypeLine(els.enemyTypeText, state.enemy.types);
 
@@ -1179,7 +1396,7 @@ function setPreviewMove(name, type, baseCost) {
     playAnim(els.enemySprite, "rpgAnim-faint");
 
     const nextIndex = state.wave + 1;
-    if (nextIndex >= ENEMIES.length) {
+    if (nextIndex >= state.enemySet.length) {
       endGame("The duel ends. You win!");
       return;
     }
@@ -1197,7 +1414,7 @@ function setPreviewMove(name, type, baseCost) {
 
     // Spawn next enemy.
     state.wave = nextIndex;
-    state.enemy = makeEnemy(state.wave);
+    state.enemy = makeEnemy(state.wave, state.enemySet);
 
     addLog(`Wave ${state.wave + 1}: ${state.enemy.name} arrives.`);
     addLog("Your turn.");
@@ -1254,6 +1471,7 @@ function setPreviewMove(name, type, baseCost) {
 
     if (phase === "player") setTurnBanner("Your turn", "player");
     else if (phase === "enemy") setTurnBanner("Enemy turn", "enemy");
+    else if (phase === "select") setTurnBanner("Choose a location", null);
     else setTurnBanner("Resolving…", "enemy");
   }
 
@@ -1438,10 +1656,12 @@ function setPreviewMove(name, type, baseCost) {
       p.burn = Math.max(p.burn, 2);
       addLog("Flame clings to you (burn).");
     }
-    if (intent.id === "stonebind") {
-      p.bound = 1;
-      addLog("Stonebind locks your movement (bind).");
-    }
+    if (intent.id === "stonebind" || intent.id === "mirrorbind") {
+  p.bound = 1;
+  addLog(intent.id === "stonebind"
+    ? "Stonebind locks your movement (bind)."
+    : "Mirrorbind locks your movement (bind).");
+}
     if (intent.id === "siphon") {
       const heal = 3;
       e.hp = clamp(e.hp + heal, 0, e.max);
@@ -1742,34 +1962,16 @@ playAnim(els.playerSprite, "rpgAnim-heal");
   }
 
   function restart() {
-    closeMagicMenu();
-    state = makeInitialState();
+  closeMagicMenu();
+  resetVisuals();
+  state = makeLobbyState();
+  renderIntent(null);
+  setEffectBanner("—", "neutral");
+  setPhase("select");
+  render();
+  openLocationPicker();
+}
 
-    const clear = [
-      "rpgAnim-attack",
-      "rpgAnim-hit",
-      "rpgAnim-heal",
-      "rpgAnim-guard",
-      "rpgAnim-faint",
-    ];
-
-    if (els.enemySprite instanceof HTMLElement) {
-      clear.forEach((c) => els.enemySprite.classList.remove(c));
-      els.enemySprite.classList.remove("is-guarding");
-      els.enemySprite.classList.remove("is-phase2");
-    }
-    if (els.playerSprite instanceof HTMLElement) {
-      clear.forEach((c) => els.playerSprite.classList.remove(c));
-      els.playerSprite.classList.remove("is-guarding");
-    }
-
-    // Set initial intent so the first turn is readable.
-    state.enemy.intent = computeEnemyIntent();
-    renderIntent(state.enemy.intent);
-
-    setEffectBanner("—", "neutral");
-    render();
-  }
 
   // --------------------
   // Wire up events
@@ -1786,6 +1988,18 @@ playAnim(els.playerSprite, "rpgAnim-heal");
   if (els.guardBtn instanceof HTMLButtonElement) els.guardBtn.addEventListener("click", playerGuard);
   if (els.restartBtn instanceof HTMLButtonElement) els.restartBtn.addEventListener("click", restart);
 
+  if (els.locationChoices instanceof HTMLElement) {
+    els.locationChoices.addEventListener("click", (e) => {
+      const target = e.target;
+      if (!(target instanceof HTMLElement)) return;
+      const btn = target.closest("button[data-loc]");
+      if (!(btn instanceof HTMLButtonElement)) return;
+      const locId = btn.getAttribute("data-loc");
+      if (!locId) return;
+      startBattleWithLocation(locId);
+    });
+  }
+
   
   // Effectiveness preview (hover/focus shows Extra/Normal/Weak before you click)
   const wirePreview = (btn, name, type, baseCost) => {
@@ -1799,10 +2013,11 @@ playAnim(els.playerSprite, "rpgAnim-heal");
   wirePreview(els.windBtn, "Wind attack", "Wind", 2);
   wirePreview(els.fireBtn, "Fire attack", "Fire", 3);
 
-// Initialize
-  state.enemy.intent = computeEnemyIntent();
-  setPhase("player");
-  renderIntent(state.enemy.intent);
+// Initialize (start on the location picker)
+  state = makeLobbyState();
+  renderIntent(null);
   setEffectBanner("—", "neutral");
+  setPhase("select");
   render();
+  openLocationPicker();
 }

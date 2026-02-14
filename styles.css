@@ -2735,6 +2735,40 @@ body.modalOpen {
   gap: 8px;
 }
 
+/* Location picker */
+.rpgLocationGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+@media (max-width: 640px) {
+  .rpgLocationGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.rpgLocChoice {
+  padding: 12px 14px;
+  text-align: left;
+  border-radius: 14px;
+}
+
+.rpgLocTitle {
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.rpgLocMeta {
+  margin-top: 6px;
+}
+
+.rpgTypeInline {
+  opacity: 0.9;
+}
+
+
 .rpgFormula {
   margin: 0;
   padding: 10px 12px;
