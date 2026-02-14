@@ -8,7 +8,7 @@
 <title>Dragonstone | Tiny Turn RPG</title>
 <link href="./favicon.ico" rel="icon" sizes="any"/>
 <link href="./favicon.png" rel="icon" type="image/png"/>
-<link href="./styles.css?v=2026-02-14k" rel="stylesheet"/>
+<link href="./styles.css?v=2026-02-14l" rel="stylesheet"/>
 </head>
 <body class="gamePage">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -57,7 +57,19 @@
 <p class="kicker">Minigame</p>
 <h1>Tiny Turn RPG</h1>
 <p class="muted">Pick an action, watch your rival respond, and keep your HP above zero.</p>
-<p class="muted small" id="buildTag">Build: 2026-02-14k</p>
+<p class="muted small" id="buildTag">Build: 2026-02-14l</p>
+
+<details class="rpgHowto" id="howtoDetails">
+  <summary>How to play (30 sec)</summary>
+  <ul>
+    <li><strong>Goal:</strong> drop the enemy HP to 0 before yours hits 0. Defeat both waves to win.</li>
+    <li><strong>Turn loop:</strong> you act, then the enemy acts. Check <strong>Intent</strong> to plan.</li>
+    <li><strong>Focus:</strong> <strong>Attack</strong> and <strong>Guard</strong> give <strong>+1 Focus</strong>. <strong>Magic</strong> and <strong>Heal</strong> spend Focus.</li>
+    <li><strong>Types:</strong> some types are strong/weak into others. Hover actions to see <strong>Extra effective / Normal / Weak</strong>.</li>
+    <li><strong>Status:</strong> <strong>Burn</strong> deals damage each turn. <strong>Bound</strong> makes magic cost +1 Focus. <strong>Guard</strong> breaks Bind.</li>
+  </ul>
+</details>
+
 </div>
 <div class="rpgWrap" id="rpgRoot">
 <div aria-label="Battlefield" class="rpgGrid" role="group">
@@ -68,6 +80,10 @@
 <p class="muted small rpgTypeLine" id="playerTypeText">Type: Wind • Sight</p>
 <p class="muted small" id="playerStatus">Ready</p>
 <p class="muted small" id="playerFocusText">Focus: 2 / 6</p>
+<div class="rpgMiniBar" aria-label="Focus meter">
+  <div class="rpgMiniBarFill" id="playerFocusFill"></div>
+</div>
+<p class="muted tiny rpgInlineHelp" id="playerFocusHelp">Spend Focus on Magic/Heal. Attack/Guard builds it.</p>
 </div>
 <p class="rpgHpText" id="playerHpText">HP 20 / 20</p>
 </div>
@@ -82,6 +98,7 @@
 <p class="muted small rpgTypeLine" id="enemyTypeText">Type: Fire • Sight</p>
 <p class="muted small" id="enemyStatus">Channeling</p>
 <p class="muted small" id="enemyIntentText">Intent: —</p>
+<p class="muted tiny rpgInlineHelp" id="enemyIntentHelp">Intent shows what the enemy plans to do next turn.</p>
 </div>
 <p class="rpgHpText" id="enemyHpText">HP 18 / 18</p>
 </div>
@@ -105,6 +122,7 @@
 
 <div aria-label="Actions" class="rpgActions">
 <div class="rpgEffectPreview isNeutral" id="effectPreview" aria-live="polite">Effect preview: <span class="rpgEffectPreviewText">Hover an attack to see effectiveness.</span></div>
+<div class="rpgHint" id="rpgHint" aria-live="polite">Tip: Hover an action to preview effectiveness and Focus cost. Check enemy Intent to plan.</div>
 <button class="btn primary" id="attackBtn" type="button">Attack</button>
 <button class="btn secondary" id="healBtn" type="button">Heal</button>
 <button class="btn ghost" id="guardBtn" type="button">Guard</button>
@@ -263,6 +281,6 @@
 </footer>
 <script defer="" src="./script.js"></script>
 <script src="./js/app.js" type="module"></script>
-<script defer src="./js/game.js?v=2026-02-14k"></script>
+<script defer src="./js/game.js?v=2026-02-14l"></script>
 </body>
 </html>

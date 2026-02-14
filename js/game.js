@@ -28,6 +28,7 @@ if (root) {
     playerStatus: document.getElementById("playerStatus"),
     enemyStatus: document.getElementById("enemyStatus"),
     playerFocusText: document.getElementById("playerFocusText"),
+    playerFocusFill: document.getElementById("playerFocusFill"),
     enemyIntentText: document.getElementById("enemyIntentText"),
 
     log: document.getElementById("battleLog"),
@@ -40,6 +41,8 @@ if (root) {
     windBtn: document.getElementById("windBtn"),
     fireBtn: document.getElementById("fireBtn"),
     effectPreview: document.getElementById("effectPreview"),
+    hintLine: document.getElementById("rpgHint"),
+    howtoDetails: document.getElementById("howtoDetails"),
 
     explainBtn: document.getElementById("explainBtn"),
     explainModal: document.getElementById("explainModal"),
@@ -301,7 +304,77 @@ function setTypeAccent(el, types) {
   }
 
   /** @param {string} name @param {MagicType} type @param {number} baseCost */
-  function setPreviewMove(name, type, baseCost) {
+  
+  /**
+   * Render a short, always-visible hint so the game explains itself while you play.
+   * The goal is not to "play for you", but to make the mechanics readable.
+   */
+  function renderHint() {
+    if (!(els.hintLine instanceof HTMLElement)) return;
+
+    if (state.over) {
+      els.hintLine.textContent = "Tip: Restart to play again. Use Explain for the full rules.";
+      return;
+    }
+
+    const extra = state.player.bound > 0 ? 1 : 0;
+    const healCost = 1 + extra;
+    const hpRatio = state.player.hp / Math.max(1, state.player.max);
+
+    const intent = state.enemy.intent;
+    let intentHint = "";
+    if (intent) {
+      if (intent.id === "shatter") intentHint = "Enemy intent: Shatter (punishes Guard).";
+      else if (intent.id === "quake") intentHint = "Enemy intent: Quake (hits hard even through Guard).";
+      else if (intent.id === "stonebind") intentHint = "Enemy intent: Stonebind (causes Bind).";
+      else if (intent.id === "ignite") intentHint = "Enemy intent: Ignite (causes Burn).";
+      else if (intent.id === "ward" || intent.id === "fortify") intentHint = `Enemy intent: ${intent.name} (defense up).`;
+      else if (intent.id === "heal") intentHint = "Enemy intent: Heal (they'll recover HP).";
+      else intentHint = `Enemy intent: ${intent.name}.`;
+    }
+
+    // If low HP, prioritize the healing explanation.
+    if (hpRatio <= 0.35 && state.player.healCharges > 0) {
+      if (state.player.focus >= healCost) {
+        els.hintLine.textContent = [intentHint, `Low HP: Heal now (${healCost} Focus).`].filter(Boolean).join(" ");
+        return;
+      }
+      els.hintLine.textContent = [intentHint, `Low HP: Build Focus with Attack/Guard to Heal (need ${healCost}).`].filter(Boolean).join(" ");
+      return;
+    }
+
+    // Otherwise, recommend the best affordable hit (based on type effectiveness).
+    const atkPrev = computeTypedDamage("player", "enemy", 5, "Sight");
+    const windPrev = computeTypedDamage("player", "enemy", 4, "Wind");
+    const firePrev = computeTypedDamage("player", "enemy", 6, "Fire");
+
+    const options = [
+      { label: "Attack", type: "Sight", cost: 0, overall: atkPrev.overall },
+      { label: "Wind attack", type: "Wind", cost: 2 + extra, overall: windPrev.overall },
+      { label: "Fire attack", type: "Fire", cost: 3 + extra, overall: firePrev.overall },
+    ];
+
+    const affordable = options.filter((o) => state.player.focus >= o.cost);
+    const best = (affordable.length ? affordable : options).slice().sort((a, b) => b.overall - a.overall)[0];
+
+    const eff = typeMultiplier(best.type, state.enemy.types);
+    const tier = effectivenessTierLabel(eff);
+
+    let actionHint = "";
+    if (best.cost > state.player.focus) {
+      actionHint = `${best.label} is ${tier.label.toLowerCase()} (x${fmtMult(best.overall)}), but you need ${best.cost} Focus. Use Attack/Guard to build Focus.`;
+    } else if (best.label === "Attack") {
+      actionHint = "Build Focus with Attack/Guard, then spend it on Magic or Heal.";
+    } else {
+      actionHint = `Best hit: ${best.label} is ${tier.label.toLowerCase()} (x${fmtMult(best.overall)}).`;
+    }
+
+    const bindNote = state.player.bound > 0 ? "You are Bound: magic costs +1 Focus. Guard breaks Bind." : "";
+
+    els.hintLine.textContent = [intentHint, actionHint, bindNote].filter(Boolean).join(" ");
+  }
+
+function setPreviewMove(name, type, baseCost) {
     previewMove = { name, type, baseCost };
     renderEffectPreview(previewMove);
   }
@@ -535,12 +608,28 @@ function setTypeAccent(el, types) {
     };
   }
 
-  const GAME_BUILD = "2026-02-14k";
+  const GAME_BUILD = "2026-02-14l";
 
   /** @type {ReturnType<typeof makeInitialState>} */
   let state = makeInitialState();
 
   if (els.buildTag instanceof HTMLElement) els.buildTag.textContent = `Build: ${GAME_BUILD}`;
+
+  // "How to play" helper: open by default on first visit, remember your choice.
+  try {
+    const KEY = "dragonstone_rpg_howto_open";
+    if (els.howtoDetails instanceof HTMLDetailsElement) {
+      const saved = window.localStorage.getItem(KEY);
+      if (saved === null) els.howtoDetails.open = true;
+      else els.howtoDetails.open = saved === "1";
+      els.howtoDetails.addEventListener("toggle", () => {
+        window.localStorage.setItem(KEY, els.howtoDetails.open ? "1" : "0");
+      });
+    }
+  } catch (e) {
+    // localStorage may be blocked (private mode). Ignore.
+  }
+
 
   /** @param {string} message */
   function addLog(message) {
@@ -785,7 +874,11 @@ function setTypeAccent(el, types) {
     if (els.playerFocusText instanceof HTMLElement) {
       els.playerFocusText.textContent = `Focus: ${focus} / ${state.player.focusMax}`;
     }
+    // Focus bar (visual) + keep the hover preview accurate as focus changes.
+    setBar(els.playerFocusFill, focus / state.player.focusMax);
     renderIntent(state.enemy.intent);
+    renderEffectPreview(previewMove);
+    renderHint();
 
     // Sprite swap (wave-based enemies)
     if (els.enemySpriteImg instanceof HTMLImageElement && state.enemy.sprite) {
