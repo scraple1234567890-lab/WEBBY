@@ -748,7 +748,7 @@ function setPreviewMove(name, type, baseCost) {
     };
   }
 
-  const GAME_BUILD = "2026-02-14r";
+  const GAME_BUILD = "2026-02-14s";
 
   /** @type {ReturnType<typeof makeInitialState>} */
   let state = makeInitialState();
@@ -989,9 +989,18 @@ function setPreviewMove(name, type, baseCost) {
     unit.burn = Math.max(0, unit.burn - 1);
 
     const label = who === "player" ? "You" : state.enemy.name;
-    addLog(`${label} take${who === "player" ? "" : "s"} ${dmg} burn damage.`);
-    if (who === "player") playAnim(els.playerSprite, "rpgAnim-hit");
-    if (who === "enemy") playAnim(els.enemySprite, "rpgAnim-hit");
+    // Make it visually obvious this is a status tick, not a second attack.
+    addLog(`🔥 Burn ticks: ${label} take${who === "player" ? "" : "s"} ${dmg} damage.`);
+    if (who === "player") {
+      playAnim(els.playerSprite, "rpgAnim-hit");
+      spawnFx("fire", "player");
+      spawnFloat(`-${dmg}`, "player", "dmg", null);
+    }
+    if (who === "enemy") {
+      playAnim(els.enemySprite, "rpgAnim-hit");
+      spawnFx("fire", "enemy");
+      spawnFloat(`-${dmg}`, "enemy", "dmg", null);
+    }
   }
 
   // --------------------
@@ -1174,8 +1183,11 @@ function setPreviewMove(name, type, baseCost) {
   // --------------------
 
   // Turn pacing: slow enough to read, fast enough to feel snappy.
+  // NOTE: A short "status window" makes it clearer that burn/bind ticks are not
+  // a second enemy attack.
   const TURN_DELAY_MS = prefersReducedMotion ? 120 : 650;      // after you act, before enemy acts
-  const BETWEEN_TURN_MS = prefersReducedMotion ? 120 : 450;    // after enemy acts, before your turn begins
+  const BETWEEN_TURN_MS = prefersReducedMotion ? 120 : 520;    // after enemy acts, before your turn begins
+  const STATUS_WINDOW_MS = prefersReducedMotion ? 0 : 520;     // show status resolution before "Your turn"
 
   function setTurnBanner(text, who) {
     if (!(els.turnBanner instanceof HTMLElement)) return;
@@ -1228,7 +1240,10 @@ function setPreviewMove(name, type, baseCost) {
     if (isGameOver()) return;
     if (state.enemy.hp <= 0) return;
 
-    setPhase("player");
+    // Brief "in-between" phase so the next status tick doesn't look like
+    // the enemy attacked twice.
+    setPhase("resolving");
+    render();
     window.setTimeout(() => {
       beginPlayerTurn();
     }, BETWEEN_TURN_MS);
@@ -1239,19 +1254,39 @@ function setPreviewMove(name, type, baseCost) {
     if (isGameOver()) return;
     if (state.enemy.hp <= 0) return;
 
-    // Start-of-turn effects on player
+    const finishStart = () => {
+      // Telegraph the next enemy move now (strategy).
+      state.enemy.intent = computeEnemyIntent();
+      renderIntent(state.enemy.intent);
+
+      addLog("Your turn.");
+      setPhase("player");
+      render();
+    };
+
+    // Start-of-turn effects on player (shown as a separate mini-phase).
+    if (state.player.burn > 0 && STATUS_WINDOW_MS > 0) {
+      setPhase("resolving");
+      setTurnBanner("Status effects", "player");
+      addLog("Status effects resolve.");
+      render();
+      window.setTimeout(() => {
+        tickBurn("player");
+        if (state.player.hp <= 0) {
+          endGame("The burn finishes you. Game over.");
+          return;
+        }
+        finishStart();
+      }, STATUS_WINDOW_MS);
+      return;
+    }
+
     tickBurn("player");
     if (state.player.hp <= 0) {
       endGame("The burn finishes you. Game over.");
       return;
     }
-
-    // Telegraph the next enemy move now (strategy).
-    state.enemy.intent = computeEnemyIntent();
-    renderIntent(state.enemy.intent);
-
-    addLog("Your turn.");
-    render();
+    finishStart();
   }
 
   function enemyTurn() {
