@@ -44,6 +44,8 @@ if (root) {
 
     playerTypePills: document.getElementById("playerTypePills"),
     enemyTypePills: document.getElementById("enemyTypePills"),
+    atkVsEnemyList: document.getElementById("atkVsEnemyList"),
+    enemyVsYouList: document.getElementById("enemyVsYouList"),
     effectBanner: document.getElementById("effectBanner"),
     buildTag: document.getElementById("buildTag"),
   };
@@ -170,7 +172,89 @@ if (root) {
     }
   }
 
-  /** @param {string} text @param {"super"|"not"|"neutral"} tone */
+  
+  /** @param {number} mult */
+  function matchupLabel(mult) {
+    if (mult >= 1.30) return { text: "Strong", cls: "isStrong" };
+    if (mult <= 0.90) return { text: "Weak", cls: "isWeak" };
+    return { text: "Even", cls: "isNeutral" };
+  }
+
+  /**
+   * Render a single matchup row.
+   * @param {HTMLElement|null} listEl
+   * @param {{type: MagicType, label: string, mult: number}} item
+   */
+  function appendMatchupRow(listEl, item) {
+    if (!(listEl instanceof HTMLElement)) return;
+    const li = document.createElement("li");
+    const tone = matchupLabel(item.mult);
+    li.className = `rpgTypeRow ${tone.cls}`;
+
+    const left = document.createElement("span");
+    left.className = "rpgTypeLeft";
+
+    const pill = document.createElement("span");
+    pill.className = `typePill typePill--${item.type}`;
+    pill.textContent = item.type;
+
+    const name = document.createElement("span");
+    name.className = "rpgTypeName";
+    name.textContent = item.label;
+
+    left.appendChild(pill);
+    left.appendChild(name);
+
+    const meta = document.createElement("span");
+    meta.className = "rpgTypeMeta";
+
+    const mult = document.createElement("span");
+    mult.className = "rpgMult";
+    mult.textContent = `x${fmtMult(item.mult)}`;
+
+    const tag = document.createElement("span");
+    tag.className = "rpgTag";
+    tag.textContent = tone.text;
+
+    meta.appendChild(mult);
+    meta.appendChild(tag);
+
+    li.appendChild(left);
+    li.appendChild(meta);
+
+    listEl.appendChild(li);
+  }
+
+  /**
+   * Render the simple matchup lists (no giant chart required).
+   */
+  function renderMatchupLists() {
+    // Clear
+    if (els.atkVsEnemyList instanceof HTMLElement) els.atkVsEnemyList.innerHTML = "";
+    if (els.enemyVsYouList instanceof HTMLElement) els.enemyVsYouList.innerHTML = "";
+
+    // Player moves (what the UI actually offers)
+    const atkPrev = computeTypedDamage("player", "enemy", 5, "Sight");
+    const windPrev = computeTypedDamage("player", "enemy", 4, "Wind");
+    const firePrev = computeTypedDamage("player", "enemy", 6, "Fire");
+
+    appendMatchupRow(els.atkVsEnemyList, { type: "Sight", label: "Attack", mult: atkPrev.overall });
+    appendMatchupRow(els.atkVsEnemyList, { type: "Wind", label: "Wind spell", mult: windPrev.overall });
+
+    const offType = !state.player.types.includes("Fire");
+    appendMatchupRow(els.atkVsEnemyList, { type: "Fire", label: offType ? "Fire spell (off-type)" : "Fire spell", mult: firePrev.overall });
+
+    // Enemy core move types (based on their types)
+    const seen = new Set();
+    for (const t of state.enemy.types) {
+      if (seen.has(t)) continue;
+      seen.add(t);
+      const prev = computeTypedDamage("enemy", "player", 5, t);
+      appendMatchupRow(els.enemyVsYouList, { type: t, label: `${t} move`, mult: prev.overall });
+    }
+  }
+
+/** @param {string} text @param {"super"|"not"|"neutral"} tone */
   function setEffectBanner(text, tone) {
     if (!(els.effectBanner instanceof HTMLElement)) return;
     els.effectBanner.classList.remove("isSuper", "isNot", "isNeutral");
@@ -300,7 +384,7 @@ if (root) {
     };
   }
 
-  const GAME_BUILD = "2026-02-14g";
+  const GAME_BUILD = "2026-02-14h";
 
   /** @type {ReturnType<typeof makeInitialState>} */
   let state = makeInitialState();
@@ -562,6 +646,9 @@ if (root) {
     // Type pills
     renderTypePills(els.playerTypePills, state.player.types);
     renderTypePills(els.enemyTypePills, state.enemy.types);
+
+    // Simple matchup lists
+    renderMatchupLists();
 
     // Button labels show multiplier + cost (so choices are readable)
     const atkPrev = computeTypedDamage("player", "enemy", 5, "Sight");

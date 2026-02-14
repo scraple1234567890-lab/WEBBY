@@ -8,7 +8,7 @@
 <title>Dragonstone | Tiny Turn RPG</title>
 <link href="./favicon.ico" rel="icon" sizes="any"/>
 <link href="./favicon.png" rel="icon" type="image/png"/>
-<link href="./styles.css?v=2026-02-14f" rel="stylesheet"/>
+<link href="./styles.css?v=2026-02-14h" rel="stylesheet"/>
 </head>
 <body class="gamePage">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -120,10 +120,10 @@
 <article aria-label="Type matchup" class="post rpgTypeCard">
   <div class="rpgTypeHead">
     <h2 class="rpgLogTitle">Type matchup</h2>
-    <p class="muted small">Your types and the enemy&apos;s types shape damage. Watch for the multipliers.</p>
+    <p class="muted small">Quick read: <span class="rpgLegendStrong">Strong</span> ≥ x1.3, <span class="rpgLegendWeak">Weak</span> ≤ x0.9.</p>
   </div>
 
-  <div class="rpgTypeGrid">
+  <div class="rpgTypeTop">
     <div class="rpgTypeBlock">
       <div class="rpgTypeBlockTitle">You</div>
       <div class="rpgTypePills" id="playerTypePills"></div>
@@ -133,10 +133,23 @@
       <div class="rpgTypeBlockTitle">Enemy</div>
       <div class="rpgTypePills" id="enemyTypePills"></div>
     </div>
+  </div>
 
-    <div class="rpgTypeBlock rpgTypeBlock--wide">
-      <div class="rpgTypeBlockTitle">Type chart</div>
-      <div class="rpgTypeChart" id="typeChart">
+  <div class="rpgTypeSimple">
+    <div class="rpgTypeBlock">
+      <div class="rpgTypeBlockTitle">Your attacks vs enemy</div>
+      <ul class="rpgTypeList" id="atkVsEnemyList" aria-label="Your attack multipliers"></ul>
+    </div>
+
+    <div class="rpgTypeBlock">
+      <div class="rpgTypeBlockTitle">Enemy attacks vs you</div>
+      <ul class="rpgTypeList" id="enemyVsYouList" aria-label="Enemy attack multipliers"></ul>
+    </div>
+  </div>
+
+  <details class="rpgTypeDetails">
+    <summary>Show full type chart</summary>
+    <div class="rpgTypeChart" id="typeChart">
   <span class="typePill typePill--Wind">Wind</span>
   <span class="rpgArrow">▶</span>
   <span class="typePill typePill--Fire">Fire</span>
@@ -157,12 +170,11 @@
   <span class="rpgArrow">▶</span>
   <span class="typePill typePill--Fire">Fire</span>
 </div>
-    </div>
+  </details>
 
-    <div class="rpgTypeBlock rpgTypeBlock--wide">
-      <div class="rpgTypeBlockTitle">Last impact</div>
-      <div class="rpgEffectBanner" id="effectBanner">—</div>
-    </div>
+  <div class="rpgTypeImpact">
+    <div class="rpgTypeBlockTitle">Last impact</div>
+    <div class="rpgEffectBanner" id="effectBanner">—</div>
   </div>
 </article>
 
@@ -203,6 +215,6 @@
 </footer>
 <script defer="" src="./script.js"></script>
 <script src="./js/app.js" type="module"></script>
-<script defer src="./js/game.js?v=2026-02-14f"></script>
+<script defer src="./js/game.js?v=2026-02-14h"></script>
 </body>
 </html>

@@ -3813,6 +3813,140 @@ body.homePage #contact .sectionHead p.muted{
   flex-wrap: wrap;
 }
 
+
+.rpgLegendStrong,
+.rpgLegendWeak{
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.06);
+  font-weight: 900;
+}
+
+.rpgLegendStrong{
+  border-color: rgba(80,170,255,0.35);
+  background: rgba(80,170,255,0.14);
+}
+
+.rpgLegendWeak{
+  border-color: rgba(255,120,80,0.28);
+  background: rgba(255,120,80,0.12);
+}
+
+.rpgTypeTop{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.rpgTypeSimple{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.rpgTypeList{
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rpgTypeRow{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(0,0,0,0.55);
+}
+
+.rpgTypeLeft{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.rpgTypeName{
+  font-weight: 900;
+  opacity: 0.95;
+  font-size: 0.86rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rpgTypeMeta{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.rpgMult{
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  opacity: 0.95;
+}
+
+.rpgTag{
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  font-size: 0.78rem;
+  font-weight: 900;
+  opacity: 0.98;
+}
+
+.rpgTypeRow.isStrong{
+  border-color: rgba(80,170,255,0.35);
+  background: rgba(80,170,255,0.10);
+}
+
+.rpgTypeRow.isWeak{
+  border-color: rgba(255,120,80,0.28);
+  background: rgba(255,120,80,0.09);
+}
+
+.rpgTypeDetails{
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.45);
+}
+
+.rpgTypeDetails summary{
+  cursor: pointer;
+  font-weight: 900;
+  opacity: 0.95;
+  user-select: none;
+}
+
+.rpgTypeDetails[open] summary{
+  margin-bottom: 10px;
+}
+
+.rpgTypeImpact{
+  margin-top: 12px;
+}
+
+@media (max-width: 740px){
+  .rpgTypeTop{ grid-template-columns: 1fr; }
+  .rpgTypeSimple{ grid-template-columns: 1fr; }
+}
+
 .rpgTypeGrid{
   display: grid;
   grid-template-columns: 1fr 1fr;
