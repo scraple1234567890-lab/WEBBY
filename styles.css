@@ -2473,8 +2473,8 @@ body.isEditingShopProduct {
 
 /* Game page readability: make panels fully opaque so menus/cards are easier to see */
 body.gamePage {
-  --panel: rgba(16, 10, 32, 0.92);
-  --panel2: rgba(26, 16, 48, 0.92);
+  --panel: rgb(16 10 32);
+  --panel2: rgb(26 16 48);
   --border: rgba(255, 255, 255, 0.20);
 }
 

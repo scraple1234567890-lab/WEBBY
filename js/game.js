@@ -222,7 +222,7 @@ if (root) {
       eff,
       stab,
       overall: stab * eff,
-      note: effectivenessText(eff),
+      note: effectivenessText(stab * eff),
     };
   }
 
@@ -301,7 +301,10 @@ if (root) {
     };
   }
 
+  const GAME_BUILD = "2026-02-14c";
+
   let state = makeInitialState();
+  addLog(`Build: ${GAME_BUILD}`);
 
   /** @param {string} message */
   function addLog(message) {
@@ -385,7 +388,9 @@ if (root) {
       els.windBtn.textContent = `Wind attack (x${fmtMult(windPrev.overall)})`;
     }
     if (els.fireBtn instanceof HTMLButtonElement) {
-      els.fireBtn.textContent = `Fire attack (x${fmtMult(firePrev.overall)})`;
+      const offType = !state.player.types.includes("Fire");
+      const label = offType ? "Fire attack (off-type)" : "Fire attack";
+      els.fireBtn.textContent = `${label} (x${fmtMult(firePrev.overall)})`;
     }
 
     // HP
@@ -429,11 +434,6 @@ if (root) {
     // Update button labels / availability
     if (els.healBtn instanceof HTMLButtonElement) {
       els.healBtn.textContent = `Heal (${state.player.healCharges})`;
-    }
-
-    // Make it obvious Fire is off-type for the player.
-    if (els.fireBtn instanceof HTMLButtonElement) {
-      els.fireBtn.textContent = "Fire attack (off-type)";
     }
 
     const disableActions = state.over;
@@ -495,6 +495,7 @@ if (root) {
     addLog(`Wave ${state.wave + 1}: ${state.enemy.name} arrives.`);
     addLog("Your turn.");
 
+    setEffectBanner("—", "neutral");
     render();
   }
 
