@@ -35,6 +35,12 @@ if (root) {
     fireBtn: document.getElementById("fireBtn"),
     playerSprite: document.getElementById("playerSprite"),
     enemySprite: document.getElementById("enemySprite"),
+    playerSpriteImg: document.getElementById("playerSpriteImg"),
+    enemySpriteImg: document.getElementById("enemySpriteImg"),
+
+    playerTypePills: document.getElementById("playerTypePills"),
+    enemyTypePills: document.getElementById("enemyTypePills"),
+    effectBanner: document.getElementById("effectBanner"),
   };
 
   /**
@@ -125,9 +131,10 @@ if (root) {
    * Design goal: noticeable, not swingy.
    */
   const TYPE_CHART = /** @type {Record<MagicType, Record<MagicType, number>>} */ ({
-    Wind: { Wind: 1.0, Fire: 1.35, Sight: 0.85 },
-    Fire: { Fire: 0.75, Wind: 1.35, Sight: 0.85 },
-    Sight: { Sight: 1.0, Wind: 1.15, Fire: 1.15 },
+    // More noticeable matchups (so types matter at a glance).
+    Wind:  { Wind: 1.0, Fire: 1.6, Sight: 0.9 },
+    Fire:  { Fire: 0.7, Wind: 1.6, Sight: 0.9 },
+    Sight: { Sight: 1.0, Wind: 1.2, Fire: 1.2 },
   });
 
   /** @param {MagicType} attackType @param {MagicType[]} defenderTypes */
@@ -141,7 +148,7 @@ if (root) {
 
   /** @param {number} mult */
   function effectivenessText(mult) {
-    if (mult >= 1.25) return "It's super effective!";
+    if (mult >= 1.30) return "It’s super effective!";
     if (mult <= 0.85) return "Not very effective…";
     return "";
   }
@@ -149,6 +156,50 @@ if (root) {
   /** @param {MagicType[]} types */
   function formatTypes(types) {
     return `Type: ${types.join(" • ")}`;
+  }
+
+  /** @param {number} n */
+  function fmtMult(n) {
+    // Avoid noisy decimals; 1.44 -> "1.44", 1.2 -> "1.2"
+    const s = (Math.round(n * 100) / 100).toString();
+    return s.includes(".") ? s.replace(/0+$/, "").replace(/\.$/, "") : s;
+  }
+
+  /** @param {MagicType} moveType @param {"player"|"enemy"} attackerKey @param {MagicType[]} defenderTypes */
+  function previewMultiplier(moveType, attackerKey, defenderTypes) {
+    const attacker = state[attackerKey];
+    const stab = attacker.types.includes(moveType) ? 1.2 : 1.0;
+    const eff = typeMultiplier(moveType, defenderTypes);
+    return { stab, eff, overall: stab * eff };
+  }
+
+  /** @param {HTMLElement|null} el @param {MagicType[]} types */
+  function renderTypePills(el, types) {
+    if (!(el instanceof HTMLElement)) return;
+    el.innerHTML = "";
+    for (const t of types) {
+      const span = document.createElement("span");
+      span.className = `typePill typePill--${t}`;
+      span.textContent = t;
+      el.appendChild(span);
+    }
+  }
+
+  /** @param {string} text @param {"super"|"not"|"neutral"} tone */
+  function setEffectBanner(text, tone) {
+    if (!(els.effectBanner instanceof HTMLElement)) return;
+    els.effectBanner.classList.remove("isSuper", "isNot", "isNeutral");
+    if (tone === "super") els.effectBanner.classList.add("isSuper");
+    else if (tone === "not") els.effectBanner.classList.add("isNot");
+    else els.effectBanner.classList.add("isNeutral");
+    els.effectBanner.textContent = text || "—";
+  }
+
+  /** @param {number} overall */
+  function toneFromMultiplier(overall) {
+    if (overall >= 1.30) return "super";
+    if (overall <= 0.90) return "not";
+    return "neutral";
   }
 
   /**
@@ -170,6 +221,7 @@ if (root) {
       scaled,
       eff,
       stab,
+      overall: stab * eff,
       note: effectivenessText(eff),
     };
   }
@@ -192,6 +244,7 @@ if (root) {
       maxHp: 22,
       healCharges: 2,
       profile: "standard",
+      sprite: "./assets/images/enemy-blue.png",
     },
     {
       name: "Cinder Seer",
@@ -199,6 +252,7 @@ if (root) {
       maxHp: 28,
       healCharges: 2,
       profile: "aggressive",
+      sprite: "./assets/images/enemy-blonde.png",
     },
   ];
 
@@ -220,6 +274,7 @@ if (root) {
       healCharges: t.healCharges,
       enraged: false,
       profile: t.profile,
+      sprite: t.sprite,
     };
   }
 
@@ -306,6 +361,32 @@ if (root) {
     );
     setText(els.playerTypeText, formatTypes(state.player.types));
     setText(els.enemyTypeText, formatTypes(state.enemy.types));
+
+    // Sprite swap (wave-based enemies)
+    if (els.enemySpriteImg instanceof HTMLImageElement && state.enemy.sprite) {
+      if (els.enemySpriteImg.getAttribute("src") !== state.enemy.sprite) {
+        els.enemySpriteImg.setAttribute("src", state.enemy.sprite);
+      }
+    }
+
+    // Type pills panel
+    renderTypePills(els.playerTypePills, state.player.types);
+    renderTypePills(els.enemyTypePills, state.enemy.types);
+
+    // Make type multipliers obvious on the move buttons
+    const atkPrev = previewMultiplier("Sight", "player", state.enemy.types);
+    const windPrev = previewMultiplier("Wind", "player", state.enemy.types);
+    const firePrev = previewMultiplier("Fire", "player", state.enemy.types);
+
+    if (els.attackBtn instanceof HTMLButtonElement) {
+      els.attackBtn.textContent = `Attack (Sight x${fmtMult(atkPrev.overall)})`;
+    }
+    if (els.windBtn instanceof HTMLButtonElement) {
+      els.windBtn.textContent = `Wind attack (x${fmtMult(windPrev.overall)})`;
+    }
+    if (els.fireBtn instanceof HTMLButtonElement) {
+      els.fireBtn.textContent = `Fire attack (x${fmtMult(firePrev.overall)})`;
+    }
 
     // HP
     setText(els.playerHpText, `HP ${playerHp} / ${state.player.max}`);
@@ -604,6 +685,7 @@ if (root) {
 
       // Siphon is Sight-type.
       const typed = computeTypedDamage("enemy", "player", base, "Sight");
+    setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
       const def = applyDefenses("player", typed.scaled);
       const final = def.final;
 
@@ -617,6 +699,7 @@ if (root) {
           : `${e.name} siphons ${final} HP and steals ${heal}.`
       );
       if (typed.note) addLog(typed.note);
+      setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
       if (!state.over) playAnim(els.playerSprite, "rpgAnim-hit");
 
       if (p.hp <= 0) {
@@ -656,12 +739,14 @@ if (root) {
 
       // Ignite is Fire-type.
       const typed = computeTypedDamage("enemy", "player", base, "Fire");
+    setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
       const def = applyDefenses("player", typed.scaled);
       const final = def.final;
 
       p.hp = clamp(p.hp - final, 0, p.max);
       addLog(roll.crit ? `A critical ignition scorches you for ${final} damage!` : `Ignition scorches you for ${final} damage.`);
       if (typed.note) addLog(typed.note);
+      setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
       playAnim(els.playerSprite, "rpgAnim-hit");
 
       // 45% chance to apply burn for 2 turns.
@@ -710,6 +795,7 @@ if (root) {
 
     // Both attack and lance are Sight-type.
     const typed = computeTypedDamage("enemy", "player", base, "Sight");
+    setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
     const def = applyDefenses("player", typed.scaled);
     const final = def.final;
 
@@ -781,6 +867,7 @@ if (root) {
     }
 
     const typed = computeTypedDamage("player", "enemy", roll.amount, "Sight");
+    setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
     const def = applyDefenses("enemy", typed.scaled);
     state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
 
@@ -831,6 +918,7 @@ if (root) {
     }
 
     const typed = computeTypedDamage("player", "enemy", roll.amount, "Wind");
+    setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
     const def = applyDefenses("enemy", typed.scaled);
     state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
 
@@ -894,6 +982,7 @@ if (root) {
 
     // Off-type Fire: no STAB for the player.
     const typed = computeTypedDamage("player", "enemy", roll.amount, "Fire");
+    setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
     const def = applyDefenses("enemy", typed.scaled);
     state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
 

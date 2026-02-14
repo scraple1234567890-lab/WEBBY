@@ -90,15 +90,61 @@
 <article aria-label="Battle scene" class="post rpgStage">
 <div aria-label="A tiny battle scene: the player faces a rival mage." class="rpgStageInner" role="img">
 <div aria-hidden="true" class="rpgFoe rpgFoe--player" id="playerSprite">
-<img alt="" class="rpgSpriteImg" loading="lazy" src="./assets/images/player-brown.png"/>
+<img id="playerSpriteImg" alt="" class="rpgSpriteImg" loading="lazy" src="./assets/images/player-brown.png"/>
 <span aria-hidden="true" class="rpgShield" id="playerShield"></span>
 </div>
 <div aria-hidden="true" class="rpgFoe rpgFoe--enemy" id="enemySprite">
-<img alt="" class="rpgSpriteImg" loading="lazy" src="./assets/images/enemy-blue.png"/>
+<img id="enemySpriteImg" alt="" class="rpgSpriteImg" loading="lazy" src="./assets/images/enemy-blue.png"/>
 <span aria-hidden="true" class="rpgShield" id="enemyShield"></span>
 </div>
 </div>
 </article>
+
+<article aria-label="Type matchup" class="post rpgTypeCard">
+  <div class="rpgTypeHead">
+    <h2 class="rpgLogTitle">Type matchup</h2>
+    <p class="muted small">Your types and the enemy&apos;s types shape damage. Watch for the multipliers.</p>
+  </div>
+
+  <div class="rpgTypeGrid">
+    <div class="rpgTypeBlock">
+      <div class="rpgTypeBlockTitle">You</div>
+      <div class="rpgTypePills" id="playerTypePills"></div>
+    </div>
+
+    <div class="rpgTypeBlock">
+      <div class="rpgTypeBlockTitle">Enemy</div>
+      <div class="rpgTypePills" id="enemyTypePills"></div>
+    </div>
+
+    <div class="rpgTypeBlock rpgTypeBlock--wide">
+      <div class="rpgTypeBlockTitle">Type chart</div>
+      <div class="rpgTypeChart" id="typeChart">
+        <span class="typePill typePill--Wind">Wind</span>
+        <span class="rpgArrow">▶</span>
+        <span class="typePill typePill--Fire">Fire</span>
+        <span class="rpgDot">•</span>
+        <span class="typePill typePill--Fire">Fire</span>
+        <span class="rpgArrow">▶</span>
+        <span class="typePill typePill--Wind">Wind</span>
+        <span class="rpgDot">•</span>
+        <span class="typePill typePill--Sight">Sight</span>
+        <span class="rpgArrow">▶</span>
+        <span class="typePill typePill--Wind">Wind</span>
+        <span class="rpgDot">•</span>
+        <span class="typePill typePill--Sight">Sight</span>
+        <span class="rpgArrow">▶</span>
+        <span class="typePill typePill--Fire">Fire</span>
+      </div>
+    </div>
+
+    <div class="rpgTypeBlock rpgTypeBlock--wide">
+      <div class="rpgTypeBlockTitle">Last impact</div>
+      <div class="rpgEffectBanner" id="effectBanner">—</div>
+    </div>
+  </div>
+</article>
+
 <div aria-label="Actions" class="rpgActions">
 <button class="btn primary" id="attackBtn" type="button">Attack</button>
 <button class="btn secondary" id="healBtn" type="button">Heal</button>
