@@ -18,6 +18,9 @@ if (root) {
     playerTypeText: document.getElementById("playerTypeText"),
     enemyTypeText: document.getElementById("enemyTypeText"),
 
+    playerCard: document.getElementById("playerCard"),
+    enemyCard: document.getElementById("enemyCard"),
+
     playerHpText: document.getElementById("playerHpText"),
     enemyHpText: document.getElementById("enemyHpText"),
     playerHpFill: document.getElementById("playerHpFill"),
@@ -111,6 +114,47 @@ if (root) {
       if (!inMenu && !inToggle) closeMagicMenu();
     }
   });
+
+
+const TYPE_META = /** @type {Record<MagicType, {icon: string, label: string}>} */ ({
+  Wind:  { icon: "🍃", label: "Wind" },
+  Fire:  { icon: "🔥", label: "Fire" },
+  Earth: { icon: "🪨", label: "Earth" },
+  Sight: { icon: "👁", label: "Sight" },
+  Touch: { icon: "✋", label: "Touch" },
+});
+
+/** @param {MagicType} t */
+function typeIcon(t) {
+  return TYPE_META[t]?.icon ?? "✦";
+}
+
+/** @param {MagicType[]} types */
+function formatTypesDisplay(types) {
+  return types.join(" • ");
+}
+
+/** @param {MagicType[]} types */
+function formatTypeLineHTML(types) {
+  const pieces = types
+    .map((t) => `<span class="typeInline typeInline--${t}">${typeIcon(t)} ${TYPE_META[t]?.label ?? t}</span>`)
+    .join('<span class="rpgDot">•</span>');
+  return `<span class="typeLabel">Type:</span> ${pieces}`;
+}
+
+/** @param {HTMLElement|null} el @param {MagicType[]} types */
+function setTypeLine(el, types) {
+  if (!(el instanceof HTMLElement)) return;
+  el.innerHTML = formatTypeLineHTML(types);
+}
+
+/** @param {HTMLElement|null} el @param {MagicType[]} types */
+function setTypeAccent(el, types) {
+  if (!(el instanceof HTMLElement)) return;
+  const primary = types[0] || "";
+  el.dataset.primaryType = primary;
+  el.dataset.types = formatTypesDisplay(types);
+}
 
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
@@ -212,7 +256,7 @@ if (root) {
 
   /** @param {MagicType[]} types */
   function formatTypes(types) {
-    return `Type: ${types.join(" • ")}`;
+    return `Type: ${formatTypesDisplay(types)}`;
   }
 
   /** @param {HTMLElement|null} el @param {MagicType[]} types */
@@ -222,7 +266,7 @@ if (root) {
     for (const t of types) {
       const span = document.createElement("span");
       span.className = `typePill typePill--${t}`;
-      span.textContent = t;
+      span.textContent = `${typeIcon(t)} ${t}`;
       el.appendChild(span);
     }
   }
@@ -439,7 +483,7 @@ if (root) {
     };
   }
 
-  const GAME_BUILD = "2026-02-14i";
+  const GAME_BUILD = "2026-02-14j";
 
   /** @type {ReturnType<typeof makeInitialState>} */
   let state = makeInitialState();
@@ -682,8 +726,8 @@ if (root) {
     // Names + types
     setText(els.playerName, state.player.name);
     setText(els.enemyName, `${state.enemy.name} (Wave ${state.wave + 1}/${ENEMIES.length})`);
-    setText(els.playerTypeText, formatTypes(state.player.types));
-    setText(els.enemyTypeText, formatTypes(state.enemy.types));
+    setTypeLine(els.playerTypeText, state.player.types);
+    setTypeLine(els.enemyTypeText, state.enemy.types);
 
     // Focus + intent
     if (els.playerFocusText instanceof HTMLElement) {
@@ -701,6 +745,12 @@ if (root) {
     // Type pills
     renderTypePills(els.playerTypePills, state.player.types);
     renderTypePills(els.enemyTypePills, state.enemy.types);
+
+    // Accent cues: make types visually obvious on cards and sprites
+    setTypeAccent(els.playerCard, state.player.types);
+    setTypeAccent(els.enemyCard, state.enemy.types);
+    setTypeAccent(els.playerSprite, state.player.types);
+    setTypeAccent(els.enemySprite, state.enemy.types);
 
     // Simple matchup lists
     renderMatchupLists();
