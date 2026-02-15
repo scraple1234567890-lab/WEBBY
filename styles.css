@@ -5201,3 +5201,87 @@ body.gamePage .rpgLog{
     max-height: 320px;
   }
 }
+
+
+/* RPG compact layout tweaks */
+.gamePage .rpgGrid { gap: 12px; }
+
+.gamePage .rpgCard { padding: 12px 14px; }
+.gamePage .rpgCardTop { display: block; }
+
+.gamePage .rpgName { font-size: 1.15rem; }
+.gamePage .rpgTypeLine { margin: 0; }
+
+.gamePage .rpgStatStack {
+  display: grid;
+  gap: 6px;
+}
+
+.gamePage .rpgHeaderRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.gamePage .rpgStatusPill {
+  margin: 0;
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.28);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.gamePage .rpgResourceRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.gamePage .rpgResourceText {
+  margin: 0;
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+.gamePage .rpgMiniBar {
+  margin-top: 0;
+  flex: 1;
+  height: 8px;
+}
+
+.gamePage .rpgHpRow { margin-top: 10px; gap: 8px; }
+.gamePage .rpgHpTrack { height: 10px; }
+.gamePage .rpgHpText--inline { font-size: 0.9rem; }
+
+.gamePage .rpgActions {
+  padding: 10px;
+  gap: 8px;
+  border-radius: 16px;
+}
+
+.gamePage .rpgEffectPreview {
+  padding: 6px 10px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+}
+
+.gamePage .rpgEffectPreviewMeta { font-size: 0.82rem; }
+.gamePage .rpgEffectPreview:empty { display: none; }
+
+.gamePage .rpgActions .btn {
+  padding: 10px 14px;
+  gap: 8px;
+  font-size: 0.98rem;
+}
+
+@media (max-width: 620px) {
+  .gamePage .rpgActions .btn { flex: 1 1 calc(50% - 8px); }
+  .gamePage .rpgMagicWrap { flex: 1 1 100%; }
+  .gamePage .rpgMagicMenu { width: 100%; }
+}

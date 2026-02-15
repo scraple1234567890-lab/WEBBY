@@ -59,15 +59,18 @@
 <div aria-label="Battlefield" class="rpgGrid" role="group">
 <article aria-label="Player" class="post rpgCard" id="playerCard">
 <div class="rpgCardTop">
-<div>
-<h2 class="rpgName" id="playerName">Player</h2>
-<p class="muted small rpgTypeLine" id="playerTypeText">Type: Wind • Sight</p>
-<p class="muted small" id="playerStatus">Ready</p>
-<p class="muted small" id="playerFocusText">Mana: 2 / 6</p>
-<div class="rpgMiniBar" aria-label="Mana meter">
-  <div class="rpgMiniBarFill" id="playerFocusFill"></div>
-</div>
-<p class="muted tiny rpgInlineHelp" id="playerFocusHelp">Spend Mana on Magic/Heal. Attack/Guard builds it.</p>
+<div class="rpgStatStack">
+  <div class="rpgHeaderRow">
+    <h2 class="rpgName" id="playerName">Player</h2>
+    <p class="muted small rpgStatusPill" id="playerStatus">Ready</p>
+  </div>
+  <p class="muted small rpgTypeLine" id="playerTypeText">Type: Wind • Sight</p>
+  <div class="rpgResourceRow" aria-label="Mana">
+    <p class="muted small rpgResourceText" id="playerFocusText">Mana: 2 / 6</p>
+    <div class="rpgMiniBar" aria-label="Mana meter">
+      <div class="rpgMiniBarFill" id="playerFocusFill"></div>
+    </div>
+  </div>
 </div>
 </div>
 <div class="rpgHpRow">
@@ -79,14 +82,19 @@
 </article>
 <article aria-label="Enemy" class="post rpgCard" id="enemyCard">
 <div class="rpgCardTop">
-<div>
-<h2 class="rpgName" id="enemyName">Rival Mage</h2>
-<p class="muted small rpgTypeLine" id="enemyTypeText">Type: Fire • Sight</p>
-<p class="muted small" id="enemyStatus">Channeling</p>
-        <p class="muted small" id="enemyFocusText">Mana: 2 / 6</p>
-        <div class="rpgMiniBar" aria-label="Mana meter">
-          <div class="rpgMiniBarFill" id="enemyFocusFill"></div>
-        </div>
+<div class="rpgStatStack">
+  <div class="rpgHeaderRow">
+    <h2 class="rpgName" id="enemyName">Rival Mage</h2>
+    <p class="muted small rpgStatusPill" id="enemyStatus">Channeling</p>
+  </div>
+  <p class="muted small rpgTypeLine" id="enemyTypeText">Type: Fire • Sight</p>
+  <div class="rpgResourceRow" aria-label="Mana">
+    <p class="muted small rpgResourceText" id="enemyFocusText">Mana: 2 / 6</p>
+    <div class="rpgMiniBar" aria-label="Mana meter">
+      <div class="rpgMiniBarFill" id="enemyFocusFill"></div>
+    </div>
+  </div>
+</div>
 </div>
 </div>
 <div class="rpgHpRow">
@@ -114,7 +122,7 @@
 </article>
 
 <div aria-label="Actions" class="rpgActions">
-<div class="rpgEffectPreview isNeutral" id="effectPreview" aria-live="polite">Effect preview: <span class="rpgEffectPreviewText">Hover an attack to see effectiveness.</span></div>
+<div class="rpgEffectPreview isNeutral" id="effectPreview" aria-live="polite"></div>
 <div class="rpgHint" id="rpgHint" aria-live="polite"></div>
 <button class="btn primary" id="attackBtn" type="button">Attack</button>
 <button class="btn secondary" id="healBtn" type="button">Heal</button>
