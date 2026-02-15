@@ -2413,6 +2413,16 @@ body.isEditingShopProduct {
 }
 
 /* Tiny Turn RPG */
+.rpgTitle {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 14px;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+}
+
+
 .rpgWrap {
   display: grid;
   gap: 14px;
@@ -2473,6 +2483,11 @@ body.isEditingShopProduct {
   line-height: 1.25;
   opacity: 0.95;
 }
+
+.rpgHint:empty {
+  display: none;
+}
+
 
 
 .rpgGrid {

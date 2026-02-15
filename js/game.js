@@ -29,6 +29,8 @@ if (root) {
     enemyStatus: document.getElementById("enemyStatus"),
     playerFocusText: document.getElementById("playerFocusText"),
     playerFocusFill: document.getElementById("playerFocusFill"),
+    enemyFocusText: document.getElementById("enemyFocusText"),
+    enemyFocusFill: document.getElementById("enemyFocusFill"),
     enemyIntentText: document.getElementById("enemyIntentText"),
 
     log: document.getElementById("battleLog"),
@@ -413,7 +415,7 @@ function renderHeroChoices() {
         <div>
           <div class="rpgCharTitle">${h.name}</div>
           <div class="rpgCharMeta muted small"><span class="pill">${types}</span></div>
-          <div class="rpgCharStats muted">HP ${h.maxHp} • Focus ${h.focusStart}/${h.focusMax} • Heals ${h.healCharges}</div>
+          <div class="rpgCharStats muted">HP ${h.maxHp} • Mana ${h.focusStart}/${h.focusMax} • Heals ${h.healCharges}</div>
         </div>
       </button>
     `;
@@ -648,13 +650,13 @@ SmellTaste: { SmellTaste: 0.7, Wind: 0.8, Fire: 0.8, Water: 1.6, Earth: 0.9, Sig
     else if (tier.tone === "bad") els.effectPreview.classList.add("isBad");
     else els.effectPreview.classList.add("isNeutral");
 
-    // Focus cost note (only for magic)
+    // Mana cost note (only for magic)
     const extra = state.player.bound > 0 ? 1 : 0;
     const cost = move.baseCost > 0 ? move.baseCost + extra : 0;
     const needs = cost > 0 && state.player.focus < cost;
 
-    const needText = needs ? `Need ${cost} Focus` : (cost > 0 ? `${cost} Focus` : "+1 Focus");
-    const meta = move.baseCost > 0 ? needText : "+1 Focus";
+    const needText = needs ? `Need ${cost} Mana` : (cost > 0 ? `${cost} Mana` : "+1 Mana");
+    const meta = move.baseCost > 0 ? needText : "+1 Mana";
 
     // Keep it short and readable
     els.effectPreview.innerHTML =
@@ -683,16 +685,16 @@ SmellTaste: { SmellTaste: 0.7, Wind: 0.8, Fire: 0.8, Water: 1.6, Earth: 0.9, Sig
     // If low HP, prioritize the healing explanation.
     if (hpRatio <= 0.35 && state.player.healCharges > 0) {
       if (state.player.focus >= healCost) {
-        els.hintLine.textContent = `Low HP: Heal now (${healCost} Focus).`;
+        els.hintLine.textContent = `Low HP: Heal now (${healCost} Mana).`;
         return;
       }
-      els.hintLine.textContent = `Low HP: Build Focus with Attack/Guard to Heal (need ${healCost}).`;
+      els.hintLine.textContent = `Low HP: Build Mana with Attack/Guard to Heal (need ${healCost}).`;
       return;
     }
 
     // Otherwise keep the advice generic (no enemy intent / no "best hit" coaching).
-    const bindNote = state.player.bound > 0 ? "You are Bound: magic costs +1 Focus. Guard breaks Bind." : "";
-    const baseTip = "Hover an action to preview Extra effective / Normal / Weak and Focus cost.";
+    const bindNote = state.player.bound > 0 ? "You are Bound: magic costs +1 Mana. Guard breaks Bind." : "";
+    const baseTip = "";
     els.hintLine.textContent = [baseTip, bindNote].filter(Boolean).join(" ");
   }
 
@@ -1102,12 +1104,19 @@ function setActiveLocation(id) {
   const set = enemySet || activeEnemySet || ENEMIES;
   const t = set[waveIndex] ?? set[0] ?? ENEMIES[0];
 
+  const focusMax = typeof t.focusMax === "number" ? t.focusMax : 6;
+  const focusStart = typeof t.focusStart === "number" ? t.focusStart : 2;
+
   return {
     name: t.name,
     types: t.types,
     hp: t.maxHp,
     max: t.maxHp,
     healCharges: t.healCharges,
+
+    // resources (Mana)
+    focus: clamp(focusStart, 0, focusMax),
+    focusMax: focusMax,
 
     // statuses
     guarding: false,     // brace (50% next hit)
@@ -1299,6 +1308,32 @@ function makeLobbyState() {
    * Runs at the start of the player's turn so you can plan.
    * @returns {Intent}
    */
+
+  const ENEMY_MANA_COST = {
+    // 0-cost moves build Mana
+    attack: 0,
+    ward: 0,
+    fortify: 0,
+
+    // spending moves
+    heal: 2,
+    arcane: 2,
+    glare: 2,
+    squall: 2,
+    resonant: 2,
+    quake: 2,
+    shatter: 2,
+    mirrorbind: 2,
+    stonebind: 2,
+    hushbind: 2,
+    ignite: 3,
+    siphon: 3,
+  };
+
+  function enemyManaCost(id) {
+    return ENEMY_MANA_COST[id] ?? 0;
+  }
+
   function computeEnemyIntent() {
   const p = state.player;
   const e = state.enemy;
@@ -1529,10 +1564,19 @@ function makeLobbyState() {
 
     // Focus + intent
     if (els.playerFocusText instanceof HTMLElement) {
-      els.playerFocusText.textContent = `Focus: ${focus} / ${state.player.focusMax}`;
+      els.playerFocusText.textContent = `Mana: ${focus} / ${state.player.focusMax}`;
     }
     // Focus bar (visual) + keep the hover preview accurate as focus changes.
     setBar(els.playerFocusFill, focus / state.player.focusMax);
+
+    // Enemy Mana
+    if (els.enemyFocusText instanceof HTMLElement) {
+      const eMana = typeof state.enemy.focus === "number" ? state.enemy.focus : 0;
+      const eMax = typeof state.enemy.focusMax === "number" ? state.enemy.focusMax : 6;
+      els.enemyFocusText.textContent = `Mana: ${eMana} / ${eMax}`;
+      setBar(els.enemyFocusFill, eMax > 0 ? (eMana / eMax) : 0);
+    }
+
     renderIntent(state.enemy.intent);
     renderEffectPreview(previewMove);
     renderHint();
@@ -1577,28 +1621,28 @@ function makeLobbyState() {
     const firePrev = computeTypedDamage("player", "enemy", 6, "Fire");
 
     if (els.attackBtn instanceof HTMLButtonElement) {
-      els.attackBtn.textContent = `Attack (Sight x${fmtMult(atkPrev.overall)} | +1 Focus)`;
+      els.attackBtn.textContent = `Attack (Sight x${fmtMult(atkPrev.overall)} | +1 Mana)`;
     }
     if (els.windBtn instanceof HTMLButtonElement) {
-      els.windBtn.textContent = `Wind attack (2 Focus, x${fmtMult(windPrev.overall)})`;
+      els.windBtn.textContent = `Wind attack (2 Mana, x${fmtMult(windPrev.overall)})`;
     }
     if (els.waterBtn instanceof HTMLButtonElement) {
-      els.waterBtn.textContent = `Water attack (2 Focus, x${fmtMult(waterPrev.overall)})`;
+      els.waterBtn.textContent = `Water attack (2 Mana, x${fmtMult(waterPrev.overall)})`;
     }
     if (els.soundBtn instanceof HTMLButtonElement) {
-      els.soundBtn.textContent = `Sound attack (2 Focus, x${fmtMult(soundPrev.overall)})`;
+      els.soundBtn.textContent = `Sound attack (2 Mana, x${fmtMult(soundPrev.overall)})`;
     }
     if (els.smellTasteBtn instanceof HTMLButtonElement) {
-      els.smellTasteBtn.textContent = `Smell/Taste attack (2 Focus, x${fmtMult(smellPrev.overall)})`;
+      els.smellTasteBtn.textContent = `Smell/Taste attack (2 Mana, x${fmtMult(smellPrev.overall)})`;
     }
     if (els.fireBtn instanceof HTMLButtonElement) {
       const offType = !state.player.types.includes("Fire");
       const label = offType ? "Fire attack (off-type)" : "Fire attack";
-      els.fireBtn.textContent = `${label} (3 Focus, x${fmtMult(firePrev.overall)})`;
+      els.fireBtn.textContent = `${label} (3 Mana, x${fmtMult(firePrev.overall)})`;
     }
 
     if (els.healBtn instanceof HTMLButtonElement) {
-      els.healBtn.textContent = `Heal (${healCost} Focus, ${state.player.healCharges})`;
+      els.healBtn.textContent = `Heal (${healCost} Mana, ${state.player.healCharges})`;
     }
 
     // HP
@@ -1854,13 +1898,26 @@ function makeLobbyState() {
     const p = state.player;
 
     /** @type {Intent} */
-    const intent = e.intent || computeEnemyIntent();
+    let intent = e.intent || computeEnemyIntent();
+
+    // Mana gating: if the planned move costs more Mana than the enemy has,
+    // the enemy performs a basic Strike to build Mana and tries the same step next turn.
+    const plannedCost = enemyManaCost(intent.id);
+    const holdStep = plannedCost > 0 && e.focus < plannedCost;
+    if (holdStep) {
+      intent = { id: "attack", name: "Strike", type: "Sight", base: 4, note: "Builds Mana" };
+    }
 
     // Show the enemy move name in the center (clear turn readability)
     showMoveBanner(intent.name || "Enemy action", /** @type {MagicType} */ (intent.type || "Sight"));
 
-    // Consume the step after deciding the intent (keeps the pattern stable)
-    e.aiStep += 1;
+    // Consume the step only if the intended move was executed
+    if (!holdStep) e.aiStep += 1;
+
+    // Pay or build Mana
+    const cost = enemyManaCost(intent.id);
+    if (cost > 0) spendEnemyFocus(cost);
+    else gainEnemyFocus(1);
 
     // Execute intent
     if (intent.id === "heal") {
@@ -2002,6 +2059,16 @@ function makeLobbyState() {
     state.player.focus = clamp(state.player.focus + amount, 0, state.player.focusMax);
   }
 
+  function spendEnemyFocus(cost) {
+    if (cost <= 0) return;
+    state.enemy.focus = clamp(state.enemy.focus - cost, 0, state.enemy.focusMax);
+  }
+
+  function gainEnemyFocus(amount) {
+    if (amount <= 0) return;
+    state.enemy.focus = clamp(state.enemy.focus + amount, 0, state.enemy.focusMax);
+  }
+
   function clearBindIfAny() {
     if (state.player.bound > 0) {
       state.player.bound = 0;
@@ -2071,7 +2138,7 @@ function makeLobbyState() {
     const extra = state.player.bound > 0 ? 1 : 0;
     const cost = 2 + extra;
     if (state.player.focus < cost) {
-      addLog("Not enough Focus.");
+      addLog("Not enough Mana.");
       render();
       return;
     }
@@ -2136,7 +2203,7 @@ function makeLobbyState() {
     const cost = 2 + extra;
 
     if (state.player.focus < cost) {
-      addLog("Not enough Focus.");
+      addLog("Not enough Mana.");
       render();
       return;
     }
@@ -2206,7 +2273,7 @@ function makeLobbyState() {
     const cost = 2 + extra;
 
     if (state.player.focus < cost) {
-      addLog("Not enough Focus.");
+      addLog("Not enough Mana.");
       render();
       return;
     }
@@ -2273,7 +2340,7 @@ function playerSmellTasteAttack() {
   const cost = 2 + extra;
 
   if (state.player.focus < cost) {
-    addLog("Not enough Focus.");
+    addLog("Not enough Mana.");
     render();
     return;
   }
@@ -2335,7 +2402,7 @@ function playerFireAttack() {
     const extra = state.player.bound > 0 ? 1 : 0;
     const cost = 3 + extra;
     if (state.player.focus < cost) {
-      addLog("Not enough Focus.");
+      addLog("Not enough Mana.");
       render();
       return;
     }
@@ -2402,7 +2469,7 @@ function playerFireAttack() {
       return;
     }
     if (state.player.focus < cost) {
-      addLog("Not enough Focus.");
+      addLog("Not enough Mana.");
       render();
       return;
     }    showMoveBanner("Heal", "Touch");
@@ -2441,7 +2508,7 @@ playAnim(els.playerSprite, "rpgAnim-heal");
     if (!state.player.guarding) {
       state.player.guarding = true;
       showMoveBanner("Guard", "Wind");
-      addLog("You raise your guard (+1 Focus).");
+      addLog("You raise your guard (+1 Mana).");
       playAnim(els.playerSprite, "rpgAnim-guard");
       spawnFx("guard", "player");
       gainFocus(1);
