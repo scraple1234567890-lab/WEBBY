@@ -5037,7 +5037,7 @@ body.gamePage .rpgBottom{
 /* Give Type matchup room to breathe: stack on medium widths, then go 2:1 on large screens */
 @media (min-width: 1200px){
   body.gamePage .rpgBottom{
-    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    grid-template-columns: 1fr;
   }
 }
 
