@@ -2511,6 +2511,25 @@ body.isEditingShopProduct {
   color: color-mix(in srgb, var(--text) 92%, var(--muted));
 }
 
+.rpgHpRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  min-width: 0;
+}
+
+.rpgHpRow .rpgHpTrack {
+  margin-top: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+.rpgHpText--inline {
+  white-space: nowrap;
+  font-size: 0.95rem;
+}
+
 .rpgHpTrack {
   margin-top: 12px;
   height: 12px;
@@ -2570,6 +2589,7 @@ body.gamePage {
 /* Turn indicator: makes it obvious whose turn it is */
 .rpgTurnBanner{
   flex: 1 0 100%;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2581,6 +2601,11 @@ body.gamePage {
   letter-spacing: .02em;
   text-transform: uppercase;
   user-select: none;
+}
+
+
+.rpgTurnBannerTop{
+  margin: 0 0 12px;
 }
 .rpgTurnBanner.isPlayer{
   background: linear-gradient(180deg, var(--hp-green-2), var(--hp-green-1));
@@ -4761,6 +4786,109 @@ body.homePage #contact .sectionHead p.muted{
 
 .rpgTypeDetails[open] summary{
   margin-bottom: 10px;
+}
+
+/* Type chart: grid (easier to scan than the inline sentence) */
+.rpgTypeMatrixLegend{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.rpgTypeKey{
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  font-weight: 900;
+  font-size: 0.82rem;
+}
+
+.rpgTypeKey--strong{
+  border-color: rgba(80,170,255,0.35);
+  background: rgba(80,170,255,0.12);
+}
+
+.rpgTypeKey--weak{
+  border-color: rgba(255,120,80,0.28);
+  background: rgba(255,120,80,0.10);
+}
+
+.rpgTypeKey--neutral{
+  border-color: rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.40);
+}
+
+.rpgTypeMatrixScroll{
+  max-width: 100%;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 6px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.35);
+}
+
+.rpgTypeMatrix{
+  width: max-content;
+  border-collapse: separate;
+  border-spacing: 6px;
+}
+
+.rpgTypeMatrix th,
+.rpgTypeMatrix td{
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.55);
+  text-align: center;
+  vertical-align: middle;
+  font-weight: 900;
+  font-size: 0.86rem;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+.rpgTypeMatrix .rpgCorner,
+.rpgTypeMatrix .rpgColHead{
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: rgba(0,0,0,0.78);
+  backdrop-filter: blur(6px);
+}
+
+.rpgTypeMatrix .rpgCorner{
+  left: 0;
+  z-index: 4;
+}
+
+.rpgTypeMatrix .rpgRowHead{
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background: rgba(0,0,0,0.78);
+  backdrop-filter: blur(6px);
+  text-align: left;
+}
+
+.rpgTypeCell.isStrong{
+  border-color: rgba(80,170,255,0.35);
+  background: rgba(80,170,255,0.12);
+}
+
+.rpgTypeCell.isWeak{
+  border-color: rgba(255,120,80,0.28);
+  background: rgba(255,120,80,0.10);
+}
+
+.rpgTypeCell.isNeutral{
+  border-color: rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
 }
 
 .rpgTypeImpact{

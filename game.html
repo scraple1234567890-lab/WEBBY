@@ -70,10 +70,12 @@
 </div>
 <p class="muted tiny rpgInlineHelp" id="playerFocusHelp">Spend Focus on Magic/Heal. Attack/Guard builds it.</p>
 </div>
-<p class="rpgHpText" id="playerHpText">HP 20 / 20</p>
 </div>
-<div aria-hidden="true" class="rpgHpTrack">
-<div class="rpgHpFill" id="playerHpFill" style="width: 100%"></div>
+<div class="rpgHpRow">
+  <div aria-hidden="true" class="rpgHpTrack">
+    <div class="rpgHpFill" id="playerHpFill" style="width: 100%"></div>
+  </div>
+  <p class="rpgHpText rpgHpText--inline" id="playerHpText">HP 20 / 20</p>
 </div>
 </article>
 <article aria-label="Enemy" class="post rpgCard" id="enemyCard">
@@ -82,17 +84,18 @@
 <h2 class="rpgName" id="enemyName">Rival Mage</h2>
 <p class="muted small rpgTypeLine" id="enemyTypeText">Type: Fire • Sight</p>
 <p class="muted small" id="enemyStatus">Channeling</p>
-<p class="muted small" id="enemyIntentText">Intent: —</p>
-<p class="muted tiny rpgInlineHelp" id="enemyIntentHelp">Intent shows what the enemy plans to do next turn.</p>
 </div>
-<p class="rpgHpText" id="enemyHpText">HP 18 / 18</p>
 </div>
-<div aria-hidden="true" class="rpgHpTrack">
-<div class="rpgHpFill" id="enemyHpFill" style="width: 100%"></div>
+<div class="rpgHpRow">
+  <div aria-hidden="true" class="rpgHpTrack">
+    <div class="rpgHpFill" id="enemyHpFill" style="width: 100%"></div>
+  </div>
+  <p class="rpgHpText rpgHpText--inline" id="enemyHpText">HP 18 / 18</p>
 </div>
 </article>
 </div>
 <article aria-label="Battle scene" class="post rpgStage">
+<div class="rpgTurnBanner isPlayer rpgTurnBannerTop" id="turnBanner" aria-live="polite">Your turn</div>
 <div aria-label="A tiny battle scene: the player faces a rival mage." class="rpgStageInner" role="img">
   <div aria-hidden="true" class="rpgFxLayer" id="fxLayer"></div>
   <div aria-hidden="true" class="rpgMoveBanner" id="moveBanner" data-type="Sight"><span class="rpgMoveBannerText" id="moveBannerText"></span></div>
@@ -108,9 +111,8 @@
 </article>
 
 <div aria-label="Actions" class="rpgActions">
-<div class="rpgTurnBanner isPlayer" id="turnBanner" aria-live="polite">Your turn</div>
 <div class="rpgEffectPreview isNeutral" id="effectPreview" aria-live="polite">Effect preview: <span class="rpgEffectPreviewText">Hover an attack to see effectiveness.</span></div>
-<div class="rpgHint" id="rpgHint" aria-live="polite">Tip: Hover an action to preview effectiveness and Focus cost. Check enemy Intent to plan.</div>
+<div class="rpgHint" id="rpgHint" aria-live="polite">Tip: Hover an action to preview effectiveness and Focus cost. Attack/Guard build Focus; Magic/Heal spend it.</div>
 <button class="btn primary" id="attackBtn" type="button">Attack</button>
 <button class="btn secondary" id="healBtn" type="button">Heal</button>
 <button class="btn ghost" id="guardBtn" type="button">Guard</button>
@@ -183,69 +185,18 @@
     <p class="muted small">Quick read: <span class="rpgLegendStrong">Strong</span> ≥ x1.3, <span class="rpgLegendWeak">Weak</span> ≤ x0.9.</p>
   </div>
 
-  <div class="rpgTypeTop">
-    <div class="rpgTypeBlock">
-      <div class="rpgTypeBlockTitle">You</div>
-      <div class="rpgTypePills" id="playerTypePills"></div>
-    </div>
-
-    <div class="rpgTypeBlock">
-      <div class="rpgTypeBlockTitle">Enemy</div>
-      <div class="rpgTypePills" id="enemyTypePills"></div>
-    </div>
-  </div>
-
-  <div class="rpgTypeSimple">
-    <div class="rpgTypeBlock">
-      <div class="rpgTypeBlockTitle">Your attacks vs enemy</div>
-      <ul class="rpgTypeList" id="atkVsEnemyList" aria-label="Your attack multipliers"></ul>
-    </div>
-
-    <div class="rpgTypeBlock">
-      <div class="rpgTypeBlockTitle">Enemy attacks vs you</div>
-      <ul class="rpgTypeList" id="enemyVsYouList" aria-label="Enemy attack multipliers"></ul>
-    </div>
-  </div>
-
-  <details class="rpgTypeDetails">
-    <summary>Show full type chart</summary>
-    <div class="rpgTypeChart" id="typeChart">
-  <span class="typePill typePill--Wind">Wind</span>
-  <span class="rpgArrow">▶</span>
-  <span class="typePill typePill--Fire">Fire</span>
-  <span class="rpgDot">•</span>
-  <span class="typePill typePill--Fire">Fire</span>
-  <span class="rpgArrow">▶</span>
-  <span class="typePill typePill--Earth">Earth</span>
-  <span class="rpgDot">•</span>
-  <span class="typePill typePill--Earth">Earth</span>
-  <span class="rpgArrow">▶</span>
-  <span class="typePill typePill--Water">Water</span>
-  <span class="rpgDot">•</span>
-  <span class="typePill typePill--Water">Water</span>
-  <span class="rpgArrow">▶</span>
-  <span class="typePill typePill--Wind">Wind</span>
-  <span class="rpgDot">•</span>
-  <span class="typePill typePill--Touch">Touch</span>
-  <span class="rpgArrow">▶</span>
-  <span class="typePill typePill--Sight">Sight</span>
-  <span class="rpgDot">•</span>
-  <span class="typePill typePill--Sight">Sight</span>
-  <span class="rpgArrow">▶</span>
-  <span class="typePill typePill--Fire">Fire</span>
-  <span class="rpgDot">•</span>
-  <span class="typePill typePill--Sight">Sight</span>
-  <span class="rpgArrow">▶</span>
-  <span class="typePill typePill--Sound">Sound</span>
-  <span class="rpgDot">•</span>
-  <span class="typePill typePill--Sound">Sound</span>
-  <span class="rpgArrow">▶</span>
-  <span class="typePill typePill--Touch">Touch</span>
-</div>
-  </details>
-
-  <div class="rpgTypeImpact">
-    <div class="rpgTypeBlockTitle">Last impact</div>
+	  <details class="rpgTypeDetails">
+	    <summary>Show full type chart</summary>
+	    <div class="rpgTypeMatrixLegend">
+	      <span class="rpgTypeKey rpgTypeKey--strong">Strong</span>
+	      <span class="rpgTypeKey rpgTypeKey--weak">Weak</span>
+	      <span class="rpgTypeKey rpgTypeKey--neutral">Normal</span>
+	      <span class="muted tiny">Rows = attacker. Columns = defender.</span>
+	    </div>
+	    <div class="rpgTypeMatrixScroll" role="region" aria-label="Type chart scroll area">
+	      <table class="rpgTypeMatrix" id="typeMatrix" aria-label="Type effectiveness chart"></table>
+	    </div>
+	  </details>
     <div class="rpgEffectBanner" id="effectBanner">—</div>
   </div>
 </article>

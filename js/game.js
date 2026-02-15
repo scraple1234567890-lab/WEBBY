@@ -78,6 +78,7 @@ if (root) {
     enemyTypePills: document.getElementById("enemyTypePills"),
     atkVsEnemyList: document.getElementById("atkVsEnemyList"),
     enemyVsYouList: document.getElementById("enemyVsYouList"),
+    typeMatrix: document.getElementById("typeMatrix"),
     effectBanner: document.getElementById("effectBanner"),
     moveBanner: document.getElementById("moveBanner"),
     moveBannerText: document.getElementById("moveBannerText"),
@@ -671,7 +672,7 @@ SmellTaste: { SmellTaste: 0.7, Wind: 0.8, Fire: 0.8, Water: 1.6, Earth: 0.9, Sig
     if (!(els.hintLine instanceof HTMLElement)) return;
 
     if (state.over) {
-      els.hintLine.textContent = "Tip: Restart to play again. Use Explain for the full rules.";
+      els.hintLine.textContent = "Tip: Restart to play again. Use Explain if you want the full rules.";
       return;
     }
 
@@ -679,63 +680,20 @@ SmellTaste: { SmellTaste: 0.7, Wind: 0.8, Fire: 0.8, Water: 1.6, Earth: 0.9, Sig
     const healCost = 1 + extra;
     const hpRatio = state.player.hp / Math.max(1, state.player.max);
 
-    const intent = state.enemy.intent;
-    let intentHint = "";
-    if (intent) {
-      if (intent.id === "shatter") intentHint = "Enemy intent: Shatter (punishes Guard).";
-      else if (intent.id === "quake") intentHint = "Enemy intent: Quake (hits hard even through Guard).";
-      else if (intent.id === "stonebind") intentHint = "Enemy intent: Stonebind (causes Bind).";
-      else if (intent.id === "ignite") intentHint = "Enemy intent: Ignite (causes Burn).";
-      else if (intent.id === "ward" || intent.id === "fortify") intentHint = `Enemy intent: ${intent.name} (defense up).`;
-      else if (intent.id === "heal") intentHint = "Enemy intent: Heal (they'll recover HP).";
-      else intentHint = `Enemy intent: ${intent.name}.`;
-    }
-
     // If low HP, prioritize the healing explanation.
     if (hpRatio <= 0.35 && state.player.healCharges > 0) {
       if (state.player.focus >= healCost) {
-        els.hintLine.textContent = [intentHint, `Low HP: Heal now (${healCost} Focus).`].filter(Boolean).join(" ");
+        els.hintLine.textContent = `Low HP: Heal now (${healCost} Focus).`;
         return;
       }
-      els.hintLine.textContent = [intentHint, `Low HP: Build Focus with Attack/Guard to Heal (need ${healCost}).`].filter(Boolean).join(" ");
+      els.hintLine.textContent = `Low HP: Build Focus with Attack/Guard to Heal (need ${healCost}).`;
       return;
     }
 
-    // Otherwise, recommend the best affordable hit (based on type effectiveness).
-    const atkPrev = computeTypedDamage("player", "enemy", 5, "Sight");
-    const windPrev = computeTypedDamage("player", "enemy", 4, "Wind");
-    const waterPrev = computeTypedDamage("player", "enemy", 5, "Water");
-    const soundPrev = computeTypedDamage("player", "enemy", 5, "Sound");
-    const smellPrev = computeTypedDamage("player", "enemy", 4, "SmellTaste");
-    const firePrev = computeTypedDamage("player", "enemy", 6, "Fire");
-
-    const options = [
-      { label: "Attack", type: "Sight", cost: 0, overall: atkPrev.overall },
-      { label: "Wind attack", type: "Wind", cost: 2 + extra, overall: windPrev.overall },
-      { label: "Water attack", type: "Water", cost: 2 + extra, overall: waterPrev.overall },
-      { label: "Sound attack", type: "Sound", cost: 2 + extra, overall: soundPrev.overall },
-      { label: "Smell/Taste attack", type: "SmellTaste", cost: 2 + extra, overall: smellPrev.overall },
-      { label: "Fire attack", type: "Fire", cost: 3 + extra, overall: firePrev.overall },
-    ];
-
-    const affordable = options.filter((o) => state.player.focus >= o.cost);
-    const best = (affordable.length ? affordable : options).slice().sort((a, b) => b.overall - a.overall)[0];
-
-    const eff = typeMultiplier(best.type, state.enemy.types);
-    const tier = effectivenessTierLabel(eff);
-
-    let actionHint = "";
-    if (best.cost > state.player.focus) {
-      actionHint = `${best.label} is ${tier.label.toLowerCase()} (x${fmtMult(best.overall)}), but you need ${best.cost} Focus. Use Attack/Guard to build Focus.`;
-    } else if (best.label === "Attack") {
-      actionHint = "Build Focus with Attack/Guard, then spend it on Magic or Heal.";
-    } else {
-      actionHint = `Best hit: ${best.label} is ${tier.label.toLowerCase()} (x${fmtMult(best.overall)}).`;
-    }
-
+    // Otherwise keep the advice generic (no enemy intent / no "best hit" coaching).
     const bindNote = state.player.bound > 0 ? "You are Bound: magic costs +1 Focus. Guard breaks Bind." : "";
-
-    els.hintLine.textContent = [intentHint, actionHint, bindNote].filter(Boolean).join(" ");
+    const baseTip = "Hover an action to preview Extra effective / Normal / Weak and Focus cost.";
+    els.hintLine.textContent = [baseTip, bindNote].filter(Boolean).join(" ");
   }
 
 function setPreviewMove(name, type, baseCost) {
@@ -850,6 +808,76 @@ function setPreviewMove(name, type, baseCost) {
       const prev = computeTypedDamage("enemy", "player", 5, t);
       appendMatchupRow(els.enemyVsYouList, { type: t, label: `${t} move`, mult: prev.overall });
     }
+  }
+
+  /**
+   * Render a full type chart as an easy-to-scan grid.
+   * Rows = attacker type, columns = defender type.
+   */
+  function renderTypeMatrix() {
+    if (!(els.typeMatrix instanceof HTMLElement)) return;
+    if (els.typeMatrix.dataset.ready === "1") return;
+
+    /** @type {MagicType[]} */
+    const order = ["Wind", "Water", "Fire", "Earth", "Sight", "Sound", "Touch", "SmellTaste"];
+
+    const table = els.typeMatrix;
+    table.innerHTML = "";
+
+    const thead = document.createElement("thead");
+    const headRow = document.createElement("tr");
+
+    const corner = document.createElement("th");
+    corner.className = "rpgCorner";
+    corner.innerHTML = '<span class="muted tiny">Atk\\Def</span>';
+    headRow.appendChild(corner);
+
+    for (const def of order) {
+      const th = document.createElement("th");
+      th.className = "rpgColHead";
+      const chip = document.createElement("span");
+      chip.className = `typeInline typeInline--${def}`;
+      chip.textContent = `${typeIcon(def)} ${TYPE_META[def]?.label ?? def}`;
+      th.appendChild(chip);
+      headRow.appendChild(th);
+    }
+
+    thead.appendChild(headRow);
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+
+    for (const atk of order) {
+      const tr = document.createElement("tr");
+
+      const rowHead = document.createElement("th");
+      rowHead.className = "rpgRowHead";
+      const chip = document.createElement("span");
+      chip.className = `typeInline typeInline--${atk}`;
+      chip.textContent = `${typeIcon(atk)} ${TYPE_META[atk]?.label ?? atk}`;
+      rowHead.appendChild(chip);
+      tr.appendChild(rowHead);
+
+      for (const def of order) {
+        const mult = TYPE_CHART[atk]?.[def] ?? 1;
+        const td = document.createElement("td");
+        td.className = "rpgTypeCell";
+
+        // Reuse the same thresholds used elsewhere in the UI.
+        if (mult >= 1.30) td.classList.add("isStrong");
+        else if (mult <= 0.90) td.classList.add("isWeak");
+        else td.classList.add("isNeutral");
+
+        td.textContent = `x${fmtMult(mult)}`;
+        td.title = `${TYPE_META[atk]?.label ?? atk} → ${TYPE_META[def]?.label ?? def}: x${fmtMult(mult)}`;
+        tr.appendChild(td);
+      }
+
+      tbody.appendChild(tr);
+    }
+
+    table.appendChild(tbody);
+    table.dataset.ready = "1";
   }
 
 /** @param {string} text @param {"super"|"not"|"neutral"} tone */
@@ -1536,6 +1564,9 @@ function makeLobbyState() {
 
     // Simple matchup lists
     renderMatchupLists();
+
+    // Full chart (static grid)
+    renderTypeMatrix();
 
     // Button labels show multiplier + cost (so choices are readable)
     const atkPrev = computeTypedDamage("player", "enemy", 5, "Sight");
