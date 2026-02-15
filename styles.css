@@ -4748,6 +4748,8 @@ body.homePage #contact .sectionHead p.muted{
   border-radius: 14px;
   border: 1px solid rgba(255,255,255,0.14);
   background: rgba(0,0,0,0.45);
+
+  overflow: visible;
 }
 
 .rpgTypeDetails summary{
@@ -4898,25 +4900,10 @@ body.homePage #contact .sectionHead p.muted{
   gap: 8px;
   align-items: center;
   opacity: 0.98;
-}
-/* Game: keep the "full type chart" readable on all screen sizes */
-body.gamePage .rpgTypeDetails[open] .rpgTypeChart{
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  overflow-y: hidden;
   max-width: 100%;
-  padding-bottom: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
   -webkit-overflow-scrolling: touch;
-}
-body.gamePage .rpgTypeDetails[open] .rpgTypeChart > *{
-  flex: 0 0 auto;
-}
-
-/* Avoid truncating longer type names (ex: Smell/Taste) */
-body.gamePage .rpgTypeName{
-  white-space: normal;
-  overflow: visible;
-  text-overflow: clip;
 }
 
 .rpgArrow{
@@ -5043,14 +5030,17 @@ body.gamePage .rpgMagicMenu{
 body.gamePage .rpgBottom{
   display: grid;
   gap: 10px;
+  grid-template-columns: 1fr;
+  align-items: start;
 }
+
+/* Give Type matchup room to breathe: stack on medium widths, then go 2:1 on large screens */
 @media (min-width: 1200px){
   body.gamePage .rpgBottom{
-    /* Give the Type matchup panel more horizontal room (it contains 2 internal columns + a wide chart) */
     grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-    align-items: start;
   }
 }
+
 body.gamePage .rpgTypeCard{
   margin-top: 0;
   padding: 14px;
