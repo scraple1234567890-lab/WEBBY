@@ -2547,6 +2547,7 @@ body.gamePage {
   --type-fire: rgb(255 120 80);
   --type-earth: rgb(190 140 90);
   --type-sight: rgb(255 215 0);
+  --type-sound: rgb(170 120 255);
   --type-touch: rgb(255 140 210);
 }
 
@@ -2641,6 +2642,12 @@ body.gamePage #windBtn{
 body.gamePage #waterBtn{
   background: linear-gradient(180deg, color-mix(in srgb, var(--type-water) 90%, white 10%), color-mix(in srgb, var(--type-water) 65%, black 35%));
   border-color: color-mix(in srgb, var(--type-water) 80%, white 20%);
+  color: rgb(10 10 18);
+  font-weight: 900;
+}
+body.gamePage #soundBtn{
+  background: linear-gradient(180deg, color-mix(in srgb, var(--type-sound) 90%, white 10%), color-mix(in srgb, var(--type-sound) 65%, black 35%));
+  border-color: color-mix(in srgb, var(--type-sound) 80%, white 20%);
   color: rgb(10 10 18);
   font-weight: 900;
 }
@@ -3173,6 +3180,36 @@ body.modalOpen {
   100%{ opacity: 0; transform: scale(1.10); filter: blur(0.2px); }
 }
 
+
+/* --- Sound --- */
+.rpgFx--sound::before,
+.rpgFx--sound::after{
+  content: "";
+  position: absolute;
+  inset: -10px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--type-sound) 80%, white 20%) 0%, rgba(0,0,0,0) 58%),
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.22) 0%, rgba(0,0,0,0) 35%),
+    radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 64%, color-mix(in srgb, var(--type-sound) 55%, rgba(0,0,0,0) 45%) 66%, rgba(0,0,0,0) 76%),
+    radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 76%, rgba(255,255,255,0.10) 78%, rgba(0,0,0,0) 88%);
+  opacity: 0;
+  transform: scale(0.70);
+  animation: rpg-sound 560ms ease-out 1;
+}
+
+.rpgFx--sound::after{
+  filter: blur(1.4px);
+  animation-duration: 700ms;
+  animation-delay: 40ms;
+}
+
+@keyframes rpg-sound{
+  0%{ opacity: 0; transform: scale(0.62); }
+  22%{ opacity: 1; }
+  100%{ opacity: 0; transform: scale(1.18); }
+}
+
 /* --- Fire --- */
 .rpgFx--fire::before{
   content: "";
@@ -3344,6 +3381,7 @@ body.modalOpen {
 #enemyCard[data-primary-type="Fire"]{ --typeAccent: var(--type-fire); box-shadow: 0 0 0 1px rgba(255,120,80,0.22) inset, 0 0 28px rgba(255,120,80,0.14); }
 #enemyCard[data-primary-type="Earth"]{ --typeAccent: var(--type-earth); box-shadow: 0 0 0 1px rgba(120,255,150,0.20) inset, 0 0 28px rgba(120,255,150,0.12); }
 #enemyCard[data-primary-type="Sight"]{ --typeAccent: var(--type-sight); box-shadow: 0 0 0 1px rgba(255,215,0,0.20) inset, 0 0 28px rgba(255,215,0,0.12); }
+#enemyCard[data-primary-type="Sound"]{ --typeAccent: var(--type-sound); box-shadow: 0 0 0 1px rgba(170,120,255,0.20) inset, 0 0 28px rgba(170,120,255,0.12); }
 #enemyCard[data-primary-type="Touch"]{ --typeAccent: var(--type-touch); box-shadow: 0 0 0 1px rgba(210,160,255,0.20) inset, 0 0 28px rgba(210,160,255,0.12); }
 
 #enemySprite{
@@ -3373,6 +3411,7 @@ body.modalOpen {
 #enemySprite[data-primary-type="Fire"]{ --typeAccent: var(--type-fire); --foeGlow: rgba(255,120,80,0.35); }
 #enemySprite[data-primary-type="Earth"]{ --typeAccent: var(--type-earth); --foeGlow: rgba(120,255,150,0.30); }
 #enemySprite[data-primary-type="Sight"]{ --typeAccent: var(--type-sight); --foeGlow: rgba(255,215,0,0.30); }
+#enemySprite[data-primary-type="Sound"]{ --typeAccent: var(--type-sound); --foeGlow: rgba(170,120,255,0.30); }
 #enemySprite[data-primary-type="Touch"]{ --typeAccent: var(--type-touch); --foeGlow: rgba(210,160,255,0.30); }
 
 

@@ -43,6 +43,7 @@ if (root) {
     magicMenu: document.getElementById("magicMenu"),
     windBtn: document.getElementById("windBtn"),
     waterBtn: document.getElementById("waterBtn"),
+    soundBtn: document.getElementById("soundBtn"),
     fireBtn: document.getElementById("fireBtn"),
     effectPreview: document.getElementById("effectPreview"),
     hintLine: document.getElementById("rpgHint"),
@@ -116,7 +117,7 @@ if (root) {
 
   /**
    * Spawn a one-shot type FX overlay.
-   * @param {"wind"|"water"|"fire"|"earth"|"sight"|"touch"|"heal"|"guard"} kind
+   * @param {"wind"|"water"|"fire"|"earth"|"sight"|"touch"|"sound"|"heal"|"guard"} kind
    * @param {"player"|"enemy"|"center"} side
    */
   function spawnFx(kind, side) {
@@ -307,6 +308,7 @@ const TYPE_META = /** @type {Record<MagicType, {icon: string, label: string}>} *
   Fire:  { icon: "🔥", label: "Fire" },
   Earth: { icon: "🪨", label: "Earth" },
   Sight: { icon: "👁", label: "Sight" },
+  Sound: { icon: "🔊", label: "Sound" },
   Touch: { icon: "✋", label: "Touch" },
 });
 
@@ -317,8 +319,8 @@ function typeIcon(t) {
 
 /** @param {MagicType} t */
 function fxKindForType(t) {
-  /** @type {Record<MagicType, "wind"|"water"|"fire"|"earth"|"sight"|"touch">} */
-  const m = { Wind: "wind", Water: "water", Fire: "fire", Earth: "earth", Sight: "sight", Touch: "touch" };
+  /** @type {Record<MagicType, "wind"|"water"|"fire"|"earth"|"sight"|"touch"|"sound">} */
+  const m = { Wind: "wind", Water: "water", Fire: "fire", Earth: "earth", Sight: "sight", Sound: "sound", Touch: "touch" };
   return m[t] || "sight";
 }
 
@@ -588,7 +590,7 @@ function startBattleWithLocation(locId) {
   // Type system
   // --------------------
 
-  /** @typedef {"Wind"|"Water"|"Fire"|"Sight"|"Earth"|"Touch"} MagicType */
+  /** @typedef {"Wind"|"Water"|"Fire"|"Sight"|"Earth"|"Touch"|"Sound"} MagicType */
 
   /**
    * Type effectiveness chart: attackType -> defenderType -> multiplier.
@@ -596,12 +598,13 @@ function startBattleWithLocation(locId) {
    * NOTE: Balance is intentionally "obvious" so matchups are readable.
    */
   const TYPE_CHART = /** @type {Record<MagicType, Record<MagicType, number>>} */ ({
-    Wind:  { Wind: 1.0, Fire: 1.6, Water: 0.8, Sight: 0.9, Earth: 0.8, Touch: 1.0 },
-    Water: { Water: 0.7, Wind: 1.6, Fire: 1.6, Sight: 0.9, Earth: 0.8, Touch: 1.0 },
-    Fire:  { Fire: 0.7, Wind: 0.8, Water: 0.8, Sight: 0.9, Earth: 1.6, Touch: 1.0 },
-    Sight: { Sight: 1.0, Wind: 1.2, Fire: 1.2, Water: 1.2, Earth: 0.9, Touch: 0.8 },
-    Earth: { Earth: 0.7, Wind: 1.6, Fire: 0.8, Water: 1.6, Sight: 1.0, Touch: 1.1 },
-    Touch: { Touch: 1.0, Wind: 0.9, Fire: 1.0, Water: 1.0, Earth: 0.9, Sight: 1.4 },
+    Wind:  { Wind: 1.0, Fire: 1.6, Water: 0.8, Sight: 0.9, Earth: 0.8, Touch: 1.0, Sound: 1.4 },
+    Water: { Water: 0.7, Wind: 1.6, Fire: 1.6, Sight: 0.9, Earth: 0.8, Touch: 1.0, Sound: 0.9 },
+    Fire:  { Fire: 0.7, Wind: 0.8, Water: 0.8, Sight: 0.9, Earth: 1.6, Touch: 1.0, Sound: 1.2 },
+    Sight: { Sight: 1.0, Wind: 1.2, Fire: 1.2, Water: 1.2, Earth: 0.9, Touch: 0.8, Sound: 1.6 },
+    Earth: { Earth: 0.7, Wind: 1.6, Fire: 0.8, Water: 1.6, Sight: 1.0, Touch: 1.1, Sound: 1.2 },
+    Touch: { Touch: 1.0, Wind: 0.9, Fire: 1.0, Water: 1.0, Earth: 0.9, Sight: 1.4, Sound: 0.8 },
+    Sound: { Sound: 0.7, Wind: 0.8, Fire: 1.0, Water: 1.2, Earth: 0.8, Sight: 0.8, Touch: 1.6 },
   });
 
   /** @param {MagicType} attackType @param {MagicType[]} defenderTypes */
@@ -935,6 +938,17 @@ const PLAYABLE_HEROES = [
     sprite: "./assets/images/enemy-blonde.png",
     blurb: "Lightforged brawler with ember edges.",
   },
+  {
+    id: "lyric",
+    name: "Lyric",
+    types: /** @type {MagicType[]} */ (["Sound", "Sight"]),
+    maxHp: 19,
+    healCharges: 3,
+    focusMax: 6,
+    focusStart: 2,
+    sprite: "./assets/images/player-brown.png",
+    blurb: "Resonance caster with sharp perception.",
+  },
 ];
 
 /** @type {string} */
@@ -1002,13 +1016,21 @@ function getActiveHero() {
     profile: "mirrorTouch",
     sprite: "./assets/images/enemy-red.png",
   },
+  {
+    name: "Resonance Cantor",
+    types: /** @type {MagicType[]} */ (["Sound", "Touch"]),
+    maxHp: 25,
+    healCharges: 1,
+    profile: "soundTouch",
+    sprite: "./assets/images/enemy-blue.png",
+  },
 ];
 
 const LOCATIONS = [
   { id: "ember_plaza", name: "Ember Plaza", subtitle: "Warm stones. Hot tempers.", enemySet: [0, 1] },
   { id: "quartz_library", name: "Quartz Library", subtitle: "Quiet halls. Heavy secrets.", enemySet: [1, 2] },
   { id: "gale_rooftops", name: "Gale Rooftops", subtitle: "Open sky. Unstable footing.", enemySet: [2, 3] },
-  { id: "mirror_tunnels", name: "Mirror Tunnels", subtitle: "Dim lights. Echoing steps.", enemySet: [3, 0] },
+  { id: "mirror_tunnels", name: "Mirror Tunnels", subtitle: "Dim lights. Echoing steps.", enemySet: [3, 4] },
 ];
 
 /** @type {string|null} */
@@ -1280,7 +1302,20 @@ function makeLobbyState() {
     return { id: "attack", name: "Strike", type: "Sight", base: 4, note: "" };
   }
 
-  // Default: Earth/Touch pattern.
+  
+  if (e.profile === "soundTouch") {
+    const pattern = ["hushbind", "resonate", "ward", "resonate", "attack"];
+    let next = pattern[e.aiStep % pattern.length];
+
+    if (next === "hushbind" && p.bound > 0) next = "resonate";
+
+    if (next === "hushbind") return { id: "hushbind", name: "Hushbind", type: "Touch", base: 3, note: "Applies Bind" };
+    if (next === "resonate") return { id: "resonate", name: "Resonant Blast", type: "Sound", base: 5, note: "" };
+    if (next === "ward") return { id: "ward", name: "Mirror Ward", type: null, base: 0, note: "Next hit reduced + reflects" };
+    return { id: "attack", name: "Strike", type: "Sight", base: 4, note: "" };
+  }
+
+// Default: Earth/Touch pattern.
   const pattern = ["stonebind", "quake", "fortify", "shatter", "quake"];
   let next = pattern[e.aiStep % pattern.length];
 
@@ -1845,11 +1880,15 @@ function makeLobbyState() {
       p.burn = Math.max(p.burn, 2);
       addLog("Flame clings to you (burn).");
     }
-    if (intent.id === "stonebind" || intent.id === "mirrorbind") {
+    if (intent.id === "stonebind" || intent.id === "mirrorbind" || intent.id === "hushbind") {
   p.bound = 1;
-  addLog(intent.id === "stonebind"
-    ? "Stonebind locks your movement (bind)."
-    : "Mirrorbind locks your movement (bind).");
+  addLog(
+    intent.id === "stonebind"
+      ? "Stonebind locks your movement (bind)."
+      : intent.id === "hushbind"
+        ? "Hushbind seals your motion (bind)."
+        : "Mirrorbind locks your movement (bind)."
+  );
 }
     if (intent.id === "siphon") {
       const heal = 3;
@@ -1903,8 +1942,10 @@ function makeLobbyState() {
   function playerAttack() {
     if (isGameOver()) return;
     if (state.phase !== "player") return;
-    closeMagicMenu();    showMoveBanner("Attack", "Sight");
-playAnim(els.playerSprite, "rpgAnim-attack");
+    closeMagicMenu();
+
+    showMoveBanner("Attack", "Sight");
+    playAnim(els.playerSprite, "rpgAnim-attack");
 
     // Attack: fixed base, generates Focus
     let base = 5;
@@ -1924,10 +1965,6 @@ playAnim(els.playerSprite, "rpgAnim-attack");
     if (typed.note) addLog(typed.note);
     setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
     playAnim(els.enemySprite, "rpgAnim-hit");
-    spawnFx("fire", "enemy");
-    spawnFloat(`-${def.final}`, "enemy", "dmg", typed.overall);
-    spawnFx("wind", "enemy");
-    spawnFloat(`-${def.final}`, "enemy", "dmg", typed.overall);
     spawnFx("sight", "enemy");
     spawnFloat(`-${def.final}`, "enemy", "dmg", typed.overall);
 
@@ -2025,9 +2062,8 @@ playAnim(els.playerSprite, "rpgAnim-attack");
     if (state.phase !== "player") return;
     closeMagicMenu();
 
-    const baseCost = 2;
     const extra = state.player.bound > 0 ? 1 : 0;
-    const cost = baseCost + extra;
+    const cost = 2 + extra;
 
     if (state.player.focus < cost) {
       addLog("Not enough Focus.");
@@ -2037,17 +2073,38 @@ playAnim(els.playerSprite, "rpgAnim-attack");
 
     showMoveBanner("Water attack", "Water");
     playAnim(els.playerSprite, "rpgAnim-attack");
-    spawnFx("water", "enemy");
 
     let base = 5;
-    // Bound makes your next offensive action weaker and more expensive.
-    if (state.player.bound > 0) base = Math.max(1, base - 2);
 
-    const prev = computeTypedDamage("player", "enemy", base, "Water");
-    const dmg = prev.damage;
+    if (state.player.bound > 0) {
+      base = Math.max(1, base - 2);
+      state.player.bound = 0;
+      addLog("Bind dulls your water lash (−2).");
+    }
 
-    applyDamageToEnemy(dmg);
-    spendFocus(cost);
+    const typed = computeTypedDamage("player", "enemy", base, "Water");
+    const def = applyEnemyDefenses(typed.scaled);
+
+    state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
+    addLog(`You crash water onto ${state.enemy.name} for ${def.final} damage.`);
+    if (typed.note) addLog(typed.note);
+    setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
+    playAnim(els.enemySprite, "rpgAnim-hit");
+    spawnFx("water", "enemy");
+    spawnFloat(`-${def.final}`, "enemy", "dmg", typed.overall);
+
+    // Mirror reflect (if any ward remained)
+    if (def.reflected > 0) {
+      state.player.hp = clamp(state.player.hp - def.reflected, 0, state.player.max);
+      addLog(`Reflected magic nicks you for ${def.reflected}.`);
+      playAnim(els.playerSprite, "rpgAnim-hit");
+      spawnFx("sight", "player");
+      spawnFloat(`-${def.reflected}`, "player", "dmg", null);
+      if (state.player.hp <= 0) {
+        endGame("Reflected magic drops you. Game over.");
+        return;
+      }
+    }
 
     // Water utility: douse burns (yours and theirs).
     if (state.enemy.burn > 0) {
@@ -2059,15 +2116,80 @@ playAnim(els.playerSprite, "rpgAnim-attack");
       addLog("You douse your burn.");
     }
 
-    spawnFloat(`-${dmg}`, "enemy", "dmg", prev);
+    spendFocus(cost);
 
-    // Water doesn't evade like wind; it is a steadier hit.
-
-    // Break bind after you take an action (bind is a one-turn tax).
-    clearBindIfAny();
+    if (state.enemy.hp <= 0) {
+      onEnemyDown(`${state.enemy.name} falls.`);
+      return;
+    }
 
     render();
+    queueEnemyTurn();
+  }
 
+  function playerSoundAttack() {
+    if (isGameOver()) return;
+    if (state.phase !== "player") return;
+    closeMagicMenu();
+
+    const extra = state.player.bound > 0 ? 1 : 0;
+    const cost = 2 + extra;
+
+    if (state.player.focus < cost) {
+      addLog("Not enough Focus.");
+      render();
+      return;
+    }
+
+    showMoveBanner("Sound attack", "Sound");
+    playAnim(els.playerSprite, "rpgAnim-attack");
+
+    let base = 5;
+
+    if (state.player.bound > 0) {
+      base = Math.max(1, base - 2);
+      state.player.bound = 0;
+      addLog("Bind muddies your rhythm (−2).");
+    }
+
+    // Resonance disrupts defensive wards and braces before the hit lands.
+    const had = state.enemy.ward > 0 || state.enemy.fortified > 0 || state.enemy.guarding;
+    state.enemy.ward = 0;
+    state.enemy.fortified = 0;
+    state.enemy.guarding = false;
+    if (had) addLog("Resonance shatters their defenses.");
+
+    const typed = computeTypedDamage("player", "enemy", base, "Sound");
+    const def = applyEnemyDefenses(typed.scaled);
+
+    state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
+    addLog(`You unleash a sonic burst for ${def.final} damage.`);
+    if (typed.note) addLog(typed.note);
+    setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
+    playAnim(els.enemySprite, "rpgAnim-hit");
+    spawnFx("sound", "enemy");
+    spawnFloat(`-${def.final}`, "enemy", "dmg", typed.overall);
+
+    if (def.reflected > 0) {
+      state.player.hp = clamp(state.player.hp - def.reflected, 0, state.player.max);
+      addLog(`Reflected magic nicks you for ${def.reflected}.`);
+      playAnim(els.playerSprite, "rpgAnim-hit");
+      spawnFx("sight", "player");
+      spawnFloat(`-${def.reflected}`, "player", "dmg", null);
+      if (state.player.hp <= 0) {
+        endGame("Reflected magic drops you. Game over.");
+        return;
+      }
+    }
+
+    spendFocus(cost);
+
+    if (state.enemy.hp <= 0) {
+      onEnemyDown(`${state.enemy.name} falls.`);
+      return;
+    }
+
+    render();
     queueEnemyTurn();
   }
 
@@ -2223,6 +2345,7 @@ playAnim(els.playerSprite, "rpgAnim-heal");
   }
   if (els.windBtn instanceof HTMLButtonElement) els.windBtn.addEventListener("click", playerWindAttack);
   if (els.waterBtn instanceof HTMLButtonElement) els.waterBtn.addEventListener("click", playerWaterAttack);
+  if (els.soundBtn instanceof HTMLButtonElement) els.soundBtn.addEventListener("click", playerSoundAttack);
   if (els.fireBtn instanceof HTMLButtonElement) els.fireBtn.addEventListener("click", playerFireAttack);
 
   if (els.attackBtn instanceof HTMLButtonElement) els.attackBtn.addEventListener("click", playerAttack);
@@ -2284,6 +2407,7 @@ playAnim(els.playerSprite, "rpgAnim-heal");
   wirePreview(els.attackBtn, "Attack", "Sight", 0);
   wirePreview(els.windBtn, "Wind attack", "Wind", 2);
   wirePreview(els.waterBtn, "Water attack", "Water", 2);
+  wirePreview(els.soundBtn, "Sound attack", "Sound", 2);
   wirePreview(els.fireBtn, "Fire attack", "Fire", 3);
 
 // Initialize (hero → location)
