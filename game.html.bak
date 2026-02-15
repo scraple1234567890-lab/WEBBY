@@ -55,7 +55,22 @@
 <div class="container">
 <div class="sectionHead">
 <p class="kicker">Minigame</p>
-<h1>Tiny Turn RPG</h1></div>
+<h1>Tiny Turn RPG</h1>
+<p class="muted">Pick an action, watch your rival respond, and keep your HP above zero.</p>
+<p class="muted small" id="buildTag">Build: 2026-02-14s</p>
+
+<details class="rpgHowto" id="howtoDetails">
+  <summary>How to play (30 sec)</summary>
+  <ul>
+    <li><strong>Goal:</strong> drop the enemy HP to 0 before yours hits 0. Defeat both waves to win.</li>
+    <li><strong>Turn loop:</strong> you act, then the enemy acts. Check <strong>Intent</strong> to plan.</li>
+    <li><strong>Focus:</strong> <strong>Attack</strong> and <strong>Guard</strong> give <strong>+1 Focus</strong>. <strong>Magic</strong> and <strong>Heal</strong> spend Focus.</li>
+    <li><strong>Types:</strong> some types are strong/weak into others. Hover actions to see <strong>Extra effective / Normal / Weak</strong>.</li>
+    <li><strong>Status:</strong> <strong>Burn</strong> deals damage each turn. <strong>Bound</strong> makes magic cost +1 Focus. <strong>Guard</strong> breaks Bind.</li>
+  </ul>
+</details>
+
+</div>
 <div class="rpgWrap" id="rpgRoot">
 <div aria-label="Battlefield" class="rpgGrid" role="group">
 <article aria-label="Player" class="post rpgCard" id="playerCard">
