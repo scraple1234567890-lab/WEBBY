@@ -384,7 +384,11 @@ function setTypeAccent(el, types) {
   updateBodyModalOpen();
   if (prev && prev instanceof HTMLElement) prev.focus();
 }
-  function updateBodyModalOpen() {
+  function isHeroOpen() {
+  return (els.characterModal instanceof HTMLElement) && !els.characterModal.hasAttribute("hidden");
+}
+
+function updateBodyModalOpen() {
   const any = isExplainOpen() || isHeroOpen() || isLocationOpen();
   document.body.classList.toggle("modalOpen", any);
 }
