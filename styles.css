@@ -2548,6 +2548,7 @@ body.gamePage {
   --type-earth: rgb(190 140 90);
   --type-sight: rgb(255 215 0);
   --type-sound: rgb(170 120 255);
+  --type-smelltaste: rgb(120 230 160);
   --type-touch: rgb(255 140 210);
 }
 
@@ -3066,6 +3067,8 @@ body.modalOpen {
 .rpgMoveBanner[data-type="Earth"]{ --accent: var(--type-earth); }
 .rpgMoveBanner[data-type="Sight"]{ --accent: var(--type-sight); }
 .rpgMoveBanner[data-type="Touch"]{ --accent: var(--type-touch); }
+.rpgMoveBanner[data-type="Sound"]{ --accent: var(--type-sound); }
+.rpgMoveBanner[data-type="SmellTaste"]{ --accent: var(--type-smelltaste); }
 
 .rpgFx{
   position: absolute;
@@ -3287,6 +3290,36 @@ body.modalOpen {
   transform: scale(0.92) rotate(0deg);
   animation: rpg-touch 620ms ease-out 1;
 }
+.rpgFx--smell::before,
+.rpgFx--smell::after{
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 30% 55%, color-mix(in srgb, var(--type-smelltaste) 62%, white 38%) 0%, rgba(0,0,0,0) 58%),
+    radial-gradient(circle at 70% 45%, color-mix(in srgb, var(--type-smelltaste) 58%, white 42%) 0%, rgba(0,0,0,0) 62%),
+    radial-gradient(circle at 52% 50%, rgba(255,255,255,0.20) 0%, rgba(0,0,0,0) 38%),
+    radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 66%, color-mix(in srgb, var(--type-smelltaste) 48%, rgba(0,0,0,0) 52%) 68%, rgba(0,0,0,0) 78%);
+  opacity: 0;
+  filter: blur(0.6px);
+  animation: rpg-smell 560ms ease-out 1;
+}
+
+.rpgFx--smell::after{
+  filter: blur(1.6px);
+  opacity: 0;
+  animation-duration: 660ms;
+  animation-delay: 40ms;
+}
+
+@keyframes rpg-smell{
+  0%{ transform: translateX(8px) translateY(6px) scale(0.92) rotate(2deg); opacity: 0; }
+  12%{ opacity: 1; }
+  60%{ opacity: 0.75; transform: translateX(-8px) translateY(-10px) scale(1.04) rotate(-2deg); }
+  100%{ opacity: 0; transform: translateX(-14px) translateY(-18px) scale(1.10) rotate(-3deg); }
+}
+
 
 .rpgFx--touch::after{
   inset: 34px;
@@ -4809,6 +4842,17 @@ body.homePage #contact .sectionHead p.muted{
   box-shadow: 0 0 0 1px rgba(0,0,0,0.20) inset, 0 10px 22px color-mix(in srgb, var(--type-touch, rgb(255 140 210)) 26%, transparent);
 }
 
+.typePill--Sound{
+  background: color-mix(in srgb, var(--type-sound, rgb(170 120 255)) 70%, transparent);
+  border-color: color-mix(in srgb, var(--type-sound, rgb(170 120 255)) 92%, white 8%);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.20) inset, 0 10px 22px color-mix(in srgb, var(--type-sound, rgb(170 120 255)) 26%, transparent);
+}
+.typePill--SmellTaste{
+  background: color-mix(in srgb, var(--type-smelltaste, rgb(120 230 160)) 70%, transparent);
+  border-color: color-mix(in srgb, var(--type-smelltaste, rgb(120 230 160)) 92%, white 8%);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.20) inset, 0 10px 22px color-mix(in srgb, var(--type-smelltaste, rgb(120 230 160)) 26%, transparent);
+}
+
 /* Inline type chips used in the player/enemy cards */
 .rpgTypeLine{
   margin: 6px 0 0;
@@ -4844,6 +4888,8 @@ body.homePage #contact .sectionHead p.muted{
 .typeInline--Fire{ background: color-mix(in srgb, var(--type-fire, rgb(255 120 80)) 62%, transparent); border-color: color-mix(in srgb, var(--type-fire, rgb(255 120 80)) 86%, white 14%); }
 .typeInline--Sight{ background: color-mix(in srgb, var(--type-sight, rgb(255 215 0)) 58%, transparent); border-color: color-mix(in srgb, var(--type-sight, rgb(255 215 0)) 84%, white 16%); }
 .typeInline--Earth{ background: color-mix(in srgb, var(--type-earth, rgb(190 140 90)) 58%, transparent); border-color: color-mix(in srgb, var(--type-earth, rgb(190 140 90)) 84%, white 16%); }
+.typeInline--Sound{ background: color-mix(in srgb, var(--type-sound, rgb(170 120 255)) 60%, transparent); border-color: color-mix(in srgb, var(--type-sound, rgb(170 120 255)) 86%, white 14%); }
+.typeInline--SmellTaste{ background: color-mix(in srgb, var(--type-smelltaste, rgb(120 230 160)) 58%, transparent); border-color: color-mix(in srgb, var(--type-smelltaste, rgb(120 230 160)) 84%, white 16%); }
 .typeInline--Touch{ background: color-mix(in srgb, var(--type-touch, rgb(255 140 210)) 60%, transparent); border-color: color-mix(in srgb, var(--type-touch, rgb(255 140 210)) 84%, white 16%); }
 
 .rpgTypeChart{
