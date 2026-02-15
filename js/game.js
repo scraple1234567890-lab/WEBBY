@@ -42,6 +42,7 @@ if (root) {
     magicToggle: document.getElementById("magicToggle"),
     magicMenu: document.getElementById("magicMenu"),
     windBtn: document.getElementById("windBtn"),
+    waterBtn: document.getElementById("waterBtn"),
     fireBtn: document.getElementById("fireBtn"),
     effectPreview: document.getElementById("effectPreview"),
     hintLine: document.getElementById("rpgHint"),
@@ -115,7 +116,7 @@ if (root) {
 
   /**
    * Spawn a one-shot type FX overlay.
-   * @param {"wind"|"fire"|"earth"|"sight"|"touch"|"heal"|"guard"} kind
+   * @param {"wind"|"water"|"fire"|"earth"|"sight"|"touch"|"heal"|"guard"} kind
    * @param {"player"|"enemy"|"center"} side
    */
   function spawnFx(kind, side) {
@@ -302,6 +303,7 @@ function playWaveClearSfx() {
 
 const TYPE_META = /** @type {Record<MagicType, {icon: string, label: string}>} */ ({
   Wind:  { icon: "🍃", label: "Wind" },
+  Water: { icon: "💧", label: "Water" },
   Fire:  { icon: "🔥", label: "Fire" },
   Earth: { icon: "🪨", label: "Earth" },
   Sight: { icon: "👁", label: "Sight" },
@@ -315,8 +317,8 @@ function typeIcon(t) {
 
 /** @param {MagicType} t */
 function fxKindForType(t) {
-  /** @type {Record<MagicType, "wind"|"fire"|"earth"|"sight"|"touch">} */
-  const m = { Wind: "wind", Fire: "fire", Earth: "earth", Sight: "sight", Touch: "touch" };
+  /** @type {Record<MagicType, "wind"|"water"|"fire"|"earth"|"sight"|"touch">} */
+  const m = { Wind: "wind", Water: "water", Fire: "fire", Earth: "earth", Sight: "sight", Touch: "touch" };
   return m[t] || "sight";
 }
 
@@ -586,7 +588,7 @@ function startBattleWithLocation(locId) {
   // Type system
   // --------------------
 
-  /** @typedef {"Wind"|"Fire"|"Sight"|"Earth"|"Touch"} MagicType */
+  /** @typedef {"Wind"|"Water"|"Fire"|"Sight"|"Earth"|"Touch"} MagicType */
 
   /**
    * Type effectiveness chart: attackType -> defenderType -> multiplier.
@@ -594,11 +596,12 @@ function startBattleWithLocation(locId) {
    * NOTE: Balance is intentionally "obvious" so matchups are readable.
    */
   const TYPE_CHART = /** @type {Record<MagicType, Record<MagicType, number>>} */ ({
-    Wind:  { Wind: 1.0, Fire: 1.6, Sight: 0.9, Earth: 0.8, Touch: 1.0 },
-    Fire:  { Fire: 0.7, Wind: 0.8, Sight: 0.9, Earth: 1.6, Touch: 1.0 },
-    Sight: { Sight: 1.0, Wind: 1.2, Fire: 1.2, Earth: 0.9, Touch: 0.8 },
-    Earth: { Earth: 0.7, Wind: 1.6, Fire: 0.8, Sight: 1.0, Touch: 1.1 },
-    Touch: { Touch: 1.0, Wind: 0.9, Fire: 1.0, Earth: 0.9, Sight: 1.4 },
+    Wind:  { Wind: 1.0, Fire: 1.6, Water: 0.8, Sight: 0.9, Earth: 0.8, Touch: 1.0 },
+    Water: { Water: 0.7, Wind: 1.6, Fire: 1.6, Sight: 0.9, Earth: 0.8, Touch: 1.0 },
+    Fire:  { Fire: 0.7, Wind: 0.8, Water: 0.8, Sight: 0.9, Earth: 1.6, Touch: 1.0 },
+    Sight: { Sight: 1.0, Wind: 1.2, Fire: 1.2, Water: 1.2, Earth: 0.9, Touch: 0.8 },
+    Earth: { Earth: 0.7, Wind: 1.6, Fire: 0.8, Water: 1.6, Sight: 1.0, Touch: 1.1 },
+    Touch: { Touch: 1.0, Wind: 0.9, Fire: 1.0, Water: 1.0, Earth: 0.9, Sight: 1.4 },
   });
 
   /** @param {MagicType} attackType @param {MagicType[]} defenderTypes */
@@ -695,11 +698,13 @@ function startBattleWithLocation(locId) {
     // Otherwise, recommend the best affordable hit (based on type effectiveness).
     const atkPrev = computeTypedDamage("player", "enemy", 5, "Sight");
     const windPrev = computeTypedDamage("player", "enemy", 4, "Wind");
+    const waterPrev = computeTypedDamage("player", "enemy", 5, "Water");
     const firePrev = computeTypedDamage("player", "enemy", 6, "Fire");
 
     const options = [
       { label: "Attack", type: "Sight", cost: 0, overall: atkPrev.overall },
       { label: "Wind attack", type: "Wind", cost: 2 + extra, overall: windPrev.overall },
+      { label: "Water attack", type: "Water", cost: 2 + extra, overall: waterPrev.overall },
       { label: "Fire attack", type: "Fire", cost: 3 + extra, overall: firePrev.overall },
     ];
 
@@ -809,10 +814,12 @@ function setPreviewMove(name, type, baseCost) {
     // Player moves (what the UI actually offers)
     const atkPrev = computeTypedDamage("player", "enemy", 5, "Sight");
     const windPrev = computeTypedDamage("player", "enemy", 4, "Wind");
+    const waterPrev = computeTypedDamage("player", "enemy", 5, "Water");
     const firePrev = computeTypedDamage("player", "enemy", 6, "Fire");
 
     appendMatchupRow(els.atkVsEnemyList, { type: "Sight", label: "Attack", mult: atkPrev.overall });
     appendMatchupRow(els.atkVsEnemyList, { type: "Wind", label: "Wind spell", mult: windPrev.overall });
+    appendMatchupRow(els.atkVsEnemyList, { type: "Water", label: "Water spell", mult: waterPrev.overall });
 
     const offType = !state.player.types.includes("Fire");
     appendMatchupRow(els.atkVsEnemyList, { type: "Fire", label: offType ? "Fire spell (off-type)" : "Fire spell", mult: firePrev.overall });
@@ -1132,7 +1139,7 @@ function makeLobbyState() {
 }
 
 
-  const GAME_BUILD = "2026-02-14s";
+  const GAME_BUILD = "2026-02-15-water";
 
 
   // Load saved hero choice (if any)
@@ -1481,6 +1488,7 @@ function makeLobbyState() {
     // Button labels show multiplier + cost (so choices are readable)
     const atkPrev = computeTypedDamage("player", "enemy", 5, "Sight");
     const windPrev = computeTypedDamage("player", "enemy", 4, "Wind");
+    const waterPrev = computeTypedDamage("player", "enemy", 5, "Water");
     const firePrev = computeTypedDamage("player", "enemy", 6, "Fire");
 
     if (els.attackBtn instanceof HTMLButtonElement) {
@@ -1488,6 +1496,9 @@ function makeLobbyState() {
     }
     if (els.windBtn instanceof HTMLButtonElement) {
       els.windBtn.textContent = `Wind attack (2 Focus, x${fmtMult(windPrev.overall)})`;
+    }
+    if (els.waterBtn instanceof HTMLButtonElement) {
+      els.waterBtn.textContent = `Water attack (2 Focus, x${fmtMult(waterPrev.overall)})`;
     }
     if (els.fireBtn instanceof HTMLButtonElement) {
       const offType = !state.player.types.includes("Fire");
@@ -1539,6 +1550,7 @@ function makeLobbyState() {
     if (disableActions) closeMagicMenu();
 
     const canWind = isPlayerTurn && focus >= (2 + boundExtra);
+    const canWater = isPlayerTurn && focus >= (2 + boundExtra);
     const canFire = isPlayerTurn && focus >= (3 + boundExtra);
     const canHeal = isPlayerTurn && state.player.healCharges > 0 && focus >= healCost;
 
@@ -1546,6 +1558,7 @@ function makeLobbyState() {
     if (els.guardBtn instanceof HTMLButtonElement) els.guardBtn.disabled = disableActions;
     if (els.magicToggle instanceof HTMLButtonElement) els.magicToggle.disabled = disableActions;
     if (els.windBtn instanceof HTMLButtonElement) els.windBtn.disabled = !canWind;
+    if (els.waterBtn instanceof HTMLButtonElement) els.waterBtn.disabled = !canWater;
     if (els.fireBtn instanceof HTMLButtonElement) els.fireBtn.disabled = !canFire;
     if (els.healBtn instanceof HTMLButtonElement) els.healBtn.disabled = !canHeal;
     if (els.restartBtn instanceof HTMLButtonElement) els.restartBtn.disabled = false;
@@ -2007,6 +2020,57 @@ playAnim(els.playerSprite, "rpgAnim-attack");
     queueEnemyTurn();
   }
 
+  function playerWaterAttack() {
+    if (isGameOver()) return;
+    if (state.phase !== "player") return;
+    closeMagicMenu();
+
+    const baseCost = 2;
+    const extra = state.player.bound > 0 ? 1 : 0;
+    const cost = baseCost + extra;
+
+    if (state.player.focus < cost) {
+      addLog("Not enough Focus.");
+      render();
+      return;
+    }
+
+    showMoveBanner("Water attack", "Water");
+    playAnim(els.playerSprite, "rpgAnim-attack");
+    spawnFx("water", "enemy");
+
+    let base = 5;
+    // Bound makes your next offensive action weaker and more expensive.
+    if (state.player.bound > 0) base = Math.max(1, base - 2);
+
+    const prev = computeTypedDamage("player", "enemy", base, "Water");
+    const dmg = prev.damage;
+
+    applyDamageToEnemy(dmg);
+    spendFocus(cost);
+
+    // Water utility: douse burns (yours and theirs).
+    if (state.enemy.burn > 0) {
+      state.enemy.burn = 0;
+      addLog("Water douses the flames.");
+    }
+    if (state.player.burn > 0) {
+      state.player.burn = 0;
+      addLog("You douse your burn.");
+    }
+
+    spawnFloat(`-${dmg}`, "enemy", "dmg", prev);
+
+    // Water doesn't evade like wind; it is a steadier hit.
+
+    // Break bind after you take an action (bind is a one-turn tax).
+    clearBindIfAny();
+
+    render();
+
+    queueEnemyTurn();
+  }
+
   function playerFireAttack() {
     if (isGameOver()) return;
     if (state.phase !== "player") return;
@@ -2158,6 +2222,7 @@ playAnim(els.playerSprite, "rpgAnim-heal");
     els.magicToggle.addEventListener("click", toggleMagicMenu);
   }
   if (els.windBtn instanceof HTMLButtonElement) els.windBtn.addEventListener("click", playerWindAttack);
+  if (els.waterBtn instanceof HTMLButtonElement) els.waterBtn.addEventListener("click", playerWaterAttack);
   if (els.fireBtn instanceof HTMLButtonElement) els.fireBtn.addEventListener("click", playerFireAttack);
 
   if (els.attackBtn instanceof HTMLButtonElement) els.attackBtn.addEventListener("click", playerAttack);
@@ -2218,6 +2283,7 @@ playAnim(els.playerSprite, "rpgAnim-heal");
   };
   wirePreview(els.attackBtn, "Attack", "Sight", 0);
   wirePreview(els.windBtn, "Wind attack", "Wind", 2);
+  wirePreview(els.waterBtn, "Water attack", "Water", 2);
   wirePreview(els.fireBtn, "Fire attack", "Fire", 3);
 
 // Initialize (hero → location)

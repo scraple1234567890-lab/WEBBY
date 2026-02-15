@@ -133,6 +133,7 @@
   <button class="btn ghost rpgMagicToggle" id="magicToggle" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="magicMenu">Magic</button>
   <div class="rpgMagicMenu" id="magicMenu" role="menu" hidden>
     <button class="btn secondary rpgMagicItem" id="windBtn" type="button" role="menuitem">Wind attack</button>
+    <button class="btn secondary rpgMagicItem" id="waterBtn" type="button" role="menuitem">Water attack</button>
     <button class="btn primary rpgMagicItem" id="fireBtn" type="button" role="menuitem">Fire attack</button>
   </div>
 </div>
@@ -153,7 +154,7 @@
         <li><strong>Focus</strong> is your resource (0 to 6). You spend it on bigger actions.</li>
         <li><strong>Attack</strong> always gives <strong>+1 Focus</strong> (and deals Sight damage).</li>
         <li><strong>Guard</strong> gives <strong>+1 Focus</strong> and makes the next hit deal <strong>50% less</strong>.</li>
-        <li><strong>Wind</strong> costs <strong>2 Focus</strong>. <strong>Fire</strong> costs <strong>3 Focus</strong>.</li>
+        <li><strong>Wind</strong> costs <strong>2 Focus</strong>. <strong>Water</strong> costs <strong>2 Focus</strong>. <strong>Fire</strong> costs <strong>3 Focus</strong>.</li>
         <li><strong>Heal</strong> costs <strong>1 Focus</strong> (or <strong>2</strong> if you are <strong>Bound</strong>). You have limited charges.</li>
         <li>If you are <strong>Bound</strong> (Touch effect), your <strong>magic costs +1 Focus</strong> until it wears off. Guard breaks Bind.</li>
       </ul>
@@ -162,7 +163,7 @@
       <p class="muted">Damage is calculated like this:</p>
       <p class="rpgFormula"><strong>Damage</strong> = Base × <strong>STAB</strong> × <strong>Effectiveness</strong> (rounded)</p>
       <ul class="rpgModalList">
-        <li><strong>Move type</strong>: each action is a type (Wind / Fire / Sight / Earth / Touch).</li>
+        <li><strong>Move type</strong>: each action is a type (Wind / Water / Fire / Sight / Earth / Touch).</li>
         <li><strong>STAB</strong> (Same Type Attack Bonus): if the move matches one of your types, it gets <strong>×1.2</strong>.</li>
         <li><strong>Effectiveness</strong>: some types hit harder or softer into other types.</li>
         <li><strong>Dual types</strong> multiply together (example: Wind vs Fire+Sight uses both matchups).</li>
@@ -170,11 +171,12 @@
       <div class="rpgMiniChart" aria-label="Quick type hints">
         <div class="muted small">Quick hints:</div>
         <div class="rpgMiniChartRow">
-          <span class="typePill typePill--Wind">Wind</span><span class="rpgArrow">▶</span><span class="typePill typePill--Fire">Fire</span><span class="rpgDot">•</span>
-          <span class="typePill typePill--Fire">Fire</span><span class="rpgArrow">▶</span><span class="typePill typePill--Earth">Earth</span><span class="rpgDot">•</span>
-          <span class="typePill typePill--Earth">Earth</span><span class="rpgArrow">▶</span><span class="typePill typePill--Wind">Wind</span>
-        </div>
-        <div class="rpgMiniChartRow">
+  <span class="typePill typePill--Wind">Wind</span><span class="rpgArrow">▶</span><span class="typePill typePill--Fire">Fire</span><span class="rpgDot">•</span>
+  <span class="typePill typePill--Fire">Fire</span><span class="rpgArrow">▶</span><span class="typePill typePill--Earth">Earth</span><span class="rpgDot">•</span>
+  <span class="typePill typePill--Earth">Earth</span><span class="rpgArrow">▶</span><span class="typePill typePill--Water">Water</span><span class="rpgDot">•</span>
+  <span class="typePill typePill--Water">Water</span><span class="rpgArrow">▶</span><span class="typePill typePill--Wind">Wind</span>
+</div>
+<div class="rpgMiniChartRow">
           <span class="typePill typePill--Touch">Touch</span><span class="rpgArrow">▶</span><span class="typePill typePill--Sight">Sight</span><span class="rpgDot">•</span>
           <span class="typePill typePill--Sight">Sight</span><span class="rpgArrow">▶</span><span class="typePill typePill--Fire">Fire</span>
         </div>
@@ -230,6 +232,10 @@
   <span class="typePill typePill--Earth">Earth</span>
   <span class="rpgDot">•</span>
   <span class="typePill typePill--Earth">Earth</span>
+  <span class="rpgArrow">▶</span>
+  <span class="typePill typePill--Water">Water</span>
+  <span class="rpgDot">•</span>
+  <span class="typePill typePill--Water">Water</span>
   <span class="rpgArrow">▶</span>
   <span class="typePill typePill--Wind">Wind</span>
   <span class="rpgDot">•</span>

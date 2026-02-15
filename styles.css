@@ -2543,6 +2543,7 @@ body.gamePage {
 
   /* Type palette (intuitive + readable) */
   --type-wind: rgb(80 170 255);
+  --type-water: rgb(80 190 255);
   --type-fire: rgb(255 120 80);
   --type-earth: rgb(190 140 90);
   --type-sight: rgb(255 215 0);
@@ -2634,6 +2635,12 @@ body.gamePage #magicToggle{
 body.gamePage #windBtn{
   background: linear-gradient(180deg, color-mix(in srgb, var(--type-wind) 90%, white 10%), color-mix(in srgb, var(--type-wind) 65%, black 35%));
   border-color: color-mix(in srgb, var(--type-wind) 80%, white 20%);
+  color: rgb(10 10 18);
+  font-weight: 900;
+}
+body.gamePage #waterBtn{
+  background: linear-gradient(180deg, color-mix(in srgb, var(--type-water) 90%, white 10%), color-mix(in srgb, var(--type-water) 65%, black 35%));
+  border-color: color-mix(in srgb, var(--type-water) 80%, white 20%);
   color: rgb(10 10 18);
   font-weight: 900;
 }
@@ -3047,6 +3054,7 @@ body.modalOpen {
 }
 
 .rpgMoveBanner[data-type="Wind"]{ --accent: var(--type-wind); }
+.rpgMoveBanner[data-type="Water"]{ --accent: var(--type-water); }
 .rpgMoveBanner[data-type="Fire"]{ --accent: var(--type-fire); }
 .rpgMoveBanner[data-type="Earth"]{ --accent: var(--type-earth); }
 .rpgMoveBanner[data-type="Sight"]{ --accent: var(--type-sight); }
@@ -3135,6 +3143,34 @@ body.modalOpen {
   0%{ transform: translateX(-22px) rotate(-3deg); opacity: 0; }
   18%{ opacity: 0.9; }
   100%{ transform: translateX(24px) rotate(3deg); opacity: 0; }
+}
+
+/* --- Water --- */
+.rpgFx--water::before,
+.rpgFx--water::after{
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 40% 55%, color-mix(in srgb, var(--type-water) 80%, white 20%), transparent 58%),
+    radial-gradient(circle at 60% 45%, color-mix(in srgb, var(--type-water) 55%, black 45%), transparent 64%),
+    radial-gradient(circle at 50% 80%, rgba(255,255,255,0.10), transparent 60%);
+  opacity: 0;
+  transform: scale(0.84);
+  animation: rpg-water 560ms ease-out 1;
+}
+
+.rpgFx--water::after{
+  filter: blur(1.2px);
+  animation-duration: 660ms;
+  animation-delay: 40ms;
+}
+
+@keyframes rpg-water{
+  0%{ opacity: 0; transform: scale(0.76); filter: blur(1px); }
+  28%{ opacity: 1; }
+  100%{ opacity: 0; transform: scale(1.10); filter: blur(0.2px); }
 }
 
 /* --- Fire --- */
@@ -3304,6 +3340,7 @@ body.modalOpen {
 }
 
 #enemyCard[data-primary-type="Wind"]{ --typeAccent: var(--type-wind); box-shadow: 0 0 0 1px rgba(80,170,255,0.22) inset, 0 0 28px rgba(80,170,255,0.14); }
+#enemyCard[data-primary-type="Water"]{ --typeAccent: var(--type-water); box-shadow: 0 0 0 1px rgba(80,190,255,0.22) inset, 0 0 28px rgba(80,190,255,0.14); }
 #enemyCard[data-primary-type="Fire"]{ --typeAccent: var(--type-fire); box-shadow: 0 0 0 1px rgba(255,120,80,0.22) inset, 0 0 28px rgba(255,120,80,0.14); }
 #enemyCard[data-primary-type="Earth"]{ --typeAccent: var(--type-earth); box-shadow: 0 0 0 1px rgba(120,255,150,0.20) inset, 0 0 28px rgba(120,255,150,0.12); }
 #enemyCard[data-primary-type="Sight"]{ --typeAccent: var(--type-sight); box-shadow: 0 0 0 1px rgba(255,215,0,0.20) inset, 0 0 28px rgba(255,215,0,0.12); }
@@ -3332,6 +3369,7 @@ body.modalOpen {
 }
 
 #enemySprite[data-primary-type="Wind"]{ --typeAccent: var(--type-wind); --foeGlow: rgba(80,170,255,0.35); }
+#enemySprite[data-primary-type="Water"]{ --typeAccent: var(--type-water); --foeGlow: rgba(80,190,255,0.32); }
 #enemySprite[data-primary-type="Fire"]{ --typeAccent: var(--type-fire); --foeGlow: rgba(255,120,80,0.35); }
 #enemySprite[data-primary-type="Earth"]{ --typeAccent: var(--type-earth); --foeGlow: rgba(120,255,150,0.30); }
 #enemySprite[data-primary-type="Sight"]{ --typeAccent: var(--type-sight); --foeGlow: rgba(255,215,0,0.30); }
@@ -4706,6 +4744,11 @@ body.homePage #contact .sectionHead p.muted{
   border-color: color-mix(in srgb, var(--type-wind, rgb(80 170 255)) 92%, white 8%);
   box-shadow: 0 0 0 1px rgba(0,0,0,0.20) inset, 0 10px 22px color-mix(in srgb, var(--type-wind, rgb(80 170 255)) 26%, transparent);
 }
+.typePill--Water{
+  background: color-mix(in srgb, var(--type-water, rgb(80 190 255)) 70%, transparent);
+  border-color: color-mix(in srgb, var(--type-water, rgb(80 190 255)) 92%, white 8%);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.20) inset, 0 10px 22px color-mix(in srgb, var(--type-water, rgb(80 190 255)) 26%, transparent);
+}
 .typePill--Fire{
   background: color-mix(in srgb, var(--type-fire, rgb(255 120 80)) 70%, transparent);
   border-color: color-mix(in srgb, var(--type-fire, rgb(255 120 80)) 92%, white 8%);
@@ -4758,6 +4801,7 @@ body.homePage #contact .sectionHead p.muted{
 }
 
 .typeInline--Wind{ background: color-mix(in srgb, var(--type-wind, rgb(80 170 255)) 62%, transparent); border-color: color-mix(in srgb, var(--type-wind, rgb(80 170 255)) 86%, white 14%); }
+.typeInline--Water{ background: color-mix(in srgb, var(--type-water, rgb(80 190 255)) 62%, transparent); border-color: color-mix(in srgb, var(--type-water, rgb(80 190 255)) 86%, white 14%); }
 .typeInline--Fire{ background: color-mix(in srgb, var(--type-fire, rgb(255 120 80)) 62%, transparent); border-color: color-mix(in srgb, var(--type-fire, rgb(255 120 80)) 86%, white 14%); }
 .typeInline--Sight{ background: color-mix(in srgb, var(--type-sight, rgb(255 215 0)) 58%, transparent); border-color: color-mix(in srgb, var(--type-sight, rgb(255 215 0)) 84%, white 16%); }
 .typeInline--Earth{ background: color-mix(in srgb, var(--type-earth, rgb(190 140 90)) 58%, transparent); border-color: color-mix(in srgb, var(--type-earth, rgb(190 140 90)) 84%, white 16%); }
