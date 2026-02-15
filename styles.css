@@ -4899,6 +4899,25 @@ body.homePage #contact .sectionHead p.muted{
   align-items: center;
   opacity: 0.98;
 }
+/* Game: keep the "full type chart" readable on all screen sizes */
+body.gamePage .rpgTypeDetails[open] .rpgTypeChart{
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+  padding-bottom: 6px;
+  -webkit-overflow-scrolling: touch;
+}
+body.gamePage .rpgTypeDetails[open] .rpgTypeChart > *{
+  flex: 0 0 auto;
+}
+
+/* Avoid truncating longer type names (ex: Smell/Taste) */
+body.gamePage .rpgTypeName{
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
 
 .rpgArrow{
   opacity: 0.9;
@@ -5025,9 +5044,10 @@ body.gamePage .rpgBottom{
   display: grid;
   gap: 10px;
 }
-@media (min-width: 980px){
+@media (min-width: 1200px){
   body.gamePage .rpgBottom{
-    grid-template-columns: 1fr 1fr;
+    /* Give the Type matchup panel more horizontal room (it contains 2 internal columns + a wide chart) */
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
     align-items: start;
   }
 }
