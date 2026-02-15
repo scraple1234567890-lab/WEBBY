@@ -137,6 +137,7 @@
   </div>
 </div>
 <button class="btn ghost" id="explainBtn" type="button">Explain</button>
+<button class="btn ghost" id="heroBtn" type="button" title="Choose a different character">Hero</button>
 <button class="btn ghost" id="restartBtn" type="button">Restart</button>
 </div>
 
@@ -251,6 +252,22 @@
 
 
 <!-- Location Picker Modal (pre-combat) -->
+
+<div class="rpgModal" id="characterModal" aria-hidden="false" role="dialog" aria-modal="true" aria-labelledby="characterTitle" hidden>
+  <div class="post rpgModalInner" role="document">
+    <div class="rpgModalHead">
+      <h2 class="rpgLogTitle" id="characterTitle">Choose your hero</h2>
+      <button class="iconBtn" id="characterClose" type="button" aria-label="Close hero picker">✕</button>
+    </div>
+    <div class="rpgModalBody">
+      <p class="muted small" style="margin-top:0">Your hero changes your stats and type bonuses (STAB). You can change heroes anytime.</p>
+      <div class="rpgCharGrid" id="characterChoices" aria-label="Character choices"></div>
+    </div>
+    <div class="rpgModalFoot">
+      <button class="btn primary" id="characterOk" type="button">Continue</button>
+    </div>
+  </div>
+</div>
 <div class="rpgModal" id="locationModal" aria-hidden="false" role="dialog" aria-modal="true" aria-labelledby="locationTitle" hidden>
   <div class="post rpgModalInner" role="document">
     <div class="rpgModalHead">

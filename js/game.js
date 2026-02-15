@@ -38,6 +38,7 @@ if (root) {
     healBtn: document.getElementById("healBtn"),
     guardBtn: document.getElementById("guardBtn"),
     restartBtn: document.getElementById("restartBtn"),
+    heroBtn: document.getElementById("heroBtn"),
     magicToggle: document.getElementById("magicToggle"),
     magicMenu: document.getElementById("magicMenu"),
     windBtn: document.getElementById("windBtn"),
@@ -54,6 +55,12 @@ if (root) {
     // Location picker (pre-combat)
     locationModal: document.getElementById("locationModal"),
     locationChoices: document.getElementById("locationChoices"),
+
+    // Character picker (pre-combat)
+    characterModal: document.getElementById("characterModal"),
+    characterChoices: document.getElementById("characterChoices"),
+    characterClose: document.getElementById("characterClose"),
+    characterOk: document.getElementById("characterOk"),
 
     playerSprite: document.getElementById("playerSprite"),
     enemySprite: document.getElementById("enemySprite"),
@@ -377,6 +384,75 @@ function setTypeAccent(el, types) {
   updateBodyModalOpen();
   if (prev && prev instanceof HTMLElement) prev.focus();
 }
+  function updateBodyModalOpen() {
+  const any = isExplainOpen() || isHeroOpen() || isLocationOpen();
+  document.body.classList.toggle("modalOpen", any);
+}
+
+function renderHeroChoices() {
+  if (!(els.characterChoices instanceof HTMLElement)) return;
+
+  const active = pendingHeroId || activeHeroId;
+
+  els.characterChoices.innerHTML = PLAYABLE_HEROES.map((h) => {
+    const types = formatTypesDisplay(h.types);
+    return `
+      <button type="button" class="btn ghost rpgCharChoice ${h.id === active ? "isSelected" : ""}" data-hero="${h.id}">
+        <div class="rpgCharSprite"><img src="${h.sprite}" alt="" /></div>
+        <div>
+          <div class="rpgCharTitle">${h.name}</div>
+          <div class="rpgCharMeta muted small"><span class="pill">${types}</span></div>
+          <div class="rpgCharStats muted">HP ${h.maxHp} • Focus ${h.focusStart}/${h.focusMax} • Heals ${h.healCharges}</div>
+        </div>
+      </button>
+    `;
+  }).join("");
+}
+
+function openHeroPicker() {
+  if (!(els.characterModal instanceof HTMLElement)) return;
+  closeMagicMenu();
+
+  pendingHeroId = activeHeroId;
+  renderHeroChoices();
+
+  els.characterModal.removeAttribute("hidden");
+  heroLastFocus = document.activeElement;
+  updateBodyModalOpen();
+
+  setPhase("hero");
+  renderIntent(null);
+  setEffectBanner("—", "neutral");
+  render();
+
+  const first = els.characterModal.querySelector("button[data-hero]");
+  if (first instanceof HTMLButtonElement) first.focus();
+}
+
+function closeHeroPicker() {
+  if (!(els.characterModal instanceof HTMLElement)) return;
+  els.characterModal.setAttribute("hidden", "");
+  const prev = heroLastFocus;
+  heroLastFocus = null;
+  updateBodyModalOpen();
+  if (prev && prev instanceof HTMLElement) prev.focus();
+}
+
+function confirmHeroSelection() {
+  const id = pendingHeroId || activeHeroId;
+  setActiveHero(id);
+  pendingHeroId = null;
+  closeHeroPicker();
+
+  closeMagicMenu();
+  resetVisuals();
+  state = makeLobbyState();
+  renderIntent(null);
+  setEffectBanner("—", "neutral");
+  render();
+  openLocationPicker();
+}
+
 // --------------------
 // Location picker (pre-combat)
 // --------------------
@@ -386,10 +462,6 @@ function isLocationOpen() {
   return (els.locationModal instanceof HTMLElement) && !els.locationModal.hasAttribute("hidden");
 }
 
-function updateBodyModalOpen() {
-  const any = isExplainOpen() || isLocationOpen();
-  document.body.classList.toggle("modalOpen", any);
-}
 
 function renderLocationChoices() {
   if (!(els.locationChoices instanceof HTMLElement)) return;
@@ -794,14 +866,97 @@ function setPreviewMove(name, type, baseCost) {
   // Combatants + waves
   // --------------------
 
-  const PLAYER_TEMPLATE = {
-    name: "Player",
+const HERO_STORAGE_KEY = "dragonstone_rpg_hero";
+
+const PLAYABLE_HEROES = [
+  {
+    id: "alethea",
+    name: "Alethea",
     types: /** @type {MagicType[]} */ (["Wind", "Sight"]),
     maxHp: 20,
     healCharges: 3,
     focusMax: 6,
     focusStart: 2,
-  };
+    sprite: "./assets/images/player-brown.png",
+    blurb: "Balanced wind seer.",
+  },
+  {
+    id: "cinder",
+    name: "Cinder",
+    types: /** @type {MagicType[]} */ (["Fire", "Sight"]),
+    maxHp: 18,
+    healCharges: 2,
+    focusMax: 7,
+    focusStart: 3,
+    sprite: "./assets/images/enemy-red.png",
+    blurb: "Aggressive fire duelist.",
+  },
+  {
+    id: "bramble",
+    name: "Bramble",
+    types: /** @type {MagicType[]} */ (["Earth", "Fire"]),
+    maxHp: 24,
+    healCharges: 3,
+    focusMax: 5,
+    focusStart: 1,
+    sprite: "./assets/images/enemy-green.png",
+    blurb: "Sturdy earth warden (pyro-leaning).",
+  },
+  {
+    id: "knot",
+    name: "Knot",
+    types: /** @type {MagicType[]} */ (["Touch", "Wind"]),
+    maxHp: 20,
+    healCharges: 3,
+    focusMax: 6,
+    focusStart: 2,
+    sprite: "./assets/images/enemy-blue.png",
+    blurb: "Binder with windy footwork.",
+  },
+  {
+    id: "relen",
+    name: "Relen",
+    types: /** @type {MagicType[]} */ (["Sight", "Fire"]),
+    maxHp: 21,
+    healCharges: 3,
+    focusMax: 6,
+    focusStart: 2,
+    sprite: "./assets/images/enemy-blonde.png",
+    blurb: "Lightforged brawler with ember edges.",
+  },
+];
+
+/** @type {string} */
+let activeHeroId = PLAYABLE_HEROES[0].id;
+
+function getHeroById(id) {
+  return PLAYABLE_HEROES.find((h) => h.id === id) || PLAYABLE_HEROES[0];
+}
+
+function loadSavedHero() {
+  try {
+    const saved = window.localStorage.getItem(HERO_STORAGE_KEY);
+    if (saved) activeHeroId = getHeroById(saved).id;
+  } catch (e) {
+    // localStorage may be blocked.
+  }
+}
+
+function saveHero(id) {
+  try { window.localStorage.setItem(HERO_STORAGE_KEY, id); } catch (e) {}
+}
+
+function setActiveHero(id) {
+  const h = getHeroById(id);
+  activeHeroId = h.id;
+  saveHero(activeHeroId);
+  return h;
+}
+
+function getActiveHero() {
+  return getHeroById(activeHeroId);
+}
+
 
   const ENEMIES = [
   {
@@ -898,6 +1053,7 @@ function setActiveLocation(id) {
   function makeInitialState(enemySet = activeEnemySet, locationId = activeLocationId) {
   const set = enemySet || activeEnemySet || [ENEMIES[0], ENEMIES[1]];
   const loc = locationId ? getLocationById(locationId) : null;
+  const pt = getActiveHero();
 
   return {
     turn: 1,
@@ -906,10 +1062,11 @@ function setActiveLocation(id) {
     locationId: loc ? loc.id : null,
     enemySet: set,
     player: {
-      name: PLAYER_TEMPLATE.name,
-      types: PLAYER_TEMPLATE.types,
-      hp: PLAYER_TEMPLATE.maxHp,
-      max: PLAYER_TEMPLATE.maxHp,
+      name: pt.name,
+      types: pt.types,
+      sprite: pt.sprite,
+      hp: pt.maxHp,
+      max: pt.maxHp,
 
       // statuses
       guarding: false,
@@ -918,9 +1075,9 @@ function setActiveLocation(id) {
       bound: 0,         // touch bind: next attack weakened + magic costs +1 focus
 
       // resources
-      healCharges: PLAYER_TEMPLATE.healCharges,
-      focus: PLAYER_TEMPLATE.focusStart,
-      focusMax: PLAYER_TEMPLATE.focusMax,
+      healCharges: pt.healCharges,
+      focus: pt.focusStart,
+      focusMax: pt.focusMax,
     },
     enemy: makeEnemy(0, set),
     over: false,
@@ -935,6 +1092,7 @@ function setActiveLocation(id) {
 function makeLobbyState() {
   const loc = LOCATIONS[0];
   const set = loc.enemySet.map((i) => ENEMIES[i]);
+  const pt = getActiveHero();
 
   return {
     turn: 1,
@@ -943,10 +1101,11 @@ function makeLobbyState() {
     locationId: null,
     enemySet: set,
     player: {
-      name: PLAYER_TEMPLATE.name,
-      types: PLAYER_TEMPLATE.types,
-      hp: PLAYER_TEMPLATE.maxHp,
-      max: PLAYER_TEMPLATE.maxHp,
+      name: pt.name,
+      types: pt.types,
+      sprite: pt.sprite,
+      hp: pt.maxHp,
+      max: pt.maxHp,
 
       // statuses
       guarding: false,
@@ -955,21 +1114,25 @@ function makeLobbyState() {
       bound: 0,
 
       // resources
-      healCharges: PLAYER_TEMPLATE.healCharges,
-      focus: PLAYER_TEMPLATE.focusStart,
-      focusMax: PLAYER_TEMPLATE.focusMax,
+      healCharges: pt.healCharges,
+      focus: pt.focusStart,
+      focusMax: pt.focusMax,
     },
     enemy: makeEnemy(0, set),
     over: false,
     log: [
-      "Choose a location to begin.",
-      "Pick a battleground to determine your encounter.",
+      "Choose a hero, then a location to begin.",
+      "Your hero changes stats and type bonuses (STAB).",
     ],
   };
 }
 
 
   const GAME_BUILD = "2026-02-14s";
+
+
+  // Load saved hero choice (if any)
+  loadSavedHero();
 
   /** @type {ReturnType<typeof makeInitialState>} */
   let state = makeInitialState();
@@ -1290,6 +1453,14 @@ function makeLobbyState() {
       }
     }
 
+    // Player sprite swap (hero selection)
+    if (els.playerSpriteImg instanceof HTMLImageElement && state.player.sprite) {
+      if (els.playerSpriteImg.getAttribute("src") !== state.player.sprite) {
+        els.playerSpriteImg.setAttribute("src", state.player.sprite);
+      }
+    }
+
+
     // Type pills
     renderTypePills(els.playerTypePills, state.player.types);
     renderTypePills(els.enemyTypePills, state.enemy.types);
@@ -1457,7 +1628,7 @@ function makeLobbyState() {
 
     // Lock/unlock action controls (Restart stays available).
     const lockBtn = (b, on) => {
-      if (b instanceof HTMLButtonElement && b.id !== "restartBtn") b.disabled = on;
+      if (b instanceof HTMLButtonElement && b.id !== "restartBtn" && b.id !== "heroBtn") b.disabled = on;
     };
     lockBtn(els.attackBtn, locked);
     lockBtn(els.healBtn, locked);
@@ -1471,6 +1642,7 @@ function makeLobbyState() {
 
     if (phase === "player") setTurnBanner("Your turn", "player");
     else if (phase === "enemy") setTurnBanner("Enemy turn", "enemy");
+    else if (phase === "hero") setTurnBanner("Choose a hero", null);
     else if (phase === "select") setTurnBanner("Choose a location", null);
     else setTurnBanner("Resolving…", "enemy");
   }
@@ -1960,17 +2132,18 @@ playAnim(els.playerSprite, "rpgAnim-heal");
 
     queueEnemyTurn();
   }
-
   function restart() {
-  closeMagicMenu();
-  resetVisuals();
-  state = makeLobbyState();
-  renderIntent(null);
-  setEffectBanner("—", "neutral");
-  setPhase("select");
-  render();
-  openLocationPicker();
-}
+    closeMagicMenu();
+    closeHeroPicker();
+    closeLocationPicker();
+    resetVisuals();
+    state = makeLobbyState();
+    renderIntent(null);
+    setEffectBanner("—", "neutral");
+    setPhase("select");
+    render();
+    openLocationPicker();
+  }
 
 
   // --------------------
@@ -1987,6 +2160,36 @@ playAnim(els.playerSprite, "rpgAnim-heal");
   if (els.healBtn instanceof HTMLButtonElement) els.healBtn.addEventListener("click", playerHeal);
   if (els.guardBtn instanceof HTMLButtonElement) els.guardBtn.addEventListener("click", playerGuard);
   if (els.restartBtn instanceof HTMLButtonElement) els.restartBtn.addEventListener("click", restart);
+
+
+  if (els.heroBtn instanceof HTMLButtonElement) {
+    els.heroBtn.addEventListener("click", () => {
+      closeMagicMenu();
+      closeLocationPicker();
+      resetVisuals();
+      state = makeLobbyState();
+      renderIntent(null);
+      setEffectBanner("—", "neutral");
+      render();
+      openHeroPicker();
+    });
+  }
+
+  if (els.characterChoices instanceof HTMLElement) {
+    els.characterChoices.addEventListener("click", (e) => {
+      const target = e.target;
+      if (!(target instanceof HTMLElement)) return;
+      const btn = target.closest("button[data-hero]");
+      if (!(btn instanceof HTMLButtonElement)) return;
+      const id = btn.getAttribute("data-hero");
+      if (!id) return;
+      pendingHeroId = id;
+      renderHeroChoices();
+    });
+  }
+  if (els.characterOk instanceof HTMLButtonElement) els.characterOk.addEventListener("click", confirmHeroSelection);
+  if (els.characterClose instanceof HTMLButtonElement) els.characterClose.addEventListener("click", confirmHeroSelection);
+
 
   if (els.locationChoices instanceof HTMLElement) {
     els.locationChoices.addEventListener("click", (e) => {
@@ -2013,11 +2216,11 @@ playAnim(els.playerSprite, "rpgAnim-heal");
   wirePreview(els.windBtn, "Wind attack", "Wind", 2);
   wirePreview(els.fireBtn, "Fire attack", "Fire", 3);
 
-// Initialize (start on the location picker)
+// Initialize (hero → location)
   state = makeLobbyState();
   renderIntent(null);
   setEffectBanner("—", "neutral");
-  setPhase("select");
+  setPhase("hero");
   render();
-  openLocationPicker();
+  openHeroPicker();
 }
