@@ -54,7 +54,6 @@
 <section class="section">
 <div class="container">
 <div class="sectionHead">
-<p class="kicker">Minigame</p>
 <h1 class="rpgTitle">Tiny Turn RPG</h1></div>
 <div class="rpgWrap" id="rpgRoot">
 <div aria-label="Battlefield" class="rpgGrid" role="group">
@@ -161,20 +160,8 @@
         <li><strong>Effectiveness</strong>: some types hit harder or softer into other types.</li>
         <li><strong>Dual types</strong> multiply together (example: Wind vs Fire+Sight uses both matchups).</li>
       </ul>
-      <div class="rpgMiniChart" aria-label="Quick type hints">
-        <div class="muted small">Quick hints:</div>
-        <div class="rpgMiniChartRow">
-  <span class="typePill typePill--Wind">Wind</span><span class="rpgArrow">▶</span><span class="typePill typePill--Fire">Fire</span><span class="rpgDot">•</span>
-  <span class="typePill typePill--Fire">Fire</span><span class="rpgArrow">▶</span><span class="typePill typePill--Earth">Earth</span><span class="rpgDot">•</span>
-  <span class="typePill typePill--Earth">Earth</span><span class="rpgArrow">▶</span><span class="typePill typePill--Water">Water</span><span class="rpgDot">•</span>
-  <span class="typePill typePill--Water">Water</span><span class="rpgArrow">▶</span><span class="typePill typePill--Wind">Wind</span>
-</div>
-<div class="rpgMiniChartRow">
-          <span class="typePill typePill--Touch">Touch</span><span class="rpgArrow">▶</span><span class="typePill typePill--Sight">Sight</span><span class="rpgDot">•</span>
-          <span class="typePill typePill--Sight">Sight</span><span class="rpgArrow">▶</span><span class="typePill typePill--Fire">Fire</span>
-        </div>
-      </div>
-      <p class="muted small">Tip: the move buttons show the multiplier (x1.44, x0.81, etc.) so you can plan before committing.</p>
+      
+
     </div>
     <div class="rpgModalFoot">
       <button class="btn primary" id="explainOk" type="button">Got it</button>
@@ -183,30 +170,22 @@
 </div>
 
 <div class="rpgBottom">
-<article aria-label="Type matchup" class="post rpgTypeCard">
+<article aria-label="Type chart" class="post rpgTypeCard">
   <div class="rpgTypeHead">
-    <h2 class="rpgLogTitle">Type matchup</h2>
-    <p class="muted small">Quick read: <span class="rpgLegendStrong">Strong</span> ≥ x1.3, <span class="rpgLegendWeak">Weak</span> ≤ x0.9.</p>
+    <h2 class="rpgLogTitle">Full type chart</h2>
   </div>
 
-	  <details class="rpgTypeDetails">
-	    <summary>Show full type chart</summary>
-	    <div class="rpgTypeMatrixLegend">
-	      <span class="rpgTypeKey rpgTypeKey--strong">Strong</span>
-	      <span class="rpgTypeKey rpgTypeKey--weak">Weak</span>
-	      <span class="rpgTypeKey rpgTypeKey--neutral">Normal</span>
-	      <span class="muted tiny">Rows = attacker. Columns = defender.</span>
-	    </div>
-	    <div class="rpgTypeMatrixScroll" role="region" aria-label="Type chart scroll area">
-	      <table class="rpgTypeMatrix" id="typeMatrix" aria-label="Type effectiveness chart"></table>
-	    </div>
-	  </details>
-    <div class="rpgEffectBanner" id="effectBanner">—</div>
+  <div class="rpgTypeMatrixLegend">
+    <span class="rpgTypeKey rpgTypeKey--strong">Strong</span>
+    <span class="rpgTypeKey rpgTypeKey--weak">Weak</span>
+    <span class="rpgTypeKey rpgTypeKey--neutral">Normal</span>
+    <span class="muted tiny">Rows = attacker. Columns = defender.</span>
+  </div>
+
+  <div class="rpgTypeMatrixScroll" role="region" aria-label="Type chart scroll area">
+    <table class="rpgTypeMatrix" id="typeMatrix" aria-label="Type effectiveness chart"></table>
   </div>
 </article>
-
-
-
 <!-- Location Picker Modal (pre-combat) -->
 
 <div class="rpgModal" id="characterModal" aria-hidden="false" role="dialog" aria-modal="true" aria-labelledby="characterTitle" hidden>
@@ -232,8 +211,7 @@
     <div class="rpgModalBody">
       <p class="muted">Pick one of four locations. Each one spawns a different enemy.</p>
       <div class="rpgLocationGrid" id="locationChoices"></div>
-      <p class="muted tiny">Tip: hit Restart anytime to choose again.</p>
-    </div>
+</div>
   </div>
 </div>
 
