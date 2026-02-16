@@ -45,6 +45,8 @@ if (root) {
     heroBtn: document.getElementById("heroBtn"),
     magicToggle: document.getElementById("magicToggle"),
     magicMenu: document.getElementById("magicMenu"),
+    itemsToggle: document.getElementById("itemsToggle"),
+    itemsMenu: document.getElementById("itemsMenu"),
     windBtn: document.getElementById("windBtn"),
     secondaryTypeBtn: document.getElementById("secondaryTypeBtn"),
     waterBtn: document.getElementById("waterBtn"),
@@ -297,6 +299,8 @@ function playWaveClearSfx() {
 
   function toggleMagicMenu() {
     if (!(els.magicMenu instanceof HTMLElement)) return;
+    // Keep only one dropdown open at a time.
+    if (els.itemsMenu instanceof HTMLElement && !els.itemsMenu.hidden) closeItemsMenu();
     setMagicMenuOpen(els.magicMenu.hidden);
   }
 
@@ -314,6 +318,42 @@ function playWaveClearSfx() {
       const inMenu = els.magicMenu.contains(t);
       const inToggle = els.magicToggle.contains(t);
       if (!inMenu && !inToggle) closeMagicMenu();
+    }
+  });
+
+  // --------------------
+  // Items menu helpers (simple one-use consumables)
+  // --------------------
+
+  function setItemsMenuOpen(open) {
+    if (els.itemsMenu instanceof HTMLElement) {
+      els.itemsMenu.hidden = !open;
+    }
+    if (els.itemsToggle instanceof HTMLButtonElement) {
+      els.itemsToggle.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+  }
+
+  function toggleItemsMenu() {
+    if (!(els.itemsMenu instanceof HTMLElement)) return;
+    // Keep only one dropdown open at a time.
+    if (els.magicMenu instanceof HTMLElement && !els.magicMenu.hidden) closeMagicMenu();
+    setItemsMenuOpen(els.itemsMenu.hidden);
+  }
+
+  function closeItemsMenu() {
+    setItemsMenuOpen(false);
+  }
+
+  // Close items menu when clicking outside.
+  document.addEventListener("click", (e) => {
+    if (!(els.itemsMenu instanceof HTMLElement)) return;
+    if (!(els.itemsToggle instanceof HTMLElement)) return;
+    const t = e.target;
+    if (t instanceof Node) {
+      const inMenu = els.itemsMenu.contains(t);
+      const inToggle = els.itemsToggle.contains(t);
+      if (!inMenu && !inToggle) closeItemsMenu();
     }
   });
 
@@ -594,6 +634,60 @@ function renderSpellMenu(spells, isPlayerTurn, focus, boundExtra) {
   });
 }
 
+// --------------------
+// Items UI (simple)
+// --------------------
+
+/** @param {string} itemId */
+function itemCanUse(itemId) {
+  if (!state || !state.player) return false;
+  if (itemId === "potion") return state.player.hp < state.player.max;
+  if (itemId === "ether") return state.player.focus < state.player.focusMax;
+  if (itemId === "cleanse") return (state.player.burn > 0) || (state.player.bound > 0);
+  return false;
+}
+
+/** @param {boolean} isPlayerTurn */
+function renderItemMenu(isPlayerTurn) {
+  if (!(els.itemsMenu instanceof HTMLElement)) return;
+  els.itemsMenu.replaceChildren();
+
+  const tip = document.createElement("div");
+  tip.className = "rpgMagicEmpty";
+  tip.textContent = "One-use items. Using one spends your turn.";
+  els.itemsMenu.appendChild(tip);
+
+  const inv = state?.player?.items && typeof state.player.items === "object" ? state.player.items : {};
+  const rows = ITEM_IDS
+    .map((id) => ({ id, count: Math.max(0, toSafeInt(inv[id], 0)) }))
+    .filter((r) => r.count > 0);
+
+  if (rows.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "rpgMagicEmpty";
+    empty.textContent = "No items.";
+    els.itemsMenu.appendChild(empty);
+    return;
+  }
+
+  rows.forEach(({ id, count }) => {
+    const def = ITEM_DEFS[id];
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "btn secondary rpgMagicItem";
+    btn.setAttribute("role", "menuitem");
+    btn.dataset.itemId = id;
+
+    const label = def ? `${def.icon} ${def.name}` : id;
+    const desc = def?.desc ? ` • ${def.desc}` : "";
+    btn.textContent = `${label} (x${count})${desc}`;
+
+    const usable = itemCanUse(id);
+    btn.disabled = !isPlayerTurn || !usable;
+    els.itemsMenu.appendChild(btn);
+  });
+}
+
 /** @param {MagicType[]} types */
 function formatTypesDisplay(types) {
   return types.join(" • ");
@@ -628,6 +722,7 @@ function setTypeAccent(el, types) {
       if (isHeroOpen()) closeHeroPicker();
       if (isLocationOpen()) closeLocationPicker();
       closeMagicMenu();
+      closeItemsMenu();
     }
   });
 
@@ -1019,6 +1114,7 @@ function startBattleWithLocation(locId) {
   const loc = setActiveLocation(locId);
 
   closeMagicMenu();
+  closeItemsMenu();
   closeLocationPicker();
 
   resetVisuals();
@@ -1430,6 +1526,34 @@ function toSafeInt(n, fallback) {
   return Math.trunc(x);
 }
 
+// --------------------
+// Items (extremely simple)
+// - One-use consumables
+// - Found deterministically after each cleared wave
+// - Saved per-hero
+// --------------------
+
+const ITEM_DEFS = /** @type {Record<string, {id:string,name:string,icon:string,desc:string}>} */ ({
+  potion: { id: "potion", name: "Potion", icon: "🧪", desc: "Heal 7 HP" },
+  ether: { id: "ether", name: "Mana Shard", icon: "💠", desc: "Restore 2 Mana" },
+  cleanse: { id: "cleanse", name: "Cleanse Charm", icon: "🧿", desc: "Clear Burn + Bind" },
+});
+const ITEM_IDS = Object.keys(ITEM_DEFS);
+
+const STARTING_ITEMS = /** @type {Record<string, number>} */ ({ potion: 1, ether: 1 });
+
+/** @param {any} raw */
+function sanitizeItemCounts(raw) {
+  /** @type {Record<string, number>} */
+  const out = {};
+  const src = raw && typeof raw === "object" ? raw : {};
+  for (const id of ITEM_IDS) {
+    const n = Math.max(0, toSafeInt(src[id], 0));
+    if (n > 0) out[id] = clamp(n, 0, 99);
+  }
+  return out;
+}
+
 /** @param {number} level */
 function xpToNext(level) {
   const L = Math.max(1, toSafeInt(level, 1));
@@ -1442,7 +1566,7 @@ function xpToNext(level) {
 
 function loadHeroProgress(heroId) {
   const raw = localStorage.getItem(PROGRESS_KEY_PREFIX + heroId);
-  if (!raw) return { level: 1, xp: 0, spells: undefined };
+  if (!raw) return { level: 1, xp: 0, spells: undefined, items: { ...STARTING_ITEMS } };
   try {
     const obj = JSON.parse(raw);
     const level = clamp(toSafeInt(obj?.level, 1), 1, 99);
@@ -1450,14 +1574,15 @@ function loadHeroProgress(heroId) {
     const spells = Array.isArray(obj?.spells)
       ? obj.spells.filter((id) => typeof id === "string" && !!SPELLS_BY_ID[id])
       : undefined;
-    return { level, xp, spells };
+    const items = sanitizeItemCounts(obj?.items);
+    return { level, xp, spells, items };
   } catch {
-    return { level: 1, xp: 0, spells: undefined };
+    return { level: 1, xp: 0, spells: undefined, items: { ...STARTING_ITEMS } };
   }
 }
 
 
-/** @param {string} heroId @param {{level:number,xp:number,spells?:string[]}} prog */
+/** @param {string} heroId @param {{level:number,xp:number,spells?:string[],items?:Record<string,number>}} prog */
 function saveHeroProgress(heroId, prog) {
   try {
     const payload = {
@@ -1466,6 +1591,9 @@ function saveHeroProgress(heroId, prog) {
     };
     if (Array.isArray(prog.spells)) {
       payload.spells = prog.spells.filter((id) => typeof id === "string" && !!SPELLS_BY_ID[id]);
+    }
+    if (prog?.items && typeof prog.items === "object") {
+      payload.items = sanitizeItemCounts(prog.items);
     }
     window.localStorage.setItem(PROGRESS_KEY_PREFIX + heroId, JSON.stringify(payload));
   } catch (e) {
@@ -1856,6 +1984,7 @@ function setActiveLocation(id) {
   function makePlayerFromHero(pt) {
     const prog = loadHeroProgress(pt.id);
     const scaled = applyLevelToHero(pt, prog.level);
+    const items = sanitizeItemCounts(prog.items);
     const savedSpells = Array.isArray(prog.spells) ? prog.spells : knownSpellIdsFor(pt.types, prog.level);
     let spells = sanitizeKnownSpellIds(savedSpells, pt.types, prog.level);
     startingSpellIdsFor(pt.types).forEach((id) => { if (!spells.includes(id)) spells.push(id); });
@@ -1888,6 +2017,9 @@ function setActiveLocation(id) {
       evading: false,
       burn: 0,
       bound: 0,
+
+      // items (one-use consumables)
+      items,
 
       // resources
       healCharges: pt.healCharges,
@@ -2002,6 +2134,7 @@ function persistPlayerProgress() {
     level: Math.max(1, toSafeInt(state.player.level, 1)),
     xp: Math.max(0, toSafeInt(state.player.xp, 0)),
     spells: Array.isArray(state.player.spells) ? state.player.spells : [],
+    items: sanitizeItemCounts(state.player.items),
   });
 }
 
@@ -2530,10 +2663,16 @@ function persistPlayerProgress() {
     // Enable/disable actions
     const isPlayerTurn = !state.over && state.phase === "player";
     const disableActions = !isPlayerTurn;
-    if (disableActions) closeMagicMenu();
+    if (disableActions) {
+      closeMagicMenu();
+      closeItemsMenu();
+    }
 
     // Render spell menu with up-to-date enable/disable state.
     renderSpellMenu(spells, isPlayerTurn, focus, boundExtra);
+
+    // Render items menu (inventory) with up-to-date enable/disable state.
+    renderItemMenu(isPlayerTurn);
 
     const canHeal = isPlayerTurn && state.player.healCharges > 0 && focus >= healCost;
 
@@ -2541,6 +2680,8 @@ function persistPlayerProgress() {
     if (els.guardBtn instanceof HTMLButtonElement) els.guardBtn.disabled = disableActions;
     const hasAnySpell = spells.length > 0;
     if (els.magicToggle instanceof HTMLButtonElement) els.magicToggle.disabled = disableActions || !hasAnySpell;
+
+    if (els.itemsToggle instanceof HTMLButtonElement) els.itemsToggle.disabled = disableActions;
     if (els.healBtn instanceof HTMLButtonElement) els.healBtn.disabled = !canHeal;
     if (els.restartBtn instanceof HTMLButtonElement) els.restartBtn.disabled = false;
   }
@@ -2551,6 +2692,50 @@ function persistPlayerProgress() {
     if (state.enemy.hp <= 0) playAnim(els.enemySprite, "rpgAnim-faint");
     if (state.player.hp <= 0) playAnim(els.playerSprite, "rpgAnim-faint");
     render();
+  }
+
+  // --------------------
+  // Items: inventory + deterministic loot
+  // --------------------
+
+  /** @param {string} itemId @param {number} count */
+  function gainItem(itemId, count = 1) {
+    if (!ITEM_DEFS[itemId]) return;
+    if (!state.player.items || typeof state.player.items !== "object") state.player.items = {};
+    const prev = Math.max(0, toSafeInt(state.player.items[itemId], 0));
+    const next = clamp(prev + Math.max(1, toSafeInt(count, 1)), 0, 99);
+    state.player.items[itemId] = next;
+    const def = ITEM_DEFS[itemId];
+    addLog(`🎁 Found: ${def.icon} ${def.name} (x${Math.max(1, toSafeInt(count, 1))}).`);
+    persistPlayerProgress();
+  }
+
+  /** @param {string} itemId */
+  function consumeItem(itemId) {
+    const inv = state?.player?.items && typeof state.player.items === "object" ? state.player.items : {};
+    const prev = Math.max(0, toSafeInt(inv[itemId], 0));
+    if (prev <= 0) return false;
+    const next = prev - 1;
+    if (next <= 0) delete inv[itemId];
+    else inv[itemId] = next;
+    state.player.items = inv;
+    persistPlayerProgress();
+    return true;
+  }
+
+  /** @param {number} waveIndex */
+  function lootForWave(waveIndex) {
+    const locId = state?.locationId || activeLocationId || "";
+    /** @type {Record<string, string[]>} */
+    const table = {
+      "arena": ["potion", "ether"],
+      "market-central": ["ether", "potion"],
+      "fey-forest": ["cleanse", "potion"],
+      "gutterglass": ["potion", "cleanse"],
+    };
+    const row = table[locId] || ["potion", "ether"];
+    const idx = clamp(toSafeInt(waveIndex, 0), 0, row.length - 1);
+    return row[idx] || "potion";
   }
 
   /**
@@ -2565,6 +2750,9 @@ function persistPlayerProgress() {
 
     // Play the badge-unlock SFX when you clear Wave 1.
     if (state.wave === 0) playWaveClearSfx();
+
+    // Simple loot: one item per cleared wave (deterministic by location).
+    gainItem(lootForWave(state.wave), 1);
 
     playAnim(els.enemySprite, "rpgAnim-faint");
 
@@ -2636,6 +2824,7 @@ function persistPlayerProgress() {
     lockBtn(els.healBtn, locked);
     lockBtn(els.guardBtn, locked);
     lockBtn(els.magicToggle, locked);
+    lockBtn(els.itemsToggle, locked);
     lockBtn(els.windBtn, locked);
     lockBtn(els.waterBtn, locked);
     lockBtn(els.soundBtn, locked);
@@ -2650,7 +2839,17 @@ function persistPlayerProgress() {
       });
     }
 
-    if (locked) closeMagicMenu();
+    // Dynamic item buttons inside the Items menu.
+    if (els.itemsMenu instanceof HTMLElement) {
+      els.itemsMenu.querySelectorAll("button[data-item-id]").forEach((b) => {
+        if (b instanceof HTMLButtonElement) b.disabled = locked;
+      });
+    }
+
+    if (locked) {
+      closeMagicMenu();
+      closeItemsMenu();
+    }
 
     if (phase === "player") setTurnBanner("Your turn", "player");
     else if (phase === "enemy") setTurnBanner("Enemy turn", "enemy");
@@ -2937,6 +3136,7 @@ function persistPlayerProgress() {
     if (isGameOver()) return;
     if (state.phase !== "player") return;
     closeMagicMenu();
+    closeItemsMenu();
 
     const atkType = playerPrimaryType();
     showMoveBanner("Attack", atkType);
@@ -2996,6 +3196,7 @@ function persistPlayerProgress() {
     if (isGameOver()) return;
     if (state.phase !== "player") return;
     closeMagicMenu();
+    closeItemsMenu();
 
     const spell = SPELLS_BY_ID[spellId];
     if (!spell) {
@@ -3604,6 +3805,7 @@ function playerFireAttack() {
     if (isGameOver()) return;
     if (state.phase !== "player") return;
     closeMagicMenu();
+    closeItemsMenu();
 
     const extra = state.player.bound > 0 ? 1 : 0;
     const cost = 1 + extra;
@@ -3617,8 +3819,10 @@ function playerFireAttack() {
       addLog("Not enough Mana.");
       render();
       return;
-    }    showMoveBanner("Heal", "Touch");
-playAnim(els.playerSprite, "rpgAnim-heal");
+    }
+
+    showMoveBanner("Heal", "Touch");
+    playAnim(els.playerSprite, "rpgAnim-heal");
     spawnFx("heal", "player");
 
     const healMult = typeof state.player.healMult === "number" ? state.player.healMult : 1;
@@ -3650,6 +3854,7 @@ playAnim(els.playerSprite, "rpgAnim-heal");
     if (isGameOver()) return;
     if (state.phase !== "player") return;
     closeMagicMenu();
+    closeItemsMenu();
 
     if (!state.player.guarding) {
       state.player.guarding = true;
@@ -3669,8 +3874,83 @@ playAnim(els.playerSprite, "rpgAnim-heal");
 
     queueEnemyTurn();
   }
+
+  /** @param {string} itemId */
+  function playerUseItem(itemId) {
+    if (isGameOver()) return;
+    if (state.phase !== "player") return;
+
+    closeMagicMenu();
+    closeItemsMenu();
+
+    const def = ITEM_DEFS[itemId];
+    if (!def) {
+      addLog("That item doesn't exist.");
+      render();
+      return;
+    }
+
+    const inv = state?.player?.items && typeof state.player.items === "object" ? state.player.items : {};
+    const have = Math.max(0, toSafeInt(inv[itemId], 0));
+    if (have <= 0) {
+      addLog(`You don't have any ${def.name} left.`);
+      render();
+      return;
+    }
+
+    if (!itemCanUse(itemId)) {
+      // Don't waste it.
+      addLog(`${def.name} would have no effect right now.`);
+      render();
+      return;
+    }
+
+    // Consume first so the UI stays honest even if something throws later.
+    if (!consumeItem(itemId)) {
+      addLog(`You don't have any ${def.name} left.`);
+      render();
+      return;
+    }
+
+    // Apply effect
+    if (itemId === "potion") {
+      const amount = 7;
+      const before = state.player.hp;
+      state.player.hp = clamp(state.player.hp + amount, 0, state.player.max);
+      const actual = state.player.hp - before;
+      showMoveBanner(`${def.name}`, "Touch");
+      playAnim(els.playerSprite, "rpgAnim-heal");
+      spawnFx("heal", "player");
+      if (actual > 0) spawnFloat(`+${actual}`, "player", "heal", null);
+      addLog(`You use ${def.name} (+${actual} HP).`);
+    } else if (itemId === "ether") {
+      const before = state.player.focus;
+      gainFocus(2);
+      const actual = state.player.focus - before;
+      showMoveBanner(`${def.name}`, "Sight");
+      playAnim(els.playerSprite, "rpgAnim-heal");
+      spawnFx("sight", "player");
+      addLog(`You use ${def.name} (+${actual} Mana).`);
+    } else if (itemId === "cleanse") {
+      const b = Math.max(0, toSafeInt(state.player.burn, 0));
+      const bd = Math.max(0, toSafeInt(state.player.bound, 0));
+      state.player.burn = 0;
+      state.player.bound = 0;
+      showMoveBanner(`${def.name}`, "Touch");
+      playAnim(els.playerSprite, "rpgAnim-heal");
+      spawnFx("touch", "player");
+      const parts = [];
+      if (b > 0) parts.push("Burn");
+      if (bd > 0) parts.push("Bind");
+      addLog(`You use ${def.name} (cleared ${parts.join(" and ")}).`);
+    }
+
+    render();
+    queueEnemyTurn();
+  }
   function restart() {
     closeMagicMenu();
+    closeItemsMenu();
     closeHeroPicker();
     closeLocationPicker();
     resetVisuals();
@@ -3690,6 +3970,23 @@ playAnim(els.playerSprite, "rpgAnim-heal");
 
   if (els.magicToggle instanceof HTMLButtonElement) {
     els.magicToggle.addEventListener("click", toggleMagicMenu);
+  }
+
+  if (els.itemsToggle instanceof HTMLButtonElement) {
+    els.itemsToggle.addEventListener("click", toggleItemsMenu);
+  }
+
+  // Items menu: buttons are generated each render.
+  if (els.itemsMenu instanceof HTMLElement) {
+    els.itemsMenu.addEventListener("click", (e) => {
+      const target = e.target;
+      if (!(target instanceof HTMLElement)) return;
+      const btn = target.closest("button[data-item-id]");
+      if (!(btn instanceof HTMLButtonElement)) return;
+      const id = btn.getAttribute("data-item-id");
+      if (!id) return;
+      playerUseItem(id);
+    });
   }
 
   // Dynamic spell menu: buttons are generated each render.
@@ -3730,6 +4027,7 @@ playAnim(els.playerSprite, "rpgAnim-heal");
   if (els.heroBtn instanceof HTMLButtonElement) {
     els.heroBtn.addEventListener("click", () => {
       closeMagicMenu();
+      closeItemsMenu();
       closeLocationPicker();
       resetVisuals();
       state = makeLobbyState();
@@ -3762,7 +4060,7 @@ playAnim(els.playerSprite, "rpgAnim-heal");
       if (!id) return;
       const hero = getHeroById(id);
       const baseSpells = startingSpellIdsFor(hero.types);
-      saveHeroProgress(id, { level: 1, xp: 0, spells: baseSpells });
+      saveHeroProgress(id, { level: 1, xp: 0, spells: baseSpells, items: { ...STARTING_ITEMS } });
       addLog(`Progress reset for ${hero.name}.`);
 
       if (state?.player?.id === id) {
@@ -3771,6 +4069,7 @@ playAnim(els.playerSprite, "rpgAnim-heal");
         state.player.xpToNext = xpToNext(1);
         state.player.spells = baseSpells;
         state.player.pendingSpellQueue = [];
+        state.player.items = { ...STARTING_ITEMS };
         syncPlayerLevel(false);
         syncKnownSpells(false);
       }
