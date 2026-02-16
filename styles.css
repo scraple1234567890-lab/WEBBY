@@ -3389,20 +3389,54 @@ body.modalOpen {
 .rpgFx--fire::before{
   content: "";
   position: absolute;
-  inset: -10px;
-  border-radius: 999px;
-  background:
-    radial-gradient(circle at 45% 55%, color-mix(in srgb, var(--type-fire) 85%, white 15%), transparent 55%),
-    radial-gradient(circle at 60% 45%, color-mix(in srgb, var(--type-fire) 55%, black 45%), transparent 62%),
-    radial-gradient(circle at 50% 80%, rgba(255,255,255,0.10), transparent 60%);
+  left: 50%;
+  top: 50%;
+  width: 200px;
+  height: 200px;
+  background: url("assets/images/fire-sigil.png") center/contain no-repeat;
   opacity: 0;
-  transform: scale(0.85);
-  animation: rpg-fire 520ms ease-out 1;
+  transform: translate(-58%, -52%) scale(0.54) rotate(-14deg);
+  filter: drop-shadow(0 18px 28px rgba(0,0,0,0.28));
+  animation: rpg-fire-sigil 720ms cubic-bezier(.2,.9,.2,1) 1;
 }
 
-@keyframes rpg-fire{
-  0%{ opacity: 0; transform: scale(0.78); filter: blur(1px); }
-  25%{ opacity: 1; }
+/* heat shimmer behind the sigil */
+.rpgFx--fire::after{
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 260px;
+  height: 260px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 50% 55%,
+      rgba(255,255,255,0.0) 0 40%,
+      color-mix(in srgb, var(--type-fire) 62%, rgba(255,255,255,0.30)) 44% 50%,
+      rgba(255,255,255,0.0) 58%),
+    radial-gradient(circle at 55% 45%,
+      color-mix(in srgb, var(--type-fire) 42%, rgba(255,255,255,0.18)),
+      rgba(255,255,255,0.0) 62%);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.55);
+  filter: blur(0.7px);
+  animation: rpg-fire-heat 620ms ease-out 1;
+}
+
+@keyframes rpg-fire-sigil{
+  0%{ opacity: 0; transform: translate(-62%, -54%) scale(0.48) rotate(-18deg); filter: blur(1px) drop-shadow(0 18px 28px rgba(0,0,0,0.28)); }
+  18%{ opacity: 0.98; }
+  62%{ opacity: 0.88; transform: translate(-50%, -52%) scale(0.98) rotate(10deg); filter: blur(0.2px) drop-shadow(0 18px 28px rgba(0,0,0,0.28)); }
+  100%{ opacity: 0; transform: translate(-40%, -50%) scale(1.10) rotate(28deg); filter: blur(0px) drop-shadow(0 18px 28px rgba(0,0,0,0.25)); }
+}
+
+@keyframes rpg-fire-heat{
+  0%{ opacity: 0; transform: translate(-50%, -50%) scale(0.52) rotate(-8deg); }
+  20%{ opacity: 0.92; }
+  100%{ opacity: 0; transform: translate(-50%, -50%) scale(1.14) rotate(10deg); }
+}
+
+25%{ opacity: 1; }
   100%{ opacity: 0; transform: scale(1.10); filter: blur(0.2px); }
 }
 
@@ -3426,24 +3460,71 @@ body.modalOpen {
   100%{ opacity: 0; transform: translateX(20px) skewX(-10deg) scaleX(0.95); }
 }
 
-/* --- Earth (dust ring) --- */
+/* --- Earth (rock impact) --- */
 .rpgFx--earth::before{
   content: "";
   position: absolute;
-  inset: 12px;
+  left: 50%;
+  top: 50%;
+  width: 220px;
+  height: 220px;
+  background: url("assets/images/earth-sigil.png") center/contain no-repeat;
+  opacity: 0;
+  transform: translate(-56%, -52%) scale(0.52) rotate(-12deg);
+  filter: drop-shadow(0 18px 28px rgba(0,0,0,0.28));
+  animation: rpg-earth-sigil 720ms cubic-bezier(.2,.9,.2,1) 1;
+}
+
+/* dust burst behind the rock */
+.rpgFx--earth::after{
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 260px;
+  height: 260px;
   border-radius: 999px;
   border: 2px solid color-mix(in srgb, var(--type-earth) 65%, rgba(255,255,255,0.18));
   box-shadow: 0 0 0 1px rgba(0,0,0,0.22) inset;
   background: radial-gradient(circle at 50% 60%, color-mix(in srgb, var(--type-earth) 25%, transparent), transparent 66%);
   opacity: 0;
-  transform: scale(0.88);
-  animation: rpg-earth 520ms ease-out 1;
+  transform: translate(-50%, -50%) scale(0.84);
+  filter: blur(0.7px);
+  animation: rpg-earth-dust 560ms ease-out 1;
 }
 
-@keyframes rpg-earth{
-  0%{ opacity: 0; transform: scale(0.82); filter: blur(0.8px); }
+@keyframes rpg-earth-sigil{
+  0%{ opacity: 0; transform: translate(-60%, -52%) scale(0.46) rotate(-18deg); }
+  18%{ opacity: 0.98; }
+  62%{ opacity: 0.88; transform: translate(-50%, -52%) scale(0.98) rotate(6deg); }
+  100%{ opacity: 0; transform: translate(-42%, -52%) scale(1.12) rotate(14deg); }
+}
+
+@keyframes rpg-earth-dust{
+  0%{ opacity: 0; transform: translate(-50%, -50%) scale(0.76); }
+  24%{ opacity: 0.95; }
+  100%{ opacity: 0; transform: translate(-50%, -50%) scale(1.12); }
+}
+
+/* --- Earth center telegraph (dust ring only) --- */
+.rpgFx--earthCenter::before{
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: 999px;
+  border: 2px solid color-mix(in srgb, var(--type-earth) 65%, rgba(255,255,255,0.18));
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.22) inset;
+  background: radial-gradient(circle at 50% 60%, color-mix(in srgb, var(--type-earth) 18%, transparent), transparent 68%);
+  opacity: 0;
+  transform: scale(0.82);
+  filter: blur(0.9px);
+  animation: rpg-earth-center 520ms ease-out 1;
+}
+
+@keyframes rpg-earth-center{
+  0%{ opacity: 0; transform: scale(0.74); }
   30%{ opacity: 0.95; }
-  100%{ opacity: 0; transform: scale(1.10); filter: blur(0.1px); }
+  100%{ opacity: 0; transform: scale(1.12); }
 }
 
 /* --- Touch (binding rings) --- */

@@ -122,7 +122,7 @@ if (root) {
 
   /**
    * Spawn a one-shot type FX overlay.
-   * @param {"wind"|"water"|"fire"|"earth"|"sight"|"touch"|"sound"|"smell"|"heal"|"guard"} kind
+   * @param {"wind"|"water"|"fire"|"earth"|"earthCenter"|"sight"|"touch"|"sound"|"smell"|"heal"|"guard"} kind
    * @param {"player"|"enemy"|"center"} side
    */
   function spawnFx(kind, side) {
@@ -2170,7 +2170,7 @@ function makeLobbyState() {
     // Type FX telegraph (visual, not random)
     if (intent.id === "quake" || intent.id === "shatter") {
       stageShake();
-      spawnFx("earth", "center");
+      spawnFx("earthCenter", "center");
     }
 
     let base = intent.base + (e.enraged ? 1 : 0);
@@ -2669,6 +2669,8 @@ function playerFireAttack() {
     if (typed.note) addLog(typed.note);
     setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
     playAnim(els.enemySprite, "rpgAnim-hit");
+    spawnFx("fire", "enemy");
+    spawnFloat(`-${def.final}`, "enemy", "dmg", typed.overall);
 
     if (def.reflected > 0) {
       state.player.hp = clamp(state.player.hp - def.reflected, 0, state.player.max);
