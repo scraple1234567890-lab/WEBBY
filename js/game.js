@@ -2115,6 +2115,9 @@ function makeLobbyState() {
 
     // Show the enemy move name in the center (clear turn readability)
     showMoveBanner(intent.name || "Enemy action", /** @type {MagicType} */ (intent.type || "Sight"));
+    const __intentType = /** @type {MagicType} */ (intent.type || "Sight");
+    if (__intentType === "Wind") spawnFx("wind", "enemy");
+
 
     // Consume the step only if the intended move was executed
     if (!holdStep) e.aiStep += 1;
@@ -2375,6 +2378,7 @@ function makeLobbyState() {
     setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
     playAnim(els.enemySprite, "rpgAnim-hit");
 
+    spawnFx("wind", "enemy");
     if (def.reflected > 0) {
       state.player.hp = clamp(state.player.hp - def.reflected, 0, state.player.max);
       addLog(`Reflected magic nicks you for ${def.reflected}.`);
