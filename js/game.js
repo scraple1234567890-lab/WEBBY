@@ -29,6 +29,8 @@ if (root) {
     enemyStatus: document.getElementById("enemyStatus"),
     playerFocusText: document.getElementById("playerFocusText"),
     playerFocusFill: document.getElementById("playerFocusFill"),
+    playerLevelText: document.getElementById("playerLevelText"),
+    playerXpFill: document.getElementById("playerXpFill"),
     enemyFocusText: document.getElementById("enemyFocusText"),
     enemyFocusFill: document.getElementById("enemyFocusFill"),
     enemyIntentText: document.getElementById("enemyIntentText"),
@@ -67,6 +69,7 @@ if (root) {
     characterChoices: document.getElementById("characterChoices"),
     characterClose: document.getElementById("characterClose"),
     characterOk: document.getElementById("characterOk"),
+    resetProgressBtn: document.getElementById("resetProgressBtn"),
 
     playerSprite: document.getElementById("playerSprite"),
     enemySprite: document.getElementById("enemySprite"),
@@ -425,13 +428,17 @@ function renderHeroChoices() {
 
   els.characterChoices.innerHTML = PLAYABLE_HEROES.map((h) => {
     const types = h.typesLabel || formatTypesDisplay(h.types);
+    const prog = loadHeroProgress(h.id);
+    const scaled = applyLevelToHero(h, prog.level);
+    const xpNeed = xpToNext(prog.level);
     return `
       <button type="button" class="btn ghost rpgCharChoice ${h.id === active ? "isSelected" : ""}" data-hero="${h.id}">
         <div class="rpgCharSprite"><img src="${h.sprite}" alt="" /></div>
         <div>
           <div class="rpgCharTitle">${h.name}</div>
           <div class="rpgCharMeta muted small"><span class="pill">${types}</span></div>
-          <div class="rpgCharStats muted">HP ${h.maxHp} • Mana ${h.focusStart}/${h.focusMax} • Heals ${h.healCharges}</div>
+          <div class="rpgCharStats muted">Lv ${prog.level} • XP ${prog.xp}/${xpNeed}</div>
+          <div class="rpgCharStats muted">HP ${scaled.maxHp} • Mana ${scaled.focusStart}/${scaled.focusMax} • Heals ${h.healCharges}</div>
         </div>
       </button>
     `;
@@ -944,6 +951,74 @@ function setPreviewMove(name, type, baseCost) {
 
 const HERO_STORAGE_KEY = "dragonstone_rpg_hero";
 
+// --------------------
+// Leveling + XP (saved per-hero)
+// --------------------
+
+const PROGRESS_KEY_PREFIX = "dragonstone_rpg_progress_";
+
+/** @param {any} n @param {number} fallback */
+function toSafeInt(n, fallback) {
+  const x = Number(n);
+  if (!Number.isFinite(x)) return fallback;
+  return Math.trunc(x);
+}
+
+/** @param {number} level */
+function xpToNext(level) {
+  const L = Math.max(1, toSafeInt(level, 1));
+  const t = L - 1;
+  // Smooth curve: early levels are quick, later levels take longer.
+  return Math.max(12, Math.round(20 + t * 12 + t * t * 4));
+}
+
+/** @param {string} heroId */
+function loadHeroProgress(heroId) {
+  try {
+    const raw = window.localStorage.getItem(PROGRESS_KEY_PREFIX + heroId);
+    if (!raw) return { level: 1, xp: 0 };
+    const obj = JSON.parse(raw);
+    const level = Math.max(1, toSafeInt(obj?.level, 1));
+    const xp = Math.max(0, toSafeInt(obj?.xp, 0));
+    return { level, xp };
+  } catch (e) {
+    return { level: 1, xp: 0 };
+  }
+}
+
+/** @param {string} heroId @param {{level:number,xp:number}} prog */
+function saveHeroProgress(heroId, prog) {
+  try {
+    window.localStorage.setItem(
+      PROGRESS_KEY_PREFIX + heroId,
+      JSON.stringify({ level: Math.max(1, toSafeInt(prog.level, 1)), xp: Math.max(0, toSafeInt(prog.xp, 0)) })
+    );
+  } catch (e) {
+    // localStorage may be blocked (private mode). Ignore.
+  }
+}
+
+/** @param {number} level */
+function levelBonuses(level) {
+  const L = Math.max(1, toSafeInt(level, 1));
+  const t = L - 1;
+  return {
+    hpBonus: t * 2,
+    focusBonus: Math.floor(t / 4),
+    powerMult: 1 + t * 0.04,
+    healMult: 1 + t * 0.03,
+  };
+}
+
+/** @param {{maxHp:number, focusMax:number, focusStart:number}} hero @param {number} level */
+function applyLevelToHero(hero, level) {
+  const b = levelBonuses(level);
+  const maxHp = Math.max(1, toSafeInt(hero.maxHp, 18) + b.hpBonus);
+  const focusMax = Math.max(1, toSafeInt(hero.focusMax, 6) + b.focusBonus);
+  const focusStart = clamp(toSafeInt(hero.focusStart, 2), 0, focusMax);
+  return { maxHp, focusMax, focusStart, ...b };
+}
+
 /** @type {MagicType[]} */
 const __KNOWN_TYPES = ["Wind","Water","Fire","Sight","Earth","Touch","Sound","SmellTaste"];
 
@@ -1258,9 +1333,15 @@ function setActiveLocation(id) {
    * Create a fresh enemy state from template.
    * @param {number} waveIndex
    */
-  function makeEnemy(waveIndex, enemySet) {
+  function makeEnemy(waveIndex, enemySet, playerLevel = 1) {
   const set = enemySet || activeEnemySet || ENEMIES;
   const t = set[waveIndex] ?? set[0] ?? ENEMIES[0];
+
+  const lvl = Math.max(1, toSafeInt(playerLevel, 1) + Math.max(0, toSafeInt(waveIndex, 0)));
+  // Enemies scale gently with your level so battles stay interesting.
+  const hpScale = 1 + (lvl - 1) * 0.06;
+  const powScale = 1 + (lvl - 1) * 0.04;
+  const scaledMaxHp = Math.max(1, Math.round(toSafeInt(t.maxHp, 18) * hpScale));
 
   const focusMax = typeof t.focusMax === "number" ? t.focusMax : 6;
   const focusStart = typeof t.focusStart === "number" ? t.focusStart : 2;
@@ -1268,8 +1349,10 @@ function setActiveLocation(id) {
   return {
     name: t.name,
     types: t.types,
-    hp: t.maxHp,
-    max: t.maxHp,
+    level: lvl,
+    powerMult: powScale,
+    hp: scaledMaxHp,
+    max: scaledMaxHp,
     healCharges: t.healCharges,
 
     // resources (Mana)
@@ -1293,11 +1376,48 @@ function setActiveLocation(id) {
   };
 }
 
+  /** @param {ReturnType<typeof getHeroById>} pt */
+  function makePlayerFromHero(pt) {
+    const prog = loadHeroProgress(pt.id);
+    const scaled = applyLevelToHero(pt, prog.level);
+    return {
+      id: pt.id,
+      name: pt.name,
+      types: pt.types,
+      sprite: pt.sprite,
+
+      // progression
+      level: prog.level,
+      xp: prog.xp,
+      xpToNext: xpToNext(prog.level),
+      powerMult: scaled.powerMult,
+      healMult: scaled.healMult,
+      baseMaxHp: pt.maxHp,
+      baseFocusMax: pt.focusMax,
+
+      // vitals
+      hp: scaled.maxHp,
+      max: scaled.maxHp,
+
+      // statuses
+      guarding: false,
+      evading: false,
+      burn: 0,
+      bound: 0,
+
+      // resources
+      healCharges: pt.healCharges,
+      focus: scaled.focusStart,
+      focusMax: scaled.focusMax,
+    };
+  }
+
 
   function makeInitialState(enemySet = activeEnemySet, locationId = activeLocationId) {
   const set = enemySet || activeEnemySet || [ENEMIES[0], ENEMIES[1]];
   const loc = locationId ? getLocationById(locationId) : null;
   const pt = getActiveHero();
+  const player = makePlayerFromHero(pt);
 
   return {
     turn: 1,
@@ -1305,25 +1425,8 @@ function setActiveLocation(id) {
     wave: 0,
     locationId: loc ? loc.id : null,
     enemySet: set,
-    player: {
-      name: pt.name,
-      types: pt.types,
-      sprite: pt.sprite,
-      hp: pt.maxHp,
-      max: pt.maxHp,
-
-      // statuses
-      guarding: false,
-      evading: false,   // next hit reduced
-      burn: 0,
-      bound: 0,         // touch bind: next attack weakened + magic costs +1 focus
-
-      // resources
-      healCharges: pt.healCharges,
-      focus: pt.focusStart,
-      focusMax: pt.focusMax,
-    },
-    enemy: makeEnemy(0, set),
+    player,
+    enemy: makeEnemy(0, set, player.level),
     over: false,
     log: [
       `Location: ${loc ? loc.name : "—"}.`,
@@ -1337,6 +1440,7 @@ function makeLobbyState() {
   const loc = LOCATIONS[0];
   const set = loc.enemySet.map((i) => ENEMIES[i]);
   const pt = getActiveHero();
+  const player = makePlayerFromHero(pt);
 
   return {
     turn: 1,
@@ -1344,25 +1448,8 @@ function makeLobbyState() {
     wave: 0,
     locationId: null,
     enemySet: set,
-    player: {
-      name: pt.name,
-      types: pt.types,
-      sprite: pt.sprite,
-      hp: pt.maxHp,
-      max: pt.maxHp,
-
-      // statuses
-      guarding: false,
-      evading: false,
-      burn: 0,
-      bound: 0,
-
-      // resources
-      healCharges: pt.healCharges,
-      focus: pt.focusStart,
-      focusMax: pt.focusMax,
-    },
-    enemy: makeEnemy(0, set),
+    player,
+    enemy: makeEnemy(0, set, player.level),
     over: false,
     log: [
       "Choose a hero, then a location to begin.",
@@ -1420,6 +1507,91 @@ function makeLobbyState() {
     if (!el) return;
     const safe = clamp(ratio, 0, 1);
     el.style.width = `${Math.round(safe * 100)}%`;
+  }
+
+  function persistPlayerProgress() {
+    const heroId = state?.player?.id || activeHeroId;
+    if (!heroId) return;
+    saveHeroProgress(heroId, {
+      level: Math.max(1, toSafeInt(state.player.level, 1)),
+      xp: Math.max(0, toSafeInt(state.player.xp, 0)),
+    });
+  }
+
+  /** Recompute scaled stats/multipliers for the current level.
+   *  @param {boolean} onLevelUp
+   */
+  function syncPlayerLevel(onLevelUp = false) {
+    const hero = getHeroById(state?.player?.id || activeHeroId);
+    const lvl = Math.max(1, toSafeInt(state.player.level, 1));
+    const scaled = applyLevelToHero(hero, lvl);
+
+    const oldMax = toSafeInt(state.player.max, scaled.maxHp);
+    const oldFocusMax = toSafeInt(state.player.focusMax, scaled.focusMax);
+
+    state.player.max = scaled.maxHp;
+    state.player.focusMax = scaled.focusMax;
+    state.player.powerMult = scaled.powerMult;
+    state.player.healMult = scaled.healMult;
+    state.player.xpToNext = xpToNext(lvl);
+    state.player.baseMaxHp = hero.maxHp;
+    state.player.baseFocusMax = hero.focusMax;
+
+    // Preserve current HP/Mana, but allow a small "level-up refresh".
+    const gainedMax = state.player.max - oldMax;
+    state.player.hp = clamp(toSafeInt(state.player.hp, state.player.max) + gainedMax, 0, state.player.max);
+    state.player.focus = clamp(toSafeInt(state.player.focus, 0) + (state.player.focusMax - oldFocusMax), 0, state.player.focusMax);
+
+    if (onLevelUp) {
+      state.player.hp = clamp(state.player.hp + 2, 0, state.player.max);
+      state.player.focus = clamp(state.player.focus + 1, 0, state.player.focusMax);
+    }
+  }
+
+  /** @param {any} enemy */
+  function xpForEnemy(enemy) {
+    const lvl = Math.max(1, toSafeInt(enemy?.level, 1));
+    const maxHp = Math.max(1, toSafeInt(enemy?.max, 18));
+    // Simple readable reward: tougher enemies give more XP.
+    return Math.max(6, Math.round(8 + lvl * 4 + maxHp / 6));
+  }
+
+  /** @param {number} amount */
+  function gainXp(amount) {
+    const add = Math.max(0, toSafeInt(amount, 0));
+    if (add <= 0) return;
+
+    state.player.xp = Math.max(0, toSafeInt(state.player.xp, 0) + add);
+    addLog(`✨ You gain ${add} XP.`);
+
+    let leveled = false;
+    while (state.player.xp >= state.player.xpToNext) {
+      state.player.xp -= state.player.xpToNext;
+      state.player.level = Math.max(1, toSafeInt(state.player.level, 1) + 1);
+      state.player.xpToNext = xpToNext(state.player.level);
+      syncPlayerLevel(true);
+      leveled = true;
+      addLog(`🌟 Level up! You are now Lv ${state.player.level}.`);
+    }
+
+    if (leveled) {
+      // A little celebration without interrupting flow.
+      showMoveBanner("Level Up", "Sight");
+    }
+
+    persistPlayerProgress();
+  }
+
+  /** @param {number} base */
+  function scaledPlayerBase(base) {
+    const mult = typeof state.player.powerMult === "number" ? state.player.powerMult : 1;
+    return Math.max(1, Math.round(toSafeInt(base, 1) * mult));
+  }
+
+  /** @param {number} base */
+  function scaledEnemyBase(base) {
+    const mult = typeof state.enemy.powerMult === "number" ? state.enemy.powerMult : 1;
+    return Math.max(1, Math.round(toSafeInt(base, 1) * mult));
   }
 
   function statusLineForPlayer() {
@@ -1716,7 +1888,8 @@ function makeLobbyState() {
 
     // Names + types
     setText(els.playerName, state.player.name);
-    setText(els.enemyName, `${state.enemy.name} (Wave ${state.wave + 1}/${state.enemySet.length})`);
+    const enemyLv = typeof state.enemy.level === "number" ? state.enemy.level : 1;
+    setText(els.enemyName, `${state.enemy.name} Lv ${enemyLv} (Wave ${state.wave + 1}/${state.enemySet.length})`);
     setTypeLine(els.playerTypeText, state.player.types);
     setTypeLine(els.enemyTypeText, state.enemy.types);
 
@@ -1726,6 +1899,15 @@ function makeLobbyState() {
     }
     // Focus bar (visual) + keep the hover preview accurate as focus changes.
     setBar(els.playerFocusFill, focus / state.player.focusMax);
+
+    // Level + XP
+    if (els.playerLevelText instanceof HTMLElement) {
+      const lvl = typeof state.player.level === "number" ? state.player.level : 1;
+      const xp = typeof state.player.xp === "number" ? state.player.xp : 0;
+      const need = typeof state.player.xpToNext === "number" ? state.player.xpToNext : xpToNext(lvl);
+      els.playerLevelText.textContent = `Lv ${lvl} • XP ${xp} / ${need}`;
+      setBar(els.playerXpFill, need > 0 ? (xp / need) : 0);
+    }
 
     // Enemy Mana
     if (els.enemyFocusText instanceof HTMLElement) {
@@ -1920,7 +2102,11 @@ function makeLobbyState() {
    * Transition to next wave if available.
    */
   function advanceWave(defeatMessage) {
+    if (state.over) return;
+
     addLog(defeatMessage);
+    // Award XP for the defeated enemy (before swapping to the next wave).
+    gainXp(xpForEnemy(state.enemy));
 
     // Play the badge-unlock SFX when you clear Wave 1.
     if (state.wave === 0) playWaveClearSfx();
@@ -1946,7 +2132,7 @@ function makeLobbyState() {
 
     // Spawn next enemy.
     state.wave = nextIndex;
-    state.enemy = makeEnemy(state.wave, state.enemySet);
+    state.enemy = makeEnemy(state.wave, state.enemySet, state.player.level);
 
     addLog(`Wave ${state.wave + 1}: ${state.enemy.name} arrives.`);
     addLog("Your turn.");
@@ -2130,7 +2316,7 @@ function makeLobbyState() {
 
     // Execute intent
     if (intent.id === "heal") {
-      const heal = 6;
+      const heal = scaledEnemyBase(6);
       const before = e.hp;
       e.hp = clamp(e.hp + heal, 0, e.max);
       const actual = e.hp - before;
@@ -2173,7 +2359,7 @@ function makeLobbyState() {
       spawnFx("earthCenter", "center");
     }
 
-    let base = intent.base + (e.enraged ? 1 : 0);
+    let base = scaledEnemyBase(intent.base + (e.enraged ? 1 : 0));
 
     // Gusted: deterministic -2 on next hit
     if (e.gusted) {
@@ -2294,8 +2480,8 @@ function makeLobbyState() {
     showMoveBanner("Attack", atkType);
     playAnim(els.playerSprite, "rpgAnim-attack");
 
-    // Attack: fixed base, generates Focus
-    let base = 5;
+    // Attack: fixed base, generates Mana (scaled by level)
+    let base = scaledPlayerBase(5);
 
     // Bind weakens next move
     if (state.player.bound > 0) {
@@ -2362,7 +2548,7 @@ function makeLobbyState() {
     showMoveBanner("Wind attack", "Wind");
     playAnim(els.playerSprite, "rpgAnim-attack");
 
-    let base = 4;
+    let base = scaledPlayerBase(4);
 
     if (state.player.bound > 0) {
       base = Math.max(1, base - 2);
@@ -2436,7 +2622,7 @@ function makeLobbyState() {
     showMoveBanner("Water attack", "Water");
     playAnim(els.playerSprite, "rpgAnim-attack");
 
-    let base = 5;
+    let base = scaledPlayerBase(5);
 
     if (state.player.bound > 0) {
       base = Math.max(1, base - 2);
@@ -2512,7 +2698,7 @@ function makeLobbyState() {
     showMoveBanner("Sound attack", "Sound");
     playAnim(els.playerSprite, "rpgAnim-attack");
 
-    let base = 5;
+    let base = scaledPlayerBase(5);
 
     if (state.player.bound > 0) {
       base = Math.max(1, base - 2);
@@ -2585,7 +2771,7 @@ function playerSmellTasteAttack() {
   showMoveBanner("Smell/Taste attack", "SmellTaste");
   playAnim(els.playerSprite, "rpgAnim-attack");
 
-  let base = 4;
+  let base = scaledPlayerBase(4);
 
   if (state.player.bound > 0) {
     base = Math.max(1, base - 2);
@@ -2653,7 +2839,7 @@ function playerFireAttack() {
     showMoveBanner("Fire attack", "Fire");
     playAnim(els.playerSprite, "rpgAnim-attack");
 
-    let base = 6;
+    let base = scaledPlayerBase(6);
 
     if (state.player.bound > 0) {
       base = Math.max(1, base - 2);
@@ -2755,7 +2941,7 @@ function playerFireAttack() {
     showMoveBanner(`${label} attack`, t);
     playAnim(els.playerSprite, "rpgAnim-attack");
 
-    let base = magicBaseDamage(t);
+    let base = scaledPlayerBase(magicBaseDamage(t));
     if (state.player.bound > 0) {
       base = Math.max(1, base - 2);
       state.player.bound = 0;
@@ -2817,7 +3003,8 @@ function playerFireAttack() {
 playAnim(els.playerSprite, "rpgAnim-heal");
     spawnFx("heal", "player");
 
-    const heal = 5;
+    const healMult = typeof state.player.healMult === "number" ? state.player.healMult : 1;
+    const heal = Math.max(1, Math.round(5 * healMult));
     const before = state.player.hp;
     state.player.hp = clamp(state.player.hp + heal, 0, state.player.max);
     const actual = state.player.hp - before;
@@ -2925,6 +3112,27 @@ playAnim(els.playerSprite, "rpgAnim-heal");
   }
   if (els.characterOk instanceof HTMLButtonElement) els.characterOk.addEventListener("click", confirmHeroSelection);
   if (els.characterClose instanceof HTMLButtonElement) els.characterClose.addEventListener("click", confirmHeroSelection);
+
+  if (els.resetProgressBtn instanceof HTMLButtonElement) {
+    els.resetProgressBtn.addEventListener("click", () => {
+      const id = pendingHeroId || activeHeroId;
+      if (!id) return;
+      const hero = getHeroById(id);
+      saveHeroProgress(id, { level: 1, xp: 0 });
+      addLog(`Progress reset for ${hero.name}.`);
+
+      if (state?.player?.id === id) {
+        state.player.level = 1;
+        state.player.xp = 0;
+        state.player.xpToNext = xpToNext(1);
+        syncPlayerLevel(false);
+      }
+
+      renderHeroChoices();
+      setEffectBanner("Hero progress reset.", "neutral");
+      render();
+    });
+  }
 
 
   if (els.locationChoices instanceof HTMLElement) {

@@ -76,6 +76,12 @@
 <div class="rpgMiniBarFill" id="playerFocusFill"></div>
 </div>
 </div>
+<div aria-label="Level" class="rpgResourceRow">
+<p class="muted small rpgResourceText" id="playerLevelText">Lv 1 • XP 0 / 20</p>
+<div aria-label="Experience meter" class="rpgMiniBar">
+<div class="rpgMiniBarFill" id="playerXpFill"></div>
+</div>
+</div>
 <div class="rpgHpRow">
 <div aria-hidden="true" class="rpgHpTrack">
 <div class="rpgHpFill" id="playerHpFill" style="width: 100%"></div>
@@ -204,6 +210,7 @@
 <div aria-label="Character choices" class="rpgCharGrid" id="characterChoices"></div>
 </div>
 <div class="rpgModalFoot">
+<button class="btn ghost" id="resetProgressBtn" type="button">Reset hero level</button>
 <button class="btn primary" id="characterOk" type="button">Continue</button>
 </div>
 </div>
