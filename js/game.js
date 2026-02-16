@@ -2114,9 +2114,10 @@ function makeLobbyState() {
     }
 
     // Show the enemy move name in the center (clear turn readability)
+    // NOTE: Impact FX for elemental/types should appear on the *target* getting hit,
+    // not on the caster. Wind impacts are spawned during damage resolution below,
+    // so we intentionally avoid spawning Wind FX here.
     showMoveBanner(intent.name || "Enemy action", /** @type {MagicType} */ (intent.type || "Sight"));
-    const __intentType = /** @type {MagicType} */ (intent.type || "Sight");
-    if (__intentType === "Wind") spawnFx("wind", "enemy");
 
 
     // Consume the step only if the intended move was executed
@@ -2396,7 +2397,9 @@ function makeLobbyState() {
     state.player.evading = true;     // next hit reduced
     addLog("Gust rattles their aim (next enemy hit −2).");
     addLog("An evasive veil surrounds you (next hit softened).");
-    spawnFx("wind", "player");
+    // The wind icon FX is reserved for the character being *hit* by a wind attack.
+    // Use a neutral defensive shimmer to indicate your self-buff.
+    spawnFx("guard", "player");
 
     spendFocus(cost);
 

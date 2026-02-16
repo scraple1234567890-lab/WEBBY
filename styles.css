@@ -3305,31 +3305,54 @@ body.modalOpen {
 }
 
 /* --- Water --- */
-.rpgFx--water::before,
+.rpgFx--water::before{
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 190px;
+  height: 190px;
+  background: url("assets/images/water-sigil.png") center/contain no-repeat;
+  opacity: 0;
+  transform: translate(-55%, -52%) scale(0.52) rotate(-8deg);
+  filter: drop-shadow(0 16px 26px rgba(0,0,0,0.25));
+  animation: rpg-water-sigil 700ms cubic-bezier(.2,.9,.2,1) 1;
+}
+
 .rpgFx--water::after{
   content: "";
   position: absolute;
-  inset: -6px;
+  left: 50%;
+  top: 50%;
+  width: 240px;
+  height: 240px;
   border-radius: 999px;
   background:
-    radial-gradient(circle at 40% 55%, color-mix(in srgb, var(--type-water) 80%, white 20%), transparent 58%),
-    radial-gradient(circle at 60% 45%, color-mix(in srgb, var(--type-water) 55%, black 45%), transparent 64%),
-    radial-gradient(circle at 50% 80%, rgba(255,255,255,0.10), transparent 60%);
+    radial-gradient(circle at 50% 50%,
+      rgba(255,255,255,0.0) 0 46%,
+      color-mix(in srgb, var(--type-water) 60%, rgba(255,255,255,0.40)) 48% 52%,
+      rgba(255,255,255,0.0) 55%),
+    radial-gradient(circle at 50% 50%,
+      rgba(255,255,255,0.0) 0 62%,
+      color-mix(in srgb, var(--type-water) 40%, rgba(255,255,255,0.30)) 64% 67%,
+      rgba(255,255,255,0.0) 70%);
   opacity: 0;
-  transform: scale(0.84);
-  animation: rpg-water 560ms ease-out 1;
+  transform: translate(-50%, -50%) scale(0.55);
+  filter: blur(0.6px);
+  animation: rpg-water-ripple 620ms ease-out 1;
 }
 
-.rpgFx--water::after{
-  filter: blur(1.2px);
-  animation-duration: 660ms;
-  animation-delay: 40ms;
+@keyframes rpg-water-sigil{
+  0%{ opacity: 0; transform: translate(-60%, -52%) scale(0.48) rotate(-12deg); }
+  18%{ opacity: 0.98; }
+  62%{ opacity: 0.86; transform: translate(-50%, -52%) scale(0.98) rotate(10deg); }
+  100%{ opacity: 0; transform: translate(-42%, -52%) scale(1.08) rotate(22deg); }
 }
 
-@keyframes rpg-water{
-  0%{ opacity: 0; transform: scale(0.76); filter: blur(1px); }
-  28%{ opacity: 1; }
-  100%{ opacity: 0; transform: scale(1.10); filter: blur(0.2px); }
+@keyframes rpg-water-ripple{
+  0%{ opacity: 0; transform: translate(-50%, -50%) scale(0.52); }
+  22%{ opacity: 0.95; }
+  100%{ opacity: 0; transform: translate(-50%, -50%) scale(1.10); }
 }
 
 
