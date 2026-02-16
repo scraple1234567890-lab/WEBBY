@@ -44,6 +44,7 @@ if (root) {
     magicToggle: document.getElementById("magicToggle"),
     magicMenu: document.getElementById("magicMenu"),
     windBtn: document.getElementById("windBtn"),
+    secondaryTypeBtn: document.getElementById("secondaryTypeBtn"),
     waterBtn: document.getElementById("waterBtn"),
     soundBtn: document.getElementById("soundBtn"),
     smellTasteBtn: document.getElementById("smellTasteBtn"),
@@ -1651,6 +1652,9 @@ function makeLobbyState() {
     const hasSmell = playerHasType("SmellTaste");
     const hasFire = playerHasType("Fire");
 
+    const secondaryType = Array.isArray(state.player.types) && state.player.types.length > 1 ? state.player.types[1] : null;
+    const hasSecondaryGeneric = !!secondaryType && !["Wind", "Water", "Sound", "SmellTaste", "Fire"].includes(secondaryType);
+
     // Only show spells that match your hero's types.
     if (els.windBtn instanceof HTMLButtonElement) {
       els.windBtn.toggleAttribute("hidden", !hasWind);
@@ -1671,6 +1675,17 @@ function makeLobbyState() {
     if (els.fireBtn instanceof HTMLButtonElement) {
       els.fireBtn.toggleAttribute("hidden", !hasFire);
       els.fireBtn.textContent = `Fire attack (3 Mana, x${fmtMult(firePrev.overall)})`;
+    }
+
+    // Secondary-type spell (only when your secondary type isn't already one of the dedicated spell buttons).
+    if (els.secondaryTypeBtn instanceof HTMLButtonElement) {
+      els.secondaryTypeBtn.toggleAttribute("hidden", !hasSecondaryGeneric);
+      if (hasSecondaryGeneric && secondaryType) {
+        const secPrev = computeTypedDamage("player", "enemy", magicBaseDamage(secondaryType), secondaryType);
+        const secLabel = TYPE_META[secondaryType]?.label ?? secondaryType;
+        const secCost = magicBaseCost(secondaryType);
+        els.secondaryTypeBtn.textContent = `${secLabel} attack (${secCost} Mana, x${fmtMult(secPrev.overall)})`;
+      }
     }
 
     if (els.healBtn instanceof HTMLButtonElement) {
@@ -1721,17 +1736,19 @@ function makeLobbyState() {
     const canSound = isPlayerTurn && hasSound && focus >= (2 + boundExtra);
     const canSmellTaste = isPlayerTurn && hasSmell && focus >= (2 + boundExtra);
     const canFire = isPlayerTurn && hasFire && focus >= (3 + boundExtra);
+    const canSecondary = isPlayerTurn && hasSecondaryGeneric && !!secondaryType && focus >= (magicBaseCost(secondaryType) + boundExtra);
     const canHeal = isPlayerTurn && state.player.healCharges > 0 && focus >= healCost;
 
     if (els.attackBtn instanceof HTMLButtonElement) els.attackBtn.disabled = disableActions;
     if (els.guardBtn instanceof HTMLButtonElement) els.guardBtn.disabled = disableActions;
-    const hasAnySpell = hasWind || hasWater || hasSound || hasSmell || hasFire;
+    const hasAnySpell = hasWind || hasWater || hasSound || hasSmell || hasFire || hasSecondaryGeneric;
     if (els.magicToggle instanceof HTMLButtonElement) els.magicToggle.disabled = disableActions || !hasAnySpell;
     if (els.windBtn instanceof HTMLButtonElement) els.windBtn.disabled = !canWind;
     if (els.waterBtn instanceof HTMLButtonElement) els.waterBtn.disabled = !canWater;
     if (els.soundBtn instanceof HTMLButtonElement) els.soundBtn.disabled = !canSound;
     if (els.smellTasteBtn instanceof HTMLButtonElement) els.smellTasteBtn.disabled = !canSmellTaste;
     if (els.fireBtn instanceof HTMLButtonElement) els.fireBtn.disabled = !canFire;
+    if (els.secondaryTypeBtn instanceof HTMLButtonElement) els.secondaryTypeBtn.disabled = !canSecondary;
     if (els.healBtn instanceof HTMLButtonElement) els.healBtn.disabled = !canHeal;
     if (els.restartBtn instanceof HTMLButtonElement) els.restartBtn.disabled = false;
   }
@@ -2519,6 +2536,102 @@ function playerFireAttack() {
     queueEnemyTurn();
   }
 
+  /** @param {MagicType} t */
+  function magicBaseCost(t) {
+    return t === "Fire" ? 3 : 2;
+  }
+
+  /** @param {MagicType} t */
+  function magicBaseDamage(t) {
+    if (t === "Fire") return 6;
+    if (t === "Wind") return 4;
+    if (t === "SmellTaste") return 4;
+    if (t === "Touch") return 4;
+    return 5;
+  }
+
+  /**
+   * Secondary-type magic attack: only shown for secondary types that don't already
+   * have a dedicated spell button (currently Sight/Earth/Touch).
+   */
+  function playerSecondaryTypeAttack() {
+    if (isGameOver()) return;
+    if (state.phase !== "player") return;
+    closeMagicMenu();
+
+    const t = Array.isArray(state.player.types) ? state.player.types[1] : null;
+    if (!t) {
+      addLog("No secondary type equipped.");
+      render();
+      return;
+    }
+
+    // If a dedicated spell exists, route to it (safety).
+    if (t === "Wind") return playerWindAttack();
+    if (t === "Water") return playerWaterAttack();
+    if (t === "Sound") return playerSoundAttack();
+    if (t === "SmellTaste") return playerSmellTasteAttack();
+    if (t === "Fire") return playerFireAttack();
+
+    if (!playerHasType(t)) {
+      addLog(`Your hero can't use ${TYPE_META[t]?.label ?? t} magic.`);
+      render();
+      return;
+    }
+
+    const extra = state.player.bound > 0 ? 1 : 0;
+    const cost = magicBaseCost(t) + extra;
+    if (state.player.focus < cost) {
+      addLog("Not enough Mana.");
+      render();
+      return;
+    }
+
+    const label = TYPE_META[t]?.label ?? t;
+    showMoveBanner(`${label} attack`, t);
+    playAnim(els.playerSprite, "rpgAnim-attack");
+
+    let base = magicBaseDamage(t);
+    if (state.player.bound > 0) {
+      base = Math.max(1, base - 2);
+      state.player.bound = 0;
+      addLog("Bind blurs your casting (−2). ");
+    }
+
+    const typed = computeTypedDamage("player", "enemy", base, t);
+    const def = applyEnemyDefenses(typed.scaled);
+
+    state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
+    addLog(`You channel ${label} magic for ${def.final} damage.`);
+    if (typed.note) addLog(typed.note);
+    setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
+    playAnim(els.enemySprite, "rpgAnim-hit");
+    spawnFx(fxKindForType(t), "enemy");
+    spawnFloat(`-${def.final}`, "enemy", "dmg", typed.overall);
+
+    if (def.reflected > 0) {
+      state.player.hp = clamp(state.player.hp - def.reflected, 0, state.player.max);
+      addLog(`Reflected magic nicks you for ${def.reflected}.`);
+      playAnim(els.playerSprite, "rpgAnim-hit");
+      spawnFx("sight", "player");
+      spawnFloat(`-${def.reflected}`, "player", "dmg", null);
+      if (state.player.hp <= 0) {
+        endGame("Reflected magic drops you. Game over.");
+        return;
+      }
+    }
+
+    spendFocus(cost);
+
+    if (state.enemy.hp <= 0) {
+      onEnemyDown(`${state.enemy.name} falls.`);
+      return;
+    }
+
+    render();
+    queueEnemyTurn();
+  }
+
   function playerHeal() {
     if (isGameOver()) return;
     if (state.phase !== "player") return;
@@ -2609,6 +2722,7 @@ playAnim(els.playerSprite, "rpgAnim-heal");
     els.magicToggle.addEventListener("click", toggleMagicMenu);
   }
   if (els.windBtn instanceof HTMLButtonElement) els.windBtn.addEventListener("click", playerWindAttack);
+  if (els.secondaryTypeBtn instanceof HTMLButtonElement) els.secondaryTypeBtn.addEventListener("click", playerSecondaryTypeAttack);
   if (els.waterBtn instanceof HTMLButtonElement) els.waterBtn.addEventListener("click", playerWaterAttack);
   if (els.soundBtn instanceof HTMLButtonElement) els.soundBtn.addEventListener("click", playerSoundAttack);
   if (els.smellTasteBtn instanceof HTMLButtonElement) els.smellTasteBtn.addEventListener("click", playerSmellTasteAttack);
@@ -2665,20 +2779,38 @@ playAnim(els.playerSprite, "rpgAnim-heal");
   // Effectiveness preview (hover/focus shows Extra/Normal/Weak before you click)
   /**
    * @param {HTMLElement|null} btn
-   * @param {string} name
+   * @param {string | (() => string)} nameOrFn
    * @param {MagicType | (() => MagicType)} typeOrFn
-   * @param {number} baseCost
+   * @param {number | (() => number)} baseCostOrFn
    */
-  const wirePreview = (btn, name, typeOrFn, baseCost) => {
+  const wirePreview = (btn, nameOrFn, typeOrFn, baseCostOrFn) => {
     if (!(btn instanceof HTMLElement)) return;
+    const resolveName = () => (typeof nameOrFn === "function" ? nameOrFn() : nameOrFn);
     const resolveType = () => (typeof typeOrFn === "function" ? typeOrFn() : typeOrFn);
-    btn.addEventListener("mouseenter", () => setPreviewMove(name, resolveType(), baseCost));
-    btn.addEventListener("focus", () => setPreviewMove(name, resolveType(), baseCost));
+    const resolveCost = () => (typeof baseCostOrFn === "function" ? baseCostOrFn() : baseCostOrFn);
+    btn.addEventListener("mouseenter", () => setPreviewMove(resolveName(), resolveType(), resolveCost()));
+    btn.addEventListener("focus", () => setPreviewMove(resolveName(), resolveType(), resolveCost()));
     // Also update on click, since some users go straight to clicking.
-    btn.addEventListener("click", () => setPreviewMove(name, resolveType(), baseCost));
+    btn.addEventListener("click", () => setPreviewMove(resolveName(), resolveType(), resolveCost()));
   };
   wirePreview(els.attackBtn, "Attack", () => playerPrimaryType(), 0);
   wirePreview(els.windBtn, "Wind attack", "Wind", 2);
+  wirePreview(
+    els.secondaryTypeBtn,
+    () => {
+      const t = Array.isArray(state.player.types) ? state.player.types[1] : null;
+      const label = t ? (TYPE_META[t]?.label ?? t) : "Secondary";
+      return `${label} attack`;
+    },
+    () => {
+      const t = Array.isArray(state.player.types) ? state.player.types[1] : null;
+      return t || playerPrimaryType();
+    },
+    () => {
+      const t = Array.isArray(state.player.types) ? state.player.types[1] : null;
+      return t ? magicBaseCost(t) : 2;
+    }
+  );
   wirePreview(els.waterBtn, "Water attack", "Water", 2);
   wirePreview(els.soundBtn, "Sound attack", "Sound", 2);
   wirePreview(els.smellTasteBtn, "Smell/Taste attack", "SmellTaste", 2);

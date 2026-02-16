@@ -130,6 +130,7 @@
 <button aria-controls="magicMenu" aria-expanded="false" aria-haspopup="true" class="btn ghost rpgMagicToggle" id="magicToggle" type="button">Magic</button>
 <div class="rpgMagicMenu" hidden="" id="magicMenu" role="menu">
 <button class="btn secondary rpgMagicItem" id="windBtn" role="menuitem" type="button">Wind attack</button>
+<button class="btn secondary rpgMagicItem" id="secondaryTypeBtn" role="menuitem" type="button" hidden="">Secondary attack</button>
 <button class="btn secondary rpgMagicItem" id="waterBtn" role="menuitem" type="button">Water attack</button>
 <button class="btn secondary rpgMagicItem" id="soundBtn" role="menuitem" type="button">Sound attack</button>
 <button class="btn secondary rpgMagicItem" id="smellTasteBtn" role="menuitem" type="button">Smell/Taste attack</button>
@@ -152,7 +153,7 @@
 <li><strong>Mana</strong> is your resource (0 to 6). You spend it on bigger actions.</li>
 <li><strong>Attack</strong> always gives <strong>+1 Mana</strong> and deals damage matching your hero’s <strong>primary type</strong>.</li>
 <li><strong>Guard</strong> gives <strong>+1 Mana</strong> and makes the next hit deal <strong>50% less</strong>.</li>
-<li><strong>Wind</strong>, <strong>Water</strong>, <strong>Sound</strong>, and <strong>Smell/Taste</strong> cost <strong>2 Mana</strong>. <strong>Fire</strong> costs <strong>3 Mana</strong>.</li>
+<li><strong>Magic attacks</strong> cost <strong>2 Mana</strong>. <strong>Fire</strong> costs <strong>3 Mana</strong>.</li>
 <li><strong>Heal</strong> costs <strong>1 Mana</strong> (or <strong>2</strong> if you are <strong>Bound</strong>). You have limited charges.</li>
 <li>If you are <strong>Bound</strong> (Touch effect), your <strong>magic costs +1 Mana</strong> until it wears off. Guard breaks Bind.</li>
 </ul>
