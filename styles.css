@@ -3208,7 +3208,7 @@ body.modalOpen {
   position: absolute;
   width: 260px;
   height: 200px;
-  opacity: 0;
+  opacity: 1;
   filter: blur(0.2px);
 }
 
