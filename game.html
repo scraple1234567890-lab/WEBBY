@@ -56,12 +56,11 @@
 <div class="sectionHead">
 <h1 class="rpgTitle">Tiny Turn RPG</h1></div>
 <div class="rpgWrap" id="rpgRoot">
-  <!-- Utility controls (Hero / Restart) -->
+    <!-- Utility controls (Hero / Restart) -->
   <div aria-label="Game controls" class="rpgTopControls" role="group">
-    <button class="btn ghost" id="heroBtn" title="Choose a different character" type="button">Hero</button>
-    <button class="btn ghost" id="restartBtn" type="button">Restart</button>
+    <button class="btn heroCta rpgTopBtn" id="heroBtn" title="Choose a different character" type="button"><span aria-hidden="true" class="rpgTopBtnIcon">✦</span>Hero</button>
+    <button class="btn ghost rpgTopBtn rpgRestartBtn" id="restartBtn" type="button"><span aria-hidden="true" class="rpgTopBtnIcon">↻</span>Restart</button>
   </div>
-
 <div aria-label="Battlefield" class="rpgGrid" role="group">
 <article aria-label="Player" class="post rpgCard" id="playerCard">
 <div class="rpgCardTop">
