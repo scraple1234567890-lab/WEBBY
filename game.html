@@ -64,7 +64,7 @@
 <h2 class="rpgName" id="playerName">Player</h2>
 <p class="muted small rpgStatusPill" id="playerStatus">Ready</p>
 </div>
-<p class="muted small rpgTypeLine" id="playerTypeText">Type: Air • Sight</p>
+<p class="muted small rpgTypeLine" id="playerTypeText">Type: Wind • Sight</p>
 <div aria-label="Mana" class="rpgResourceRow">
 <p class="muted small rpgResourceText" id="playerFocusText">Mana: 2 / 6</p>
 <div aria-label="Mana meter" class="rpgMiniBar">
@@ -129,10 +129,8 @@
 <div class="rpgMagicWrap">
 <button aria-controls="magicMenu" aria-expanded="false" aria-haspopup="true" class="btn ghost rpgMagicToggle" id="magicToggle" type="button">Magic</button>
 <div class="rpgMagicMenu" hidden="" id="magicMenu" role="menu">
-<button class="btn secondary rpgMagicItem" id="windBtn" role="menuitem" type="button">Air attack</button>
+<button class="btn secondary rpgMagicItem" id="windBtn" role="menuitem" type="button">Wind attack</button>
 <button class="btn secondary rpgMagicItem" id="waterBtn" role="menuitem" type="button">Water attack</button>
-<button class="btn secondary rpgMagicItem" id="earthBtn" role="menuitem" type="button">Earth attack</button>
-<button class="btn secondary rpgMagicItem" id="touchBtn" role="menuitem" type="button">Touch attack</button>
 <button class="btn secondary rpgMagicItem" id="soundBtn" role="menuitem" type="button">Sound attack</button>
 <button class="btn secondary rpgMagicItem" id="smellTasteBtn" role="menuitem" type="button">Smell/Taste attack</button>
 <button class="btn primary rpgMagicItem" id="fireBtn" role="menuitem" type="button">Fire attack</button>
@@ -154,7 +152,7 @@
 <li><strong>Mana</strong> is your resource (0 to 6). You spend it on bigger actions.</li>
 <li><strong>Attack</strong> always gives <strong>+1 Mana</strong> (and deals Sight damage).</li>
 <li><strong>Guard</strong> gives <strong>+1 Mana</strong> and makes the next hit deal <strong>50% less</strong>.</li>
-<li><strong>Air</strong>, <strong>Water</strong>, <strong>Earth</strong>, <strong>Touch</strong>, <strong>Sound</strong>, <strong>Smell/Taste</strong>, and <strong>Fire</strong> spells each cost <strong>2 Mana</strong>.</li>
+<li><strong>Wind</strong> costs <strong>2 Mana</strong>. <strong>Water</strong> costs <strong>2 Mana</strong>. <strong>Sound</strong> costs <strong>2 Mana</strong>. <strong>Fire</strong> costs <strong>3 Mana</strong>.</li>
 <li><strong>Heal</strong> costs <strong>1 Mana</strong> (or <strong>2</strong> if you are <strong>Bound</strong>). You have limited charges.</li>
 <li>If you are <strong>Bound</strong> (Touch effect), your <strong>magic costs +1 Mana</strong> until it wears off. Guard breaks Bind.</li>
 </ul>
@@ -162,10 +160,10 @@
 <p class="muted">Damage is calculated like this:</p>
 <p class="rpgFormula"><strong>Damage</strong> = Base × <strong>STAB</strong> × <strong>Effectiveness</strong> (rounded)</p>
 <ul class="rpgModalList">
-<li><strong>Move type</strong>: each action is a type (Air / Water / Earth / Touch / Sound / Smell/Taste / Fire / Sight).</li>
+<li><strong>Move type</strong>: each action is a type (Wind / Water / Sound / Smell/Taste / Fire / Sight / Earth / Touch).</li>
 <li><strong>STAB</strong> (Same Type Attack Bonus): if the move matches one of your types, it gets <strong>×1.2</strong>.</li>
-<li><strong>Effectiveness</strong>: each type has <strong>2 strengths</strong>, <strong>2 weaknesses</strong>, and is neutral into the rest (see the chart).</li>
-<li><strong>Dual types</strong> multiply together (example: Air vs Fire+Sight uses both matchups).</li>
+<li><strong>Effectiveness</strong>: some types hit harder or softer into other types.</li>
+<li><strong>Dual types</strong> multiply together (example: Wind vs Fire+Sight uses both matchups).</li>
 </ul>
 </div>
 <div class="rpgModalFoot">

@@ -45,8 +45,6 @@ if (root) {
     magicMenu: document.getElementById("magicMenu"),
     windBtn: document.getElementById("windBtn"),
     waterBtn: document.getElementById("waterBtn"),
-    earthBtn: document.getElementById("earthBtn"),
-    touchBtn: document.getElementById("touchBtn"),
     soundBtn: document.getElementById("soundBtn"),
     smellTasteBtn: document.getElementById("smellTasteBtn"),
     fireBtn: document.getElementById("fireBtn"),
@@ -154,8 +152,8 @@ if (root) {
     const f = document.createElement("div");
     f.className = `rpgFloat rpgFloat--${side} rpgFloat--${variant}`;
     if (typeof overallMult === "number") {
-      if (overallMult >= 1.15) f.classList.add("rpgFloat--super");
-      else if (overallMult <= 0.88) f.classList.add("rpgFloat--weak");
+      if (overallMult >= 1.30) f.classList.add("rpgFloat--super");
+      else if (overallMult <= 0.90) f.classList.add("rpgFloat--weak");
     }
     f.textContent = text;
     els.fxLayer.appendChild(f);
@@ -309,7 +307,7 @@ function playWaveClearSfx() {
 
 
 const TYPE_META = /** @type {Record<MagicType, {icon: string, label: string}>} */ ({
-  Wind:  { icon: "🍃", label: "Air" },
+  Wind:  { icon: "🍃", label: "Wind" },
   Water: { icon: "💧", label: "Water" },
   Fire:  { icon: "🔥", label: "Fire" },
   Earth: { icon: "🪨", label: "Earth" },
@@ -333,9 +331,7 @@ function fxKindForType(t) {
 
 /** @param {MagicType[]} types */
 function formatTypesDisplay(types) {
-  return types
-    .map((t) => TYPE_META[t]?.label ?? t)
-    .join(" • ");
+  return types.join(" • ");
 }
 
 /** @param {MagicType[]} types */
@@ -602,80 +598,40 @@ function startBattleWithLocation(locId) {
   /** @typedef {"Wind"|"Water"|"Fire"|"Sight"|"Earth"|"Touch"|"Sound"|"SmellTaste"} MagicType */
 
   /**
-   * Balanced type system.
-   *
-   * Eight types arranged in a ring. Each type is:
-   * - Extra effective vs the next TWO types
-   * - Weak vs the previous TWO types
-   * - Normal vs the remaining THREE types
-   *
-   * Dual-types multiply, then are softly clamped so extremes stay readable.
-   */
-  const TYPE_ORDER = /** @type {MagicType[]} */ ([
-    "Fire",
-    "Wind",
-    "Sight",
-    "Sound",
-    "Water",
-    "SmellTaste",
-    "Earth",
-    "Touch",
-  ]);
-
-  const TYPE_STRONG = 1.4;
-  const TYPE_WEAK = 1 / TYPE_STRONG;
-
-  /** @param {MagicType} atk @param {MagicType} def */
-  function typeMultiplierSingle(atk, def) {
-    if (atk === def) return 1;
-    const i = TYPE_ORDER.indexOf(atk);
-    const j = TYPE_ORDER.indexOf(def);
-    if (i < 0 || j < 0) return 1;
-    const n = TYPE_ORDER.length;
-    const diff = (j - i + n) % n;
-    if (diff === 1 || diff === 2) return TYPE_STRONG;
-    if (diff === n - 1 || diff === n - 2) return TYPE_WEAK;
-    return 1;
-  }
-
-  /**
    * Type effectiveness chart: attackType -> defenderType -> multiplier.
-   * (Generated from TYPE_ORDER so it stays perfectly balanced.)
+   * Dual types multiply.
+   * NOTE: Balance is intentionally "obvious" so matchups are readable.
    */
-  const TYPE_CHART = /** @type {Record<MagicType, Record<MagicType, number>>} */ ((() => {
-    /** @type {Record<MagicType, Record<MagicType, number>>} */
-    // @ts-ignore
-    const out = {};
-    for (const atk of TYPE_ORDER) {
-      // @ts-ignore
-      out[atk] = {};
-      for (const def of TYPE_ORDER) {
-        // @ts-ignore
-        out[atk][def] = typeMultiplierSingle(atk, def);
-      }
-    }
-    return out;
-  })());
+  const TYPE_CHART = /** @type {Record<MagicType, Record<MagicType, number>>} */ ({
+Wind:  { Wind: 1.0, Fire: 1.6, Water: 0.8, Sight: 0.9, Earth: 0.8, Touch: 1.0, Sound: 1.4, SmellTaste: 1.6 },
+Water: { Water: 0.7, Wind: 1.6, Fire: 1.6, Sight: 0.9, Earth: 0.8, Touch: 1.0, Sound: 0.9, SmellTaste: 0.8 },
+Fire:  { Fire: 0.7, Wind: 0.8, Water: 0.8, Sight: 0.9, Earth: 1.6, Touch: 1.0, Sound: 1.2, SmellTaste: 1.6 },
+Sight: { Sight: 1.0, Wind: 1.2, Fire: 1.2, Water: 1.2, Earth: 0.9, Touch: 0.8, Sound: 1.6, SmellTaste: 0.8 },
+Earth: { Earth: 0.7, Wind: 1.6, Fire: 0.8, Water: 1.6, Sight: 1.2, Touch: 1.1, Sound: 1.2, SmellTaste: 1.2 },
+Touch: { Touch: 1.0, Wind: 1.0, Fire: 1.0, Water: 1.0, Earth: 0.9, Sight: 1.4, Sound: 0.8, SmellTaste: 0.9 },
+Sound: { Sound: 0.7, Wind: 0.8, Fire: 0.9, Water: 1.2, Earth: 0.9, Sight: 0.8, Touch: 1.6, SmellTaste: 1.0 },
+SmellTaste: { SmellTaste: 0.7, Wind: 0.8, Fire: 0.8, Water: 1.6, Earth: 0.9, Sight: 1.4, Touch: 1.2, Sound: 1.0 },
+  });
 
-  /** @param {MagicType} attackType @param {MagicType[]} defenderTypes */
+/** @param {MagicType} attackType @param {MagicType[]} defenderTypes */
   function typeMultiplier(attackType, defenderTypes) {
     let mult = 1;
-    for (const dt of defenderTypes) mult *= typeMultiplierSingle(attackType, dt);
-    // Soft clamp keeps dual-type extremes from getting too swingy.
-    return clamp(mult, 0.55, 1.95);
+    for (const dt of defenderTypes) mult *= TYPE_CHART[attackType]?.[dt] ?? 1;
+    return mult;
   }
 
   /** @param {number} mult */
   function effectivenessText(mult) {
-    if (mult >= 1.15) return "Extra effective!";
-    if (mult <= 0.88) return "Weak…";
+    if (mult >= 1.30) return "Super effective!";
+    if (mult <= 0.85) return "Not very effective…";
     return "";
   }
 
+
   /** @param {number} mult */
   function effectivenessTierLabel(mult) {
-    if (mult >= 1.15) return { label: "Extra effective", tone: "good" };
-    if (mult <= 0.88) return { label: "Weak", tone: "bad" };
+    if (mult >= 1.30) return { label: "Extra effective", tone: "good" };
+    if (mult <= 0.85) return { label: "Weak", tone: "bad" };
     return { label: "Normal", tone: "neutral" };
   }
 
@@ -767,8 +723,8 @@ function setPreviewMove(name, type, baseCost) {
   
   /** @param {number} mult */
   function matchupLabel(mult) {
-    if (mult >= 1.15) return { text: "Strong", cls: "isStrong" };
-    if (mult <= 0.88) return { text: "Weak", cls: "isWeak" };
+    if (mult >= 1.30) return { text: "Strong", cls: "isStrong" };
+    if (mult <= 0.90) return { text: "Weak", cls: "isWeak" };
     return { text: "Even", cls: "isNeutral" };
   }
 
@@ -829,21 +785,13 @@ function setPreviewMove(name, type, baseCost) {
     const atkPrev = computeTypedDamage("player", "enemy", 5, "Sight");
     const windPrev = computeTypedDamage("player", "enemy", 4, "Wind");
     const waterPrev = computeTypedDamage("player", "enemy", 5, "Water");
-    const earthPrev = computeTypedDamage("player", "enemy", 5, "Earth");
-    const touchPrev = computeTypedDamage("player", "enemy", 4, "Touch");
     const soundPrev = computeTypedDamage("player", "enemy", 5, "Sound");
     const smellPrev = computeTypedDamage("player", "enemy", 4, "SmellTaste");
-    const firePrev = computeTypedDamage("player", "enemy", 4, "Fire");
+    const firePrev = computeTypedDamage("player", "enemy", 6, "Fire");
 
     appendMatchupRow(els.atkVsEnemyList, { type: "Sight", label: "Attack", mult: atkPrev.overall });
-    appendMatchupRow(els.atkVsEnemyList, { type: "Wind", label: "Air spell", mult: windPrev.overall });
+    appendMatchupRow(els.atkVsEnemyList, { type: "Wind", label: "Wind spell", mult: windPrev.overall });
     appendMatchupRow(els.atkVsEnemyList, { type: "Water", label: "Water spell", mult: waterPrev.overall });
-
-    const offEarth = !state.player.types.includes("Earth");
-    appendMatchupRow(els.atkVsEnemyList, { type: "Earth", label: offEarth ? "Earth spell (off-type)" : "Earth spell", mult: earthPrev.overall });
-
-    const offTouch = !state.player.types.includes("Touch");
-    appendMatchupRow(els.atkVsEnemyList, { type: "Touch", label: offTouch ? "Touch spell (off-type)" : "Touch spell", mult: touchPrev.overall });
 
     const offSound = !state.player.types.includes("Sound");
     appendMatchupRow(els.atkVsEnemyList, { type: "Sound", label: offSound ? "Sound spell (off-type)" : "Sound spell", mult: soundPrev.overall });
@@ -851,8 +799,8 @@ function setPreviewMove(name, type, baseCost) {
     const offSmell = !state.player.types.includes("SmellTaste");
     appendMatchupRow(els.atkVsEnemyList, { type: "SmellTaste", label: offSmell ? "Smell/Taste spell (off-type)" : "Smell/Taste spell", mult: smellPrev.overall });
 
-    const offFire = !state.player.types.includes("Fire");
-    appendMatchupRow(els.atkVsEnemyList, { type: "Fire", label: offFire ? "Fire spell (off-type)" : "Fire spell", mult: firePrev.overall });
+    const offType = !state.player.types.includes("Fire");
+    appendMatchupRow(els.atkVsEnemyList, { type: "Fire", label: offType ? "Fire spell (off-type)" : "Fire spell", mult: firePrev.overall });
 
     // Enemy core move types (based on their types)
     const seen = new Set();
@@ -873,7 +821,7 @@ function setPreviewMove(name, type, baseCost) {
     if (els.typeMatrix.dataset.ready === "1") return;
 
     /** @type {MagicType[]} */
-    const order = TYPE_ORDER.slice();
+    const order = ["Wind", "Water", "Fire", "Earth", "Sight", "Sound", "Touch", "SmellTaste"];
 
     const table = els.typeMatrix;
     table.innerHTML = "";
@@ -918,8 +866,8 @@ function setPreviewMove(name, type, baseCost) {
         td.className = "rpgTypeCell";
 
         // Reuse the same thresholds used elsewhere in the UI.
-        if (mult >= 1.15) td.classList.add("isStrong");
-        else if (mult <= 0.88) td.classList.add("isWeak");
+        if (mult >= 1.30) td.classList.add("isStrong");
+        else if (mult <= 0.90) td.classList.add("isWeak");
         else td.classList.add("isNeutral");
 
         td.textContent = `x${fmtMult(mult)}`;
@@ -946,8 +894,8 @@ function setPreviewMove(name, type, baseCost) {
 
   /** @param {number} overall */
   function toneFromMultiplier(overall) {
-    if (overall >= 1.15) return "super";
-    if (overall <= 0.88) return "not";
+    if (overall >= 1.30) return "super";
+    if (overall <= 0.90) return "not";
     return "neutral";
   }
 
@@ -1174,7 +1122,7 @@ function setActiveLocation(id) {
     guarding: false,     // brace (50% next hit)
     ward: 0,             // mirror ward: 40% reduction + reflect
     fortified: 0,        // earth fortify: 30% reduction
-    gusted: false,       // next damage -1
+    gusted: false,       // next damage -2
     scented: 0,          // next attacks -1 (Smell/Taste)
     burn: 0,             // ticks 2 at start of turn
     enraged: false,
@@ -1331,7 +1279,6 @@ function makeLobbyState() {
     if (!state.over && state.enemy.ward > 0) parts.push("Mirror ward (reflect)");
     if (!state.over && state.enemy.fortified > 0) parts.push("Fortified (next hit −30%)");
     if (!state.over && state.enemy.guarding) parts.push("Bracing (next hit −50%)");
-    if (!state.over && state.enemy.bound > 0) parts.push("Bound (next action weakened)");
     if (!state.over && state.enemy.gusted) parts.push("Gusted (next hit weakened)");
     if (!state.over && state.enemy.scented > 0) parts.push(`Scented (${state.enemy.scented})`);
     if (!state.over && state.enemy.burn > 0) parts.push(`Burning (${state.enemy.burn})`);
@@ -1370,7 +1317,7 @@ function makeLobbyState() {
 
     // spending moves
     heal: 2,
-    lance: 2,
+    arcane: 2,
     glare: 2,
     squall: 2,
     resonant: 2,
@@ -1379,8 +1326,8 @@ function makeLobbyState() {
     mirrorbind: 2,
     stonebind: 2,
     hushbind: 2,
-    ignite: 2,
-    siphon: 2,
+    ignite: 3,
+    siphon: 3,
   };
 
   function enemyManaCost(id) {
@@ -1394,7 +1341,7 @@ function makeLobbyState() {
   // Emergency heal if low.
   if (e.hp > 0 && e.hp < e.max && e.healCharges > 0) {
     const ratio = e.hp / e.max;
-    if (ratio <= 0.32) return { id: "heal", name: "Heal", type: null, base: 0, note: "Heals for 6" };
+    if (ratio <= 0.32) return { id: "heal", name: "Heal", type: null, base: 0, note: "Heals for 8" };
   }
 
   // Profiles (deterministic patterns)
@@ -1405,7 +1352,7 @@ function makeLobbyState() {
     // If you're already burning, they don't waste a turn re-igniting.
     if (next === "ignite" && p.burn > 0) next = "lance";
 
-    if (next === "ignite") return { id: "ignite", name: "Ignite", type: "Fire", base: 4, note: "Applies Burn (1)" };
+    if (next === "ignite") return { id: "ignite", name: "Ignite", type: "Fire", base: 4, note: "Applies Burn (2)" };
     if (next === "lance") return { id: "lance", name: "Arcane Lance", type: "Sight", base: 6, note: "" };
     if (next === "ward") return { id: "ward", name: "Mirror Ward", type: null, base: 0, note: "Next hit reduced + reflects" };
     if (next === "siphon") return { id: "siphon", name: "Siphon", type: "Sight", base: 4, note: "Heals enemy for 3" };
@@ -1488,7 +1435,7 @@ function makeLobbyState() {
    * Apply enemy defenses. Returns {final, reflected}.
    * @param {number} incoming
    */
-  function applyEnemyDefenses(incoming, flags = {}) {
+  function applyEnemyDefenses(incoming) {
     let final = incoming;
     let reflected = 0;
 
@@ -1512,17 +1459,13 @@ function makeLobbyState() {
       playAnim(els.enemySprite, "rpgAnim-guard");
       spawnFx("guard", "enemy");
     }
-    // Brace: reduction (normally 50%, but Quake pushes through)
+
+    // Brace: 50% reduction
     if (state.enemy.guarding) {
       const before = final;
-      const mult = flags.quake ? 0.75 : 0.5;
-      final = Math.max(1, Math.ceil(final * mult));
+      final = Math.floor(final / 2);
       state.enemy.guarding = false;
-      if (flags.quake) {
-        addLog(`${state.enemy.name} tries to brace, but the tremor slips through (${before} → ${final}).`);
-      } else {
-        addLog(`${state.enemy.name} braces (${before} → ${final}).`);
-      }
+      addLog(`${state.enemy.name} braces (${before} → ${final}).`);
       playAnim(els.enemySprite, "rpgAnim-guard");
       spawnFx("guard", "enemy");
     }
@@ -1538,10 +1481,10 @@ function makeLobbyState() {
   function applyPlayerDefenses(incoming, flags = {}) {
     let final = incoming;
 
-    // Evasion veil: reduce next hit by 30%
+    // Evasion veil: reduce next hit by 60%
     if (state.player.evading) {
       const before = final;
-      final = Math.ceil(final * 0.7);
+      final = Math.ceil(final * 0.4);
       state.player.evading = false;
       addLog(`You slip in an evasive veil (${before} → ${final}).`);
       playAnim(els.playerSprite, "rpgAnim-guard");
@@ -1673,26 +1616,18 @@ function makeLobbyState() {
     const atkPrev = computeTypedDamage("player", "enemy", 5, "Sight");
     const windPrev = computeTypedDamage("player", "enemy", 4, "Wind");
     const waterPrev = computeTypedDamage("player", "enemy", 5, "Water");
-    const earthPrev = computeTypedDamage("player", "enemy", 5, "Earth");
-    const touchPrev = computeTypedDamage("player", "enemy", 4, "Touch");
     const soundPrev = computeTypedDamage("player", "enemy", 5, "Sound");
     const smellPrev = computeTypedDamage("player", "enemy", 4, "SmellTaste");
-    const firePrev = computeTypedDamage("player", "enemy", 4, "Fire");
+    const firePrev = computeTypedDamage("player", "enemy", 6, "Fire");
 
     if (els.attackBtn instanceof HTMLButtonElement) {
       els.attackBtn.textContent = `Attack (Sight x${fmtMult(atkPrev.overall)} | +1 Mana)`;
     }
     if (els.windBtn instanceof HTMLButtonElement) {
-      els.windBtn.textContent = `Air attack (2 Mana, x${fmtMult(windPrev.overall)})`;
+      els.windBtn.textContent = `Wind attack (2 Mana, x${fmtMult(windPrev.overall)})`;
     }
     if (els.waterBtn instanceof HTMLButtonElement) {
       els.waterBtn.textContent = `Water attack (2 Mana, x${fmtMult(waterPrev.overall)})`;
-    }
-    if (els.earthBtn instanceof HTMLButtonElement) {
-      els.earthBtn.textContent = `Earth attack (2 Mana, x${fmtMult(earthPrev.overall)})`;
-    }
-    if (els.touchBtn instanceof HTMLButtonElement) {
-      els.touchBtn.textContent = `Touch attack (2 Mana, x${fmtMult(touchPrev.overall)})`;
     }
     if (els.soundBtn instanceof HTMLButtonElement) {
       els.soundBtn.textContent = `Sound attack (2 Mana, x${fmtMult(soundPrev.overall)})`;
@@ -1701,9 +1636,9 @@ function makeLobbyState() {
       els.smellTasteBtn.textContent = `Smell/Taste attack (2 Mana, x${fmtMult(smellPrev.overall)})`;
     }
     if (els.fireBtn instanceof HTMLButtonElement) {
-      const offFire = !state.player.types.includes("Fire");
-      const label = offFire ? "Fire attack (off-type)" : "Fire attack";
-      els.fireBtn.textContent = `${label} (2 Mana, x${fmtMult(firePrev.overall)})`;
+      const offType = !state.player.types.includes("Fire");
+      const label = offType ? "Fire attack (off-type)" : "Fire attack";
+      els.fireBtn.textContent = `${label} (3 Mana, x${fmtMult(firePrev.overall)})`;
     }
 
     if (els.healBtn instanceof HTMLButtonElement) {
@@ -1751,11 +1686,9 @@ function makeLobbyState() {
 
     const canWind = isPlayerTurn && focus >= (2 + boundExtra);
     const canWater = isPlayerTurn && focus >= (2 + boundExtra);
-    const canEarth = isPlayerTurn && focus >= (2 + boundExtra);
-    const canTouch = isPlayerTurn && focus >= (2 + boundExtra);
     const canSound = isPlayerTurn && focus >= (2 + boundExtra);
     const canSmellTaste = isPlayerTurn && focus >= (2 + boundExtra);
-    const canFire = isPlayerTurn && focus >= (2 + boundExtra);
+    const canFire = isPlayerTurn && focus >= (3 + boundExtra);
     const canHeal = isPlayerTurn && state.player.healCharges > 0 && focus >= healCost;
 
     if (els.attackBtn instanceof HTMLButtonElement) els.attackBtn.disabled = disableActions;
@@ -1763,8 +1696,6 @@ function makeLobbyState() {
     if (els.magicToggle instanceof HTMLButtonElement) els.magicToggle.disabled = disableActions;
     if (els.windBtn instanceof HTMLButtonElement) els.windBtn.disabled = !canWind;
     if (els.waterBtn instanceof HTMLButtonElement) els.waterBtn.disabled = !canWater;
-    if (els.earthBtn instanceof HTMLButtonElement) els.earthBtn.disabled = !canEarth;
-    if (els.touchBtn instanceof HTMLButtonElement) els.touchBtn.disabled = !canTouch;
     if (els.soundBtn instanceof HTMLButtonElement) els.soundBtn.disabled = !canSound;
     if (els.smellTasteBtn instanceof HTMLButtonElement) els.smellTasteBtn.disabled = !canSmellTaste;
     if (els.fireBtn instanceof HTMLButtonElement) els.fireBtn.disabled = !canFire;
@@ -1861,8 +1792,6 @@ function makeLobbyState() {
     lockBtn(els.magicToggle, locked);
     lockBtn(els.windBtn, locked);
     lockBtn(els.waterBtn, locked);
-    lockBtn(els.earthBtn, locked);
-    lockBtn(els.touchBtn, locked);
     lockBtn(els.soundBtn, locked);
     lockBtn(els.smellTasteBtn, locked);
     lockBtn(els.fireBtn, locked);
@@ -1973,8 +1902,7 @@ function makeLobbyState() {
 
     // Mana gating: if the planned move costs more Mana than the enemy has,
     // the enemy performs a basic Strike to build Mana and tries the same step next turn.
-    const baseCostPlanned = enemyManaCost(intent.id);
-    const plannedCost = baseCostPlanned + (e.bound > 0 && baseCostPlanned > 0 ? 1 : 0);
+    const plannedCost = enemyManaCost(intent.id);
     const holdStep = plannedCost > 0 && e.focus < plannedCost;
     if (holdStep) {
       intent = { id: "attack", name: "Strike", type: "Sight", base: 4, note: "Builds Mana" };
@@ -1987,9 +1915,7 @@ function makeLobbyState() {
     if (!holdStep) e.aiStep += 1;
 
     // Pay or build Mana
-    const baseCost = enemyManaCost(intent.id);
-    const hadBind = e.bound > 0;
-    const cost = baseCost + (hadBind && baseCost > 0 ? 1 : 0);
+    const cost = enemyManaCost(intent.id);
     if (cost > 0) spendEnemyFocus(cost);
     else gainEnemyFocus(1);
 
@@ -2040,21 +1966,11 @@ function makeLobbyState() {
 
     let base = intent.base + (e.enraged ? 1 : 0);
 
-    if (hadBind) {
-      const parts = [];
-      if (baseCost > 0) parts.push("+1 Mana");
-      if (intent.base > 0) parts.push("−1 damage");
-      const suffix = parts.length ? ` (${parts.join(", ")})` : "";
-      addLog(`Bind constricts them${suffix}.`);
-      if (intent.base > 0) base = Math.max(1, base - 1);
-      e.bound = 0;
-    }
-
-    // Gusted: deterministic -1 on next hit
+    // Gusted: deterministic -2 on next hit
     if (e.gusted) {
-      base = Math.max(1, base - 1);
+      base = Math.max(1, base - 2);
       e.gusted = false;
-      addLog("A lingering gust throws off their focus (−1 damage).");
+      addLog("A lingering gust throws off their focus (−2 damage).");
     }
 
     // Scented: deterministic -1 on next attacks
@@ -2088,7 +2004,7 @@ function makeLobbyState() {
 
     // Apply deterministic status effects
     if (intent.id === "ignite") {
-      p.burn = Math.max(p.burn, 1);
+      p.burn = Math.max(p.burn, 2);
       addLog("Flame clings to you (burn).");
     }
     if (intent.id === "stonebind" || intent.id === "mirrorbind" || intent.id === "hushbind") {
@@ -2173,9 +2089,9 @@ function makeLobbyState() {
 
     // Bind weakens next move
     if (state.player.bound > 0) {
-      base = Math.max(1, base - 1);
+      base = Math.max(1, base - 2);
       state.player.bound = 0;
-      addLog("Bind dulls your strike (−1).");
+      addLog("Bind dulls your strike (−2).");
     }
 
     const typed = computeTypedDamage("player", "enemy", base, "Sight");
@@ -2227,27 +2143,25 @@ function makeLobbyState() {
       return;
     }
 
-    showMoveBanner("Air attack", "Wind");
+    showMoveBanner("Wind attack", "Wind");
     playAnim(els.playerSprite, "rpgAnim-attack");
 
     let base = 4;
 
     if (state.player.bound > 0) {
-      base = Math.max(1, base - 1);
+      base = Math.max(1, base - 2);
       state.player.bound = 0;
-      addLog("Bind drags your air blade (−1).");
+      addLog("Bind drags your wind blade (−2).");
     }
 
     const typed = computeTypedDamage("player", "enemy", base, "Wind");
     const def = applyEnemyDefenses(typed.scaled);
 
     state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
-    addLog(`You send an air blade for ${def.final} damage.`);
+    addLog(`You send a wind blade for ${def.final} damage.`);
     if (typed.note) addLog(typed.note);
     setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
     playAnim(els.enemySprite, "rpgAnim-hit");
-    spawnFx("wind", "enemy");
-    spawnFloat(`-${def.final}`, "enemy", "dmg", typed.overall);
 
     if (def.reflected > 0) {
       state.player.hp = clamp(state.player.hp - def.reflected, 0, state.player.max);
@@ -2262,9 +2176,9 @@ function makeLobbyState() {
     }
 
     // Deterministic tactical effects
-    state.enemy.gusted = true;       // next enemy hit -1
+    state.enemy.gusted = true;       // next enemy hit -2
     state.player.evading = true;     // next hit reduced
-    addLog("Gust rattles their aim (next enemy hit −1).");
+    addLog("Gust rattles their aim (next enemy hit −2).");
     addLog("An evasive veil surrounds you (next hit softened).");
     spawnFx("wind", "player");
 
@@ -2300,9 +2214,9 @@ function makeLobbyState() {
     let base = 5;
 
     if (state.player.bound > 0) {
-      base = Math.max(1, base - 1);
+      base = Math.max(1, base - 2);
       state.player.bound = 0;
-      addLog("Bind dulls your water lash (−1).");
+      addLog("Bind dulls your water lash (−2).");
     }
 
     const typed = computeTypedDamage("player", "enemy", base, "Water");
@@ -2350,134 +2264,6 @@ function makeLobbyState() {
     queueEnemyTurn();
   }
 
-  function playerEarthAttack() {
-    if (isGameOver()) return;
-    if (state.phase !== "player") return;
-    closeMagicMenu();
-
-    const extra = state.player.bound > 0 ? 1 : 0;
-    const cost = 2 + extra;
-
-    if (state.player.focus < cost) {
-      addLog("Not enough Mana.");
-      render();
-      return;
-    }
-
-    showMoveBanner("Earth attack", "Earth");
-    playAnim(els.playerSprite, "rpgAnim-attack");
-
-    let base = 5;
-
-    if (state.player.bound > 0) {
-      base = Math.max(1, base - 1);
-      state.player.bound = 0;
-      addLog("Bind snags your casting (−1).");
-    }
-
-    const typed = computeTypedDamage("player", "enemy", base, "Earth");
-    const def = applyEnemyDefenses(typed.scaled, { quake: true });
-
-    state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
-    addLog(`You crack the ground for ${def.final} damage.`);
-    if (typed.note) addLog(typed.note);
-    setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
-
-    stageShake();
-    spawnFx("earth", "center");
-    playAnim(els.enemySprite, "rpgAnim-hit");
-    spawnFx("earth", "enemy");
-    spawnFloat(`-${def.final}`, "enemy", "dmg", typed.overall);
-
-    // Mirror reflect (if any ward remained)
-    if (def.reflected > 0) {
-      state.player.hp = clamp(state.player.hp - def.reflected, 0, state.player.max);
-      addLog(`Reflected magic nicks you for ${def.reflected}.`);
-      playAnim(els.playerSprite, "rpgAnim-hit");
-      spawnFx("sight", "player");
-      spawnFloat(`-${def.reflected}`, "player", "dmg", null);
-      if (state.player.hp <= 0) {
-        endGame("Reflected magic drops you. Game over.");
-        return;
-      }
-    }
-
-    spendFocus(cost);
-
-    if (state.enemy.hp <= 0) {
-      onEnemyDown(`${state.enemy.name} falls.`);
-      return;
-    }
-
-    render();
-    queueEnemyTurn();
-  }
-
-  function playerTouchAttack() {
-    if (isGameOver()) return;
-    if (state.phase !== "player") return;
-    closeMagicMenu();
-
-    const extra = state.player.bound > 0 ? 1 : 0;
-    const cost = 2 + extra;
-
-    if (state.player.focus < cost) {
-      addLog("Not enough Mana.");
-      render();
-      return;
-    }
-
-    showMoveBanner("Touch attack", "Touch");
-    playAnim(els.playerSprite, "rpgAnim-attack");
-
-    let base = 4;
-
-    if (state.player.bound > 0) {
-      base = Math.max(1, base - 1);
-      state.player.bound = 0;
-      addLog("Bind snags your casting (−1).");
-    }
-
-    const typed = computeTypedDamage("player", "enemy", base, "Touch");
-    const def = applyEnemyDefenses(typed.scaled);
-
-    state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
-    addLog(`You snap binding threads for ${def.final} damage.`);
-    if (typed.note) addLog(typed.note);
-    setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
-    playAnim(els.enemySprite, "rpgAnim-hit");
-    spawnFx("touch", "enemy");
-    spawnFloat(`-${def.final}`, "enemy", "dmg", typed.overall);
-
-    // Apply bind to the enemy: their next action is weakened, and spells cost +1 Mana.
-    state.enemy.bound = Math.max(state.enemy.bound || 0, 1);
-    addLog(`${state.enemy.name} is Bound.`);
-
-    // Mirror reflect (if any ward remained)
-    if (def.reflected > 0) {
-      state.player.hp = clamp(state.player.hp - def.reflected, 0, state.player.max);
-      addLog(`Reflected magic nicks you for ${def.reflected}.`);
-      playAnim(els.playerSprite, "rpgAnim-hit");
-      spawnFx("sight", "player");
-      spawnFloat(`-${def.reflected}`, "player", "dmg", null);
-      if (state.player.hp <= 0) {
-        endGame("Reflected magic drops you. Game over.");
-        return;
-      }
-    }
-
-    spendFocus(cost);
-
-    if (state.enemy.hp <= 0) {
-      onEnemyDown(`${state.enemy.name} falls.`);
-      return;
-    }
-
-    render();
-    queueEnemyTurn();
-  }
-
-
   function playerSoundAttack() {
     if (isGameOver()) return;
     if (state.phase !== "player") return;
@@ -2498,9 +2284,9 @@ function makeLobbyState() {
     let base = 5;
 
     if (state.player.bound > 0) {
-      base = Math.max(1, base - 1);
+      base = Math.max(1, base - 2);
       state.player.bound = 0;
-      addLog("Bind muddies your rhythm (−1).");
+      addLog("Bind muddies your rhythm (−2).");
     }
 
     // Resonance disrupts defensive wards and braces before the hit lands.
@@ -2565,9 +2351,9 @@ function playerSmellTasteAttack() {
   let base = 4;
 
   if (state.player.bound > 0) {
-    base = Math.max(1, base - 1);
+    base = Math.max(1, base - 2);
     state.player.bound = 0;
-    addLog("Bind muddles your senses (−1).");
+    addLog("Bind muddles your senses (−2).");
   }
 
   const typed = computeTypedDamage("player", "enemy", base, "SmellTaste");
@@ -2614,7 +2400,7 @@ function playerFireAttack() {
     closeMagicMenu();
 
     const extra = state.player.bound > 0 ? 1 : 0;
-    const cost = 2 + extra;
+    const cost = 3 + extra;
     if (state.player.focus < cost) {
       addLog("Not enough Mana.");
       render();
@@ -2624,12 +2410,12 @@ function playerFireAttack() {
     showMoveBanner("Fire attack", "Fire");
     playAnim(els.playerSprite, "rpgAnim-attack");
 
-    let base = 4;
+    let base = 6;
 
     if (state.player.bound > 0) {
-      base = Math.max(1, base - 1);
+      base = Math.max(1, base - 2);
       state.player.bound = 0;
-      addLog("Bind makes your flame falter (−1).");
+      addLog("Bind makes your flame falter (−2).");
     }
 
     const typed = computeTypedDamage("player", "enemy", base, "Fire");
@@ -2654,7 +2440,7 @@ function playerFireAttack() {
     }
 
     // Always applies burn (no RNG)
-    state.enemy.burn = Math.max(state.enemy.burn, 1);
+    state.enemy.burn = Math.max(state.enemy.burn, 2);
     addLog(`${state.enemy.name} catches flame (burn).`);
 
     spendFocus(cost);
@@ -2760,8 +2546,6 @@ playAnim(els.playerSprite, "rpgAnim-heal");
   }
   if (els.windBtn instanceof HTMLButtonElement) els.windBtn.addEventListener("click", playerWindAttack);
   if (els.waterBtn instanceof HTMLButtonElement) els.waterBtn.addEventListener("click", playerWaterAttack);
-  if (els.earthBtn instanceof HTMLButtonElement) els.earthBtn.addEventListener("click", playerEarthAttack);
-  if (els.touchBtn instanceof HTMLButtonElement) els.touchBtn.addEventListener("click", playerTouchAttack);
   if (els.soundBtn instanceof HTMLButtonElement) els.soundBtn.addEventListener("click", playerSoundAttack);
   if (els.smellTasteBtn instanceof HTMLButtonElement) els.smellTasteBtn.addEventListener("click", playerSmellTasteAttack);
   if (els.fireBtn instanceof HTMLButtonElement) els.fireBtn.addEventListener("click", playerFireAttack);
@@ -2823,13 +2607,11 @@ playAnim(els.playerSprite, "rpgAnim-heal");
     btn.addEventListener("click", () => setPreviewMove(name, type, baseCost));
   };
   wirePreview(els.attackBtn, "Attack", "Sight", 0);
-  wirePreview(els.windBtn, "Air attack", "Wind", 2);
+  wirePreview(els.windBtn, "Wind attack", "Wind", 2);
   wirePreview(els.waterBtn, "Water attack", "Water", 2);
-  wirePreview(els.earthBtn, "Earth attack", "Earth", 2);
-  wirePreview(els.touchBtn, "Touch attack", "Touch", 2);
   wirePreview(els.soundBtn, "Sound attack", "Sound", 2);
   wirePreview(els.smellTasteBtn, "Smell/Taste attack", "SmellTaste", 2);
-  wirePreview(els.fireBtn, "Fire attack", "Fire", 2);
+  wirePreview(els.fireBtn, "Fire attack", "Fire", 3);
 
 // Initialize (hero → location)
   state = makeLobbyState();
