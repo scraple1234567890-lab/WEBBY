@@ -49,7 +49,8 @@ window.CHARACTERS_DATA = {
           "name": "Park",
           "href": "./locations/park.html"
         }
-      ]
+      ],
+      "playable": true
     },
     {
       "id": "belle",
@@ -74,7 +75,8 @@ window.CHARACTERS_DATA = {
       ],
       "aliases": [],
       "image": "",
-      "href": "./search.html?q=Belle"
+      "href": "./search.html?q=Belle",
+      "playable": false
     },
     {
       "id": "elroy",
@@ -99,7 +101,7 @@ window.CHARACTERS_DATA = {
       "href": "./characters/elroy.html",
       "school": "Touch",
       "element": "Earth",
-      "playable": true
+      "playable": false
     },
     {
       "id": "axel",
@@ -294,7 +296,7 @@ window.CHARACTERS_DATA = {
       "href": "./characters/mira.html",
       "related_events": [],
       "related_locations": [],
-      "playable": true
+      "playable": false
     }
   ]
 };

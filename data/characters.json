@@ -44,7 +44,8 @@
           "name": "Park",
           "href": "./locations/park.html"
         }
-      ]
+      ],
+      "playable": true
     },
     {
       "id": "belle",
@@ -69,7 +70,8 @@
       ],
       "aliases": [],
       "image": "",
-      "href": "./search.html?q=Belle"
+      "href": "./search.html?q=Belle",
+      "playable": false
     },
     {
       "id": "elroy",
@@ -94,7 +96,7 @@
       "href": "./characters/elroy.html",
       "school": "Touch",
       "element": "Earth",
-      "playable": true
+      "playable": false
     },
     {
       "id": "axel",
@@ -289,7 +291,7 @@
       "href": "./characters/mira.html",
       "related_events": [],
       "related_locations": [],
-      "playable": true
+      "playable": false
     }
   ]
 }

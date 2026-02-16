@@ -1197,12 +1197,44 @@ function getActiveHero() {
   },
 ];
 
-const LOCATIONS = [
+const FALLBACK_LOCATIONS = [
   { id: "ember_plaza", name: "Ember Plaza", subtitle: "Warm stones. Hot tempers.", enemySet: [0, 1] },
   { id: "quartz_library", name: "Quartz Library", subtitle: "Quiet halls. Heavy secrets.", enemySet: [1, 2] },
   { id: "gale_rooftops", name: "Gale Rooftops", subtitle: "Open sky. Unstable footing.", enemySet: [2, 3] },
   { id: "mirror_tunnels", name: "Mirror Tunnels", subtitle: "Dim lights. Echoing steps.", enemySet: [3, 4] },
 ];
+
+// Locations in-game are sourced from the Map dataset (data/map-locations.js) when available.
+// This keeps the RPG in sync with the site's world map.
+const GAME_LOCATION_IDS = ["arena", "market-central", "fey-forest", "gutterglass"];
+const LOCATION_ENEMY_SETS = [
+  [0, 1],
+  [1, 2],
+  [2, 3],
+  [3, 4],
+];
+
+function buildLocationsFromMap() {
+  const data = window.MAP_LOCATIONS_DATA;
+  if (!data || !Array.isArray(data.locations)) return null;
+
+  const byId = new Map(data.locations.map((l) => [l.id, l]));
+  const picks = GAME_LOCATION_IDS.map((id) => byId.get(id)).filter(Boolean);
+
+  // If any IDs are missing, fall back to the first few map locations to avoid an empty picker.
+  const finalPicks = picks.length ? picks : data.locations.slice(0, GAME_LOCATION_IDS.length);
+  if (!finalPicks.length) return null;
+
+  return finalPicks.slice(0, LOCATION_ENEMY_SETS.length).map((l, idx) => ({
+    id: l.id,
+    name: l.title || l.id,
+    subtitle: l.blurb || "",
+    href: l.href || "",
+    enemySet: LOCATION_ENEMY_SETS[idx] || LOCATION_ENEMY_SETS[0],
+  }));
+}
+
+const LOCATIONS = buildLocationsFromMap() || FALLBACK_LOCATIONS;
 
 /** @type {string|null} */
 let activeLocationId = null;
