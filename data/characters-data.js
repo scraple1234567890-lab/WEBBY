@@ -6,7 +6,7 @@
 window.CHARACTERS_DATA = {
   "meta": {
     "title": "Dragonstone Characters",
-    P26-02-09",
+    "updated": "2026-02-15",
     "note": "Edit this file to add/remove characters. Spoiler tiers: public, book1, book2, full. If you open the site via file://, most browsers block JSON fetch, so use server.js or edit data/characters-data.js instead."
   },
   "characters": [
@@ -81,49 +81,52 @@ window.CHARACTERS_DATA = {
       "name": "Elroy",
       "group": "Core cast",
       "spoiler_tier": "public",
-      "hook": "Too observant to stay uninvolved.",
-      "summary": "A core member of the group with ties to the Artifact Maker's shadowy orbit.",
+      "hook": "Touch-hardened. Earth-steady.",
+      "summary": "A core cast member whose magic types are Touch and Earth.",
       "facts": [
+        "Types: Touch + Earth",
         "Core cast member",
         "Has an early connection to the Artifact Maker"
       ],
       "tags": [
         "character",
-        "core"
+        "core",
+        "earth",
+        "touch"
       ],
       "aliases": [],
-      "image": "",
-      "href": "./search.html?q=Elroy"
+      "image": "./assets/images/characters/elroy.svg",
+      "href": "./characters/elroy.html",
+      "school": "Touch",
+      "element": "Earth"
     },
     {
       "id": "axel",
       "name": "Axel",
       "group": "Core cast",
       "spoiler_tier": "book2",
-      "hook": "Friction-weaver. Alley cartographer. Loyal like a lockpick.",
-      "summary": "A streetwise runner with Touch magic that can bend friction, turning the city itself into his escape route.",
+      "hook": "Sight-led. Secondary discipline: xxx.",
+      "summary": "A core cast member whose magic types are Sight and xxx.",
       "alignment": "Neutral",
-      "element": "None",
-      "school": "Touch",
+      "element": "xxx",
+      "school": "Sight",
       "facts": [
-        "Magic: Friction Weave (Touch) \u2014 can increase or reduce friction with a touch to cling, slide, or halt momentum.",
-        "Never repeats the same route twice in a week; the city is safer when it can't predict him.",
-        "Panic makes his power overcorrect: too much grip, not enough release.",
-        "Carries two pairs of gloves: one for climbing, one for shaking hands.",
+        "Types: Sight + xxx",
+        "Secondary type is a placeholder (xxx) until you decide what it really is.",
+        "Known for fast reads, faster exits, and a habit of never repeating routes.",
         "Has ties to the Black Market and the Illegal District (by necessity, not loyalty)."
       ],
       "tags": [
         "character",
         "core",
-        "touch",
-        "friction",
         "runner",
-        "underground",
-        "spoiler:book2"
+        "sight",
+        "spoiler:book2",
+        "underground"
       ],
       "aliases": [
         "The Runner",
-        "Axel \u201cStillpoint\u201d"
+        "Axel “Stillpoint”"
       ],
       "image": "./assets/images/characters/axel.png",
       "href": "./characters/axel.html",
@@ -157,25 +160,23 @@ window.CHARACTERS_DATA = {
       "name": "Devante",
       "group": "Core cast",
       "spoiler_tier": "public",
-      "hook": "Resonance-reader. Soft-spoken shield. Arena-born.",
-      "summary": "A Sound-school mage who reads spaces through vibration, using hums and silence as tools for protection and truth.",
+      "hook": "Water-marked. Secondary discipline: xxx.",
+      "summary": "A core cast member whose magic types are Water and xxx.",
       "alignment": "Light",
-      "element": "None",
-      "school": "Sound",
+      "element": "xxx",
+      "school": "Water",
       "facts": [
-        "Magic: Resonance Mapping (Sound) \u2014 a low hum returns as a mental \u201cmap\u201d of rooms, hollow walls, and hidden doors.",
-        "Can dampen a small area into a Quiet Halo to calm panic or hide conversation.",
-        "Loud chaos triggers migraines; he keeps earwraps and speaks softly on purpose.",
-        "Protective of younger students and often shows up where help is needed before anyone asks.",
+        "Types: Water + xxx",
+        "Secondary type is a placeholder (xxx) until you decide what it really is.",
+        "Protective of others; shows up where help is needed before anyone asks.",
         "Has history with the Arena and is quietly being watched for Holy Night potential."
       ],
       "tags": [
+        "arena",
         "character",
         "core",
-        "sound",
-        "resonance",
-        "arena",
-        "protector"
+        "protector",
+        "water"
       ],
       "aliases": [
         "Dev",
@@ -213,26 +214,28 @@ window.CHARACTERS_DATA = {
       "name": "Relen",
       "group": "School Faculty",
       "spoiler_tier": "public",
-      "hook": "Headmaster at 24. Hardlight chains. Prodigy under a spotlight.",
-      "summary": "The newly appointed Headmaster of the School of Sight. A young prodigy who forges hardlight constructs, especially chains, in precise, brutal combat geometry.",
+      "hook": "Sight-born. Water-threaded. Hardlight made honest.",
+      "summary": "The newly appointed Headmaster of the School of Sight. A young prodigy who forges hardlight constructs and carries Water magic.",
       "alignment": "Light",
-      "element": "None",
+      "element": "Water",
       "school": "Sight",
       "facts": [
+        "Types: Sight + Water",
         "Age 24 and already named Headmaster of the School of Sight, a decision that still splits the faculty.",
-        "Primary magic: Hardlight Construction (Sight) \u2014 forms solid light into tools, restraints, and barriers.",
+        "Primary magic: Hardlight Construction (Sight) — forms solid light into tools, restraints, and barriers.",
         "Signature construct: luminous chains that can bind, pull, or form lattices midair.",
         "Known citywide as the \"prodigy of the city\"; praised publicly, watched privately.",
         "His control is surgical: faster to lock something down than to destroy it."
       ],
       "tags": [
+        "chains",
         "character",
+        "hardlight",
         "headmaster",
-        "sight",
         "light",
         "prodigy",
-        "hardlight",
-        "chains"
+        "sight",
+        "water"
       ],
       "aliases": [
         "Headmaster Relen",
@@ -262,20 +265,23 @@ window.CHARACTERS_DATA = {
       "name": "Mira",
       "group": "Former students",
       "spoiler_tier": "public",
-      "hook": "Expelled. The rest of the record goes quiet.",
-      "summary": "An expelled student from a few years ago. No further details survive in the public archive.",
+      "hook": "Sight-flare. Fire kept under lock.",
+      "summary": "An expelled student from a few years ago. Public record notes magic types: Sight and Fire.",
       "alignment": "",
-      "element": null,
-      "school": "",
+      "element": "Fire",
+      "school": "Sight",
       "facts": [
+        "Types: Sight + Fire",
         "Status: Expelled (a few years ago).",
         "Official reason: [REDACTED].",
         "Remaining dossier pages are missing or sealed."
       ],
       "tags": [
         "character",
+        "expelled",
+        "fire",
         "mystery",
-        "expelled"
+        "sight"
       ],
       "aliases": [
         "Mira (expelled student)"
