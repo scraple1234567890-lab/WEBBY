@@ -348,6 +348,151 @@ function playerHasType(t) {
   return !!(state && state.player && Array.isArray(state.player.types) && state.player.types.includes(t));
 }
 
+// --------------------
+// Spells (unlock on level-up)
+// --------------------
+
+/**
+ * @typedef {Object} Spell
+ * @property {string} id
+ * @property {string} name
+ * @property {MagicType} type
+ * @property {number} unlock   // level requirement
+ * @property {number} baseCost // Mana (before Bind +1)
+ * @property {number} baseDamage
+ * @property {string[]} [hooksBefore]
+ * @property {string[]} [hooksAfter]
+ * @property {number} [piercePct]   // 0..1, reduces the effectiveness of enemy defenses
+ * @property {boolean} [noReflect]  // ward reflects 0 if true
+ */
+
+/** @type {Spell[]} */
+const SPELLBOOK = [
+  // Wind
+  { id: "wind_gust", name: "Gust", type: "Wind", unlock: 1, baseCost: 2, baseDamage: 4, hooksAfter: ["gusted", "evade"] },
+  { id: "wind_razor", name: "Razorwind", type: "Wind", unlock: 3, baseCost: 2, baseDamage: 5, hooksAfter: ["gusted"] },
+  { id: "wind_slip", name: "Slipstream", type: "Wind", unlock: 6, baseCost: 2, baseDamage: 3, hooksAfter: ["evade", "mana+1"] },
+
+  // Water
+  { id: "water_lash", name: "Tidal Lash", type: "Water", unlock: 1, baseCost: 2, baseDamage: 5, hooksAfter: ["douse"] },
+  { id: "water_rain", name: "Soothing Rain", type: "Water", unlock: 3, baseCost: 2, baseDamage: 3, hooksAfter: ["heal+2", "douse"] },
+  { id: "water_undertow", name: "Undertow", type: "Water", unlock: 6, baseCost: 3, baseDamage: 6, hooksAfter: ["douse", "drainEnemyMana+1"] },
+
+  // Fire
+  { id: "fire_ignite", name: "Ignite", type: "Fire", unlock: 1, baseCost: 3, baseDamage: 6, hooksAfter: ["burn2"] },
+  { id: "fire_cinder", name: "Cinder Shot", type: "Fire", unlock: 3, baseCost: 2, baseDamage: 4, hooksAfter: ["burn1"] },
+  { id: "fire_inferno", name: "Inferno Spiral", type: "Fire", unlock: 6, baseCost: 4, baseDamage: 8, hooksAfter: ["burn2"] },
+
+  // Sound
+  { id: "sound_burst", name: "Resonant Burst", type: "Sound", unlock: 1, baseCost: 2, baseDamage: 5, hooksBefore: ["breakDefenses"] },
+  { id: "sound_disson", name: "Dissonance", type: "Sound", unlock: 3, baseCost: 2, baseDamage: 4, hooksBefore: ["breakDefenses"], hooksAfter: ["drainEnemyMana+1"] },
+  { id: "sound_cresc", name: "Crescendo", type: "Sound", unlock: 6, baseCost: 3, baseDamage: 7, hooksBefore: ["breakDefenses"] },
+
+  // Smell/Taste
+  { id: "smell_hex", name: "Aroma Hex", type: "SmellTaste", unlock: 1, baseCost: 2, baseDamage: 4, hooksAfter: ["scent2"] },
+  { id: "smell_bloom", name: "Bitter Bloom", type: "SmellTaste", unlock: 3, baseCost: 2, baseDamage: 5, hooksAfter: ["scent3"] },
+  { id: "smell_savor", name: "Savor Siphon", type: "SmellTaste", unlock: 6, baseCost: 3, baseDamage: 6, hooksAfter: ["scent2", "heal+3"] },
+
+  // Sight
+  { id: "sight_lance", name: "Arcane Lance", type: "Sight", unlock: 1, baseCost: 2, baseDamage: 5, noReflect: true },
+  { id: "sight_glare", name: "Piercing Glare", type: "Sight", unlock: 3, baseCost: 2, baseDamage: 4, piercePct: 0.45 },
+  { id: "sight_prism", name: "Prism Ray", type: "Sight", unlock: 6, baseCost: 3, baseDamage: 7, piercePct: 0.6, noReflect: true },
+
+  // Earth
+  { id: "earth_quake", name: "Quake", type: "Earth", unlock: 1, baseCost: 2, baseDamage: 5, piercePct: 0.35 },
+  { id: "earth_shatter", name: "Shatterstone", type: "Earth", unlock: 3, baseCost: 3, baseDamage: 6, piercePct: 0.6 },
+  { id: "earth_spikes", name: "Crystal Spikes", type: "Earth", unlock: 6, baseCost: 3, baseDamage: 7, piercePct: 0.25 },
+
+  // Touch
+  { id: "touch_grasp", name: "Grasp", type: "Touch", unlock: 1, baseCost: 2, baseDamage: 4, hooksAfter: ["drainEnemyMana+1"] },
+  { id: "touch_press", name: "Pressure Point", type: "Touch", unlock: 3, baseCost: 2, baseDamage: 5, piercePct: 0.35 },
+  { id: "touch_surge", name: "Vital Surge", type: "Touch", unlock: 6, baseCost: 3, baseDamage: 4, hooksAfter: ["heal+4"] },
+];
+
+/** @type {Record<string, Spell>} */
+const SPELLS_BY_ID = Object.fromEntries(SPELLBOOK.map((s) => [s.id, s]));
+
+/**
+ * Compute spells known for a hero at a given level.
+ * @param {MagicType[]} types
+ * @param {number} level
+ */
+function knownSpellIdsFor(types, level) {
+  const L = Math.max(1, toSafeInt(level, 1));
+  const has = new Set(types || []);
+  return SPELLBOOK
+    .filter((s) => has.has(s.type) && L >= s.unlock)
+    .sort((a, b) => (a.unlock - b.unlock) || (a.type.localeCompare(b.type)) || (a.baseCost - b.baseCost))
+    .map((s) => s.id);
+}
+
+/**
+ * Sync the player's known spells to match their current level + types.
+ * Returns a list of newly learned spell ids.
+ * @param {boolean} announce
+ */
+function syncKnownSpells(announce = false) {
+  const before = new Set(Array.isArray(state?.player?.spells) ? state.player.spells : []);
+  const now = knownSpellIdsFor(state?.player?.types || [], state?.player?.level || 1);
+  state.player.spells = now;
+  const gained = now.filter((id) => !before.has(id));
+
+  if (announce && gained.length) {
+    gained.forEach((id) => {
+      const sp = SPELLS_BY_ID[id];
+      if (sp) addLog(`📜 New spell learned: ${sp.name}.`);
+    });
+
+    // Let the level-up banner breathe first, then show the first learned spell.
+    const first = SPELLS_BY_ID[gained[0]];
+    if (first && !prefersReducedMotion) {
+      window.setTimeout(() => showMoveBanner(`New: ${first.name}`, first.type), 620);
+    }
+  }
+
+  return gained;
+}
+
+/** @returns {Spell[]} */
+function getKnownSpells() {
+  const ids = Array.isArray(state?.player?.spells) ? state.player.spells : [];
+  return ids.map((id) => SPELLS_BY_ID[id]).filter(Boolean);
+}
+
+/**
+ * Render the dynamic spell list inside the Magic menu.
+ * @param {Spell[]} spells
+ * @param {boolean} isPlayerTurn
+ * @param {number} focus
+ * @param {number} boundExtra
+ */
+function renderSpellMenu(spells, isPlayerTurn, focus, boundExtra) {
+  if (!(els.magicMenu instanceof HTMLElement)) return;
+  els.magicMenu.replaceChildren();
+
+  if (!Array.isArray(spells) || spells.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "rpgMagicEmpty";
+    empty.textContent = "No spells yet.";
+    els.magicMenu.appendChild(empty);
+    return;
+  }
+
+  spells.forEach((spell) => {
+    const typed = computeTypedDamage("player", "enemy", spell.baseDamage, spell.type);
+    const cost = Math.max(0, toSafeInt(spell.baseCost, 0) + boundExtra);
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "btn secondary rpgMagicItem";
+    btn.setAttribute("role", "menuitem");
+    btn.dataset.spellId = spell.id;
+    btn.dataset.type = spell.type;
+    btn.textContent = `${spell.name} (${cost} Mana, x${fmtMult(typed.overall)})`;
+    btn.disabled = !isPlayerTurn || focus < cost;
+    els.magicMenu.appendChild(btn);
+  });
+}
+
 /** @param {MagicType[]} types */
 function formatTypesDisplay(types) {
   return types.join(" • ");
@@ -1386,6 +1531,9 @@ function setActiveLocation(id) {
       types: pt.types,
       sprite: pt.sprite,
 
+      // Spells are derived from (level + hero types).
+      spells: knownSpellIdsFor(pt.types, prog.level),
+
       // progression
       level: prog.level,
       xp: prog.xp,
@@ -1570,6 +1718,7 @@ function makeLobbyState() {
       state.player.level = Math.max(1, toSafeInt(state.player.level, 1) + 1);
       state.player.xpToNext = xpToNext(state.player.level);
       syncPlayerLevel(true);
+      syncKnownSpells(true);
       leveled = true;
       addLog(`🌟 Level up! You are now Lv ${state.player.level}.`);
     }
@@ -1765,37 +1914,51 @@ function makeLobbyState() {
    * Apply enemy defenses. Returns {final, reflected}.
    * @param {number} incoming
    */
-  function applyEnemyDefenses(incoming) {
+  function applyEnemyDefenses(incoming, opts = {}) {
     let final = incoming;
     let reflected = 0;
 
-    // Mirror ward: 40% reduction + reflect 25% of pre-ward
-    if (state.enemy.ward > 0) {
+    const pierce = clamp(Number(opts?.piercePct ?? 0), 0, 1);
+    const noReflect = !!opts?.noReflect;
+
+    // Mirror ward: reduction + reflect (can be pierced / reflect suppressed).
+    if (!opts?.ignoreWard && state.enemy.ward > 0) {
       const before = final;
-      final = Math.ceil(final * 0.6);
-      reflected = Math.max(1, Math.floor(before * 0.25));
+      const mult = 0.6 + 0.4 * pierce;
+      final = Math.ceil(final * mult);
+
+      const reflFactor = noReflect ? 0 : (0.25 * (1 - pierce));
+      const refl = Math.floor(before * reflFactor);
+      if (refl > 0) reflected = Math.max(reflected, refl);
+
       state.enemy.ward = 0;
-      addLog(`A mirror ward bends the strike (${before} → ${final}) and bites back (${reflected}).`);
+      const note = pierce > 0.01 ? " (partially pierced)" : "";
+      const back = refl > 0 ? ` and bites back (${refl}).` : ".";
+      addLog(`A mirror ward bends the strike (${before} → ${final})${note}${back}`);
       playAnim(els.enemySprite, "rpgAnim-guard");
       spawnFx("guard", "enemy");
     }
 
-    // Fortify: 30% reduction
-    if (state.enemy.fortified > 0) {
+    // Fortify: reduction (can be pierced)
+    if (!opts?.ignoreFortify && state.enemy.fortified > 0) {
       const before = final;
-      final = Math.ceil(final * 0.7);
+      const mult = 0.7 + 0.3 * pierce;
+      final = Math.ceil(final * mult);
       state.enemy.fortified = 0;
-      addLog(`${state.enemy.name} is fortified (${before} → ${final}).`);
+      const note = pierce > 0.01 ? " (pierced)" : "";
+      addLog(`${state.enemy.name} is fortified (${before} → ${final})${note}.`);
       playAnim(els.enemySprite, "rpgAnim-guard");
       spawnFx("guard", "enemy");
     }
 
-    // Brace: 50% reduction
-    if (state.enemy.guarding) {
+    // Brace: reduction (can be pierced)
+    if (!opts?.ignoreGuard && state.enemy.guarding) {
       const before = final;
-      final = Math.floor(final / 2);
+      const mult = 0.5 + 0.5 * pierce;
+      final = Math.floor(final * mult);
       state.enemy.guarding = false;
-      addLog(`${state.enemy.name} braces (${before} → ${final}).`);
+      const note = pierce > 0.01 ? " (pierced)" : "";
+      addLog(`${state.enemy.name} braces (${before} → ${final})${note}.`);
       playAnim(els.enemySprite, "rpgAnim-guard");
       spawnFx("guard", "enemy");
     }
@@ -1966,64 +2129,14 @@ function makeLobbyState() {
     // Button labels show multiplier + cost (so choices are readable)
     const atkType = playerPrimaryType();
     const atkPrev = computeTypedDamage("player", "enemy", 5, atkType);
-    const windPrev = computeTypedDamage("player", "enemy", 4, "Wind");
-    const waterPrev = computeTypedDamage("player", "enemy", 5, "Water");
-    const soundPrev = computeTypedDamage("player", "enemy", 5, "Sound");
-    const smellPrev = computeTypedDamage("player", "enemy", 4, "SmellTaste");
-    const firePrev = computeTypedDamage("player", "enemy", 6, "Fire");
 
     if (els.attackBtn instanceof HTMLButtonElement) {
       const atkLabel = TYPE_META[atkType]?.label ?? atkType;
       els.attackBtn.textContent = `Attack (${atkLabel} x${fmtMult(atkPrev.overall)} | +1 Mana)`;
       els.attackBtn.dataset.type = atkType;
     }
-    const hasWind = playerHasType("Wind");
-    const hasWater = playerHasType("Water");
-    const hasSound = playerHasType("Sound");
-    const hasSmell = playerHasType("SmellTaste");
-    const hasFire = playerHasType("Fire");
-
-    const secondaryType = Array.isArray(state.player.types) && state.player.types.length > 1 ? state.player.types[1] : null;
-    const hasSecondaryGeneric = !!secondaryType && !["Wind", "Water", "Sound", "SmellTaste", "Fire"].includes(secondaryType);
-
-    // Only show spells that match your hero's types.
-    if (els.windBtn instanceof HTMLButtonElement) {
-      els.windBtn.toggleAttribute("hidden", !hasWind);
-      els.windBtn.dataset.type = "Wind";
-      els.windBtn.textContent = `Wind attack (2 Mana, x${fmtMult(windPrev.overall)})`;
-    }
-    if (els.waterBtn instanceof HTMLButtonElement) {
-      els.waterBtn.toggleAttribute("hidden", !hasWater);
-      els.waterBtn.dataset.type = "Water";
-      els.waterBtn.textContent = `Water attack (2 Mana, x${fmtMult(waterPrev.overall)})`;
-    }
-    if (els.soundBtn instanceof HTMLButtonElement) {
-      els.soundBtn.toggleAttribute("hidden", !hasSound);
-      els.soundBtn.dataset.type = "Sound";
-      els.soundBtn.textContent = `Sound attack (2 Mana, x${fmtMult(soundPrev.overall)})`;
-    }
-    if (els.smellTasteBtn instanceof HTMLButtonElement) {
-      els.smellTasteBtn.toggleAttribute("hidden", !hasSmell);
-      els.smellTasteBtn.dataset.type = "SmellTaste";
-      els.smellTasteBtn.textContent = `Smell/Taste attack (2 Mana, x${fmtMult(smellPrev.overall)})`;
-    }
-    if (els.fireBtn instanceof HTMLButtonElement) {
-      els.fireBtn.toggleAttribute("hidden", !hasFire);
-      els.fireBtn.dataset.type = "Fire";
-      els.fireBtn.textContent = `Fire attack (3 Mana, x${fmtMult(firePrev.overall)})`;
-    }
-
-    // Secondary-type spell (only when your secondary type isn't already one of the dedicated spell buttons).
-    if (els.secondaryTypeBtn instanceof HTMLButtonElement) {
-      els.secondaryTypeBtn.toggleAttribute("hidden", !hasSecondaryGeneric);
-      if (hasSecondaryGeneric && secondaryType) {
-        const secPrev = computeTypedDamage("player", "enemy", magicBaseDamage(secondaryType), secondaryType);
-        const secLabel = TYPE_META[secondaryType]?.label ?? secondaryType;
-        const secCost = magicBaseCost(secondaryType);
-        els.secondaryTypeBtn.textContent = `${secLabel} attack (${secCost} Mana, x${fmtMult(secPrev.overall)})`;
-        els.secondaryTypeBtn.dataset.type = secondaryType;
-      }
-    }
+    // Spells unlock on level-up and are rendered dynamically.
+    const spells = getKnownSpells();
 
     if (els.healBtn instanceof HTMLButtonElement) {
       els.healBtn.textContent = `Heal (${healCost} Mana, ${state.player.healCharges})`;
@@ -2068,24 +2181,15 @@ function makeLobbyState() {
     const disableActions = !isPlayerTurn;
     if (disableActions) closeMagicMenu();
 
-    const canWind = isPlayerTurn && hasWind && focus >= (2 + boundExtra);
-    const canWater = isPlayerTurn && hasWater && focus >= (2 + boundExtra);
-    const canSound = isPlayerTurn && hasSound && focus >= (2 + boundExtra);
-    const canSmellTaste = isPlayerTurn && hasSmell && focus >= (2 + boundExtra);
-    const canFire = isPlayerTurn && hasFire && focus >= (3 + boundExtra);
-    const canSecondary = isPlayerTurn && hasSecondaryGeneric && !!secondaryType && focus >= (magicBaseCost(secondaryType) + boundExtra);
+    // Render spell menu with up-to-date enable/disable state.
+    renderSpellMenu(spells, isPlayerTurn, focus, boundExtra);
+
     const canHeal = isPlayerTurn && state.player.healCharges > 0 && focus >= healCost;
 
     if (els.attackBtn instanceof HTMLButtonElement) els.attackBtn.disabled = disableActions;
     if (els.guardBtn instanceof HTMLButtonElement) els.guardBtn.disabled = disableActions;
-    const hasAnySpell = hasWind || hasWater || hasSound || hasSmell || hasFire || hasSecondaryGeneric;
+    const hasAnySpell = spells.length > 0;
     if (els.magicToggle instanceof HTMLButtonElement) els.magicToggle.disabled = disableActions || !hasAnySpell;
-    if (els.windBtn instanceof HTMLButtonElement) els.windBtn.disabled = !canWind;
-    if (els.waterBtn instanceof HTMLButtonElement) els.waterBtn.disabled = !canWater;
-    if (els.soundBtn instanceof HTMLButtonElement) els.soundBtn.disabled = !canSound;
-    if (els.smellTasteBtn instanceof HTMLButtonElement) els.smellTasteBtn.disabled = !canSmellTaste;
-    if (els.fireBtn instanceof HTMLButtonElement) els.fireBtn.disabled = !canFire;
-    if (els.secondaryTypeBtn instanceof HTMLButtonElement) els.secondaryTypeBtn.disabled = !canSecondary;
     if (els.healBtn instanceof HTMLButtonElement) els.healBtn.disabled = !canHeal;
     if (els.restartBtn instanceof HTMLButtonElement) els.restartBtn.disabled = false;
   }
@@ -2187,6 +2291,13 @@ function makeLobbyState() {
     lockBtn(els.smellTasteBtn, locked);
     lockBtn(els.fireBtn, locked);
     lockBtn(els.explainBtn, locked);
+
+    // Dynamic spell buttons inside the Magic menu.
+    if (els.magicMenu instanceof HTMLElement) {
+      els.magicMenu.querySelectorAll("button[data-spell-id]").forEach((b) => {
+        if (b instanceof HTMLButtonElement) b.disabled = locked;
+      });
+    }
 
     if (locked) closeMagicMenu();
 
@@ -2523,6 +2634,162 @@ function makeLobbyState() {
 
     render();
 
+    queueEnemyTurn();
+  }
+
+  /**
+   * Cast a spell by id (spells unlock automatically based on level).
+   * @param {string} spellId
+   */
+  function playerCastSpell(spellId) {
+    if (isGameOver()) return;
+    if (state.phase !== "player") return;
+    closeMagicMenu();
+
+    const spell = SPELLS_BY_ID[spellId];
+    if (!spell) {
+      addLog("That spell isn't in your spellbook.");
+      render();
+      return;
+    }
+
+    if (!playerHasType(spell.type)) {
+      addLog("Your hero can't use that kind of magic.");
+      render();
+      return;
+    }
+
+    const extra = state.player.bound > 0 ? 1 : 0;
+    const cost = Math.max(0, toSafeInt(spell.baseCost, 0) + extra);
+    if (state.player.focus < cost) {
+      addLog("Not enough Mana.");
+      render();
+      return;
+    }
+
+    showMoveBanner(spell.name, spell.type);
+    playAnim(els.playerSprite, "rpgAnim-attack");
+
+    const hooksBefore = Array.isArray(spell.hooksBefore) ? spell.hooksBefore : [];
+    const hooksAfter = Array.isArray(spell.hooksAfter) ? spell.hooksAfter : [];
+
+    // Before-hit hooks
+    if (hooksBefore.includes("breakDefenses")) {
+      if (state.enemy.ward > 0 || state.enemy.fortified > 0 || state.enemy.guarding) {
+        state.enemy.ward = 0;
+        state.enemy.fortified = 0;
+        state.enemy.guarding = false;
+        addLog("You shatter the enemy's defenses.");
+      }
+    }
+
+    // Damage is level-scaled.
+    let base = scaledPlayerBase(toSafeInt(spell.baseDamage, 1));
+
+    // Bind weakens next move (after cost is computed).
+    if (state.player.bound > 0) {
+      base = Math.max(1, base - 2);
+      state.player.bound = 0;
+      addLog("Bind dulls your spell (−2).");
+    }
+
+    const typed = computeTypedDamage("player", "enemy", base, spell.type);
+    const piercePct = typeof spell.piercePct === "number" ? spell.piercePct : Number(spell.piercePct) || 0;
+    const def = applyEnemyDefenses(typed.scaled, {
+      piercePct,
+      noReflect: !!spell.noReflect,
+    });
+
+    state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
+
+    addLog(`You cast ${spell.name} for ${def.final} damage.`);
+    if (typed.note) addLog(typed.note);
+    setEffectBanner(`${typed.note || "Hit"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
+
+    playAnim(els.enemySprite, "rpgAnim-hit");
+    spawnFx(fxKindForType(spell.type), "enemy");
+    spawnFloat(`-${def.final}`, "enemy", "dmg", typed.overall);
+
+    // Mirror ward reflection (if any)
+    if (def.reflected > 0) {
+      state.player.hp = clamp(state.player.hp - def.reflected, 0, state.player.max);
+      addLog(`Reflected magic nicks you for ${def.reflected}.`);
+      playAnim(els.playerSprite, "rpgAnim-hit");
+      spawnFx("sight", "player");
+      spawnFloat(`-${def.reflected}`, "player", "dmg", null);
+      if (state.player.hp <= 0) {
+        endGame("Reflected magic drops you. Game over.");
+        return;
+      }
+    }
+
+    // After-hit hooks
+    for (const hook of hooksAfter) {
+      if (hook === "gusted") {
+        state.enemy.gusted = true;
+        addLog("💨 Gusted: enemy's next hit is softened.");
+      } else if (hook === "evade") {
+        state.player.evading = true;
+        addLog("🕊️ Evading: your next hit is softened.");
+        spawnFx("guard", "player");
+      } else if (hook === "douse") {
+        let did = false;
+        if (state.enemy.burn > 0) {
+          state.enemy.burn = 0;
+          did = true;
+        }
+        if (state.player.burn > 0) {
+          state.player.burn = 0;
+          did = true;
+        }
+        if (did) addLog("💧 Flames are doused.");
+      } else if (hook === "burn1" || hook === "burn2") {
+        const n = hook === "burn1" ? 1 : 2;
+        state.enemy.burn = Math.max(state.enemy.burn, n);
+        addLog(`🔥 Burn applied (${n}).`);
+      } else if (hook.startsWith("scent")) {
+        const n = Math.max(0, toSafeInt(hook.replace("scent", ""), 0));
+        if (n > 0) {
+          state.enemy.scented = Math.max(state.enemy.scented, n);
+          addLog(`👃 Scented (${n}).`);
+        }
+      } else if (hook.startsWith("mana+")) {
+        const n = Math.max(0, toSafeInt(hook.replace("mana+", ""), 0));
+        if (n > 0) {
+          gainFocus(n);
+          addLog(`✨ Mana +${n}.`);
+        }
+      } else if (hook.startsWith("heal+")) {
+        const n = Math.max(0, toSafeInt(hook.replace("heal+", ""), 0));
+        if (n > 0) {
+          const before = state.player.hp;
+          state.player.hp = clamp(state.player.hp + n, 0, state.player.max);
+          const healed = state.player.hp - before;
+          if (healed > 0) {
+            addLog(`💚 Healed ${healed}.`);
+            spawnFx("heal", "player");
+            spawnFloat(`+${healed}`, "player", "heal", null);
+          }
+        }
+      } else if (hook.startsWith("drainEnemyMana+")) {
+        const n = Math.max(0, toSafeInt(hook.replace("drainEnemyMana+", ""), 0));
+        if (n > 0) {
+          const before = state.enemy.focus;
+          spendEnemyFocus(n);
+          const drained = Math.max(0, before - state.enemy.focus);
+          if (drained > 0) addLog(`🔻 Drained ${drained} enemy Mana.`);
+        }
+      }
+    }
+
+    spendFocus(cost);
+
+    if (state.enemy.hp <= 0) {
+      onEnemyDown(`${state.enemy.name} is defeated.`);
+      return;
+    }
+
+    render();
     queueEnemyTurn();
   }
 
@@ -3072,12 +3339,35 @@ playAnim(els.playerSprite, "rpgAnim-heal");
   if (els.magicToggle instanceof HTMLButtonElement) {
     els.magicToggle.addEventListener("click", toggleMagicMenu);
   }
-  if (els.windBtn instanceof HTMLButtonElement) els.windBtn.addEventListener("click", playerWindAttack);
-  if (els.secondaryTypeBtn instanceof HTMLButtonElement) els.secondaryTypeBtn.addEventListener("click", playerSecondaryTypeAttack);
-  if (els.waterBtn instanceof HTMLButtonElement) els.waterBtn.addEventListener("click", playerWaterAttack);
-  if (els.soundBtn instanceof HTMLButtonElement) els.soundBtn.addEventListener("click", playerSoundAttack);
-  if (els.smellTasteBtn instanceof HTMLButtonElement) els.smellTasteBtn.addEventListener("click", playerSmellTasteAttack);
-  if (els.fireBtn instanceof HTMLButtonElement) els.fireBtn.addEventListener("click", playerFireAttack);
+
+  // Dynamic spell menu: buttons are generated each render.
+  if (els.magicMenu instanceof HTMLElement) {
+    els.magicMenu.addEventListener("click", (e) => {
+      const target = e.target;
+      if (!(target instanceof HTMLElement)) return;
+      const btn = target.closest("button[data-spell-id]");
+      if (!(btn instanceof HTMLButtonElement)) return;
+      const id = btn.getAttribute("data-spell-id");
+      if (!id) return;
+      playerCastSpell(id);
+    });
+
+    const preview = (e) => {
+      const target = e.target;
+      if (!(target instanceof HTMLElement)) return;
+      const btn = target.closest("button[data-spell-id]");
+      if (!(btn instanceof HTMLButtonElement)) return;
+      const id = btn.getAttribute("data-spell-id");
+      if (!id) return;
+      const sp = SPELLS_BY_ID[id];
+      if (!sp) return;
+      setPreviewMove(sp.name, sp.type, sp.baseCost);
+      renderEffectPreview();
+    };
+
+    els.magicMenu.addEventListener("mouseover", preview);
+    els.magicMenu.addEventListener("focusin", preview);
+  }
 
   if (els.attackBtn instanceof HTMLButtonElement) els.attackBtn.addEventListener("click", playerAttack);
   if (els.healBtn instanceof HTMLButtonElement) els.healBtn.addEventListener("click", playerHeal);
@@ -3126,6 +3416,7 @@ playAnim(els.playerSprite, "rpgAnim-heal");
         state.player.xp = 0;
         state.player.xpToNext = xpToNext(1);
         syncPlayerLevel(false);
+        syncKnownSpells(false);
       }
 
       renderHeroChoices();

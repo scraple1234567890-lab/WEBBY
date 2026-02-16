@@ -138,14 +138,8 @@
 
 <div class="rpgMagicWrap">
   <button aria-controls="magicMenu" aria-expanded="false" aria-haspopup="true" class="btn ghost rpgMagicToggle" id="magicToggle" type="button">Magic</button>
-  <div class="rpgMagicMenu" hidden="" id="magicMenu" role="menu">
-    <button class="btn secondary rpgMagicItem" id="windBtn" role="menuitem" type="button">Wind attack</button>
-    <button class="btn secondary rpgMagicItem" id="secondaryTypeBtn" role="menuitem" type="button" hidden="">Secondary attack</button>
-    <button class="btn secondary rpgMagicItem" id="waterBtn" role="menuitem" type="button">Water attack</button>
-    <button class="btn secondary rpgMagicItem" id="soundBtn" role="menuitem" type="button">Sound attack</button>
-    <button class="btn secondary rpgMagicItem" id="smellTasteBtn" role="menuitem" type="button">Smell/Taste attack</button>
-    <button class="btn primary rpgMagicItem" id="fireBtn" role="menuitem" type="button">Fire attack</button>
-  </div>
+  <!-- Spell list is generated dynamically so new spells can unlock on level-up. -->
+  <div class="rpgMagicMenu" hidden="" id="magicMenu" role="menu"></div>
 </div>
 
 <button class="btn secondary" id="healBtn" type="button">Heal</button>
