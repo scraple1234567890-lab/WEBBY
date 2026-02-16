@@ -45,8 +45,6 @@ if (root) {
     heroBtn: document.getElementById("heroBtn"),
     magicToggle: document.getElementById("magicToggle"),
     magicMenu: document.getElementById("magicMenu"),
-    itemToggle: document.getElementById("itemToggle"),
-    itemMenu: document.getElementById("itemMenu"),
     windBtn: document.getElementById("windBtn"),
     secondaryTypeBtn: document.getElementById("secondaryTypeBtn"),
     waterBtn: document.getElementById("waterBtn"),
@@ -73,16 +71,6 @@ if (root) {
     // Location picker (pre-combat)
     locationModal: document.getElementById("locationModal"),
     locationChoices: document.getElementById("locationChoices"),
-
-    // Overworld (traversable map)
-    overworldBtn: document.getElementById("overworldBtn"),
-    overworldModal: document.getElementById("overworldModal"),
-    overworldCanvas: document.getElementById("overworldCanvas"),
-    overworldClose: document.getElementById("overworldClose"),
-    overworldQuickPick: document.getElementById("overworldQuickPick"),
-    overworldEnter: document.getElementById("overworldEnter"),
-    overworldHint: document.getElementById("overworldHint"),
-    overworldLocLine: document.getElementById("overworldLocLine"),
 
     // Character picker (pre-combat)
     characterModal: document.getElementById("characterModal"),
@@ -329,39 +317,6 @@ function playWaveClearSfx() {
     }
   });
 
-  // --------------------
-  // Items menu helpers
-  // --------------------
-  function setItemMenuOpen(open) {
-    if (!(els.itemMenu instanceof HTMLElement)) return;
-    if (!(els.itemToggle instanceof HTMLElement)) return;
-    els.itemMenu.hidden = !open;
-    els.itemToggle.setAttribute("aria-expanded", open ? "true" : "false");
-    if (!open) els.itemToggle.focus?.();
-  }
-
-  function toggleItemMenu() {
-    if (!(els.itemMenu instanceof HTMLElement)) return;
-    setItemMenuOpen(els.itemMenu.hidden);
-  }
-
-  function closeItemMenu() {
-    setItemMenuOpen(false);
-  }
-
-  // Close the item menu when clicking outside or pressing Escape.
-  document.addEventListener("click", (e) => {
-    if (!(els.itemMenu instanceof HTMLElement)) return;
-    if (!(els.itemToggle instanceof HTMLElement)) return;
-
-    const t = e.target;
-    if (t instanceof Node) {
-      const inMenu = els.itemMenu.contains(t);
-      const inToggle = els.itemToggle.contains(t);
-      if (!inMenu && !inToggle) closeItemMenu();
-    }
-  });
-
 
 const TYPE_META = /** @type {Record<MagicType, {icon: string, label: string}>} */ ({
   Wind:  { icon: "🍃", label: "Wind" },
@@ -464,65 +419,6 @@ const SPELLBOOK = [
 
 /** @type {Record<string, Spell>} */
 const SPELLS_BY_ID = Object.fromEntries(SPELLBOOK.map((s) => [s.id, s]));
-
-/** --------------------
- * Items (consumables)
- * --------------------
- * - One-use items (consumed on use)
- * - Earned as deterministic-ish loot after defeating enemies
- * - Stored per-hero in localStorage (so your hero "keeps" their bag)
- *
- * Design goals:
- * - Useful, but not mandatory
- * - Mostly tactical: healing, mana, cleanse, and a pinch of burst damage
- */
-
-/**
- * @typedef {{id:string,name:string,desc:string, minLevel:number, kind:"heal"|"mana"|"cleanse"|"damage", amount:number, type?:MagicType}} ItemDef
- */
-
-/** @type {ItemDef[]} */
-const ITEMBOOK = [
-  { id: "potion", name: "Potion", desc: "Restore HP.", minLevel: 1, kind: "heal", amount: 6 },
-  { id: "ether", name: "Ether", desc: "Restore Mana.", minLevel: 1, kind: "mana", amount: 3 },
-  { id: "antidote", name: "Antidote", desc: "Cure burn and bind.", minLevel: 1, kind: "cleanse", amount: 0 },
-  { id: "bomb", name: "Bomb", desc: "Deal damage (Fire).", minLevel: 3, kind: "damage", amount: 7, type: "fire" },
-
-  // Higher-level drops
-  { id: "hi_potion", name: "Hi-Potion", desc: "Restore more HP.", minLevel: 8, kind: "heal", amount: 11 },
-  { id: "hi_ether", name: "Hi-Ether", desc: "Restore more Mana.", minLevel: 10, kind: "mana", amount: 5 },
-  { id: "blast_bomb", name: "Blast Bomb", desc: "Deal heavy damage (Fire).", minLevel: 12, kind: "damage", amount: 11, type: "fire" },
-];
-
-const ITEMS_BY_ID = Object.fromEntries(ITEMBOOK.map((it) => [it.id, it]));
-
-/** @param {any} inv */
-function normalizeInventory(inv) {
-  if (!inv || typeof inv !== "object") return undefined;
-  const out = {};
-  for (const [id, qty] of Object.entries(inv)) {
-    if (!ITEMS_BY_ID[id]) continue;
-    const q = clamp(toSafeInt(qty, 0), 0, 99);
-    if (q > 0) out[id] = q;
-  }
-  return Object.keys(out).length ? out : undefined;
-}
-
-/** @param {Record<string, number>} inv */
-function countInventory(inv) {
-  if (!inv || typeof inv !== "object") return 0;
-  return Object.values(inv).reduce((a, b) => a + clamp(toSafeInt(b, 0), 0, 99), 0);
-}
-
-/** @param {Record<string, number>} inv @param {string} itemId @param {number} delta */
-function mutateInventory(inv, itemId, delta) {
-  if (!inv || typeof inv !== "object") return;
-  if (!ITEMS_BY_ID[itemId]) return;
-  const before = clamp(toSafeInt(inv[itemId], 0), 0, 99);
-  const after = clamp(before + toSafeInt(delta, 0), 0, 99);
-  if (after <= 0) delete inv[itemId];
-  else inv[itemId] = after;
-}
 
 /**
  * Compute spells known for a hero at a given level.
@@ -696,53 +592,6 @@ function renderSpellMenu(spells, isPlayerTurn, focus, boundExtra) {
     btn.disabled = !isPlayerTurn || focus < cost;
     els.magicMenu.appendChild(btn);
   });
-
-/**
- * Render the item list inside the Items menu.
- */
-function renderItemMenu() {
-  if (!(els.itemMenu instanceof HTMLElement)) return;
-  els.itemMenu.replaceChildren();
-
-  const inv = state?.player?.items && typeof state.player.items === "object" ? state.player.items : {};
-  const ids = Object.keys(inv).filter((id) => !!ITEMS_BY_ID[id] && toSafeInt(inv[id], 0) > 0);
-
-  // Update the button label with count (cosmetic).
-  if (els.itemToggle instanceof HTMLButtonElement) {
-    const total = countInventory(inv);
-    els.itemToggle.textContent = total > 0 ? `Items (${total})` : "Items";
-  }
-
-  if (!ids.length) {
-    const empty = document.createElement("div");
-    empty.className = "rpgMagicEmpty";
-    empty.textContent = "No items yet.";
-    els.itemMenu.appendChild(empty);
-    return;
-  }
-
-  // Stable order: by minLevel then name.
-  ids.sort((a, b) => {
-    const A = ITEMS_BY_ID[a];
-    const B = ITEMS_BY_ID[b];
-    return (toSafeInt(A?.minLevel, 1) - toSafeInt(B?.minLevel, 1))
-      || String(A?.name || a).localeCompare(String(B?.name || b));
-  });
-
-  const isPlayerTurn = state?.phase === "player" && !isGameOver();
-  ids.forEach((id) => {
-    const it = ITEMS_BY_ID[id];
-    const qty = clamp(toSafeInt(inv[id], 0), 0, 99);
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "btn secondary rpgMagicItem";
-    btn.setAttribute("role", "menuitem");
-    btn.dataset.itemId = id;
-    btn.textContent = `${it.name} ×${qty}`;
-    btn.disabled = !isPlayerTurn || qty <= 0;
-    els.itemMenu.appendChild(btn);
-  });
-}
 }
 
 /** @param {MagicType[]} types */
@@ -779,7 +628,6 @@ function setTypeAccent(el, types) {
       if (isHeroOpen()) closeHeroPicker();
       if (isLocationOpen()) closeLocationPicker();
       closeMagicMenu();
-      closeItemMenu();
     }
   });
 
@@ -1087,251 +935,7 @@ function confirmHeroSelection() {
   renderIntent(null);
   setEffectBanner("—", "neutral");
   render();
-  openOverworld();
-}
-
-// --------------------
-// Overworld (traversable map)
-// --------------------
-
-/** @type {{x:number,y:number}|null} */
-let overworldPos = null;
-
-/** @type {{locId:string,x:number,y:number}[]} */
-let overworldNodes = [];
-
-let overworldLastFocus = null;
-
-function overworldKey() {
-  return `rpg_overworld_${activeHeroId || "hero"}`;
-}
-
-function loadOverworldPos() {
-  try {
-    const raw = localStorage.getItem(overworldKey());
-    const o = raw ? JSON.parse(raw) : null;
-    const x = toSafeInt(o?.x, 1);
-    const y = toSafeInt(o?.y, 1);
-    return { x: clamp(x, 1, 18), y: clamp(y, 1, 10) };
-  } catch {
-    return { x: 1, y: 1 };
-  }
-}
-
-function saveOverworldPos() {
-  try {
-    if (!overworldPos) return;
-    localStorage.setItem(overworldKey(), JSON.stringify({ x: overworldPos.x, y: overworldPos.y }));
-  } catch {}
-}
-
-function isOverworldOpen() {
-  return (els.overworldModal instanceof HTMLElement) && !els.overworldModal.hasAttribute("hidden");
-}
-
-function buildOverworldNodes() {
-  // Deterministic spots so it feels like a real place.
-  const spots = [
-    { x: 3, y: 3 },
-    { x: 16, y: 2 },
-    { x: 15, y: 9 },
-    { x: 4, y: 10 },
-  ];
-  overworldNodes = LOCATIONS.slice(0, spots.length).map((loc, idx) => ({
-    locId: loc.id,
-    x: spots[idx].x,
-    y: spots[idx].y,
-  }));
-}
-
-/** @returns {{locId:string,x:number,y:number}|null} */
-function currentOverworldNode() {
-  if (!overworldPos) return null;
-  return overworldNodes.find((n) => n.x === overworldPos.x && n.y === overworldPos.y) || null;
-}
-
-function setOverworldHint(text) {
-  if (els.overworldHint instanceof HTMLElement) els.overworldHint.textContent = text;
-}
-
-function setOverworldLocLine(text) {
-  if (els.overworldLocLine instanceof HTMLElement) els.overworldLocLine.textContent = text;
-}
-
-function openOverworld() {
-  if (!(els.overworldModal instanceof HTMLElement)) return;
-  closeMagicMenu();
-  closeItemMenu();
-  closeLocationPicker();
-
-  if (!overworldPos) overworldPos = loadOverworldPos();
-  buildOverworldNodes();
-
-  els.overworldModal.removeAttribute("hidden");
-  overworldLastFocus = document.activeElement;
-  updateBodyModalOpen();
-
-  setOverworldHint("Roam the map to find locations and items.");
-  syncOverworldUi();
-  drawOverworld();
-
-  // Focus close for accessibility.
-  if (els.overworldClose instanceof HTMLButtonElement) els.overworldClose.focus();
-}
-
-function closeOverworld() {
-  if (!(els.overworldModal instanceof HTMLElement)) return;
-  els.overworldModal.setAttribute("hidden", "");
-  updateBodyModalOpen();
-  const prev = overworldLastFocus;
-  overworldLastFocus = null;
-  if (prev && prev instanceof HTMLElement) prev.focus();
-}
-
-function syncOverworldUi() {
-  const node = currentOverworldNode();
-  if (node) {
-    const loc = getLocationById(node.locId);
-    setOverworldLocLine(`Location: ${loc.name}`);
-    setOverworldHint(`Press Enter to enter ${loc.name}.`);
-    if (els.overworldEnter instanceof HTMLButtonElement) {
-      els.overworldEnter.disabled = false;
-      els.overworldEnter.textContent = `Enter ${loc.name}`;
-    }
-  } else {
-    setOverworldLocLine("Location: —");
-    if (els.overworldEnter instanceof HTMLButtonElement) {
-      els.overworldEnter.disabled = true;
-      els.overworldEnter.textContent = "Enter";
-    }
-  }
-}
-
-function tryOverworldLoot() {
-  // Light, fun drip of items while exploring.
-  if (!state?.player) return;
-  if (Math.random() > 0.12) return;
-  const lootId = rollLoot(null, state.player.level);
-  if (lootId) {
-    grantItem(lootId);
-    const it = ITEMS_BY_ID[lootId];
-    if (it) setOverworldHint(`✨ Found: ${it.name}`);
-  }
-}
-
-function isBlocked(x, y) {
-  // Solid borders
-  if (x <= 0 || y <= 0 || x >= 19 || y >= 11) return true;
-  // Some rocks/ruins
-  const blocks = new Set([
-    "7,2","8,2","9,2",
-    "7,3","9,3",
-    "7,4","8,4","9,4",
-    "12,6","13,6","14,6",
-    "12,7","14,7",
-    "12,8","13,8","14,8",
-    "3,6","4,6","5,6",
-    "3,7","5,7",
-    "3,8","4,8","5,8",
-  ]);
-  return blocks.has(`${x},${y}`);
-}
-
-function moveOverworld(dx, dy) {
-  if (!overworldPos) overworldPos = loadOverworldPos();
-  const nx = overworldPos.x + dx;
-  const ny = overworldPos.y + dy;
-  if (isBlocked(nx, ny)) {
-    setOverworldHint("⛔ Blocked.");
-    return;
-  }
-  overworldPos.x = nx;
-  overworldPos.y = ny;
-  saveOverworldPos();
-  tryOverworldLoot();
-  syncOverworldUi();
-  drawOverworld();
-}
-
-function enterOverworldNode() {
-  const node = currentOverworldNode();
-  if (!node) return;
-  closeOverworld();
-  startBattleWithLocation(node.locId);
-}
-
-function resizeCanvasToDisplay() {
-  if (!(els.overworldCanvas instanceof HTMLCanvasElement)) return;
-  const canvas = els.overworldCanvas;
-  const rect = canvas.getBoundingClientRect();
-  const dpr = Math.max(1, Math.floor(window.devicePixelRatio || 1));
-  const w = Math.max(320, Math.floor(rect.width * dpr));
-  const h = Math.max(240, Math.floor((rect.width * 0.58) * dpr));
-  if (canvas.width !== w || canvas.height !== h) {
-    canvas.width = w;
-    canvas.height = h;
-  }
-}
-
-function drawOverworld() {
-  if (!(els.overworldCanvas instanceof HTMLCanvasElement)) return;
-  resizeCanvasToDisplay();
-  const canvas = els.overworldCanvas;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
-
-  const cols = 20;
-  const rows = 12;
-  const tileW = canvas.width / cols;
-  const tileH = canvas.height / rows;
-
-  // Background
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "rgba(0,0,0,0.18)";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Grid + terrain
-  for (let y = 0; y < rows; y++) {
-    for (let x = 0; x < cols; x++) {
-      const gx = x;
-      const gy = y;
-      const pad = 0.8;
-      const rx = gx * tileW;
-      const ry = gy * tileH;
-      const blocked = isBlocked(gx, gy);
-      ctx.fillStyle = blocked ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.03)";
-      ctx.fillRect(rx + pad, ry + pad, tileW - pad * 2, tileH - pad * 2);
-    }
-  }
-
-  // Nodes (locations)
-  overworldNodes.forEach((n) => {
-    const cx = (n.x + 0.5) * tileW;
-    const cy = (n.y + 0.5) * tileH;
-    // glow
-    ctx.beginPath();
-    ctx.fillStyle = "rgba(255,255,255,0.10)";
-    ctx.arc(cx, cy, Math.min(tileW, tileH) * 0.45, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.fillStyle = "rgba(255,255,255,0.18)";
-    ctx.arc(cx, cy, Math.min(tileW, tileH) * 0.26, 0, Math.PI * 2);
-    ctx.fill();
-  });
-
-  // Player
-  if (!overworldPos) overworldPos = loadOverworldPos();
-  const px = (overworldPos.x + 0.5) * tileW;
-  const py = (overworldPos.y + 0.5) * tileH;
-  ctx.beginPath();
-  ctx.fillStyle = "rgba(255,255,255,0.85)";
-  ctx.arc(px, py, Math.min(tileW, tileH) * 0.22, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.strokeStyle = "rgba(0,0,0,0.5)";
-  ctx.lineWidth = Math.max(1, Math.floor(Math.min(tileW, tileH) * 0.06));
-  ctx.arc(px, py, Math.min(tileW, tileH) * 0.22, 0, Math.PI * 2);
-  ctx.stroke();
+  openLocationPicker();
 }
 
 // --------------------
@@ -1458,67 +1062,6 @@ function startBattleWithLocation(locId) {
     });
   }
 
-  // Overworld wiring
-  if (els.overworldBtn instanceof HTMLButtonElement) {
-    els.overworldBtn.addEventListener("click", () => openOverworld());
-  }
-  if (els.overworldClose instanceof HTMLButtonElement) {
-    els.overworldClose.addEventListener("click", () => closeOverworld());
-  }
-  if (els.overworldQuickPick instanceof HTMLButtonElement) {
-    els.overworldQuickPick.addEventListener("click", () => {
-      closeOverworld();
-      openLocationPicker();
-    });
-  }
-  if (els.overworldEnter instanceof HTMLButtonElement) {
-    els.overworldEnter.addEventListener("click", () => enterOverworldNode());
-  }
-  if (els.overworldModal instanceof HTMLElement) {
-    els.overworldModal.addEventListener("click", (e) => {
-      if (e.target === els.overworldModal) closeOverworld();
-    });
-  }
-  window.addEventListener("resize", () => {
-    if (isOverworldOpen()) drawOverworld();
-  });
-  document.addEventListener("keydown", (e) => {
-    if (!isOverworldOpen()) return;
-    const k = e.key;
-    if (k === "Escape") {
-      e.preventDefault();
-      closeOverworld();
-      return;
-    }
-    if (k === "Enter") {
-      const node = currentOverworldNode();
-      if (node) {
-        e.preventDefault();
-        enterOverworldNode();
-      }
-      return;
-    }
-    const map = {
-      ArrowUp: [0, -1],
-      ArrowDown: [0, 1],
-      ArrowLeft: [-1, 0],
-      ArrowRight: [1, 0],
-      w: [0, -1],
-      s: [0, 1],
-      a: [-1, 0],
-      d: [1, 0],
-      W: [0, -1],
-      S: [0, 1],
-      A: [-1, 0],
-      D: [1, 0],
-    };
-    const step = map[k];
-    if (step) {
-      e.preventDefault();
-      moveOverworld(step[0], step[1]);
-    }
-  });
-
   // Click outside modal content closes it
   if (els.explainModal instanceof HTMLElement) {
     els.explainModal.addEventListener("click", (e) => {
@@ -1588,37 +1131,6 @@ SmellTaste: { Wind: 0.8, Water: 1.0, Fire: 1.0, Sight: 0.8, Earth: 1.0, Touch: 1
    */
   function renderEffectPreview(move) {
     if (!(els.effectPreview instanceof HTMLElement)) return;
-    if (!move) return;
-
-    // Items render slightly differently (they're not "attacks" in the same way).
-    if (move.kind === "item") {
-      const it = ITEMS_BY_ID[move.itemId] || null;
-
-      // Default styling
-      els.effectPreview.classList.remove("isGood", "isBad", "isNeutral");
-      els.effectPreview.classList.add("isNeutral");
-
-      if (it && it.kind === "damage") {
-        const eff = typeMultiplier(move.type, state.enemy.types);
-        const tier = effectivenessTierLabel(eff);
-
-        els.effectPreview.classList.remove("isGood", "isBad", "isNeutral");
-        if (tier.tone === "good") els.effectPreview.classList.add("isGood");
-        else if (tier.tone === "bad") els.effectPreview.classList.add("isBad");
-        else els.effectPreview.classList.add("isNeutral");
-
-        els.effectPreview.innerHTML =
-          `${move.name}: <span class="rpgEffectPreviewText">${tier.label}</span> ` +
-          `<span class="rpgEffectPreviewMeta">(x${fmtMult(eff)} • one-use)</span>`;
-        return;
-      }
-
-      const desc = it ? it.desc : "One-use item.";
-      els.effectPreview.innerHTML =
-        `${move.name}: <span class="rpgEffectPreviewText">Utility</span> ` +
-        `<span class="rpgEffectPreviewMeta">(one-use • ${desc})</span>`;
-      return;
-    }
 
     const eff = typeMultiplier(move.type, state.enemy.types);
     const tier = effectivenessTierLabel(eff);
@@ -1641,7 +1153,6 @@ SmellTaste: { Wind: 0.8, Water: 1.0, Fire: 1.0, Sight: 0.8, Earth: 1.0, Touch: 1
       `${move.name}: <span class="rpgEffectPreviewText">${tier.label}</span> ` +
       `<span class="rpgEffectPreviewMeta">(x${fmtMult(eff)} • ${meta})</span>`;
   }
-}
 
   /** @param {string} name @param {MagicType} type @param {number} baseCost */
   
@@ -1679,14 +1190,6 @@ SmellTaste: { Wind: 0.8, Water: 1.0, Fire: 1.0, Sight: 0.8, Earth: 1.0, Touch: 1
 
 function setPreviewMove(name, type, baseCost) {
     previewMove = { name, type, baseCost };
-    renderEffectPreview(previewMove);
-  }
-
-  /** @param {ItemDef} it */
-  function setPreviewItem(it) {
-    if (!it) return;
-    const type = it.type || playerPrimaryType();
-    previewMove = { name: it.name, type, baseCost: 0, kind: "item", itemId: it.id };
     renderEffectPreview(previewMove);
   }
 
@@ -1939,23 +1442,15 @@ function xpToNext(level) {
 
 function loadHeroProgress(heroId) {
   const raw = localStorage.getItem(PROGRESS_KEY_PREFIX + heroId);
-  if (!raw) return { level: 1, xp: 0, spells: undefined, items: undefined };
+  if (!raw) return { level: 1, xp: 0, spells: undefined };
   try {
     const obj = JSON.parse(raw);
     const level = clamp(toSafeInt(obj?.level, 1), 1, 99);
     const xp = Math.max(0, toSafeInt(obj?.xp, 0));
     const spells = Array.isArray(obj?.spells)
       ? obj.spells.filter((id) => typeof id === "string" && !!SPELLS_BY_ID[id])
-      : undefined;    const itemsRaw = obj?.items && typeof obj.items === "object" ? obj.items : undefined;
-    const items = itemsRaw
-      ? Object.fromEntries(
-          Object.entries(itemsRaw)
-            .filter(([id, qty]) => typeof id === "string" && !!ITEMS_BY_ID[id])
-            .map(([id, qty]) => [id, clamp(toSafeInt(qty, 0), 0, 99)])
-            .filter(([, qty]) => qty > 0)
-        )
       : undefined;
-    return { level, xp, spells, items };
+    return { level, xp, spells };
   } catch {
     return { level: 1, xp: 0, spells: undefined };
   }
@@ -1971,12 +1466,6 @@ function saveHeroProgress(heroId, prog) {
     };
     if (Array.isArray(prog.spells)) {
       payload.spells = prog.spells.filter((id) => typeof id === "string" && !!SPELLS_BY_ID[id]);
-    }
-    if (prog && typeof prog.items === "object" && prog.items) {
-      const entries = Object.entries(prog.items)
-        .filter(([id, qty]) => typeof id === "string" && !!ITEMS_BY_ID[id] && toSafeInt(qty, 0) > 0)
-        .map(([id, qty]) => [id, clamp(toSafeInt(qty, 0), 0, 99)]);
-      if (entries.length) payload.items = Object.fromEntries(entries);
     }
     window.localStorage.setItem(PROGRESS_KEY_PREFIX + heroId, JSON.stringify(payload));
   } catch (e) {
@@ -2381,9 +1870,6 @@ function setActiveLocation(id) {
       spells,
       pendingSpellQueue: [],
 
-      // items
-      items: normalizeInventory(prog.items) || { potion: 1 },
-
       // progression
       level: prog.level,
       xp: prog.xp,
@@ -2516,7 +2002,6 @@ function persistPlayerProgress() {
     level: Math.max(1, toSafeInt(state.player.level, 1)),
     xp: Math.max(0, toSafeInt(state.player.xp, 0)),
     spells: Array.isArray(state.player.spells) ? state.player.spells : [],
-    items: state.player.items && typeof state.player.items === "object" ? state.player.items : {},
   });
 }
 
@@ -2558,58 +2043,6 @@ function persistPlayerProgress() {
     return Math.max(6, Math.round(8 + lvl * 4 + maxHp / 6));
   }
 
-
-
-  /**
-   * Loot: roll a consumable after defeating an enemy.
-   * It's intentionally "soft RNG" (not combat RNG) so battles stay deterministic,
-   * but you still get that little treasure-chime feeling.
-   * @param {any} enemy
-   * @param {number} playerLevel
-   * @returns {string|null} itemId
-   */
-  function rollLoot(enemy, playerLevel) {
-    const L = Math.max(1, toSafeInt(playerLevel, 1));
-
-    // Base chance rises slightly with level, capped.
-    const chance = clamp(0.35 + (L - 1) * 0.01, 0.35, 0.55);
-    if (Math.random() > chance) return null;
-
-    // Eligible items by level
-    const pool = ITEMBOOK.filter((it) => L >= toSafeInt(it.minLevel, 1));
-    if (!pool.length) return null;
-
-    // Weighting: common basics more likely; heavier items rarer.
-    const weights = pool.map((it) => {
-      if (it.id === "potion" || it.id === "ether") return 6;
-      if (it.id === "antidote") return 3;
-      if (it.id === "bomb") return 3;
-      if (it.id === "hi_potion" || it.id === "hi_ether") return 2;
-      if (it.id === "blast_bomb") return 1;
-      return 1;
-    });
-
-    const total = weights.reduce((a, b) => a + b, 0);
-    let r = Math.random() * total;
-    for (let i = 0; i < pool.length; i++) {
-      r -= weights[i];
-      if (r <= 0) return pool[i].id;
-    }
-    return pool[pool.length - 1].id;
-  }
-
-  /** @param {string} itemId */
-  function grantItem(itemId) {
-    if (!itemId || !ITEMS_BY_ID[itemId]) return;
-    if (!state?.player?.items || typeof state.player.items !== "object") state.player.items = {};
-    mutateInventory(state.player.items, itemId, 1);
-
-    const it = ITEMS_BY_ID[itemId];
-    addLog(`🎒 Found item: ${it.name}.`);
-    setEffectBanner(`Found: ${it.name}`, "neutral");
-    renderItemMenu();
-    persistPlayerProgress();
-  }
   /** @param {number} amount */
   function gainXp(amount) {
     const add = Math.max(0, toSafeInt(amount, 0));
@@ -3097,11 +2530,10 @@ function persistPlayerProgress() {
     // Enable/disable actions
     const isPlayerTurn = !state.over && state.phase === "player";
     const disableActions = !isPlayerTurn;
-    if (disableActions) { closeMagicMenu(); closeItemMenu(); }
+    if (disableActions) closeMagicMenu();
 
     // Render spell menu with up-to-date enable/disable state.
     renderSpellMenu(spells, isPlayerTurn, focus, boundExtra);
-    renderItemMenu();
 
     const canHeal = isPlayerTurn && state.player.healCharges > 0 && focus >= healCost;
 
@@ -3130,8 +2562,6 @@ function persistPlayerProgress() {
     addLog(defeatMessage);
     // Award XP for the defeated enemy (before swapping to the next wave).
     gainXp(xpForEnemy(state.enemy));
-    const lootId = rollLoot(state.enemy, state.player.level);
-    if (lootId) grantItem(lootId);
 
     // Play the badge-unlock SFX when you clear Wave 1.
     if (state.wave === 0) playWaveClearSfx();
@@ -3507,7 +2937,6 @@ function persistPlayerProgress() {
     if (isGameOver()) return;
     if (state.phase !== "player") return;
     closeMagicMenu();
-    closeItemMenu();
 
     const atkType = playerPrimaryType();
     showMoveBanner("Attack", atkType);
@@ -3567,7 +2996,6 @@ function persistPlayerProgress() {
     if (isGameOver()) return;
     if (state.phase !== "player") return;
     closeMagicMenu();
-    closeItemMenu();
 
     const spell = SPELLS_BY_ID[spellId];
     if (!spell) {
@@ -4172,102 +3600,10 @@ function playerFireAttack() {
     queueEnemyTurn();
   }
 
-  
-  /**
-   * Use a consumable item (one-use).
-   * @param {string} itemId
-   */
-  function playerUseItem(itemId) {
-    if (isGameOver()) return;
-    if (state.phase !== "player") return;
-
-    closeMagicMenu();
-    closeItemMenu();
-
-    const it = ITEMS_BY_ID[itemId];
-    if (!it) return;
-
-    const inv = state.player.items && typeof state.player.items === "object" ? state.player.items : {};
-    const qty = clamp(toSafeInt(inv[itemId], 0), 0, 99);
-    if (qty <= 0) return;
-
-    showMoveBanner(it.name, it.type || playerPrimaryType());
-    playAnim(els.playerSprite, "rpgAnim-cast");
-
-    // Consume first so reloads can't "duplicate" items.
-    mutateInventory(inv, itemId, -1);
-
-    // Apply effect
-    if (it.kind === "heal") {
-      const base = scaledPlayerBase(toSafeInt(it.amount, 0));
-      const amount = Math.max(1, Math.round(base * state.player.healMult));
-      const before = state.player.hp;
-      state.player.hp = clamp(state.player.hp + amount, 0, state.player.max);
-      const actual = state.player.hp - before;
-      addLog(`You use ${it.name} (+${actual} HP).`);
-      spawnFloat(`+${actual}`, "player", "heal", null);
-      setEffectBanner(`+${actual} HP`, "good");
-    } else if (it.kind === "mana") {
-      const amount = Math.max(1, toSafeInt(it.amount, 0));
-      const before = state.player.focus;
-      state.player.focus = clamp(state.player.focus + amount, 0, state.player.focusMax);
-      const actual = state.player.focus - before;
-      addLog(`You use ${it.name} (+${actual} Mana).`);
-      setEffectBanner(`+${actual} Mana`, "good");
-    } else if (it.kind === "cleanse") {
-      const hadBurn = state.player.burn > 0;
-      const hadBind = state.player.bound > 0;
-      state.player.burn = 0;
-      state.player.bound = 0;
-      addLog(`You use ${it.name} (cleansed).`);
-      setEffectBanner(`Cleansed`, "good");
-      if (!hadBurn && !hadBind) addLog("Nothing to cleanse, but you feel refreshed.");
-    } else if (it.kind === "damage") {
-      const t = it.type || "fire";
-      const base = scaledPlayerBase(toSafeInt(it.amount, 0));
-      const typed = computeTypedDamage("player", "enemy", base, t);
-      const def = applyEnemyDefenses(typed.scaled);
-
-      state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
-      addLog(`You throw ${it.name} for ${def.final} damage.`);
-      if (typed.note) addLog(typed.note);
-      setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
-      playAnim(els.enemySprite, "rpgAnim-hit");
-      spawnFx(fxKindForType(t), "enemy");
-      spawnFloat(`-${def.final}`, "enemy", "dmg", typed.overall);
-
-      // Mirror reflect (same as attacks)
-      if (def.reflected > 0) {
-        state.player.hp = clamp(state.player.hp - def.reflected, 0, state.player.max);
-        addLog(`Reflected magic nicks you for ${def.reflected}.`);
-        playAnim(els.playerSprite, "rpgAnim-hit");
-        spawnFx("sight", "player");
-        spawnFloat(`-${def.reflected}`, "player", "dmg", null);
-        if (state.player.hp <= 0) {
-          persistPlayerProgress();
-          endGame("Reflected magic drops you. Game over.");
-          return;
-        }
-      }
-    }
-
-    persistPlayerProgress();
-    renderItemMenu();
-
-    if (state.enemy.hp <= 0) {
-      onEnemyDown(`${state.enemy.name} falls.`);
-      return;
-    }
-
-    render();
-    queueEnemyTurn();
-  }
-
-function playerHeal() {
+  function playerHeal() {
     if (isGameOver()) return;
     if (state.phase !== "player") return;
     closeMagicMenu();
-    closeItemMenu();
 
     const extra = state.player.bound > 0 ? 1 : 0;
     const cost = 1 + extra;
@@ -4314,7 +3650,6 @@ playAnim(els.playerSprite, "rpgAnim-heal");
     if (isGameOver()) return;
     if (state.phase !== "player") return;
     closeMagicMenu();
-    closeItemMenu();
 
     if (!state.player.guarding) {
       state.player.guarding = true;
@@ -4357,10 +3692,6 @@ playAnim(els.playerSprite, "rpgAnim-heal");
     els.magicToggle.addEventListener("click", toggleMagicMenu);
   }
 
-  if (els.itemToggle instanceof HTMLButtonElement) {
-    els.itemToggle.addEventListener("click", toggleItemMenu);
-  }
-
   // Dynamic spell menu: buttons are generated each render.
   if (els.magicMenu instanceof HTMLElement) {
     els.magicMenu.addEventListener("click", (e) => {
@@ -4388,36 +3719,6 @@ playAnim(els.playerSprite, "rpgAnim-heal");
 
     els.magicMenu.addEventListener("mouseover", preview);
     els.magicMenu.addEventListener("focusin", preview);
-  }
-
-
-  // Dynamic item menu: buttons are generated each render.
-  if (els.itemMenu instanceof HTMLElement) {
-    els.itemMenu.addEventListener("click", (e) => {
-      const target = e.target;
-      if (!(target instanceof HTMLElement)) return;
-      const btn = target.closest("button[data-item-id]");
-      if (!(btn instanceof HTMLButtonElement)) return;
-      const id = btn.getAttribute("data-item-id");
-      if (!id) return;
-      playerUseItem(id);
-    });
-
-    const preview = (e) => {
-      const target = e.target;
-      if (!(target instanceof HTMLElement)) return;
-      const btn = target.closest("button[data-item-id]");
-      if (!(btn instanceof HTMLButtonElement)) return;
-      const id = btn.getAttribute("data-item-id");
-      if (!id) return;
-      const it = ITEMS_BY_ID[id];
-      if (!it) return;
-      setPreviewItem(it);
-      renderEffectPreview();
-    };
-
-    els.itemMenu.addEventListener("mouseover", preview);
-    els.itemMenu.addEventListener("focusin", preview);
   }
 
   if (els.attackBtn instanceof HTMLButtonElement) els.attackBtn.addEventListener("click", playerAttack);
@@ -4542,4 +3843,4 @@ playAnim(els.playerSprite, "rpgAnim-heal");
   setPhase("hero");
   render();
   openHeroPicker();
-
+}

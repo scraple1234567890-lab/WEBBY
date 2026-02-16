@@ -59,7 +59,6 @@
     <!-- Utility controls (Restart from hero selection / Explain) -->
   <div aria-label="Game controls" class="rpgTopControls" role="group">
     <button class="btn heroCta rpgTopBtn" id="heroBtn" title="Restart and pick a hero" type="button"><span aria-hidden="true" class="rpgTopBtnIcon">↻</span>New battle</button>
-    <button class="btn ghost rpgTopBtn" id="overworldBtn" type="button"><span aria-hidden="true" class="rpgTopBtnIcon">🧭</span>Overworld</button>
     <button class="btn ghost rpgTopBtn" id="spellPickBtn" type="button" hidden=""><span aria-hidden="true" class="rpgTopBtnIcon">📜</span>Choose spell</button>
     <button class="btn ghost rpgTopBtn" id="explainBtn" type="button"><span aria-hidden="true" class="rpgTopBtnIcon">?</span>Explain</button>
   </div>
@@ -144,11 +143,6 @@
   <div class="rpgMagicMenu" hidden="" id="magicMenu" role="menu"></div>
 </div>
 
-<div class="rpgItemsWrap">
-  <button aria-controls="itemMenu" aria-expanded="false" aria-haspopup="true" class="btn ghost rpgMagicToggle" id="itemToggle" type="button">Items</button>
-  <div class="rpgMagicMenu" hidden="" id="itemMenu" role="menu"></div>
-</div>
-
 <button class="btn secondary" id="healBtn" type="button">Heal</button>
 <button class="btn ghost" id="guardBtn" type="button">Guard</button>
 </div>
@@ -199,47 +193,24 @@
 <table aria-label="Type effectiveness chart" class="rpgTypeMatrix" id="typeMatrix"></table>
 </div>
 </article>
-
-<!-- Overworld Modal (traversable map) -->
-<div aria-hidden="false" aria-labelledby="overworldTitle" aria-modal="true" class="rpgModal" hidden="" id="overworldModal" role="dialog">
-  <div class="post rpgModalInner rpgOverworldInner" role="document">
+<!-- Character Picker Modal (pre-combat) -->
+<div aria-hidden="false" aria-labelledby="characterTitle" aria-modal="true" class="rpgModal" hidden="" id="characterModal" role="dialog">
+  <div class="post rpgModalInner" role="document">
     <div class="rpgModalHead">
-      <h2 class="rpgLogTitle" id="overworldTitle">Overworld</h2>
-      <button aria-label="Close overworld" class="iconBtn" id="overworldClose" type="button">✕</button>
+      <h2 class="rpgLogTitle" id="characterTitle">Choose your hero</h2>
+      <button aria-label="Close hero picker" class="iconBtn" id="characterClose" type="button">✕</button>
     </div>
     <div class="rpgModalBody">
-      <p class="muted small" style="margin-top:0">
-        Move with <strong>WASD</strong> or <strong>Arrow keys</strong>. Step onto a glowing location to enter a battle.
-      </p>
-      <div class="rpgOverworldWrap">
-        <canvas aria-label="Overworld map" class="rpgOverworldCanvas" id="overworldCanvas" width="720" height="420"></canvas>
-        <div class="rpgOverworldHud" aria-live="polite">
-          <div class="rpgOverworldLine" id="overworldHint">Roam the map to find locations and items.</div>
-          <div class="rpgOverworldLine muted small" id="overworldLocLine">Location: —</div>
-        </div>
-      </div>
+      <p class="muted small" style="margin-top:0">Your hero changes your stats and type bonuses (STAB). You can change heroes anytime.</p>
+      <div aria-label="Character choices" class="rpgCharGrid" id="characterChoices"></div>
     </div>
     <div class="rpgModalFoot">
-      <button class="btn ghost" id="overworldQuickPick" type="button">Quick pick location</button>
-      <button class="btn primary" id="overworldEnter" type="button" disabled>Enter</button>
+      <button class="btn ghost" id="resetProgressBtn" type="button">Reset hero level</button>
+      <button class="btn primary" id="characterOk" type="button">Continue</button>
     </div>
   </div>
 </div>
 
-<!-- Location Picker Modal (pre-combat) -->
-<div aria-hidden="false" aria-labelledby="characterTitle" aria-modal="true" class="rpgModal" hidden="" id="characterModal" role="dialog">
-<div class="post rpgModalInner" role="document">
-<div class="rpgModalHead">
-<h2 class="rpgLogTitle" id="characterTitle">Choose your hero</h2>
-<button aria-label="Close hero picker" class="iconBtn" id="characterClose" type="button">✕</button>
-</div>
-<div class="rpgModalBody">
-<p class="muted small" style="margin-top:0">Your hero changes your stats and type bonuses (STAB). You can change heroes anytime.</p>
-<div aria-label="Character choices" class="rpgCharGrid" id="characterChoices"></div>
-</div>
-<div class="rpgModalFoot">
-<button class="btn ghost" id="resetProgressBtn" type="button">Reset hero level</button>
-<button class="btn primary" id="characterOk" type="button">Continue</button>
 <!-- Spell Picker Modal (on level-up) -->
 <div aria-hidden="false" aria-labelledby="spellPickTitle" aria-modal="true" class="rpgModal" hidden="" id="spellPickModal" role="dialog">
   <div class="post rpgModalInner" role="document">
@@ -257,10 +228,7 @@
     </div>
   </div>
 </div>
-</div>
 
-</div>
-</div>
 <div aria-hidden="false" aria-labelledby="locationTitle" aria-modal="true" class="rpgModal" hidden="" id="locationModal" role="dialog">
 <div class="post rpgModalInner" role="document">
 <div class="rpgModalHead">

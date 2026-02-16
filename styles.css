@@ -3119,50 +3119,6 @@ body.modalOpen {
   backdrop-filter: none;
 }
 
-/* --------------------
-   Overworld (Game)
---------------------- */
-
-.rpgOverworldInner {
-  max-width: 920px;
-}
-
-.rpgOverworldWrap {
-  display: grid;
-  gap: 12px;
-}
-
-.rpgOverworldCanvas {
-  width: 100%;
-  height: auto;
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(0,0,0,0.25);
-}
-
-.rpgOverworldHud {
-  display: grid;
-  gap: 6px;
-}
-
-.rpgOverworldLine {
-  padding: 8px 10px;
-  border-radius: 12px;
-  background: rgba(0,0,0,0.18);
-  border: 1px solid rgba(255,255,255,0.08);
-}
-
-@media (min-width: 860px) {
-  .rpgOverworldWrap {
-    grid-template-columns: 1.6fr 1fr;
-    align-items: start;
-  }
-  .rpgOverworldHud {
-    position: sticky;
-    top: 10px;
-  }
-}
-
 .rpgMagicMenu[hidden] { display: none; }
 
 .rpgMagicMenu .btn {
