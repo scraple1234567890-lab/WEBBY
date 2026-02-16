@@ -6,7 +6,7 @@
 window.CHARACTERS_DATA = {
   "meta": {
     "title": "Dragonstone Characters",
-    "updated": "2026-02-15",
+    "updated": "2026-02-16",
     "note": "Edit this file to add/remove characters. Spoiler tiers: public, book1, book2, full. If you open the site via file://, most browsers block JSON fetch, so use server.js or edit data/characters-data.js instead."
   },
   "characters": [
@@ -98,7 +98,8 @@ window.CHARACTERS_DATA = {
       "image": "./assets/images/characters/elroy.svg",
       "href": "./characters/elroy.html",
       "school": "Touch",
-      "element": "Earth"
+      "element": "Earth",
+      "playable": true
     },
     {
       "id": "axel",
@@ -153,7 +154,8 @@ window.CHARACTERS_DATA = {
           "name": "Gutterglass",
           "href": "./locations/gutterglass.html"
         }
-      ]
+      ],
+      "playable": true
     },
     {
       "id": "devante",
@@ -207,7 +209,8 @@ window.CHARACTERS_DATA = {
           "name": "Theater",
           "href": "./locations/theater.html"
         }
-      ]
+      ],
+      "playable": true
     },
     {
       "id": "relen",
@@ -258,7 +261,8 @@ window.CHARACTERS_DATA = {
           "name": "Museum",
           "href": "./locations/museum.html"
         }
-      ]
+      ],
+      "playable": true
     },
     {
       "id": "mira",
@@ -289,7 +293,8 @@ window.CHARACTERS_DATA = {
       "image": "./assets/images/characters/mira.png",
       "href": "./characters/mira.html",
       "related_events": [],
-      "related_locations": []
+      "related_locations": [],
+      "playable": true
     }
   ]
 };

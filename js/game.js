@@ -424,7 +424,7 @@ function renderHeroChoices() {
   const active = pendingHeroId || activeHeroId;
 
   els.characterChoices.innerHTML = PLAYABLE_HEROES.map((h) => {
-    const types = formatTypesDisplay(h.types);
+    const types = h.typesLabel || formatTypesDisplay(h.types);
     return `
       <button type="button" class="btn ghost rpgCharChoice ${h.id === active ? "isSelected" : ""}" data-hero="${h.id}">
         <div class="rpgCharSprite"><img src="${h.sprite}" alt="" /></div>
@@ -944,7 +944,128 @@ function setPreviewMove(name, type, baseCost) {
 
 const HERO_STORAGE_KEY = "dragonstone_rpg_hero";
 
-const PLAYABLE_HEROES = [
+/** @type {MagicType[]} */
+const __KNOWN_TYPES = ["Wind","Water","Fire","Sight","Earth","Touch","Sound","SmellTaste"];
+
+/** Normalize a type label from site data into the game's MagicType strings. */
+function normalizeMagicType(raw) {
+  if (!raw) return null;
+
+  const s = String(raw).trim();
+  if (!s) return null;
+
+  // Light normalization for common variants.
+  const key = s
+    .replace(/\+/g, " ")
+    .replace(/\s*&\s*/g, " ")
+    .replace(/\s*\/\s*/g, "/")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const map = {
+    "Air": "Wind",
+    "Wind": "Wind",
+    "Water": "Water",
+    "Fire": "Fire",
+    "Earth": "Earth",
+    "Touch": "Touch",
+    "Sight": "Sight",
+    "Sound": "Sound",
+    "Smell/Taste": "SmellTaste",
+    "SmellTaste": "SmellTaste",
+    "Smell Taste": "SmellTaste",
+    "Smell+Taste": "SmellTaste",
+  };
+
+  const mapLower = {
+    "air": "Wind",
+    "wind": "Wind",
+    "water": "Water",
+    "fire": "Fire",
+    "earth": "Earth",
+    "touch": "Touch",
+    "sight": "Sight",
+    "sound": "Sound",
+    "smell/taste": "SmellTaste",
+    "smell taste": "SmellTaste",
+    "smelltaste": "SmellTaste",
+  };
+
+  const normalized = map[key] || mapLower[key.toLowerCase()] || null;
+  if (normalized && __KNOWN_TYPES.includes(normalized)) return /** @type {MagicType} */ (normalized);
+  return null;
+}
+
+/** @param {any} c */
+function heroFromCharacterData(c) {
+  const rawPrimary = String(c?.school ?? "").trim();
+  const rawSecondary = String(c?.element ?? "").trim();
+
+  const t1 = normalizeMagicType(rawPrimary);
+  const t2 = normalizeMagicType(rawSecondary);
+
+  /** @type {MagicType[]} */
+  const types = [];
+  if (t1) types.push(t1);
+  if (t2 && t2 !== t1) types.push(t2);
+
+  /** @type {MagicType[]} */
+  const safeTypes = (types.length ? types : /** @type {MagicType[]} */ (["Sight"]));
+
+  const hasUnknownSecondary =
+    !!rawSecondary &&
+    !t2 &&
+    rawSecondary.toLowerCase() !== "none" &&
+    rawSecondary.toLowerCase() !== "n/a" &&
+    rawSecondary.toLowerCase() !== "na";
+
+  const typesLabel =
+    safeTypes.map((t) => TYPE_META[t]?.label ?? t).join(" • ") +
+    (hasUnknownSecondary ? " • TBD" : "");
+
+  // Mild per-hero tuning (kept close to the old roster).
+  const preset = {
+    relen: { maxHp: 20, focusStart: 2 },
+    axel: { maxHp: 22, focusStart: 2 },
+    mira: { maxHp: 21, focusStart: 2 },
+    devante: { maxHp: 19, focusStart: 2 },
+    elroy: { maxHp: 23, focusStart: 2 },
+  }[String(c?.id || "").toLowerCase()] || { maxHp: 20, focusStart: 2 };
+
+  return {
+    id: String(c?.id || "hero"),
+    name: String(c?.name || "Hero"),
+    types: safeTypes,
+    typesLabel,
+    maxHp: preset.maxHp,
+    healCharges: 3,
+    focusMax: 6,
+    focusStart: preset.focusStart,
+    sprite: String(c?.image || "./assets/images/characters/relen.png"),
+    blurb: String(c?.summary || c?.hook || "").trim() || "A battle-ready mage.",
+  };
+}
+
+/** Prefer building the playable roster from the same dataset used by the Characters/Search pages. */
+function buildPlayableHeroes() {
+  try {
+    const db = window.CHARACTERS_DATA?.characters;
+    if (!Array.isArray(db)) return null;
+
+    // Use explicit flags first (so you can control who becomes playable).
+    const flagged = db.filter((c) => c && c.playable === true);
+    const picked = flagged.length ? flagged : db.filter((c) => ["axel","devante","elroy","relen","mira"].includes(String(c?.id || "")));
+
+    if (!picked.length) return null;
+
+    return picked.map(heroFromCharacterData);
+  } catch {
+    return null;
+  }
+}
+
+const PLAYABLE_HEROES = buildPlayableHeroes() || [
+  // Fallback roster if character data isn't available for any reason.
   {
     id: "relen",
     name: "Relen",
@@ -991,8 +1112,18 @@ const PLAYABLE_HEROES = [
   },
 ];
 
+
 /** @type {string} */
 let activeHeroId = PLAYABLE_HEROES[0].id;
+
+/** Rehydrate the last-picked hero if it's still playable. */
+try {
+  const saved = localStorage.getItem(HERO_STORAGE_KEY);
+  if (saved && PLAYABLE_HEROES.some((h) => h.id === saved)) activeHeroId = saved;
+} catch {
+  // ignore
+}
+
 
 function getHeroById(id) {
   return PLAYABLE_HEROES.find((h) => h.id === id) || PLAYABLE_HEROES[0];

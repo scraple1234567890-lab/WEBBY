@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Dragonstone Characters",
-    "updated": "2026-02-15",
+    "updated": "2026-02-16",
     "note": "Edit this file to add/remove characters. Spoiler tiers: public, book1, book2, full. If you open the site via file://, most browsers block JSON fetch, so use server.js or edit data/characters-data.js instead."
   },
   "characters": [
@@ -93,7 +93,8 @@
       "image": "./assets/images/characters/elroy.svg",
       "href": "./characters/elroy.html",
       "school": "Touch",
-      "element": "Earth"
+      "element": "Earth",
+      "playable": true
     },
     {
       "id": "axel",
@@ -148,7 +149,8 @@
           "name": "Gutterglass",
           "href": "./locations/gutterglass.html"
         }
-      ]
+      ],
+      "playable": true
     },
     {
       "id": "devante",
@@ -202,7 +204,8 @@
           "name": "Theater",
           "href": "./locations/theater.html"
         }
-      ]
+      ],
+      "playable": true
     },
     {
       "id": "relen",
@@ -253,7 +256,8 @@
           "name": "Museum",
           "href": "./locations/museum.html"
         }
-      ]
+      ],
+      "playable": true
     },
     {
       "id": "mira",
@@ -284,7 +288,8 @@
       "image": "./assets/images/characters/mira.png",
       "href": "./characters/mira.html",
       "related_events": [],
-      "related_locations": []
+      "related_locations": [],
+      "playable": true
     }
   ]
 }
