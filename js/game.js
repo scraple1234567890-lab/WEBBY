@@ -603,15 +603,16 @@ function startBattleWithLocation(locId) {
    * NOTE: Balance is intentionally "obvious" so matchups are readable.
    */
   const TYPE_CHART = /** @type {Record<MagicType, Record<MagicType, number>>} */ ({
-Wind:  { Wind: 1.0, Fire: 1.6, Water: 0.8, Sight: 0.9, Earth: 0.8, Touch: 1.0, Sound: 1.4, SmellTaste: 1.6 },
-Water: { Water: 0.7, Wind: 1.6, Fire: 1.6, Sight: 0.9, Earth: 0.8, Touch: 1.0, Sound: 0.9, SmellTaste: 0.8 },
-Fire:  { Fire: 0.7, Wind: 0.8, Water: 0.8, Sight: 0.9, Earth: 1.6, Touch: 1.0, Sound: 1.2, SmellTaste: 1.6 },
-Sight: { Sight: 1.0, Wind: 1.2, Fire: 1.2, Water: 1.2, Earth: 0.9, Touch: 0.8, Sound: 1.6, SmellTaste: 0.8 },
-Earth: { Earth: 0.7, Wind: 1.6, Fire: 0.8, Water: 1.6, Sight: 1.2, Touch: 1.1, Sound: 1.2, SmellTaste: 1.2 },
-Touch: { Touch: 1.0, Wind: 1.0, Fire: 1.0, Water: 1.0, Earth: 0.9, Sight: 1.4, Sound: 0.8, SmellTaste: 0.9 },
-Sound: { Sound: 0.7, Wind: 0.8, Fire: 0.9, Water: 1.2, Earth: 0.9, Sight: 0.8, Touch: 1.6, SmellTaste: 1.0 },
-SmellTaste: { SmellTaste: 0.7, Wind: 0.8, Fire: 0.8, Water: 1.6, Earth: 0.9, Sight: 1.4, Touch: 1.2, Sound: 1.0 },
+Wind: { Wind: 1.0, Water: 1.0, Fire: 0.8, Sight: 1.6, Earth: 0.8, Touch: 1.0, Sound: 1.0, SmellTaste: 1.6 },
+Water: { Wind: 1.0, Water: 1.0, Fire: 1.6, Sight: 1.0, Earth: 1.6, Touch: 0.8, Sound: 0.8, SmellTaste: 1.0 },
+Fire: { Wind: 1.6, Water: 0.8, Fire: 1.0, Sight: 1.0, Earth: 1.6, Touch: 1.0, Sound: 0.8, SmellTaste: 1.0 },
+Sight: { Wind: 0.8, Water: 1.0, Fire: 1.0, Sight: 1.0, Earth: 0.8, Touch: 1.6, Sound: 1.0, SmellTaste: 1.6 },
+Earth: { Wind: 1.6, Water: 0.8, Fire: 0.8, Sight: 1.6, Earth: 1.0, Touch: 1.0, Sound: 1.0, SmellTaste: 1.0 },
+Touch: { Wind: 1.0, Water: 1.6, Fire: 1.0, Sight: 0.8, Earth: 1.0, Touch: 1.0, Sound: 1.6, SmellTaste: 0.8 },
+Sound: { Wind: 1.0, Water: 1.6, Fire: 1.6, Sight: 1.0, Earth: 1.0, Touch: 0.8, Sound: 1.0, SmellTaste: 0.8 },
+SmellTaste: { Wind: 0.8, Water: 1.0, Fire: 1.0, Sight: 0.8, Earth: 1.0, Touch: 1.6, Sound: 1.6, SmellTaste: 1.0 },
   });
+
 
 /** @param {MagicType} attackType @param {MagicType[]} defenderTypes */
   function typeMultiplier(attackType, defenderTypes) {
