@@ -4542,4 +4542,3 @@ playAnim(els.playerSprite, "rpgAnim-heal");
   setPhase("hero");
   render();
   openHeroPicker();
-
