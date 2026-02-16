@@ -2701,11 +2701,23 @@ body.gamePage {
 
 /* Game buttons: color that matches what they do */
 body.gamePage #attackBtn{
-  background: linear-gradient(180deg, color-mix(in srgb, var(--type-sight) 92%, white 8%), color-mix(in srgb, var(--type-sight) 65%, black 35%));
-  border-color: color-mix(in srgb, var(--type-sight) 85%, white 15%);
-  color: rgb(20 14 32);
+  /* Attack changes with your hero's primary type */
+  --atkTint: var(--type-sight);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--atkTint) 92%, white 8%),
+    color-mix(in srgb, var(--atkTint) 65%, black 35%));
+  border-color: color-mix(in srgb, var(--atkTint) 85%, white 15%);
+  color: rgb(10 10 18);
   font-weight: 900;
 }
+body.gamePage #attackBtn[data-type="Wind"]{ --atkTint: var(--type-wind); }
+body.gamePage #attackBtn[data-type="Water"]{ --atkTint: var(--type-water); }
+body.gamePage #attackBtn[data-type="Fire"]{ --atkTint: var(--type-fire); }
+body.gamePage #attackBtn[data-type="Earth"]{ --atkTint: var(--type-earth); }
+body.gamePage #attackBtn[data-type="Sight"]{ --atkTint: var(--type-sight); }
+body.gamePage #attackBtn[data-type="Sound"]{ --atkTint: var(--type-sound); }
+body.gamePage #attackBtn[data-type="SmellTaste"]{ --atkTint: var(--type-smelltaste); }
+body.gamePage #attackBtn[data-type="Touch"]{ --atkTint: var(--type-touch); }
 body.gamePage #attackBtn:hover{ filter: brightness(1.03); }
 
 body.gamePage #healBtn{
@@ -2749,6 +2761,31 @@ body.gamePage #soundBtn{
   color: rgb(10 10 18);
   font-weight: 900;
 }
+
+body.gamePage #smellTasteBtn{
+  background: linear-gradient(180deg, color-mix(in srgb, var(--type-smelltaste) 90%, white 10%), color-mix(in srgb, var(--type-smelltaste) 65%, black 35%));
+  border-color: color-mix(in srgb, var(--type-smelltaste) 80%, white 20%);
+  color: rgb(10 10 18);
+  font-weight: 900;
+}
+
+body.gamePage #secondaryTypeBtn{
+  /* Secondary-type spell inherits its type color via data-type */
+  --secTint: var(--type-sight);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--secTint) 90%, white 10%), color-mix(in srgb, var(--secTint) 65%, black 35%));
+  border-color: color-mix(in srgb, var(--secTint) 80%, white 20%);
+  color: rgb(10 10 18);
+  font-weight: 900;
+}
+body.gamePage #secondaryTypeBtn[data-type="Wind"]{ --secTint: var(--type-wind); }
+body.gamePage #secondaryTypeBtn[data-type="Water"]{ --secTint: var(--type-water); }
+body.gamePage #secondaryTypeBtn[data-type="Fire"]{ --secTint: var(--type-fire); }
+body.gamePage #secondaryTypeBtn[data-type="Earth"]{ --secTint: var(--type-earth); }
+body.gamePage #secondaryTypeBtn[data-type="Sight"]{ --secTint: var(--type-sight); }
+body.gamePage #secondaryTypeBtn[data-type="Sound"]{ --secTint: var(--type-sound); }
+body.gamePage #secondaryTypeBtn[data-type="SmellTaste"]{ --secTint: var(--type-smelltaste); }
+body.gamePage #secondaryTypeBtn[data-type="Touch"]{ --secTint: var(--type-touch); }
+
 body.gamePage #fireBtn{
   background: linear-gradient(180deg, color-mix(in srgb, var(--type-fire) 90%, white 10%), color-mix(in srgb, var(--type-fire) 65%, black 35%));
   border-color: color-mix(in srgb, var(--type-fire) 80%, white 20%);
@@ -2930,7 +2967,7 @@ body.modalOpen {
   height: 100%;
   object-fit: contain;
   object-position: center bottom;
-  image-rendering: pixelated;
+  image-rendering: auto;
 }
 
 .rpgCharTitle{
@@ -3559,6 +3596,11 @@ body.modalOpen {
   height: 100%;
   object-fit: contain;
   object-position: center bottom;
+  image-rendering: auto;
+}
+
+/* Pixel-art sprites stay crisp. (Portraits and photos look better without pixelation.) */
+.rpgSpriteImg.isPixel {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }

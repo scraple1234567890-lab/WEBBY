@@ -946,70 +946,48 @@ const HERO_STORAGE_KEY = "dragonstone_rpg_hero";
 
 const PLAYABLE_HEROES = [
   {
-    id: "alethea",
-    name: "Alethea",
+    id: "relen",
+    name: "Relen",
     types: /** @type {MagicType[]} */ (["Wind", "Sight"]),
     maxHp: 20,
     healCharges: 3,
     focusMax: 6,
     focusStart: 2,
-    sprite: "./assets/images/player-brown.png",
-    blurb: "Balanced wind seer.",
+    sprite: "./assets/images/characters/relen.png",
+    blurb: "Wind + Sight. A young prodigy with light-built precision.",
   },
   {
-    id: "cinder",
-    name: "Cinder",
-    types: /** @type {MagicType[]} */ (["Fire", "Sight"]),
-    maxHp: 18,
-    healCharges: 2,
-    focusMax: 7,
-    focusStart: 3,
-    sprite: "./assets/images/enemy-red.png",
-    blurb: "Aggressive fire duelist.",
-  },
-  {
-    id: "bramble",
-    name: "Bramble",
-    types: /** @type {MagicType[]} */ (["Earth", "Fire"]),
-    maxHp: 24,
-    healCharges: 3,
-    focusMax: 5,
-    focusStart: 1,
-    sprite: "./assets/images/enemy-green.png",
-    blurb: "Sturdy earth warden (pyro-leaning).",
-  },
-  {
-    id: "knot",
-    name: "Knot",
-    types: /** @type {MagicType[]} */ (["Touch", "Wind"]),
-    maxHp: 20,
+    id: "axel",
+    name: "Axel",
+    types: /** @type {MagicType[]} */ (["Touch", "Earth"]),
+    maxHp: 22,
     healCharges: 3,
     focusMax: 6,
     focusStart: 2,
-    sprite: "./assets/images/enemy-blue.png",
-    blurb: "Binder with windy footwork.",
+    sprite: "./assets/images/characters/axel.png",
+    blurb: "Touch + Earth. Steel-nerved grip with stone grit.",
   },
   {
-    id: "relen",
-    name: "Relen",
-    types: /** @type {MagicType[]} */ (["Sight", "Fire"]),
+    id: "mira",
+    name: "Mira",
+    types: /** @type {MagicType[]} */ (["SmellTaste", "Fire"]),
     maxHp: 21,
     healCharges: 3,
     focusMax: 6,
     focusStart: 2,
-    sprite: "./assets/images/enemy-blonde.png",
-    blurb: "Lightforged brawler with ember edges.",
+    sprite: "./assets/images/characters/mira.png",
+    blurb: "Smell/Taste + Fire. Sealed record, sharp scent, hotter sparks.",
   },
   {
-    id: "lyric",
-    name: "Lyric",
-    types: /** @type {MagicType[]} */ (["Sound", "Sight"]),
+    id: "devante",
+    name: "Devante",
+    types: /** @type {MagicType[]} */ (["Water", "Sound"]),
     maxHp: 19,
     healCharges: 3,
     focusMax: 6,
     focusStart: 2,
-    sprite: "./assets/images/player-brown.png",
-    blurb: "Resonance caster with sharp perception.",
+    sprite: "./assets/images/characters/devante.png",
+    blurb: "Water + Sound. Calm resonance with a tide-tuned pulse.",
   },
 ];
 
@@ -1607,6 +1585,8 @@ function makeLobbyState() {
       if (els.enemySpriteImg.getAttribute("src") !== state.enemy.sprite) {
         els.enemySpriteImg.setAttribute("src", state.enemy.sprite);
       }
+      // Enemy art is pixel sprites.
+      els.enemySpriteImg.classList.add("isPixel");
     }
 
     // Player sprite swap (hero selection)
@@ -1614,6 +1594,11 @@ function makeLobbyState() {
       if (els.playerSpriteImg.getAttribute("src") !== state.player.sprite) {
         els.playerSpriteImg.setAttribute("src", state.player.sprite);
       }
+
+      // Use crisp pixel rendering for pixel sprites, but keep portraits smooth.
+      const isPortrait = String(state.player.sprite).includes("/assets/images/characters/") ||
+        String(state.player.sprite).includes("./assets/images/characters/");
+      els.playerSpriteImg.classList.toggle("isPixel", !isPortrait);
     }
 
 
@@ -1645,6 +1630,7 @@ function makeLobbyState() {
     if (els.attackBtn instanceof HTMLButtonElement) {
       const atkLabel = TYPE_META[atkType]?.label ?? atkType;
       els.attackBtn.textContent = `Attack (${atkLabel} x${fmtMult(atkPrev.overall)} | +1 Mana)`;
+      els.attackBtn.dataset.type = atkType;
     }
     const hasWind = playerHasType("Wind");
     const hasWater = playerHasType("Water");
@@ -1658,22 +1644,27 @@ function makeLobbyState() {
     // Only show spells that match your hero's types.
     if (els.windBtn instanceof HTMLButtonElement) {
       els.windBtn.toggleAttribute("hidden", !hasWind);
+      els.windBtn.dataset.type = "Wind";
       els.windBtn.textContent = `Wind attack (2 Mana, x${fmtMult(windPrev.overall)})`;
     }
     if (els.waterBtn instanceof HTMLButtonElement) {
       els.waterBtn.toggleAttribute("hidden", !hasWater);
+      els.waterBtn.dataset.type = "Water";
       els.waterBtn.textContent = `Water attack (2 Mana, x${fmtMult(waterPrev.overall)})`;
     }
     if (els.soundBtn instanceof HTMLButtonElement) {
       els.soundBtn.toggleAttribute("hidden", !hasSound);
+      els.soundBtn.dataset.type = "Sound";
       els.soundBtn.textContent = `Sound attack (2 Mana, x${fmtMult(soundPrev.overall)})`;
     }
     if (els.smellTasteBtn instanceof HTMLButtonElement) {
       els.smellTasteBtn.toggleAttribute("hidden", !hasSmell);
+      els.smellTasteBtn.dataset.type = "SmellTaste";
       els.smellTasteBtn.textContent = `Smell/Taste attack (2 Mana, x${fmtMult(smellPrev.overall)})`;
     }
     if (els.fireBtn instanceof HTMLButtonElement) {
       els.fireBtn.toggleAttribute("hidden", !hasFire);
+      els.fireBtn.dataset.type = "Fire";
       els.fireBtn.textContent = `Fire attack (3 Mana, x${fmtMult(firePrev.overall)})`;
     }
 
@@ -1685,6 +1676,7 @@ function makeLobbyState() {
         const secLabel = TYPE_META[secondaryType]?.label ?? secondaryType;
         const secCost = magicBaseCost(secondaryType);
         els.secondaryTypeBtn.textContent = `${secLabel} attack (${secCost} Mana, x${fmtMult(secPrev.overall)})`;
+        els.secondaryTypeBtn.dataset.type = secondaryType;
       }
     }
 
