@@ -56,9 +56,10 @@
 <div class="sectionHead">
 <h1 class="rpgTitle">Tiny Turn RPG</h1></div>
 <div class="rpgWrap" id="rpgRoot">
-    <!-- Utility controls (Hero / Restart) -->
+    <!-- Utility controls (Hero / Explain / Restart) -->
   <div aria-label="Game controls" class="rpgTopControls" role="group">
     <button class="btn heroCta rpgTopBtn" id="heroBtn" title="Choose a different character" type="button"><span aria-hidden="true" class="rpgTopBtnIcon">✦</span>Hero</button>
+    <button class="btn ghost rpgTopBtn" id="explainBtn" type="button"><span aria-hidden="true" class="rpgTopBtnIcon">?</span>Explain</button>
     <button class="btn ghost rpgTopBtn rpgRestartBtn" id="restartBtn" type="button"><span aria-hidden="true" class="rpgTopBtnIcon">↻</span>Restart</button>
   </div>
 <div aria-label="Battlefield" class="rpgGrid" role="group">
@@ -128,6 +129,8 @@
 <div aria-label="Actions" class="rpgActions">
 <div aria-live="polite" class="rpgEffectPreview isNeutral" id="effectPreview"></div>
 
+<button class="btn primary" id="attackBtn" type="button">Attack</button>
+
 <div class="rpgMagicWrap">
   <button aria-controls="magicMenu" aria-expanded="false" aria-haspopup="true" class="btn ghost rpgMagicToggle" id="magicToggle" type="button">Magic</button>
   <div class="rpgMagicMenu" hidden="" id="magicMenu" role="menu">
@@ -139,9 +142,7 @@
     <button class="btn primary rpgMagicItem" id="fireBtn" role="menuitem" type="button">Fire attack</button>
   </div>
 </div>
-<button class="btn ghost" id="explainBtn" type="button">Explain</button>
 
-<button class="btn primary" id="attackBtn" type="button">Attack</button>
 <button class="btn secondary" id="healBtn" type="button">Heal</button>
 <button class="btn ghost" id="guardBtn" type="button">Guard</button>
 </div>

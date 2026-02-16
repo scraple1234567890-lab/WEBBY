@@ -2593,6 +2593,7 @@ body.gamePage {
   gap: 10px;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
 
   /* Give the action bar its own solid panel (no transparency) */
   background: var(--panel);
@@ -2603,37 +2604,40 @@ body.gamePage {
 
 /* Top utility controls (Hero / Restart) */
 .rpgTopControls{
-  display: flex;
+  /*
+    This sits in a CSS grid (rpgWrap). Grid items default to "stretch", which made
+    the control strip look like a long, offset bar. Force it to size-to-content
+    and center itself like a proper compact toolbar.
+  */
+  display: inline-flex;
   gap: 10px;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
+  flex-wrap: nowrap;
 
-  width: fit-content;
+  place-self: start center;
+  width: auto;
   max-width: 100%;
-  margin: 12px auto 14px;
+  margin: 10px auto 10px;
 
-  /* Slightly more distinct than normal panels, without taking up space */
-  background:
-    radial-gradient(220px 120px at 18% 20%, rgba(255, 255, 255, 0.08), transparent 60%),
-    linear-gradient(135deg,
-      color-mix(in srgb, var(--panel) 94%, var(--panel2) 6%),
-      color-mix(in srgb, var(--panel2) 90%, var(--panel) 10%)
-    );
-  border: 1px solid color-mix(in srgb, var(--accent2) 18%, var(--border));
-  padding: 8px 10px;
-  border-radius: 999px;
+  /* Distinct, but compact and "webby" */
+  background: color-mix(in srgb, var(--panel) 94%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
+  padding: 6px 8px;
+  border-radius: 18px;
+  backdrop-filter: blur(8px);
   box-shadow:
-    0 16px 42px rgba(0,0,0,0.26),
-    inset 0 0 0 1px rgba(255,255,255,0.03);
+    0 12px 26px rgba(0,0,0,0.22),
+    inset 0 0 0 1px rgba(255,255,255,0.02);
 }
 
 .rpgTopControls .rpgTopBtn{
   min-width: 0;
-  padding: 10px 14px;
-  font-size: 0.95rem;
+  padding: 9px 12px;
+  font-size: 0.92rem;
   line-height: 1;
   box-shadow: 0 10px 22px rgba(0,0,0,0.22);
+  white-space: nowrap;
 }
 
 .rpgTopControls .rpgTopBtnIcon{
@@ -5334,9 +5338,9 @@ body.gamePage .rpgLog{
 }
 
 @media (max-width: 620px) {
-  .gamePage .rpgTopControls { width: 100%; }
-  .gamePage .rpgTopControls .btn { flex: 1 1 calc(50% - 8px); }
-  .gamePage .rpgTopControls .rpgMagicWrap { flex: 1 1 100%; }
+  /* Keep the top controls compact (not a full-width bar) on small screens */
+  .gamePage .rpgTopControls { width: auto; flex-wrap: wrap; }
+  .gamePage .rpgTopControls .btn { flex: 0 1 auto; }
   .gamePage .rpgActions .btn { flex: 1 1 calc(50% - 8px); }
   .gamePage .rpgMagicWrap { flex: 1 1 100%; }
   .gamePage .rpgMagicMenu { width: 100%; }
