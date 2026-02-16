@@ -329,6 +329,21 @@ function fxKindForType(t) {
   return m[t] || "sight";
 }
 
+/**
+ * Player "basic" attack type.
+ * Rule: Attack matches your hero's primary type so your baseline move always correlates with your hero.
+ * @returns {MagicType}
+ */
+function playerPrimaryType() {
+  const t = state && state.player && Array.isArray(state.player.types) ? state.player.types[0] : null;
+  return /** @type {MagicType} */ (t || "Sight");
+}
+
+/** @param {MagicType} t */
+function playerHasType(t) {
+  return !!(state && state.player && Array.isArray(state.player.types) && state.player.types.includes(t));
+}
+
 /** @param {MagicType[]} types */
 function formatTypesDisplay(types) {
   return types.join(" • ");
@@ -1215,7 +1230,7 @@ function makeLobbyState() {
 }
 
 
-  const GAME_BUILD = "2026-02-15-water";
+  const GAME_BUILD = "2026-02-15-type-locked";
 
 
   // Load saved hero choice (if any)
@@ -1579,6 +1594,10 @@ function makeLobbyState() {
     }
 
     renderIntent(state.enemy.intent);
+    // Keep hover preview consistent when you swap heroes (Attack type changes with hero).
+    if (previewMove && previewMove.name === "Attack") {
+      previewMove.type = playerPrimaryType();
+    }
     renderEffectPreview(previewMove);
     renderHint();
 
@@ -1614,7 +1633,8 @@ function makeLobbyState() {
     renderTypeMatrix();
 
     // Button labels show multiplier + cost (so choices are readable)
-    const atkPrev = computeTypedDamage("player", "enemy", 5, "Sight");
+    const atkType = playerPrimaryType();
+    const atkPrev = computeTypedDamage("player", "enemy", 5, atkType);
     const windPrev = computeTypedDamage("player", "enemy", 4, "Wind");
     const waterPrev = computeTypedDamage("player", "enemy", 5, "Water");
     const soundPrev = computeTypedDamage("player", "enemy", 5, "Sound");
@@ -1622,24 +1642,35 @@ function makeLobbyState() {
     const firePrev = computeTypedDamage("player", "enemy", 6, "Fire");
 
     if (els.attackBtn instanceof HTMLButtonElement) {
-      els.attackBtn.textContent = `Attack (Sight x${fmtMult(atkPrev.overall)} | +1 Mana)`;
+      const atkLabel = TYPE_META[atkType]?.label ?? atkType;
+      els.attackBtn.textContent = `Attack (${atkLabel} x${fmtMult(atkPrev.overall)} | +1 Mana)`;
     }
+    const hasWind = playerHasType("Wind");
+    const hasWater = playerHasType("Water");
+    const hasSound = playerHasType("Sound");
+    const hasSmell = playerHasType("SmellTaste");
+    const hasFire = playerHasType("Fire");
+
+    // Only show spells that match your hero's types.
     if (els.windBtn instanceof HTMLButtonElement) {
+      els.windBtn.toggleAttribute("hidden", !hasWind);
       els.windBtn.textContent = `Wind attack (2 Mana, x${fmtMult(windPrev.overall)})`;
     }
     if (els.waterBtn instanceof HTMLButtonElement) {
+      els.waterBtn.toggleAttribute("hidden", !hasWater);
       els.waterBtn.textContent = `Water attack (2 Mana, x${fmtMult(waterPrev.overall)})`;
     }
     if (els.soundBtn instanceof HTMLButtonElement) {
+      els.soundBtn.toggleAttribute("hidden", !hasSound);
       els.soundBtn.textContent = `Sound attack (2 Mana, x${fmtMult(soundPrev.overall)})`;
     }
     if (els.smellTasteBtn instanceof HTMLButtonElement) {
+      els.smellTasteBtn.toggleAttribute("hidden", !hasSmell);
       els.smellTasteBtn.textContent = `Smell/Taste attack (2 Mana, x${fmtMult(smellPrev.overall)})`;
     }
     if (els.fireBtn instanceof HTMLButtonElement) {
-      const offType = !state.player.types.includes("Fire");
-      const label = offType ? "Fire attack (off-type)" : "Fire attack";
-      els.fireBtn.textContent = `${label} (3 Mana, x${fmtMult(firePrev.overall)})`;
+      els.fireBtn.toggleAttribute("hidden", !hasFire);
+      els.fireBtn.textContent = `Fire attack (3 Mana, x${fmtMult(firePrev.overall)})`;
     }
 
     if (els.healBtn instanceof HTMLButtonElement) {
@@ -1685,16 +1716,17 @@ function makeLobbyState() {
     const disableActions = !isPlayerTurn;
     if (disableActions) closeMagicMenu();
 
-    const canWind = isPlayerTurn && focus >= (2 + boundExtra);
-    const canWater = isPlayerTurn && focus >= (2 + boundExtra);
-    const canSound = isPlayerTurn && focus >= (2 + boundExtra);
-    const canSmellTaste = isPlayerTurn && focus >= (2 + boundExtra);
-    const canFire = isPlayerTurn && focus >= (3 + boundExtra);
+    const canWind = isPlayerTurn && hasWind && focus >= (2 + boundExtra);
+    const canWater = isPlayerTurn && hasWater && focus >= (2 + boundExtra);
+    const canSound = isPlayerTurn && hasSound && focus >= (2 + boundExtra);
+    const canSmellTaste = isPlayerTurn && hasSmell && focus >= (2 + boundExtra);
+    const canFire = isPlayerTurn && hasFire && focus >= (3 + boundExtra);
     const canHeal = isPlayerTurn && state.player.healCharges > 0 && focus >= healCost;
 
     if (els.attackBtn instanceof HTMLButtonElement) els.attackBtn.disabled = disableActions;
     if (els.guardBtn instanceof HTMLButtonElement) els.guardBtn.disabled = disableActions;
-    if (els.magicToggle instanceof HTMLButtonElement) els.magicToggle.disabled = disableActions;
+    const hasAnySpell = hasWind || hasWater || hasSound || hasSmell || hasFire;
+    if (els.magicToggle instanceof HTMLButtonElement) els.magicToggle.disabled = disableActions || !hasAnySpell;
     if (els.windBtn instanceof HTMLButtonElement) els.windBtn.disabled = !canWind;
     if (els.waterBtn instanceof HTMLButtonElement) els.waterBtn.disabled = !canWater;
     if (els.soundBtn instanceof HTMLButtonElement) els.soundBtn.disabled = !canSound;
@@ -2082,7 +2114,8 @@ function makeLobbyState() {
     if (state.phase !== "player") return;
     closeMagicMenu();
 
-    showMoveBanner("Attack", "Sight");
+    const atkType = playerPrimaryType();
+    showMoveBanner("Attack", atkType);
     playAnim(els.playerSprite, "rpgAnim-attack");
 
     // Attack: fixed base, generates Focus
@@ -2095,7 +2128,7 @@ function makeLobbyState() {
       addLog("Bind dulls your strike (−2).");
     }
 
-    const typed = computeTypedDamage("player", "enemy", base, "Sight");
+    const typed = computeTypedDamage("player", "enemy", base, atkType);
     const def = applyEnemyDefenses(typed.scaled);
 
     state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
@@ -2103,7 +2136,7 @@ function makeLobbyState() {
     if (typed.note) addLog(typed.note);
     setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
     playAnim(els.enemySprite, "rpgAnim-hit");
-    spawnFx("sight", "enemy");
+    spawnFx(fxKindForType(atkType), "enemy");
     spawnFloat(`-${def.final}`, "enemy", "dmg", typed.overall);
 
     // Mirror reflect
@@ -2135,6 +2168,12 @@ function makeLobbyState() {
     if (isGameOver()) return;
     if (state.phase !== "player") return;
     closeMagicMenu();
+
+    if (!playerHasType("Wind")) {
+      addLog("Your hero can't use Wind magic.");
+      render();
+      return;
+    }
 
     const extra = state.player.bound > 0 ? 1 : 0;
     const cost = 2 + extra;
@@ -2199,6 +2238,12 @@ function makeLobbyState() {
     if (isGameOver()) return;
     if (state.phase !== "player") return;
     closeMagicMenu();
+
+    if (!playerHasType("Water")) {
+      addLog("Your hero can't use Water magic.");
+      render();
+      return;
+    }
 
     const extra = state.player.bound > 0 ? 1 : 0;
     const cost = 2 + extra;
@@ -2270,6 +2315,12 @@ function makeLobbyState() {
     if (state.phase !== "player") return;
     closeMagicMenu();
 
+    if (!playerHasType("Sound")) {
+      addLog("Your hero can't use Sound magic.");
+      render();
+      return;
+    }
+
     const extra = state.player.bound > 0 ? 1 : 0;
     const cost = 2 + extra;
 
@@ -2337,6 +2388,12 @@ function playerSmellTasteAttack() {
   if (state.phase !== "player") return;
   closeMagicMenu();
 
+  if (!playerHasType("SmellTaste")) {
+    addLog("Your hero can't use Smell/Taste magic.");
+    render();
+    return;
+  }
+
   const extra = state.player.bound > 0 ? 1 : 0;
   const cost = 2 + extra;
 
@@ -2399,6 +2456,12 @@ function playerFireAttack() {
     if (isGameOver()) return;
     if (state.phase !== "player") return;
     closeMagicMenu();
+
+    if (!playerHasType("Fire")) {
+      addLog("Your hero can't use Fire magic.");
+      render();
+      return;
+    }
 
     const extra = state.player.bound > 0 ? 1 : 0;
     const cost = 3 + extra;
@@ -2600,14 +2663,21 @@ playAnim(els.playerSprite, "rpgAnim-heal");
 
   
   // Effectiveness preview (hover/focus shows Extra/Normal/Weak before you click)
-  const wirePreview = (btn, name, type, baseCost) => {
+  /**
+   * @param {HTMLElement|null} btn
+   * @param {string} name
+   * @param {MagicType | (() => MagicType)} typeOrFn
+   * @param {number} baseCost
+   */
+  const wirePreview = (btn, name, typeOrFn, baseCost) => {
     if (!(btn instanceof HTMLElement)) return;
-    btn.addEventListener("mouseenter", () => setPreviewMove(name, type, baseCost));
-    btn.addEventListener("focus", () => setPreviewMove(name, type, baseCost));
+    const resolveType = () => (typeof typeOrFn === "function" ? typeOrFn() : typeOrFn);
+    btn.addEventListener("mouseenter", () => setPreviewMove(name, resolveType(), baseCost));
+    btn.addEventListener("focus", () => setPreviewMove(name, resolveType(), baseCost));
     // Also update on click, since some users go straight to clicking.
-    btn.addEventListener("click", () => setPreviewMove(name, type, baseCost));
+    btn.addEventListener("click", () => setPreviewMove(name, resolveType(), baseCost));
   };
-  wirePreview(els.attackBtn, "Attack", "Sight", 0);
+  wirePreview(els.attackBtn, "Attack", () => playerPrimaryType(), 0);
   wirePreview(els.windBtn, "Wind attack", "Wind", 2);
   wirePreview(els.waterBtn, "Water attack", "Water", 2);
   wirePreview(els.soundBtn, "Sound attack", "Sound", 2);

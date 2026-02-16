@@ -150,9 +150,9 @@
 <h3 class="rpgModalH">Mana</h3>
 <ul class="rpgModalList">
 <li><strong>Mana</strong> is your resource (0 to 6). You spend it on bigger actions.</li>
-<li><strong>Attack</strong> always gives <strong>+1 Mana</strong> (and deals Sight damage).</li>
+<li><strong>Attack</strong> always gives <strong>+1 Mana</strong> and deals damage matching your hero’s <strong>primary type</strong>.</li>
 <li><strong>Guard</strong> gives <strong>+1 Mana</strong> and makes the next hit deal <strong>50% less</strong>.</li>
-<li><strong>Wind</strong> costs <strong>2 Mana</strong>. <strong>Water</strong> costs <strong>2 Mana</strong>. <strong>Sound</strong> costs <strong>2 Mana</strong>. <strong>Fire</strong> costs <strong>3 Mana</strong>.</li>
+<li><strong>Wind</strong>, <strong>Water</strong>, <strong>Sound</strong>, and <strong>Smell/Taste</strong> cost <strong>2 Mana</strong>. <strong>Fire</strong> costs <strong>3 Mana</strong>.</li>
 <li><strong>Heal</strong> costs <strong>1 Mana</strong> (or <strong>2</strong> if you are <strong>Bound</strong>). You have limited charges.</li>
 <li>If you are <strong>Bound</strong> (Touch effect), your <strong>magic costs +1 Mana</strong> until it wears off. Guard breaks Bind.</li>
 </ul>
@@ -161,6 +161,7 @@
 <p class="rpgFormula"><strong>Damage</strong> = Base × <strong>STAB</strong> × <strong>Effectiveness</strong> (rounded)</p>
 <ul class="rpgModalList">
 <li><strong>Move type</strong>: each action is a type (Wind / Water / Sound / Smell/Taste / Fire / Sight / Earth / Touch).</li>
+<li><strong>Type-locked attacks</strong>: you can only use Attack + spells that match your hero’s types. (Attack always matches your primary type.) <span class="muted">Guard and Heal are universal.</span></li>
 <li><strong>STAB</strong> (Same Type Attack Bonus): if the move matches one of your types, it gets <strong>×1.2</strong>.</li>
 <li><strong>Effectiveness</strong>: some types hit harder or softer into other types.</li>
 <li><strong>Dual types</strong> multiply together (example: Wind vs Fire+Sight uses both matchups).</li>
