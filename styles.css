@@ -2601,6 +2601,27 @@ body.gamePage {
   border-radius: 18px;
 }
 
+/* Top utility controls (Explain / Magic / Hero / Restart) */
+.rpgTopControls{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+
+  background: var(--panel);
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  padding: 10px 12px;
+  border-radius: 18px;
+}
+
+.rpgTopControls .btn{ min-width: 110px; }
+
+.rpgTopControls .btn:disabled{
+  opacity: .7;
+  cursor: not-allowed;
+}
+
 /* Turn indicator: makes it obvious whose turn it is */
 .rpgTurnBanner{
   flex: 1 0 100%;
@@ -5281,6 +5302,8 @@ body.gamePage .rpgLog{
 }
 
 @media (max-width: 620px) {
+  .gamePage .rpgTopControls .btn { flex: 1 1 calc(50% - 8px); }
+  .gamePage .rpgTopControls .rpgMagicWrap { flex: 1 1 100%; }
   .gamePage .rpgActions .btn { flex: 1 1 calc(50% - 8px); }
   .gamePage .rpgMagicWrap { flex: 1 1 100%; }
   .gamePage .rpgMagicMenu { width: 100%; }
