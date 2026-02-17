@@ -3,7 +3,7 @@
  * Turn-based, single-player battle loop (in-browser).
  *
  * Strategy overhaul:
- * - Two-wave battle (Wave 2 spawns after Wave 1).
+ * - Three-wave battle (Wave 3 is a boss).
  * - Expanded type system: Wind / Fire / Sight / Earth / Touch (with STAB).
  * - Removed RNG (no crits, no misses, no random status procs).
  * - Added Focus (resource) + Enemy Intent telegraphing for planning.
@@ -2219,23 +2219,34 @@ function getActiveHero() {
     profile: "soundTouch",
     sprite: "./assets/images/enemy-blue.png",
   },
+
+  {
+    name: "Eclipse Warden",
+    types: /** @type {MagicType[]} */ (["Sight", "Sound"]),
+    maxHp: 42,
+    healCharges: 3,
+    focusMax: 8,
+    focusStart: 3,
+    profile: "bossEclipse",
+    sprite: "./assets/images/enemy-red.png",
+  },
 ];
 
 const FALLBACK_LOCATIONS = [
-  { id: "ember_plaza", name: "Ember Plaza", subtitle: "Warm stones. Hot tempers.", enemySet: [0, 1] },
-  { id: "quartz_library", name: "Quartz Library", subtitle: "Quiet halls. Heavy secrets.", enemySet: [1, 2] },
-  { id: "gale_rooftops", name: "Gale Rooftops", subtitle: "Open sky. Unstable footing.", enemySet: [2, 3] },
-  { id: "mirror_tunnels", name: "Mirror Tunnels", subtitle: "Dim lights. Echoing steps.", enemySet: [3, 4] },
+  { id: "ember_plaza", name: "Ember Plaza", subtitle: "Warm stones. Hot tempers.", enemySet: [0, 1, 5] },
+  { id: "quartz_library", name: "Quartz Library", subtitle: "Quiet halls. Heavy secrets.", enemySet: [1, 2, 5] },
+  { id: "gale_rooftops", name: "Gale Rooftops", subtitle: "Open sky. Unstable footing.", enemySet: [2, 3, 5] },
+  { id: "mirror_tunnels", name: "Mirror Tunnels", subtitle: "Dim lights. Echoing steps.", enemySet: [3, 4, 5] },
 ];
 
 // Locations in-game are sourced from the Map dataset (data/map-locations.js) when available.
 // This keeps the RPG in sync with the site's world map.
 const GAME_LOCATION_IDS = ["arena", "market-central", "fey-forest", "gutterglass"];
 const LOCATION_ENEMY_SETS = [
-  [0, 1],
-  [1, 2],
-  [2, 3],
-  [3, 4],
+  [0, 1, 5],
+  [1, 2, 5],
+  [2, 3, 5],
+  [3, 4, 5],
 ];
 
 function buildLocationsFromMap() {
@@ -2286,10 +2297,25 @@ function setActiveLocation(id) {
   const set = enemySet || activeEnemySet || ENEMIES;
   const t = set[waveIndex] ?? set[0] ?? ENEMIES[0];
 
-  const lvl = Math.max(1, toSafeInt(playerLevel, 1) + Math.max(0, toSafeInt(waveIndex, 0)));
-  // Enemies scale gently with your level so battles stay interesting.
-  const hpScale = 1 + (lvl - 1) * 0.06;
-  const powScale = 1 + (lvl - 1) * 0.04;
+  // Scaling philosophy:
+  // - Enemies *do* scale with you so fights stay relevant...
+  // - ...but they scale *slower* than the player so leveling still feels rewarding.
+  // - Higher waves remain tougher primarily because their base templates are tougher.
+  const pLvl = Math.max(1, toSafeInt(playerLevel, 1));
+  const w = Math.max(0, toSafeInt(waveIndex, 0));
+
+  // Enemies "catch up" to only a portion of your levels.
+  // (0.55 means: when you gain 10 levels, enemies gain about 5 of them.)
+  const ENEMY_LEVEL_CATCHUP = 0.55;
+
+  // Enemy displayed level: your (partial) level + a small wave bump.
+  const lvl = Math.max(1, 1 + Math.floor((pLvl - 1) * ENEMY_LEVEL_CATCHUP) + w);
+
+  // Stat growth per enemy level. Kept modest so higher player level gradually
+  // overtakes higher-wave enemies.
+  const hpScale = 1 + (lvl - 1) * 0.04;
+  const powScale = 1 + (lvl - 1) * 0.025;
+
   const scaledMaxHp = Math.max(1, Math.round(toSafeInt(t.maxHp, 18) * hpScale));
 
   const focusMax = typeof t.focusMax === "number" ? t.focusMax : 6;
@@ -2430,7 +2456,7 @@ function makeLobbyState() {
 }
 
 
-  const GAME_BUILD = "2026-02-15-type-locked";
+  const GAME_BUILD = "2026-02-16-boss-wave3";
 
 
   // Load saved hero choice (if any)
@@ -2623,7 +2649,15 @@ function persistPlayerProgress() {
 
   function setEnemyVisuals() {
     if (!(els.enemySprite instanceof HTMLElement)) return;
-    els.enemySprite.classList.toggle("is-phase2", state.wave >= 1);
+
+    const isBoss =
+      Array.isArray(state?.enemySet) &&
+      state.enemySet.length >= 3 &&
+      state.wave === state.enemySet.length - 1;
+
+    // Visual cue: Wave 2 gets a subtle boost, and the final wave gets a BOSS badge.
+    els.enemySprite.classList.toggle("is-phase2", state.wave === 1);
+    els.enemySprite.classList.toggle("is-boss", isBoss);
   }
 
   // --------------------
@@ -2654,9 +2688,11 @@ function persistPlayerProgress() {
     // spending moves
     heal: 2,
     arcane: 2,
+    lance: 2,
     glare: 2,
     squall: 2,
     resonant: 2,
+    resonate: 2,
     quake: 2,
     shatter: 2,
     mirrorbind: 2,
@@ -2681,6 +2717,28 @@ function persistPlayerProgress() {
   }
 
   // Profiles (deterministic patterns)
+
+  if (e.profile === "bossEclipse") {
+    // Boss pattern: mixes defense, control, and heavy hits.
+    // Mana gating (below) will force a basic Strike when the boss can't afford a spell,
+    // which naturally creates breathing room.
+    const pattern = ["ward", "mirrorbind", "lance", "resonate", "ignite", "shatter", "siphon", "quake", "attack"];
+    let next = pattern[e.aiStep % pattern.length];
+
+    if (next === "ignite" && p.burn > 0) next = "resonate";
+    if (next === "mirrorbind" && p.bound > 0) next = "lance";
+    if (next === "ward" && e.ward > 0) next = "attack";
+
+    if (next === "ward") return { id: "ward", name: "Mirror Ward", type: null, base: 0, note: "Next hit reduced + reflects" };
+    if (next === "mirrorbind") return { id: "mirrorbind", name: "Mirrorbind", type: "Touch", base: 3, note: "Applies Bind" };
+    if (next === "lance") return { id: "lance", name: "Arcane Lance", type: "Sight", base: 7, note: "" };
+    if (next === "resonate") return { id: "resonate", name: "Resonant Blast", type: "Sound", base: 6, note: "" };
+    if (next === "ignite") return { id: "ignite", name: "Ignite", type: "Fire", base: 4, note: "Applies Burn (2)" };
+    if (next === "shatter") return { id: "shatter", name: "Shatter", type: "Earth", base: 6, note: "Punishes Guard" };
+    if (next === "siphon") return { id: "siphon", name: "Siphon", type: "Sight", base: 4, note: "Heals enemy for 3" };
+    if (next === "quake") return { id: "quake", name: "Quake", type: "Earth", base: 7, note: "Shakes through guard" };
+    return { id: "attack", name: "Strike", type: "Sight", base: 4, note: "" };
+  }
   if (e.profile === "fireSight") {
     const pattern = ["ignite", "lance", "ward", "siphon", "attack"];
     let next = pattern[e.aiStep % pattern.length];
@@ -2919,7 +2977,8 @@ function persistPlayerProgress() {
     // Names + types
     setText(els.playerName, state.player.name);
     const enemyLv = typeof state.enemy.level === "number" ? state.enemy.level : 1;
-    setText(els.enemyName, `${state.enemy.name} Lv ${enemyLv} (Wave ${state.wave + 1}/${state.enemySet.length})`);
+    const isBossWave = Array.isArray(state.enemySet) && state.enemySet.length >= 3 && state.wave === state.enemySet.length - 1;
+    setText(els.enemyName, `${state.enemy.name} Lv ${enemyLv} (Wave ${state.wave + 1}/${state.enemySet.length}${isBossWave ? " • BOSS" : ""})`);
     setTypeLine(els.playerTypeText, state.player.types);
     setTypeLine(els.enemyTypeText, state.enemy.types);
     updateSpellPickButtonUI();
