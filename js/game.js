@@ -16,6 +16,7 @@ if (root) {
     playerName: document.getElementById("playerName"),
     enemyName: document.getElementById("enemyName"),
     playerTypeText: document.getElementById("playerTypeText"),
+    playerEquipText: document.getElementById("playerEquipText"),
     enemyTypeText: document.getElementById("enemyTypeText"),
 
     playerCard: document.getElementById("playerCard"),
@@ -47,6 +48,8 @@ if (root) {
     magicMenu: document.getElementById("magicMenu"),
     itemsToggle: document.getElementById("itemsToggle"),
     itemsMenu: document.getElementById("itemsMenu"),
+    gearToggle: document.getElementById("gearToggle"),
+    gearMenu: document.getElementById("gearMenu"),
     windBtn: document.getElementById("windBtn"),
     secondaryTypeBtn: document.getElementById("secondaryTypeBtn"),
     waterBtn: document.getElementById("waterBtn"),
@@ -494,6 +497,44 @@ function playWaveClearSfx() {
   });
 
 
+  // --------------------
+  // Gear menu helpers (equipment: 1 slot)
+  // --------------------
+
+  function setGearMenuOpen(open) {
+    if (els.gearMenu instanceof HTMLElement) {
+      els.gearMenu.hidden = !open;
+    }
+    if (els.gearToggle instanceof HTMLButtonElement) {
+      els.gearToggle.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+  }
+
+  function toggleGearMenu() {
+    if (!(els.gearMenu instanceof HTMLElement)) return;
+    // Keep only one dropdown open at a time.
+    if (els.magicMenu instanceof HTMLElement && !els.magicMenu.hidden) closeMagicMenu();
+    if (els.itemsMenu instanceof HTMLElement && !els.itemsMenu.hidden) closeItemsMenu();
+    setGearMenuOpen(els.gearMenu.hidden);
+  }
+
+  function closeGearMenu() {
+    setGearMenuOpen(false);
+  }
+
+  // Close gear menu when clicking outside.
+  document.addEventListener("click", (e) => {
+    if (!(els.gearMenu instanceof HTMLElement)) return;
+    if (!(els.gearToggle instanceof HTMLElement)) return;
+    const t = e.target;
+    if (t instanceof Node) {
+      const inMenu = els.gearMenu.contains(t);
+      const inToggle = els.gearToggle.contains(t);
+      if (!inMenu && !inToggle) closeGearMenu();
+    }
+  });
+
+
 const TYPE_META = /** @type {Record<MagicType, {icon: string, label: string}>} */ ({
   Wind:  { icon: "🍃", label: "Wind" },
   Water: { icon: "💧", label: "Water" },
@@ -838,6 +879,69 @@ function renderItemMenu(isPlayerTurn) {
   });
 }
 
+
+// --------------------
+// Gear UI (equipment: 1 slot)
+// --------------------
+
+/** @param {boolean} isPlayerTurn */
+function renderGearMenu(isPlayerTurn) {
+  if (!(els.gearMenu instanceof HTMLElement)) return;
+  els.gearMenu.replaceChildren();
+
+  const tip = document.createElement("div");
+  tip.className = "rpgMagicEmpty";
+  tip.textContent = "Gear is persistent (not consumed). You can equip 1 piece at a time.";
+  els.gearMenu.appendChild(tip);
+
+  const inv = state?.player?.gear && typeof state.player.gear === "object" ? state.player.gear : {};
+  const equippedId = typeof state?.player?.equip === "string" ? state.player.equip : null;
+
+  if (equippedId && GEAR_DEFS[equippedId]) {
+    const cur = GEAR_DEFS[equippedId];
+    const unequip = document.createElement("button");
+    unequip.type = "button";
+    unequip.className = "btn ghost rpgMagicItem";
+    unequip.setAttribute("role", "menuitem");
+    unequip.dataset.gearAction = "unequip";
+    unequip.textContent = `Unequip (${cur.icon} ${cur.name})`;
+    unequip.disabled = !isPlayerTurn;
+    els.gearMenu.appendChild(unequip);
+  }
+
+  const rows = GEAR_IDS
+    .map((id) => ({ id, count: Math.max(0, toSafeInt(inv[id], 0)) }))
+    .filter((r) => r.count > 0);
+
+  if (rows.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "rpgMagicEmpty";
+    empty.textContent = "No gear yet. Clear waves to find equipment.";
+    els.gearMenu.appendChild(empty);
+    return;
+  }
+
+  rows.forEach(({ id, count }) => {
+    const def = GEAR_DEFS[id];
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "btn secondary rpgMagicItem";
+    btn.setAttribute("role", "menuitem");
+    btn.dataset.gearId = id;
+    btn.dataset.gearAction = "equip";
+
+    const label = def ? `${def.icon} ${def.name}` : id;
+    const desc = def?.desc ? ` • ${def.desc}` : "";
+    const owned = count > 0 ? ` (x${count})` : "";
+    const equipped = equippedId === id ? " • Equipped" : "";
+    btn.textContent = `${label}${owned}${desc}${equipped}`;
+
+    // Equipping gear doesn't end your turn, but we keep it player-turn-only to avoid weird timing.
+    btn.disabled = !isPlayerTurn || equippedId === id;
+    els.gearMenu.appendChild(btn);
+  });
+}
+
 /** @param {MagicType[]} types */
 function formatTypesDisplay(types) {
   return types.join(" • ");
@@ -873,6 +977,7 @@ function setTypeAccent(el, types) {
       if (isLocationOpen()) closeLocationPicker();
       closeMagicMenu();
       closeItemsMenu();
+      closeGearMenu();
       if (isLootOpen()) { closeLootScreen(); if (lootTimer) window.clearTimeout(lootTimer); lootTimer = 0; }
       if (isDefeatOpen()) closeDefeatScreen();
     }
@@ -1901,6 +2006,47 @@ function sanitizeItemCounts(raw) {
   return out;
 }
 
+
+// --------------------
+// Gear (equipment)
+// - Persistent, NOT consumed
+// - One slot (trinket)
+// - Saved per-hero
+// --------------------
+
+/** @type {Record<string, {id:string,name:string,icon:string,desc:string, hpBonus?:number, focusBonus?:number, powerPct?:number, healPct?:number, drPct?:number}>} */
+const GEAR_DEFS = {
+  apprentice_ring: { id: "apprentice_ring", name: "Apprentice Ring", icon: "💍", desc: "+2 Max HP", hpBonus: 2 },
+  focus_band: { id: "focus_band", name: "Focus Band", icon: "🔷", desc: "+1 Max Mana", focusBonus: 1 },
+  ward_clasp: { id: "ward_clasp", name: "Ward Clasp", icon: "🧷", desc: "10% damage reduction", drPct: 0.10 },
+  ember_charm: { id: "ember_charm", name: "Ember Charm", icon: "🔥", desc: "+8% damage", powerPct: 0.08 },
+  sage_brooch: { id: "sage_brooch", name: "Sage Brooch", icon: "🌿", desc: "+8% healing", healPct: 0.08 },
+};
+const GEAR_IDS = Object.keys(GEAR_DEFS);
+
+// Only new heroes get a starter gear piece. Existing saves remain unchanged.
+const STARTING_GEAR = /** @type {Record<string, number>} */ ({ apprentice_ring: 1 });
+
+/** @param {any} raw */
+function sanitizeGearCounts(raw) {
+  /** @type {Record<string, number>} */
+  const out = {};
+  const src = raw && typeof raw === "object" ? raw : {};
+  for (const id of GEAR_IDS) {
+    const n = Math.max(0, toSafeInt(src[id], 0));
+    if (n > 0) out[id] = clamp(n, 0, 99);
+  }
+  return out;
+}
+
+/** @param {any} id @param {Record<string, number>} inv */
+function sanitizeEquippedGear(id, inv) {
+  if (typeof id !== "string") return null;
+  if (!GEAR_DEFS[id]) return null;
+  const n = Math.max(0, toSafeInt(inv?.[id], 0));
+  return n > 0 ? id : null;
+}
+
 /** @param {number} level */
 function xpToNext(level) {
   const L = Math.max(1, toSafeInt(level, 1));
@@ -1913,7 +2059,16 @@ function xpToNext(level) {
 
 function loadHeroProgress(heroId) {
   const raw = localStorage.getItem(PROGRESS_KEY_PREFIX + heroId);
-  if (!raw) return { level: 1, xp: 0, spells: undefined, items: { ...STARTING_ITEMS } };
+  if (!raw) {
+    return {
+      level: 1,
+      xp: 0,
+      spells: undefined,
+      items: { ...STARTING_ITEMS },
+      gear: { ...STARTING_GEAR },
+      equip: "apprentice_ring",
+    };
+  }
   try {
     const obj = JSON.parse(raw);
     const level = clamp(toSafeInt(obj?.level, 1), 1, 99);
@@ -1922,14 +2077,23 @@ function loadHeroProgress(heroId) {
       ? obj.spells.filter((id) => typeof id === "string" && !!SPELLS_BY_ID[id])
       : undefined;
     const items = sanitizeItemCounts(obj?.items);
-    return { level, xp, spells, items };
+    const gear = sanitizeGearCounts(obj?.gear);
+    const equip = sanitizeEquippedGear(obj?.equip, gear);
+    return { level, xp, spells, items, gear, equip };
   } catch {
-    return { level: 1, xp: 0, spells: undefined, items: { ...STARTING_ITEMS } };
+    return {
+      level: 1,
+      xp: 0,
+      spells: undefined,
+      items: { ...STARTING_ITEMS },
+      gear: { ...STARTING_GEAR },
+      equip: "apprentice_ring",
+    };
   }
 }
 
 
-/** @param {string} heroId @param {{level:number,xp:number,spells?:string[],items?:Record<string,number>}} prog */
+/** @param {string} heroId @param {{level:number,xp:number,spells?:string[],items?:Record<string,number>,gear?:Record<string,number>,equip?:string|null}} prog */
 function saveHeroProgress(heroId, prog) {
   try {
     const payload = {
@@ -1941,6 +2105,13 @@ function saveHeroProgress(heroId, prog) {
     }
     if (prog?.items && typeof prog.items === "object") {
       payload.items = sanitizeItemCounts(prog.items);
+    }
+    if (prog?.gear && typeof prog.gear === "object") {
+      payload.gear = sanitizeGearCounts(prog.gear);
+    }
+    if (typeof prog?.equip === "string" || prog?.equip === null) {
+      const inv = payload.gear || sanitizeGearCounts(prog.gear);
+      payload.equip = sanitizeEquippedGear(prog.equip, inv);
     }
     window.localStorage.setItem(PROGRESS_KEY_PREFIX + heroId, JSON.stringify(payload));
   } catch (e) {
@@ -2225,9 +2396,9 @@ function getActiveHero() {
   {
     name: "Candlecrown Matron",
     types: /** @type {MagicType[]} */ (["Sight", "Sound"]),
-    maxHp: 42,
-    healCharges: 3,
-    focusMax: 8,
+    maxHp: 36,
+    healCharges: 2,
+    focusMax: 7,
     focusStart: 3,
     profile: "bossEclipse",
     sprite: "./assets/images/enemy-candle-queen.png",
@@ -2384,18 +2555,23 @@ function setActiveLocation(id) {
   // - Higher waves remain tougher primarily because their base templates are tougher.
   const pLvl = Math.max(1, toSafeInt(playerLevel, 1));
   const w = Math.max(0, toSafeInt(waveIndex, 0));
-
   // Enemies "catch up" to only a portion of your levels.
   // (0.55 means: when you gain 10 levels, enemies gain about 5 of them.)
-  const ENEMY_LEVEL_CATCHUP = 0.55;
+  // Bosses scale even slower so you can eventually outgrow an area boss.
+  const isBossTemplate = t.profile === "bossEclipse" || w >= 2;
+  const ENEMY_LEVEL_CATCHUP = isBossTemplate ? 0.45 : 0.55;
 
-  // Enemy displayed level: your (partial) level + a small wave bump.
-  const lvl = Math.max(1, 1 + Math.floor((pLvl - 1) * ENEMY_LEVEL_CATCHUP) + w);
+  // Displayed level: your (partial) level + a wave bump.
+  // Boss wave already has a huge base template, so its bump is smaller.
+  const waveBump = isBossTemplate ? 1 : w;
+  const lvl = Math.max(1, 1 + Math.floor((pLvl - 1) * ENEMY_LEVEL_CATCHUP) + waveBump);
 
-  // Stat growth per enemy level. Kept modest so higher player level gradually
-  // overtakes higher-wave enemies.
-  const hpScale = 1 + (lvl - 1) * 0.04;
-  const powScale = 1 + (lvl - 1) * 0.025;
+  // Stat growth per enemy level.
+  // Boss growth is gentler so Lv ~8 is a real "you can win" threshold.
+  const hpRate = isBossTemplate ? 0.03 : 0.04;
+  const powRate = isBossTemplate ? 0.02 : 0.025;
+  const hpScale = 1 + (lvl - 1) * hpRate;
+  const powScale = 1 + (lvl - 1) * powRate;
 
   const scaledMaxHp = Math.max(1, Math.round(toSafeInt(t.maxHp, 18) * hpScale));
 
@@ -2438,6 +2614,16 @@ function setActiveLocation(id) {
     const prog = loadHeroProgress(pt.id);
     const scaled = applyLevelToHero(pt, prog.level);
     const items = sanitizeItemCounts(prog.items);
+    const gear = sanitizeGearCounts(prog.gear);
+    const equip = sanitizeEquippedGear(prog.equip, gear);
+    const g = equip ? GEAR_DEFS[equip] : null;
+    const gHp = Math.max(0, toSafeInt(g?.hpBonus, 0));
+    const gFocus = Math.max(0, toSafeInt(g?.focusBonus, 0));
+    const gPowerPct = clamp(Number(g?.powerPct ?? 0), 0, 0.50);
+    const gHealPct = clamp(Number(g?.healPct ?? 0), 0, 0.50);
+    const gDrPct = clamp(Number(g?.drPct ?? 0), 0, 0.50);
+    const maxWithGear = scaled.maxHp + gHp;
+    const focusMaxWithGear = scaled.focusMax + gFocus;
     const savedSpells = Array.isArray(prog.spells) ? prog.spells : knownSpellIdsFor(pt.types, prog.level);
     let spells = sanitizeKnownSpellIds(savedSpells, pt.types, prog.level);
     startingSpellIdsFor(pt.types).forEach((id) => { if (!spells.includes(id)) spells.push(id); });
@@ -2456,14 +2642,15 @@ function setActiveLocation(id) {
       level: prog.level,
       xp: prog.xp,
       xpToNext: xpToNext(prog.level),
-      powerMult: scaled.powerMult,
-      healMult: scaled.healMult,
+      powerMult: scaled.powerMult * (1 + gPowerPct),
+      healMult: scaled.healMult * (1 + gHealPct),
+      equipDR: gDrPct,
       baseMaxHp: pt.maxHp,
       baseFocusMax: pt.focusMax,
 
       // vitals
-      hp: scaled.maxHp,
-      max: scaled.maxHp,
+      hp: maxWithGear,
+      max: maxWithGear,
 
       // statuses
       guarding: false,
@@ -2478,13 +2665,17 @@ function setActiveLocation(id) {
       // items (one-use consumables)
       items,
 
+      // gear (equipment: 1 slot)
+      gear,
+      equip,
+
       // turn flag: allow 1 item per turn without ending the turn
       itemUsedThisTurn: false,
 
       // resources
       healCharges: pt.healCharges,
-      focus: scaled.focusStart,
-      focusMax: scaled.focusMax,
+      focus: clamp(scaled.focusStart, 0, focusMaxWithGear),
+      focusMax: focusMaxWithGear,
     };
   }
 
@@ -2634,6 +2825,8 @@ function persistPlayerProgress() {
     xp: Math.max(0, toSafeInt(state.player.xp, 0)),
     spells: Array.isArray(state.player.spells) ? state.player.spells : [],
     items: sanitizeItemCounts(state.player.items),
+    gear: sanitizeGearCounts(state.player.gear),
+    equip: typeof state.player.equip === "string" ? state.player.equip : null,
   });
 }
 
@@ -2645,13 +2838,29 @@ function persistPlayerProgress() {
     const lvl = Math.max(1, toSafeInt(state.player.level, 1));
     const scaled = applyLevelToHero(hero, lvl);
 
-    const oldMax = toSafeInt(state.player.max, scaled.maxHp);
-    const oldFocusMax = toSafeInt(state.player.focusMax, scaled.focusMax);
+    // Apply gear bonuses (1-slot equipment). Keep saves backwards compatible.
+    state.player.gear = sanitizeGearCounts(state.player.gear);
+    state.player.equip = sanitizeEquippedGear(state.player.equip, state.player.gear);
+    const g = state.player.equip ? GEAR_DEFS[state.player.equip] : null;
+    const gHp = Math.max(0, toSafeInt(g?.hpBonus, 0));
+    const gFocus = Math.max(0, toSafeInt(g?.focusBonus, 0));
+    const gPowerPct = clamp(Number(g?.powerPct ?? 0), 0, 0.50);
+    const gHealPct = clamp(Number(g?.healPct ?? 0), 0, 0.50);
+    const gDrPct = clamp(Number(g?.drPct ?? 0), 0, 0.50);
 
-    state.player.max = scaled.maxHp;
-    state.player.focusMax = scaled.focusMax;
-    state.player.powerMult = scaled.powerMult;
-    state.player.healMult = scaled.healMult;
+    const newMax = scaled.maxHp + gHp;
+    const newFocusMax = scaled.focusMax + gFocus;
+    const newPowerMult = scaled.powerMult * (1 + gPowerPct);
+    const newHealMult = scaled.healMult * (1 + gHealPct);
+
+    const oldMax = toSafeInt(state.player.max, newMax);
+    const oldFocusMax = toSafeInt(state.player.focusMax, newFocusMax);
+
+    state.player.max = newMax;
+    state.player.focusMax = newFocusMax;
+    state.player.powerMult = newPowerMult;
+    state.player.healMult = newHealMult;
+    state.player.equipDR = gDrPct;
     state.player.xpToNext = xpToNext(lvl);
     state.player.baseMaxHp = hero.maxHp;
     state.player.baseFocusMax = hero.focusMax;
@@ -3028,6 +3237,18 @@ function persistPlayerProgress() {
       playAnim(els.playerSprite, "rpgAnim-guard");
     }
 
+    // Equipment passive: constant damage reduction (after other defenses)
+    const dr = clamp(Number(state.player.equipDR ?? 0), 0, 0.50);
+    if (final > 0 && dr > 0) {
+      const before = final;
+      final = Math.max(0, Math.ceil(final * (1 - dr)));
+      if (final !== before) {
+        const eqId = typeof state.player.equip === "string" ? state.player.equip : null;
+        const eq = eqId && GEAR_DEFS[eqId] ? GEAR_DEFS[eqId] : null;
+        addLog(`${eq ? `${eq.icon} ${eq.name}` : "Your gear"} dampens the hit (${before} → ${final}).`);
+      }
+    }
+
     return final;
   }
 
@@ -3083,6 +3304,13 @@ function persistPlayerProgress() {
     setText(els.enemyName, `${state.enemy.name} Lv ${enemyLv} (Wave ${state.wave + 1}/${state.enemySet.length}${isBossWave ? " • BOSS" : ""})`);
     setTypeLine(els.playerTypeText, state.player.types);
     setTypeLine(els.enemyTypeText, state.enemy.types);
+
+    // Equipment slot (1 piece)
+    if (els.playerEquipText instanceof HTMLElement) {
+      const eqId = typeof state.player.equip === "string" ? state.player.equip : null;
+      const eq = eqId && GEAR_DEFS[eqId] ? GEAR_DEFS[eqId] : null;
+      els.playerEquipText.textContent = eq ? `Equipment: ${eq.icon} ${eq.name} (${eq.desc})` : "Equipment: None";
+    }
     updateSpellPickButtonUI();
 
     // Focus + intent
@@ -3211,6 +3439,7 @@ function persistPlayerProgress() {
     if (disableActions) {
       closeMagicMenu();
       closeItemsMenu();
+      closeGearMenu();
     }
 
     // Render spell menu with up-to-date enable/disable state.
@@ -3218,6 +3447,9 @@ function persistPlayerProgress() {
 
     // Render items menu (inventory) with up-to-date enable/disable state.
     renderItemMenu(isPlayerTurn);
+
+    // Render gear menu (equipment) with up-to-date enable/disable state.
+    renderGearMenu(isPlayerTurn);
 
     const canHeal = isPlayerTurn && state.player.healCharges > 0 && focus >= healCost;
 
@@ -3227,6 +3459,7 @@ function persistPlayerProgress() {
     if (els.magicToggle instanceof HTMLButtonElement) els.magicToggle.disabled = disableActions || !hasAnySpell;
 
     if (els.itemsToggle instanceof HTMLButtonElement) els.itemsToggle.disabled = disableActions;
+    if (els.gearToggle instanceof HTMLButtonElement) els.gearToggle.disabled = disableActions;
     if (els.healBtn instanceof HTMLButtonElement) els.healBtn.disabled = !canHeal;
     if (els.restartBtn instanceof HTMLButtonElement) els.restartBtn.disabled = false;
   }
@@ -3272,17 +3505,45 @@ function persistPlayerProgress() {
     return true;
   }
 
-    /** @param {number} waveIndex */
+  /** @param {string} gearId */
+  function gainGear(gearId, count = 1) {
+    if (!GEAR_DEFS[gearId]) return;
+    if (!state.player.gear || typeof state.player.gear !== "object") state.player.gear = {};
+    const prev = Math.max(0, toSafeInt(state.player.gear[gearId], 0));
+    const next = clamp(prev + Math.max(1, toSafeInt(count, 1)), 0, 99);
+    state.player.gear[gearId] = next;
+    const def = GEAR_DEFS[gearId];
+    addLog(`🧰 Found gear: ${def.icon} ${def.name} (x${Math.max(1, toSafeInt(count, 1))}).`);
+    persistPlayerProgress();
+  }
+
+  /** @param {number} waveIndex */
   function lootForWave(waveIndex) {
-    // Equal chance for every item, regardless of which fight/location you're in.
-    // Keep a small chance to find nothing so the loot screen can still say "No items."
-    void waveIndex;
-    const NONE_CHANCE = 0.25;
-    if (Math.random() < NONE_CHANCE) return null;
-    if (!Array.isArray(ITEM_IDS) || ITEM_IDS.length === 0) return null;
-    const idx = Math.floor(Math.random() * ITEM_IDS.length);
-    const pick = ITEM_IDS[idx];
-    return pick && ITEM_DEFS[pick] ? pick : null;
+    // Loot is split into: consumables + (rare) gear.
+    // Items: equal chance per item, small chance of none.
+    // Gear: fairly common (about 1 in 4 victories).
+    const isBossWave = waveIndex >= 2;
+    const result = { itemId: null, gearId: null };
+
+    if (!isBossWave) {
+      const NONE_CHANCE = 0.25;
+      if (Math.random() >= NONE_CHANCE && Array.isArray(ITEM_IDS) && ITEM_IDS.length > 0) {
+        const idx = Math.floor(Math.random() * ITEM_IDS.length);
+        const pick = ITEM_IDS[idx];
+        result.itemId = pick && ITEM_DEFS[pick] ? pick : null;
+      }
+    }
+
+    // Gear chance: ~25% per cleared wave.
+    // Note: we allow this on boss waves too so the overall feel stays consistent.
+    const gearChance = 0.25;
+    if (Math.random() < gearChance && Array.isArray(GEAR_IDS) && GEAR_IDS.length > 0) {
+      const idx = Math.floor(Math.random() * GEAR_IDS.length);
+      const pick = GEAR_IDS[idx];
+      result.gearId = pick && GEAR_DEFS[pick] ? pick : null;
+    }
+
+    return result;
   }
 
 
@@ -3299,11 +3560,24 @@ function persistPlayerProgress() {
     // Play the badge-unlock SFX when you clear Wave 1.
     if (state.wave === 0) playWaveClearSfx();
 
-    // Simple loot: one item per cleared wave (random, equal chance per item).
-    const lootId = lootForWave(state.wave);
-    const lootDef = lootId ? (ITEM_DEFS[lootId] || null) : null;
-    const lootLine = lootDef ? `Picked up: ${lootDef.icon} ${lootDef.name} (x1)` : "No items.";
-    if (lootDef && lootId) gainItem(lootId, 1);
+    // Loot: random consumable and (rarer) gear.
+    const loot = lootForWave(state.wave);
+    const parts = [];
+    if (loot?.itemId) {
+      const d = ITEM_DEFS[loot.itemId];
+      if (d) {
+        gainItem(loot.itemId, 1);
+        parts.push(`${d.icon} ${d.name} (x1)`);
+      }
+    }
+    if (loot?.gearId) {
+      const g = GEAR_DEFS[loot.gearId];
+      if (g) {
+        gainGear(loot.gearId, 1);
+        parts.push(`${g.icon} ${g.name} (Gear)`);
+      }
+    }
+    const lootLine = parts.length ? `Picked up: ${parts.join(" + ")}` : "No loot this time.";
 
     playAnim(els.enemySprite, "rpgAnim-faint");
 
@@ -4507,6 +4781,7 @@ function playerFireAttack() {
     if (state.phase !== "player") return;
     closeMagicMenu();
     closeItemsMenu();
+    closeGearMenu();
 
     if (!state.player.guarding) {
       state.player.guarding = true;
@@ -4540,6 +4815,7 @@ function playerFireAttack() {
 
     closeMagicMenu();
     closeItemsMenu();
+    closeGearMenu();
 
     const def = ITEM_DEFS[itemId];
     if (!def) {
@@ -4645,9 +4921,69 @@ function playerFireAttack() {
     addLog("Choose an action.");
     render();
   }
+
+  /** @param {string} gearId */
+  function playerEquipGear(gearId) {
+    if (isGameOver()) return;
+    if (state.phase !== "player") return;
+
+    closeMagicMenu();
+    closeItemsMenu();
+    closeGearMenu();
+
+    const def = GEAR_DEFS[gearId];
+    if (!def) {
+      addLog("That gear doesn't exist.");
+      render();
+      return;
+    }
+
+    const inv = state?.player?.gear && typeof state.player.gear === "object" ? state.player.gear : {};
+    const have = Math.max(0, toSafeInt(inv[gearId], 0));
+    if (have <= 0) {
+      addLog(`You don't own ${def.name}.`);
+      render();
+      return;
+    }
+
+    if (state.player.equip === gearId) {
+      addLog(`You're already wearing ${def.icon} ${def.name}.`);
+      render();
+      return;
+    }
+
+    state.player.equip = gearId;
+    syncPlayerLevel(false);
+    persistPlayerProgress();
+    addLog(`🧰 Equipped: ${def.icon} ${def.name}.`);
+    render();
+  }
+
+  function playerUnequipGear() {
+    if (isGameOver()) return;
+    if (state.phase !== "player") return;
+
+    closeMagicMenu();
+    closeItemsMenu();
+    closeGearMenu();
+
+    const curId = typeof state.player.equip === "string" ? state.player.equip : null;
+    if (!curId) {
+      addLog("You have no gear equipped.");
+      render();
+      return;
+    }
+    const cur = GEAR_DEFS[curId];
+    state.player.equip = null;
+    syncPlayerLevel(false);
+    persistPlayerProgress();
+    addLog(`🧰 Unequipped: ${cur ? `${cur.icon} ${cur.name}` : "gear"}.`);
+    render();
+  }
   function restartToHeroSelect() {
     closeMagicMenu();
     closeItemsMenu();
+    closeGearMenu();
     closeHeroPicker();
     closeLocationPicker();
     if (isLootOpen()) closeLootScreen();
@@ -4666,6 +5002,7 @@ function playerFireAttack() {
   function restart() {
     closeMagicMenu();
     closeItemsMenu();
+    closeGearMenu();
     closeHeroPicker();
     closeLocationPicker();
     if (isLootOpen()) closeLootScreen();
@@ -4693,6 +5030,10 @@ function playerFireAttack() {
 
   if (els.itemsToggle instanceof HTMLButtonElement) {
     els.itemsToggle.addEventListener("click", toggleItemsMenu);
+  }
+
+  if (els.gearToggle instanceof HTMLButtonElement) {
+    els.gearToggle.addEventListener("click", toggleGearMenu);
   }
 
   
@@ -4786,6 +5127,24 @@ function playerFireAttack() {
     });
   }
 
+  // Gear menu: equip/unequip actions
+  if (els.gearMenu instanceof HTMLElement) {
+    els.gearMenu.addEventListener("click", (e) => {
+      const target = e.target;
+      if (!(target instanceof HTMLElement)) return;
+      const btn = target.closest("button[data-gear-action]");
+      if (!(btn instanceof HTMLButtonElement)) return;
+      const action = btn.getAttribute("data-gear-action");
+      if (action === "unequip") {
+        playerUnequipGear();
+        return;
+      }
+      const id = btn.getAttribute("data-gear-id");
+      if (!id) return;
+      playerEquipGear(id);
+    });
+  }
+
   // Dynamic spell menu: buttons are generated each render.
   if (els.magicMenu instanceof HTMLElement) {
     els.magicMenu.addEventListener("click", (e) => {
@@ -4855,7 +5214,14 @@ function playerFireAttack() {
       if (!id) return;
       const hero = getHeroById(id);
       const baseSpells = startingSpellIdsFor(hero.types);
-      saveHeroProgress(id, { level: 1, xp: 0, spells: baseSpells, items: { ...STARTING_ITEMS } });
+      saveHeroProgress(id, {
+        level: 1,
+        xp: 0,
+        spells: baseSpells,
+        items: { ...STARTING_ITEMS },
+        gear: { ...STARTING_GEAR },
+        equip: "apprentice_ring",
+      });
       addLog(`Progress reset for ${hero.name}.`);
 
       if (state?.player?.id === id) {
@@ -4865,6 +5231,8 @@ function playerFireAttack() {
         state.player.spells = baseSpells;
         state.player.pendingSpellQueue = [];
         state.player.items = { ...STARTING_ITEMS };
+        state.player.gear = { ...STARTING_GEAR };
+        state.player.equip = "apprentice_ring";
         syncPlayerLevel(false);
         syncKnownSpells(false);
       }
