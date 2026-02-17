@@ -6248,3 +6248,28 @@ html[data-theme="light"] .rpgOverworldAvatar{
 .rpgOverworldPin.isNearby .rpgOverworldPinEmoji{
   opacity: 1;
 }
+
+/* ---------- Gear slots (drag & drop) ---------- */
+.rpgGearMenuWrap{display:flex;flex-direction:column;gap:12px}
+.rpgGearSlots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:650px){.rpgGearSlots{grid-template-columns:1fr}}
+.rpgGearSlotCard{border:1px solid rgba(255,255,255,0.14);border-radius:14px;padding:10px;background:rgba(255,255,255,0.03)}
+.rpgGearSlotHead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.rpgGearSlotLabel{font-weight:700;opacity:.92}
+.rpgGearSlotUnequip{font-size:12px;padding:6px 10px}
+.rpgGearSlotDrop{width:100%;text-align:left;min-height:44px;display:flex;align-items:center;justify-content:flex-start;gap:10px}
+
+.rpgGearInventoryDrop{font-size:12px;opacity:.8;border:1px dashed rgba(255,255,255,0.26);border-radius:14px;padding:8px 10px;text-align:center;display:none}
+.rpgGearMenuWrap .rpgGearInventoryDrop[aria-hidden="false"]{display:block}
+
+.rpgGearInvWrap{display:flex;flex-direction:column;gap:8px}
+.rpgGearInvTitle{font-weight:700;opacity:.92}
+.rpgGearInvList{display:flex;flex-direction:column;gap:8px}
+
+.rpgGearInvItem{width:100%;text-align:left;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:10px;row-gap:2px;align-items:center;padding:10px}
+.rpgGearSlotPill{grid-row:1 / span 2;align-self:start;font-size:11px;padding:4px 8px;border-radius:999px;border:1px solid rgba(255,255,255,0.18);opacity:.85;white-space:nowrap}
+.rpgGearInvMain{font-weight:700}
+.rpgGearInvSub{font-size:12px;opacity:.82}
+
+.rpgDropHover{outline:2px solid rgba(255,255,255,0.35);outline-offset:2px}
+.rpgGearInvItem.isEquipped{border-color:rgba(255,255,255,0.32)}

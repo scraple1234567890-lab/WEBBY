@@ -908,66 +908,224 @@ function renderItemMenu(isPlayerTurn) {
 
 
 // --------------------
-// Gear UI (equipment: 1 slot)
+// Gear UI (equipment slots)
 // --------------------
 
 /** @param {boolean} isPlayerTurn */
 function renderGearMenu(isPlayerTurn) {
   if (!(els.gearMenu instanceof HTMLElement)) return;
+  if (!state?.player) return;
+
   els.gearMenu.replaceChildren();
+
+  // Keep player gear state sanitized.
+  state.player.gear = sanitizeGearCounts(state.player.gear);
+  state.player.equipSlots = sanitizeEquipSlots(state.player.equipSlots ?? state.player.equip, state.player.gear);
+
+  const canChange = !!isPlayerTurn && state.phase === "player" && !isGameOver();
 
   const tip = document.createElement("div");
   tip.className = "rpgMagicEmpty";
-  tip.textContent = "Gear is persistent (not consumed). You can equip 1 piece at a time.";
+  tip.textContent = "Drag gear onto a slot to equip it. (Click also works.)";
   els.gearMenu.appendChild(tip);
 
-  const inv = state?.player?.gear && typeof state.player.gear === "object" ? state.player.gear : {};
-  const equippedId = typeof state?.player?.equip === "string" ? state.player.equip : null;
+  const wrap = document.createElement("div");
+  wrap.className = "rpgGearMenuWrap";
+  els.gearMenu.appendChild(wrap);
 
-  if (equippedId && GEAR_DEFS[equippedId]) {
-    const cur = GEAR_DEFS[equippedId];
-    const unequip = document.createElement("button");
-    unequip.type = "button";
-    unequip.className = "btn ghost rpgMagicItem";
-    unequip.setAttribute("role", "menuitem");
-    unequip.dataset.gearAction = "unequip";
-    unequip.textContent = `Unequip (${cur.icon} ${cur.name})`;
-    unequip.disabled = !isPlayerTurn;
-    els.gearMenu.appendChild(unequip);
+  // Slots
+  const slotsGrid = document.createElement("div");
+  slotsGrid.className = "rpgGearSlots";
+  wrap.appendChild(slotsGrid);
+
+  const slots = state.player.equipSlots;
+
+  const mkGearName = (id) => {
+    const g = id && GEAR_DEFS[id] ? GEAR_DEFS[id] : null;
+    return g ? `${g.icon} ${g.name}` : "—";
+  };
+
+  const highlight = (el, on) => {
+    if (!(el instanceof HTMLElement)) return;
+    el.classList.toggle("rpgDropHover", !!on);
+  };
+
+  const onDropEquip = (e, slot) => {
+    if (!canChange) return;
+    e.preventDefault();
+    const id = e.dataTransfer?.getData("text/gear") || e.dataTransfer?.getData("text/plain") || "";
+    const gearId = String(id || "").trim();
+    if (!gearId) return;
+    playerEquipGear(gearId, slot);
+  };
+
+  const onDragStartFromSlot = (e, slot, gearId) => {
+    try {
+      e.dataTransfer?.setData("text/plain", gearId);
+      e.dataTransfer?.setData("text/gear", gearId);
+      e.dataTransfer?.setData("text/gearFromSlot", slot);
+      if (e.dataTransfer) e.dataTransfer.effectAllowed = "move";
+    } catch { /* ignore */ }
+  };
+
+  // Drop onto inventory to unequip
+  const inventoryDropZone = document.createElement("div");
+  inventoryDropZone.className = "rpgGearInventoryDrop";
+  inventoryDropZone.textContent = "Drop here to unequip";
+  inventoryDropZone.setAttribute("aria-hidden", canChange ? "false" : "true");
+  if (canChange) {
+    inventoryDropZone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      highlight(inventoryDropZone, true);
+    });
+    inventoryDropZone.addEventListener("dragleave", () => highlight(inventoryDropZone, false));
+    inventoryDropZone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      highlight(inventoryDropZone, false);
+      const fromSlot = e.dataTransfer?.getData("text/gearFromSlot") || "";
+      if (!fromSlot) return;
+      playerUnequipGear(/** @type {"weapon"|"armor"|"trinket"} */ (fromSlot));
+    });
   }
 
-  const rows = GEAR_IDS
-    .map((id) => ({ id, count: Math.max(0, toSafeInt(inv[id], 0)) }))
-    .filter((r) => r.count > 0);
+  for (const slot of EQUIP_SLOTS) {
+    const curId = slots?.[slot] || null;
 
-  if (rows.length === 0) {
+    const card = document.createElement("div");
+    card.className = "rpgGearSlotCard";
+    card.setAttribute("data-gear-slot", slot);
+    slotsGrid.appendChild(card);
+
+    const head = document.createElement("div");
+    head.className = "rpgGearSlotHead";
+    card.appendChild(head);
+
+    const label = document.createElement("span");
+    label.className = "rpgGearSlotLabel";
+    label.textContent = EQUIP_SLOT_LABEL[slot];
+    head.appendChild(label);
+
+    const uneq = document.createElement("button");
+    uneq.type = "button";
+    uneq.className = "btn ghost rpgGearSlotUnequip";
+    uneq.textContent = "Unequip";
+    uneq.dataset.gearAction = "unequip-slot";
+    uneq.dataset.gearSlot = slot;
+    uneq.disabled = !canChange || !curId;
+    head.appendChild(uneq);
+
+    const drop = document.createElement("button");
+    drop.type = "button";
+    drop.className = "btn ghost rpgGearSlotDrop";
+    drop.dataset.gearSlot = slot;
+    drop.disabled = !canChange;
+    drop.textContent = mkGearName(curId);
+    drop.title = canChange ? "Drop gear here to equip" : "You can change gear on your turn.";
+    card.appendChild(drop);
+
+    // Drag from slot (to unequip via inventory drop zone)
+    drop.draggable = !!canChange && !!curId;
+    if (canChange && curId) {
+      drop.addEventListener("dragstart", (e) => onDragStartFromSlot(e, slot, curId));
+    }
+
+    // Drop onto slot to equip
+    if (canChange) {
+      drop.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        highlight(drop, true);
+      });
+      drop.addEventListener("dragleave", () => highlight(drop, false));
+      drop.addEventListener("drop", (e) => {
+        highlight(drop, false);
+        onDropEquip(e, slot);
+      });
+    }
+  }
+
+  wrap.appendChild(inventoryDropZone);
+
+  // Inventory
+  const invWrap = document.createElement("div");
+  invWrap.className = "rpgGearInvWrap";
+  wrap.appendChild(invWrap);
+
+  const invTitle = document.createElement("div");
+  invTitle.className = "rpgGearInvTitle";
+  invTitle.textContent = "Owned gear";
+  invWrap.appendChild(invTitle);
+
+  const inv = state.player.gear && typeof state.player.gear === "object" ? state.player.gear : {};
+
+  // Sort by slot, then name.
+  const ownedIds = Object.keys(inv)
+    .filter((id) => GEAR_DEFS[id] && Math.max(0, toSafeInt(inv[id], 0)) > 0)
+    .sort((a, b) => {
+      const A = GEAR_DEFS[a], B = GEAR_DEFS[b];
+      if (!A || !B) return 0;
+      if (A.slot !== B.slot) return A.slot.localeCompare(B.slot);
+      return A.name.localeCompare(B.name);
+    });
+
+  if (!ownedIds.length) {
     const empty = document.createElement("div");
     empty.className = "rpgMagicEmpty";
-    empty.textContent = "No gear yet. Clear waves to find equipment.";
-    els.gearMenu.appendChild(empty);
+    empty.textContent = "No gear yet. Win battles to find some.";
+    invWrap.appendChild(empty);
     return;
   }
 
-  rows.forEach(({ id, count }) => {
+  const list = document.createElement("div");
+  list.className = "rpgGearInvList";
+  invWrap.appendChild(list);
+
+  ownedIds.forEach((id) => {
     const def = GEAR_DEFS[id];
+    const have = Math.max(0, toSafeInt(inv[id], 0));
+
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "btn secondary rpgMagicItem";
-    btn.setAttribute("role", "menuitem");
+    btn.className = "btn ghost rpgGearInvItem";
     btn.dataset.gearId = id;
     btn.dataset.gearAction = "equip";
+    btn.disabled = !canChange;
 
-    const label = def ? `${def.icon} ${def.name}` : id;
-    const desc = def?.desc ? ` • ${def.desc}` : "";
-    const owned = count > 0 ? ` (x${count})` : "";
-    const equipped = equippedId === id ? " • Equipped" : "";
-    btn.textContent = `${label}${owned}${desc}${equipped}`;
+    // Drag from inventory
+    btn.draggable = !!canChange;
+    if (canChange) {
+      btn.addEventListener("dragstart", (e) => {
+        try {
+          e.dataTransfer?.setData("text/plain", id);
+          e.dataTransfer?.setData("text/gear", id);
+          if (e.dataTransfer) e.dataTransfer.effectAllowed = "copy";
+        } catch { /* ignore */ }
+      });
+    }
 
-    // Equipping gear doesn't end your turn, but we keep it player-turn-only to avoid weird timing.
-    btn.disabled = !isPlayerTurn || equippedId === id;
-    els.gearMenu.appendChild(btn);
+    const slotPill = document.createElement("span");
+    slotPill.className = "rpgGearSlotPill";
+    slotPill.textContent = EQUIP_SLOT_LABEL[def.slot];
+    btn.appendChild(slotPill);
+
+    const main = document.createElement("span");
+    main.className = "rpgGearInvMain";
+    main.textContent = `${def.icon} ${def.name}`;
+    btn.appendChild(main);
+
+    const sub = document.createElement("span");
+    sub.className = "rpgGearInvSub";
+    sub.textContent = `x${have} • ${def.desc}`;
+    btn.appendChild(sub);
+
+    // Mark as equipped in its slot
+    const isEq = slots?.[def.slot] === id;
+    if (isEq) btn.classList.add("isEquipped");
+
+    list.appendChild(btn);
   });
 }
+
+
 
 /** @param {MagicType[]} types */
 function formatTypesDisplay(types) {
@@ -1695,6 +1853,17 @@ SmellTaste: { Wind: 0.8, Water: 1.0, Fire: 1.0, Sight: 0.8, Earth: 1.0, Touch: 1
   function renderEffectPreview(move) {
     if (!(els.effectPreview instanceof HTMLElement)) return;
 
+    // Custom preview (used for non-typed actions like Heal).
+    if (move && typeof move.customHtml === "string" && move.customHtml.trim()) {
+      const tone = move.tone === "good" || move.tone === "bad" ? move.tone : "neutral";
+      els.effectPreview.classList.remove("isGood", "isBad", "isNeutral");
+      if (tone === "good") els.effectPreview.classList.add("isGood");
+      else if (tone === "bad") els.effectPreview.classList.add("isBad");
+      else els.effectPreview.classList.add("isNeutral");
+      els.effectPreview.innerHTML = move.customHtml;
+      return;
+    }
+
     const eff = typeMultiplier(move.type, state.enemy.types);
     const tier = effectivenessTierLabel(eff);
 
@@ -1757,6 +1926,39 @@ function setPreviewMove(name, type, baseCost, extra = "") {
     previewMove = { name, type, baseCost, extra };
     renderEffectPreview(previewMove);
   }
+
+	/**
+	 * Set a custom preview line (used for non-typed actions like Heal).
+	 * @param {string} html
+	 * @param {"good"|"bad"|"neutral"} tone
+	 */
+	function setPreviewText(html, tone = "neutral") {
+	  // Store as the current preview so re-renders keep the same line.
+	  const t = state?.player?.types?.[0] || "Touch";
+	  previewMove = { name: "Preview", type: t, baseCost: 0, customHtml: html, tone };
+	  renderEffectPreview(previewMove);
+	}
+
+	/**
+	 * Predict how much HP Heal will restore right now (after capping at Max HP).
+	 * This mirrors the actual heal formula so the preview is always accurate.
+	 */
+	function previewHealAmount() {
+	  const healMult = typeof state?.player?.healMult === "number" ? state.player.healMult : 1;
+	  const maxHp = Math.max(1, toSafeInt(state?.player?.max, 1));
+	  const curHp = clamp(toSafeInt(state?.player?.hp, 0), 0, maxHp);
+	  const hpRatio = maxHp > 0 ? curHp / maxHp : 1;
+	  let heal = Math.round(maxHp * 0.28 + 4 * healMult);
+	  if (hpRatio <= 0.35) heal += Math.round(maxHp * 0.08);
+	  heal = Math.max(1, heal);
+	  const next = clamp(curHp + heal, 0, maxHp);
+	  return Math.max(0, next - curHp);
+	}
+
+	function showHealPreview() {
+	  const amt = previewHealAmount();
+	  setPreviewText(`Heal: <span class="rpgEffectPreviewText">+${amt} HP</span>`, "neutral");
+	}
 
   /** @param {MagicType[]} types */
   function formatTypes(types) {
@@ -2039,21 +2241,38 @@ function sanitizeItemCounts(raw) {
 // --------------------
 // Gear (equipment)
 // - Persistent, NOT consumed
-// - One slot (trinket)
+// - Three slots: Weapon / Armor / Trinket
 // - Saved per-hero
+// - Drag & drop in Gear menu (click also works, for mobile)
 // --------------------
 
-/** @type {Record<string, {id:string,name:string,icon:string,desc:string, hpBonus?:number, focusBonus?:number, powerPct?:number, healPct?:number, drPct?:number}>} */
+const EQUIP_SLOTS = /** @type {("weapon"|"armor"|"trinket")[]} */ (["weapon", "armor", "trinket"]);
+const EQUIP_SLOT_LABEL = /** @type {Record<"weapon"|"armor"|"trinket", string>} */ ({
+  weapon: "Weapon",
+  armor: "Armor",
+  trinket: "Trinket",
+});
+
+/** @type {Record<string, {id:string,slot:"weapon"|"armor"|"trinket",name:string,icon:string,desc:string, hpBonus?:number, focusBonus?:number, powerPct?:number, healPct?:number, drPct?:number}>} */
 const GEAR_DEFS = {
-  apprentice_ring: { id: "apprentice_ring", name: "Apprentice Ring", icon: "💍", desc: "+2 Max HP", hpBonus: 2 },
-  focus_band: { id: "focus_band", name: "Focus Band", icon: "🔷", desc: "+1 Max Mana", focusBonus: 1 },
-  ward_clasp: { id: "ward_clasp", name: "Ward Clasp", icon: "🧷", desc: "10% damage reduction", drPct: 0.10 },
-  ember_charm: { id: "ember_charm", name: "Ember Charm", icon: "🔥", desc: "+8% damage", powerPct: 0.08 },
-  sage_brooch: { id: "sage_brooch", name: "Sage Brooch", icon: "🌿", desc: "+8% healing", healPct: 0.08 },
+  // Trinkets (small, flexible bonuses)
+  apprentice_ring: { id: "apprentice_ring", slot: "trinket", name: "Apprentice Ring", icon: "💍", desc: "+2 Max HP", hpBonus: 2 },
+  focus_band: { id: "focus_band", slot: "trinket", name: "Focus Band", icon: "🔷", desc: "+1 Max Mana", focusBonus: 1 },
+  ward_clasp: { id: "ward_clasp", slot: "trinket", name: "Ward Clasp", icon: "🧷", desc: "10% damage reduction", drPct: 0.10 },
+  ember_charm: { id: "ember_charm", slot: "trinket", name: "Ember Charm", icon: "🔥", desc: "+8% damage", powerPct: 0.08 },
+  sage_brooch: { id: "sage_brooch", slot: "trinket", name: "Sage Brooch", icon: "🌿", desc: "+8% healing", healPct: 0.08 },
+
+  // Weapons (lean into offense / Mana)
+  tidal_blade: { id: "tidal_blade", slot: "weapon", name: "Tidal Blade", icon: "🗡️", desc: "+10% damage", powerPct: 0.10 },
+  mana_scepter: { id: "mana_scepter", slot: "weapon", name: "Mana Scepter", icon: "🪄", desc: "+1 Max Mana", focusBonus: 1 },
+
+  // Armor (survivability)
+  stoneguard_vest: { id: "stoneguard_vest", slot: "armor", name: "Stoneguard Vest", icon: "🛡️", desc: "+4 Max HP", hpBonus: 4 },
+  warded_coat: { id: "warded_coat", slot: "armor", name: "Warded Coat", icon: "🧥", desc: "12% damage reduction", drPct: 0.12 },
 };
 const GEAR_IDS = Object.keys(GEAR_DEFS);
 
-// Only new heroes get a starter gear piece. Existing saves remain unchanged.
+// Only new heroes get starter gear. Existing saves remain unchanged.
 const STARTING_GEAR = /** @type {Record<string, number>} */ ({ apprentice_ring: 1 });
 
 /** @param {any} raw */
@@ -2068,12 +2287,69 @@ function sanitizeGearCounts(raw) {
   return out;
 }
 
-/** @param {any} id @param {Record<string, number>} inv */
-function sanitizeEquippedGear(id, inv) {
+/** @param {any} id @param {Record<string, number>} inv @param {"weapon"|"armor"|"trinket"} slot */
+function sanitizeEquippedGearId(id, inv, slot) {
   if (typeof id !== "string") return null;
-  if (!GEAR_DEFS[id]) return null;
+  const def = GEAR_DEFS[id];
+  if (!def) return null;
+  if (def.slot !== slot) return null;
   const n = Math.max(0, toSafeInt(inv?.[id], 0));
   return n > 0 ? id : null;
+}
+
+/**
+ * Accepts either:
+ * - legacy string `equip` (treated as trinket)
+ * - {weapon, armor, trinket}
+ * @param {any} raw
+ * @param {Record<string, number>} inv
+ * @returns {{weapon:string|null, armor:string|null, trinket:string|null}}
+ */
+function sanitizeEquipSlots(raw, inv) {
+  /** @type {{weapon:string|null, armor:string|null, trinket:string|null}} */
+  const out = { weapon: null, armor: null, trinket: null };
+
+  // Backwards compatible: old saves used a single `equip` string.
+  if (typeof raw === "string") {
+    out.trinket = sanitizeEquippedGearId(raw, inv, "trinket");
+    return out;
+  }
+
+  const src = raw && typeof raw === "object" ? raw : {};
+  out.weapon = sanitizeEquippedGearId(src.weapon, inv, "weapon");
+  out.armor = sanitizeEquippedGearId(src.armor, inv, "armor");
+  out.trinket = sanitizeEquippedGearId(src.trinket, inv, "trinket");
+  return out;
+}
+
+/**
+ * Aggregate bonuses from equipped slots.
+ * @param {{weapon:string|null, armor:string|null, trinket:string|null}} slots
+ */
+function gearBonusesFromSlots(slots) {
+  const ids = [slots.weapon, slots.armor, slots.trinket].filter((x) => typeof x === "string");
+  let hpBonus = 0;
+  let focusBonus = 0;
+  let powerPct = 0;
+  let healPct = 0;
+  let drPct = 0;
+
+  ids.forEach((id) => {
+    const g = id && GEAR_DEFS[id] ? GEAR_DEFS[id] : null;
+    if (!g) return;
+    hpBonus += Math.max(0, toSafeInt(g.hpBonus, 0));
+    focusBonus += Math.max(0, toSafeInt(g.focusBonus, 0));
+    powerPct += clamp(Number(g.powerPct ?? 0), 0, 0.50);
+    healPct += clamp(Number(g.healPct ?? 0), 0, 0.50);
+    drPct += clamp(Number(g.drPct ?? 0), 0, 0.50);
+  });
+
+  // Keep stacking sane.
+  powerPct = clamp(powerPct, 0, 0.50);
+  healPct = clamp(healPct, 0, 0.50);
+  drPct = clamp(drPct, 0, 0.50);
+
+  return { hpBonus, focusBonus, powerPct, healPct, drPct, ids };
 }
 
 /** @param {number} level */
@@ -2095,7 +2371,7 @@ function loadHeroProgress(heroId) {
       spells: undefined,
       items: { ...STARTING_ITEMS },
       gear: { ...STARTING_GEAR },
-      equip: "apprentice_ring",
+      equipSlots: { weapon: null, armor: null, trinket: "apprentice_ring" },
     };
   }
   try {
@@ -2107,8 +2383,12 @@ function loadHeroProgress(heroId) {
       : undefined;
     const items = sanitizeItemCounts(obj?.items);
     const gear = sanitizeGearCounts(obj?.gear);
-    const equip = sanitizeEquippedGear(obj?.equip, gear);
-    return { level, xp, spells, items, gear, equip };
+
+    // Prefer modern shape, but accept legacy `equip`.
+    const rawSlots = obj?.equipSlots ?? obj?.equipment ?? obj?.equip;
+    const equipSlots = sanitizeEquipSlots(rawSlots, gear);
+
+    return { level, xp, spells, items, gear, equipSlots };
   } catch {
     return {
       level: 1,
@@ -2116,32 +2396,45 @@ function loadHeroProgress(heroId) {
       spells: undefined,
       items: { ...STARTING_ITEMS },
       gear: { ...STARTING_GEAR },
-      equip: "apprentice_ring",
+      equipSlots: { weapon: null, armor: null, trinket: "apprentice_ring" },
     };
   }
 }
 
 
-/** @param {string} heroId @param {{level:number,xp:number,spells?:string[],items?:Record<string,number>,gear?:Record<string,number>,equip?:string|null}} prog */
+/**
+ * @param {string} heroId
+ * @param {{level:number,xp:number,spells?:string[],items?:Record<string,number>,gear?:Record<string,number>,equipSlots?:{weapon?:string|null,armor?:string|null,trinket?:string|null},equip?:string|null}} prog
+ */
 function saveHeroProgress(heroId, prog) {
   try {
     const payload = {
       level: Math.max(1, toSafeInt(prog.level, 1)),
       xp: Math.max(0, toSafeInt(prog.xp, 0)),
     };
+
     if (Array.isArray(prog.spells)) {
       payload.spells = prog.spells.filter((id) => typeof id === "string" && !!SPELLS_BY_ID[id]);
     }
+
     if (prog?.items && typeof prog.items === "object") {
       payload.items = sanitizeItemCounts(prog.items);
     }
+
     if (prog?.gear && typeof prog.gear === "object") {
       payload.gear = sanitizeGearCounts(prog.gear);
     }
-    if (typeof prog?.equip === "string" || prog?.equip === null) {
-      const inv = payload.gear || sanitizeGearCounts(prog.gear);
-      payload.equip = sanitizeEquippedGear(prog.equip, inv);
-    }
+
+    const inv = payload.gear || sanitizeGearCounts(prog.gear);
+
+    // Accept either modern equipSlots or legacy equip string, then sanitize.
+    const rawSlots = (prog?.equipSlots && typeof prog.equipSlots === "object") ? prog.equipSlots : prog?.equip;
+    const slots = sanitizeEquipSlots(rawSlots, inv);
+    payload.equipSlots = slots;
+
+    // Back-compat for older builds: store trinket in `equip` too.
+    payload.equip = slots.trinket;
+
     window.localStorage.setItem(PROGRESS_KEY_PREFIX + heroId, JSON.stringify(payload));
   } catch (e) {
     // localStorage may be blocked (private mode). Ignore.
@@ -2630,19 +2923,19 @@ function setActiveLocation(id) {
     const scaled = applyLevelToHero(pt, prog.level);
     const items = sanitizeItemCounts(prog.items);
     const gear = sanitizeGearCounts(prog.gear);
-    const equip = sanitizeEquippedGear(prog.equip, gear);
-    const g = equip ? GEAR_DEFS[equip] : null;
-    const gHp = Math.max(0, toSafeInt(g?.hpBonus, 0));
-    const gFocus = Math.max(0, toSafeInt(g?.focusBonus, 0));
-    const gPowerPct = clamp(Number(g?.powerPct ?? 0), 0, 0.50);
-    const gHealPct = clamp(Number(g?.healPct ?? 0), 0, 0.50);
-    const gDrPct = clamp(Number(g?.drPct ?? 0), 0, 0.50);
-    const maxWithGear = scaled.maxHp + gHp;
-    const focusMaxWithGear = scaled.focusMax + gFocus;
+
+    // Backwards compatible: accept legacy `equip` and modern `equipSlots`.
+    const equipSlots = sanitizeEquipSlots(prog.equipSlots ?? prog.equip, gear);
+    const bonus = gearBonusesFromSlots(equipSlots);
+
+    const maxWithGear = scaled.maxHp + bonus.hpBonus;
+    const focusMaxWithGear = scaled.focusMax + bonus.focusBonus;
+
     const savedSpells = Array.isArray(prog.spells) ? prog.spells : knownSpellIdsFor(pt.types, prog.level);
     let spells = sanitizeKnownSpellIds(savedSpells, pt.types, prog.level);
     startingSpellIdsFor(pt.types).forEach((id) => { if (!spells.includes(id)) spells.push(id); });
     spells = sanitizeKnownSpellIds(spells, pt.types, prog.level);
+
     return {
       id: pt.id,
       name: pt.name,
@@ -2657,9 +2950,9 @@ function setActiveLocation(id) {
       level: prog.level,
       xp: prog.xp,
       xpToNext: xpToNext(prog.level),
-      powerMult: scaled.powerMult * (1 + gPowerPct),
-      healMult: scaled.healMult * (1 + gHealPct),
-      equipDR: gDrPct,
+      powerMult: scaled.powerMult * (1 + bonus.powerPct),
+      healMult: scaled.healMult * (1 + bonus.healPct),
+      equipDR: bonus.drPct,
       baseMaxHp: pt.maxHp,
       baseFocusMax: pt.focusMax,
 
@@ -2680,9 +2973,9 @@ function setActiveLocation(id) {
       // items (one-use consumables)
       items,
 
-      // gear (equipment: 1 slot)
+      // gear
       gear,
-      equip,
+      equipSlots,
 
       // turn flag: allow 1 item per turn without ending the turn
       itemUsedThisTurn: false,
@@ -2841,7 +3134,7 @@ function persistPlayerProgress() {
     spells: Array.isArray(state.player.spells) ? state.player.spells : [],
     items: sanitizeItemCounts(state.player.items),
     gear: sanitizeGearCounts(state.player.gear),
-    equip: typeof state.player.equip === "string" ? state.player.equip : null,
+    equipSlots: (state.player && typeof state.player.equipSlots === "object") ? state.player.equipSlots : undefined,
   });
 }
 
@@ -2853,20 +3146,16 @@ function persistPlayerProgress() {
     const lvl = Math.max(1, toSafeInt(state.player.level, 1));
     const scaled = applyLevelToHero(hero, lvl);
 
-    // Apply gear bonuses (1-slot equipment). Keep saves backwards compatible.
-    state.player.gear = sanitizeGearCounts(state.player.gear);
-    state.player.equip = sanitizeEquippedGear(state.player.equip, state.player.gear);
-    const g = state.player.equip ? GEAR_DEFS[state.player.equip] : null;
-    const gHp = Math.max(0, toSafeInt(g?.hpBonus, 0));
-    const gFocus = Math.max(0, toSafeInt(g?.focusBonus, 0));
-    const gPowerPct = clamp(Number(g?.powerPct ?? 0), 0, 0.50);
-    const gHealPct = clamp(Number(g?.healPct ?? 0), 0, 0.50);
-    const gDrPct = clamp(Number(g?.drPct ?? 0), 0, 0.50);
 
-    const newMax = scaled.maxHp + gHp;
-    const newFocusMax = scaled.focusMax + gFocus;
-    const newPowerMult = scaled.powerMult * (1 + gPowerPct);
-    const newHealMult = scaled.healMult * (1 + gHealPct);
+    // Apply gear bonuses (3-slot equipment). Back-compat: accept legacy `equip` string.
+    state.player.gear = sanitizeGearCounts(state.player.gear);
+    state.player.equipSlots = sanitizeEquipSlots(state.player.equipSlots ?? state.player.equip, state.player.gear);
+    const bonus = gearBonusesFromSlots(state.player.equipSlots);
+
+    const newMax = scaled.maxHp + bonus.hpBonus;
+    const newFocusMax = scaled.focusMax + bonus.focusBonus;
+    const newPowerMult = scaled.powerMult * (1 + bonus.powerPct);
+    const newHealMult = scaled.healMult * (1 + bonus.healPct);
 
     const oldMax = toSafeInt(state.player.max, newMax);
     const oldFocusMax = toSafeInt(state.player.focusMax, newFocusMax);
@@ -2875,7 +3164,7 @@ function persistPlayerProgress() {
     state.player.focusMax = newFocusMax;
     state.player.powerMult = newPowerMult;
     state.player.healMult = newHealMult;
-    state.player.equipDR = gDrPct;
+    state.player.equipDR = bonus.drPct;
     state.player.xpToNext = xpToNext(lvl);
     state.player.baseMaxHp = hero.maxHp;
     state.player.baseFocusMax = hero.focusMax;
@@ -3258,9 +3547,16 @@ function persistPlayerProgress() {
       const before = final;
       final = Math.max(0, Math.ceil(final * (1 - dr)));
       if (final !== before) {
-        const eqId = typeof state.player.equip === "string" ? state.player.equip : null;
-        const eq = eqId && GEAR_DEFS[eqId] ? GEAR_DEFS[eqId] : null;
-        addLog(`${eq ? `${eq.icon} ${eq.name}` : "Your gear"} dampens the hit (${before} → ${final}).`);
+        const slots = (state?.player?.equipSlots && typeof state.player.equipSlots === "object")
+          ? state.player.equipSlots
+          : sanitizeEquipSlots(state?.player?.equip, sanitizeGearCounts(state?.player?.gear));
+
+        const ids = [slots.weapon, slots.armor, slots.trinket].filter((x) => typeof x === "string");
+        const label = ids.length
+          ? ids.map((id) => `${GEAR_DEFS[id].icon} ${GEAR_DEFS[id].name}`).join(", ")
+          : "Your gear";
+
+        addLog(`${label} dampens the hit (${before} → ${final}).`);
       }
     }
 
@@ -3320,11 +3616,19 @@ function persistPlayerProgress() {
     setTypeLine(els.playerTypeText, state.player.types);
     setTypeLine(els.enemyTypeText, state.enemy.types);
 
-    // Equipment slot (1 piece)
+    // Equipment (Weapon / Armor / Trinket)
     if (els.playerEquipText instanceof HTMLElement) {
-      const eqId = typeof state.player.equip === "string" ? state.player.equip : null;
-      const eq = eqId && GEAR_DEFS[eqId] ? GEAR_DEFS[eqId] : null;
-      els.playerEquipText.textContent = eq ? `Equipment: ${eq.icon} ${eq.name} (${eq.desc})` : "Equipment: None";
+      const slots = (state?.player?.equipSlots && typeof state.player.equipSlots === "object")
+        ? state.player.equipSlots
+        : sanitizeEquipSlots(state?.player?.equip, sanitizeGearCounts(state?.player?.gear));
+
+      const parts = EQUIP_SLOTS.map((slot) => {
+        const id = slots[slot];
+        const g = id && GEAR_DEFS[id] ? GEAR_DEFS[id] : null;
+        return `${EQUIP_SLOT_LABEL[slot]}: ${g ? `${g.icon} ${g.name}` : "—"}`;
+      });
+
+      els.playerEquipText.textContent = `Equipment: ${parts.join(" • ")}`;
     }
     updateSpellPickButtonUI();
 
@@ -3426,7 +3730,10 @@ function persistPlayerProgress() {
     }
 
     if (els.healBtn instanceof HTMLButtonElement) {
-      els.healBtn.textContent = `Heal (${healCost} Mana, ${state.player.healCharges})`;
+	      els.healBtn.textContent = `Heal (${healCost} Mana, ${state.player.healCharges})`;
+	      // Hover/focus preview shows the exact heal amount; keep the tooltip accurate too.
+	      const amt = previewHealAmount();
+	      els.healBtn.title = `Heals ${amt} HP`;
     }
 
     // HP
@@ -4973,7 +5280,12 @@ function playerFireAttack() {
   }
 
   /** @param {string} gearId */
-  function playerEquipGear(gearId) {
+    /**
+   * Equip a piece of gear into its slot (or a slot override).
+   * @param {string} gearId
+   * @param {"weapon"|"armor"|"trinket"|null} slotOverride
+   */
+  function playerEquipGear(gearId, slotOverride = null) {
     if (isGameOver()) return;
     if (state.phase !== "player") return;
 
@@ -4996,20 +5308,43 @@ function playerFireAttack() {
       return;
     }
 
-    if (state.player.equip === gearId) {
-      addLog(`You're already wearing ${def.icon} ${def.name}.`);
+    const slot = slotOverride || def.slot;
+    if (slot !== def.slot) {
+      addLog(`${def.icon} ${def.name} doesn't fit that slot.`);
       render();
       return;
     }
 
-    state.player.equip = gearId;
+    state.player.gear = sanitizeGearCounts(state.player.gear);
+    state.player.equipSlots = sanitizeEquipSlots(state.player.equipSlots ?? state.player.equip, state.player.gear);
+
+    const prev = state.player.equipSlots[slot];
+
+    if (prev === gearId) {
+      addLog(`You're already using ${def.icon} ${def.name} as your ${EQUIP_SLOT_LABEL[slot]}.`);
+      render();
+      return;
+    }
+
+    state.player.equipSlots[slot] = gearId;
+
+    // Legacy compatibility: keep `equip` as the trinket for older code paths.
+    state.player.equip = state.player.equipSlots.trinket;
+
     syncPlayerLevel(false);
     persistPlayerProgress();
-    addLog(`🧰 Equipped: ${def.icon} ${def.name}.`);
+
+    if (prev && GEAR_DEFS[prev]) {
+      addLog(`🧰 ${EQUIP_SLOT_LABEL[slot]}: replaced ${GEAR_DEFS[prev].icon} ${GEAR_DEFS[prev].name} with ${def.icon} ${def.name}.`);
+    } else {
+      addLog(`🧰 ${EQUIP_SLOT_LABEL[slot]} equipped: ${def.icon} ${def.name}.`);
+    }
+
     render();
   }
 
-  function playerUnequipGear() {
+  /** @param {"weapon"|"armor"|"trinket"} slot */
+  function playerUnequipGear(slot) {
     if (isGameOver()) return;
     if (state.phase !== "player") return;
 
@@ -5017,19 +5352,29 @@ function playerFireAttack() {
     closeItemsMenu();
     closeGearMenu();
 
-    const curId = typeof state.player.equip === "string" ? state.player.equip : null;
-    if (!curId) {
-      addLog("You have no gear equipped.");
+    state.player.gear = sanitizeGearCounts(state.player.gear);
+    state.player.equipSlots = sanitizeEquipSlots(state.player.equipSlots ?? state.player.equip, state.player.gear);
+
+    const curId = state.player.equipSlots[slot];
+    if (!curId || !GEAR_DEFS[curId]) {
+      addLog(`No ${EQUIP_SLOT_LABEL[slot]} equipped.`);
       render();
       return;
     }
+
     const cur = GEAR_DEFS[curId];
-    state.player.equip = null;
+    state.player.equipSlots[slot] = null;
+
+    // Legacy compatibility
+    state.player.equip = state.player.equipSlots.trinket;
+
     syncPlayerLevel(false);
     persistPlayerProgress();
-    addLog(`🧰 Unequipped: ${cur ? `${cur.icon} ${cur.name}` : "gear"}.`);
+    addLog(`🧰 ${EQUIP_SLOT_LABEL[slot]} unequipped: ${cur.icon} ${cur.name}.`);
     render();
   }
+
+
   function restartToHeroSelect() {
     closeMagicMenu();
     closeItemsMenu();
@@ -5184,11 +5529,17 @@ function playerFireAttack() {
       if (!(target instanceof HTMLElement)) return;
       const btn = target.closest("button[data-gear-action]");
       if (!(btn instanceof HTMLButtonElement)) return;
+
       const action = btn.getAttribute("data-gear-action");
-      if (action === "unequip") {
-        playerUnequipGear();
+
+      if (action === "unequip-slot") {
+        const slot = btn.getAttribute("data-gear-slot");
+        if (slot === "weapon" || slot === "armor" || slot === "trinket") {
+          playerUnequipGear(slot);
+        }
         return;
       }
+
       const id = btn.getAttribute("data-gear-id");
       if (!id) return;
       playerEquipGear(id);
@@ -5286,6 +5637,7 @@ function playerFireAttack() {
         state.player.pendingSpellQueue = [];
         state.player.items = { ...STARTING_ITEMS };
         state.player.gear = { ...STARTING_GEAR };
+        state.player.equipSlots = { weapon: null, armor: null, trinket: "apprentice_ring" };
         state.player.equip = "apprentice_ring";
         syncPlayerLevel(false);
         syncKnownSpells(false);
@@ -5316,6 +5668,14 @@ function playerFireAttack() {
     btn.addEventListener("click", () => setPreviewMove(resolveName(), resolveType(), resolveCost()));
   };
   wirePreview(els.attackBtn, "Attack", () => playerPrimaryType(), 0);
+  // Heal has no type matchup, so it uses a custom preview showing exact HP restored.
+  const wireHealPreview = (btn) => {
+    if (!(btn instanceof HTMLElement)) return;
+    const show = () => showHealPreview();
+    btn.addEventListener("mouseenter", show);
+    btn.addEventListener("focus", show);
+  };
+  wireHealPreview(els.healBtn);
   wirePreview(els.windBtn, "Wind attack", "Wind", 2);
   wirePreview(
     els.secondaryTypeBtn,
