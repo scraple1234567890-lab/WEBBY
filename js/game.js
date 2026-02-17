@@ -526,12 +526,13 @@ function playWaveClearSfx() {
   document.addEventListener("click", (e) => {
     if (!(els.gearMenu instanceof HTMLElement)) return;
     if (!(els.gearToggle instanceof HTMLElement)) return;
+    // Use composedPath so we don't accidentally treat an in-menu click as "outside"
+    // after we re-render and replace the clicked button.
+    const path = typeof e.composedPath === "function" ? e.composedPath() : [];
     const t = e.target;
-    if (t instanceof Node) {
-      const inMenu = els.gearMenu.contains(t);
-      const inToggle = els.gearToggle.contains(t);
-      if (!inMenu && !inToggle) closeGearMenu();
-    }
+    const inMenu = (Array.isArray(path) && path.includes(els.gearMenu)) || (t instanceof Node && els.gearMenu.contains(t));
+    const inToggle = (Array.isArray(path) && path.includes(els.gearToggle)) || (t instanceof Node && els.gearToggle.contains(t));
+    if (!inMenu && !inToggle) closeGearMenu();
   });
 
 
@@ -1063,7 +1064,10 @@ function renderGearMenu(isPlayerTurn) {
     .sort((a, b) => {
       const A = GEAR_DEFS[a], B = GEAR_DEFS[b];
       if (!A || !B) return 0;
-      if (A.slot !== B.slot) return A.slot.localeCompare(B.slot);
+      if (A.slot !== B.slot) {
+        const order = { weapon: 0, armor: 1, trinket: 2 };
+        return (order[A.slot] ?? 99) - (order[B.slot] ?? 99);
+      }
       return A.name.localeCompare(B.name);
     });
 
@@ -2261,16 +2265,52 @@ const GEAR_DEFS = {
   ward_clasp: { id: "ward_clasp", slot: "trinket", name: "Ward Clasp", icon: "🧷", desc: "10% damage reduction", drPct: 0.10 },
   ember_charm: { id: "ember_charm", slot: "trinket", name: "Ember Charm", icon: "🔥", desc: "+8% damage", powerPct: 0.08 },
   sage_brooch: { id: "sage_brooch", slot: "trinket", name: "Sage Brooch", icon: "🌿", desc: "+8% healing", healPct: 0.08 },
+  quartz_charm: { id: "quartz_charm", slot: "trinket", name: "Quartz Charm", icon: "💎", desc: "+3 Max HP", hpBonus: 3 },
+  anchor_talisman: { id: "anchor_talisman", slot: "trinket", name: "Anchor Talisman", icon: "⚓", desc: "6% damage reduction", drPct: 0.06 },
+  duelist_coin: { id: "duelist_coin", slot: "trinket", name: "Duelist Coin", icon: "🪙", desc: "+6% damage", powerPct: 0.06 },
+  wisp_locket: { id: "wisp_locket", slot: "trinket", name: "Wisp Locket", icon: "🫧", desc: "+1 Max Mana, +4% healing", focusBonus: 1, healPct: 0.04 },
+  bulwark_token: { id: "bulwark_token", slot: "trinket", name: "Bulwark Token", icon: "🛡️", desc: "8% damage reduction", drPct: 0.08 },
 
   // Weapons (lean into offense / Mana)
   tidal_blade: { id: "tidal_blade", slot: "weapon", name: "Tidal Blade", icon: "🗡️", desc: "+10% damage", powerPct: 0.10 },
+  emberbrand_sabre: { id: "emberbrand_sabre", slot: "weapon", name: "Emberbrand Sabre", icon: "🗡️", desc: "+12% damage", powerPct: 0.12 },
+  gale_dagger: { id: "gale_dagger", slot: "weapon", name: "Gale Dagger", icon: "🗡️", desc: "+9% damage", powerPct: 0.09 },
+  echo_lance: { id: "echo_lance", slot: "weapon", name: "Echo Lance", icon: "🪓", desc: "+8% damage", powerPct: 0.08 },
+  duelist_foil: { id: "duelist_foil", slot: "weapon", name: "Duelist Foil", icon: "🗡️", desc: "+6% damage, +1 Max Mana", powerPct: 0.06, focusBonus: 1 },
+  runic_mace: { id: "runic_mace", slot: "weapon", name: "Runic Mace", icon: "🔨", desc: "+2 Max HP, +6% damage", hpBonus: 2, powerPct: 0.06 },
+  spring_wand: { id: "spring_wand", slot: "weapon", name: "Spring Wand", icon: "🪄", desc: "+10% healing", healPct: 0.10 },
   mana_scepter: { id: "mana_scepter", slot: "weapon", name: "Mana Scepter", icon: "🪄", desc: "+1 Max Mana", focusBonus: 1 },
+  prism_rod: { id: "prism_rod", slot: "weapon", name: "Prism Rod", icon: "🔮", desc: "+2 Max Mana", focusBonus: 2 },
 
   // Armor (survivability)
   stoneguard_vest: { id: "stoneguard_vest", slot: "armor", name: "Stoneguard Vest", icon: "🛡️", desc: "+4 Max HP", hpBonus: 4 },
+  ironbark_mail: { id: "ironbark_mail", slot: "armor", name: "Ironbark Mail", icon: "🥋", desc: "+6 Max HP, 6% damage reduction", hpBonus: 6, drPct: 0.06 },
   warded_coat: { id: "warded_coat", slot: "armor", name: "Warded Coat", icon: "🧥", desc: "12% damage reduction", drPct: 0.12 },
+  mirrorweave_mantle: { id: "mirrorweave_mantle", slot: "armor", name: "Mirrorweave Mantle", icon: "🪞", desc: "8% damage reduction, +1 Max Mana", drPct: 0.08, focusBonus: 1 },
+  mossweave_cloak: { id: "mossweave_cloak", slot: "armor", name: "Mossweave Cloak", icon: "🧶", desc: "+2 Max HP, +6% healing", hpBonus: 2, healPct: 0.06 },
+  emberproof_jacket: { id: "emberproof_jacket", slot: "armor", name: "Emberproof Jacket", icon: "🧥", desc: "10% damage reduction", drPct: 0.10 },
+  scholar_robe: { id: "scholar_robe", slot: "armor", name: "Scholar Robe", icon: "🎓", desc: "+2 Max HP, +1 Max Mana", hpBonus: 2, focusBonus: 1 },
+  tidebreaker_coat: { id: "tidebreaker_coat", slot: "armor", name: "Tidebreaker Coat", icon: "🌊", desc: "+3 Max HP, 6% damage reduction", hpBonus: 3, drPct: 0.06 },
+  pactwarden_wrap: { id: "pactwarden_wrap", slot: "armor", name: "Pactwarden Wrap", icon: "🧣", desc: "6% damage reduction, +6% healing", drPct: 0.06, healPct: 0.06 },
+
+  // Boss relics (unique per area boss; NOT in the random drop pool)
+  arena_victor_blade: { id: "arena_victor_blade", slot: "weapon", name: "Victor's Blade", icon: "🏆", desc: "+14% damage", powerPct: 0.14, bossUnique: true },
+  market_ledger_mail: { id: "market_ledger_mail", slot: "armor", name: "Ledger Mail", icon: "🧾", desc: "+1 Max Mana, 10% damage reduction", focusBonus: 1, drPct: 0.10, bossUnique: true },
+  feyleaf_circlet: { id: "feyleaf_circlet", slot: "trinket", name: "Feyleaf Circlet", icon: "🍃", desc: "+2 Max HP, +10% healing", hpBonus: 2, healPct: 0.10, bossUnique: true },
+  gutterglass_prism: { id: "gutterglass_prism", slot: "weapon", name: "Gutterglass Prism", icon: "🪞", desc: "+1 Max Mana, +8% damage", focusBonus: 1, powerPct: 0.08, bossUnique: true },
 };
 const GEAR_IDS = Object.keys(GEAR_DEFS);
+
+// Exclude boss relics from the random drop pool (they are awarded only by bosses).
+const GEAR_DROP_IDS = GEAR_IDS.filter((id) => !GEAR_DEFS[id]?.bossUnique);
+
+// Precompute lists by slot (used for balanced drops and clean UI logic).
+const GEAR_IDS_BY_SLOT = /** @type {Record<"weapon"|"armor"|"trinket", string[]>} */ ({
+  weapon: GEAR_DROP_IDS.filter((id) => GEAR_DEFS[id]?.slot === "weapon"),
+  armor: GEAR_DROP_IDS.filter((id) => GEAR_DEFS[id]?.slot === "armor"),
+  trinket: GEAR_DROP_IDS.filter((id) => GEAR_DEFS[id]?.slot === "trinket"),
+});
+const GEAR_DROP_SLOTS = EQUIP_SLOTS.filter((s) => Array.isArray(GEAR_IDS_BY_SLOT[s]) && GEAR_IDS_BY_SLOT[s].length > 0);
 
 // Only new heroes get starter gear. Existing saves remain unchanged.
 const STARTING_GEAR = /** @type {Record<string, number>} */ ({ apprentice_ring: 1 });
@@ -2283,6 +2323,18 @@ function sanitizeGearCounts(raw) {
   for (const id of GEAR_IDS) {
     const n = Math.max(0, toSafeInt(src[id], 0));
     if (n > 0) out[id] = clamp(n, 0, 99);
+  }
+  return out;
+}
+
+/** @param {any} raw */
+function sanitizeBossUniques(raw) {
+  /** @type {Record<string, boolean>} */
+  const out = {};
+  const src = raw && typeof raw === "object" ? raw : {};
+  for (const [k, v] of Object.entries(src)) {
+    if (typeof k !== "string") continue;
+    if (v) out[k] = true;
   }
   return out;
 }
@@ -2372,6 +2424,7 @@ function loadHeroProgress(heroId) {
       items: { ...STARTING_ITEMS },
       gear: { ...STARTING_GEAR },
       equipSlots: { weapon: null, armor: null, trinket: "apprentice_ring" },
+      bossUniques: {},
     };
   }
   try {
@@ -2388,7 +2441,9 @@ function loadHeroProgress(heroId) {
     const rawSlots = obj?.equipSlots ?? obj?.equipment ?? obj?.equip;
     const equipSlots = sanitizeEquipSlots(rawSlots, gear);
 
-    return { level, xp, spells, items, gear, equipSlots };
+    const bossUniques = sanitizeBossUniques(obj?.bossUniques);
+
+    return { level, xp, spells, items, gear, equipSlots, bossUniques };
   } catch {
     return {
       level: 1,
@@ -2397,6 +2452,7 @@ function loadHeroProgress(heroId) {
       items: { ...STARTING_ITEMS },
       gear: { ...STARTING_GEAR },
       equipSlots: { weapon: null, armor: null, trinket: "apprentice_ring" },
+      bossUniques: {},
     };
   }
 }
@@ -2434,6 +2490,10 @@ function saveHeroProgress(heroId, prog) {
 
     // Back-compat for older builds: store trinket in `equip` too.
     payload.equip = slots.trinket;
+
+    if (prog?.bossUniques && typeof prog.bossUniques === "object") {
+      payload.bossUniques = sanitizeBossUniques(prog.bossUniques);
+    }
 
     window.localStorage.setItem(PROGRESS_KEY_PREFIX + heroId, JSON.stringify(payload));
   } catch (e) {
@@ -2831,6 +2891,21 @@ function buildLocationsFromMap() {
 }
 
 const LOCATIONS = buildLocationsFromMap() || FALLBACK_LOCATIONS;
+// Unique boss relic per area (awarded on first boss clear per hero).
+const BOSS_UNIQUE_GEAR_BY_LOCATION = /** @type {Record<string, string>} */ ({
+  // Map-sourced game locations
+  "arena": "arena_victor_blade",
+  "market-central": "market_ledger_mail",
+  "fey-forest": "feyleaf_circlet",
+  "gutterglass": "gutterglass_prism",
+
+  // Fallback locations (in case map data isn't present)
+  "ember_plaza": "arena_victor_blade",
+  "quartz_library": "feyleaf_circlet",
+  "gale_rooftops": "gutterglass_prism",
+  "mirror_tunnels": "market_ledger_mail",
+});
+
 
 /** @type {string|null} */
 let activeLocationId = null;
@@ -2928,6 +3003,8 @@ function setActiveLocation(id) {
     const equipSlots = sanitizeEquipSlots(prog.equipSlots ?? prog.equip, gear);
     const bonus = gearBonusesFromSlots(equipSlots);
 
+    const bossUniques = sanitizeBossUniques(prog.bossUniques);
+
     const maxWithGear = scaled.maxHp + bonus.hpBonus;
     const focusMaxWithGear = scaled.focusMax + bonus.focusBonus;
 
@@ -2976,6 +3053,7 @@ function setActiveLocation(id) {
       // gear
       gear,
       equipSlots,
+      bossUniques,
 
       // turn flag: allow 1 item per turn without ending the turn
       itemUsedThisTurn: false,
@@ -3135,6 +3213,7 @@ function persistPlayerProgress() {
     items: sanitizeItemCounts(state.player.items),
     gear: sanitizeGearCounts(state.player.gear),
     equipSlots: (state.player && typeof state.player.equipSlots === "object") ? state.player.equipSlots : undefined,
+    bossUniques: (state.player && typeof state.player.bossUniques === "object") ? state.player.bossUniques : undefined,
   });
 }
 
@@ -3854,6 +3933,23 @@ function persistPlayerProgress() {
     persistPlayerProgress();
   }
 
+
+  /**
+   * Award a one-time boss relic for the current location (per hero).
+   * Returns the awarded gearId, or null if none/already claimed.
+   * @param {string|null} locationId
+   */
+  function awardBossRelicIfEligible(locationId) {
+    if (!locationId || !state?.player) return null;
+    const gearId = BOSS_UNIQUE_GEAR_BY_LOCATION?.[locationId] || null;
+    if (!gearId || !GEAR_DEFS[gearId]) return null;
+    if (!state.player.bossUniques || typeof state.player.bossUniques !== "object") state.player.bossUniques = {};
+    if (state.player.bossUniques[locationId]) return null;
+    state.player.bossUniques[locationId] = true;
+    gainGear(gearId, 1);
+    return gearId;
+  }
+
   /** @param {number} waveIndex */
   function lootForWave(waveIndex) {
     // Loot is split into: consumables + (rare) gear.
@@ -3874,10 +3970,15 @@ function persistPlayerProgress() {
     // Gear chance: ~25% per cleared wave.
     // Note: we allow this on boss waves too so the overall feel stays consistent.
     const gearChance = 0.25;
-    if (Math.random() < gearChance && Array.isArray(GEAR_IDS) && GEAR_IDS.length > 0) {
-      const idx = Math.floor(Math.random() * GEAR_IDS.length);
-      const pick = GEAR_IDS[idx];
-      result.gearId = pick && GEAR_DEFS[pick] ? pick : null;
+
+    // Pick a slot first, then a random piece within that slot (keeps drops varied across Weapon/Armor/Trinket).
+    if (Math.random() < gearChance && Array.isArray(GEAR_DROP_SLOTS) && GEAR_DROP_SLOTS.length > 0) {
+      const slot = GEAR_DROP_SLOTS[Math.floor(Math.random() * GEAR_DROP_SLOTS.length)];
+      const list = Array.isArray(GEAR_IDS_BY_SLOT?.[slot]) ? GEAR_IDS_BY_SLOT[slot] : [];
+      if (list.length > 0) {
+        const pick = list[Math.floor(Math.random() * list.length)];
+        result.gearId = pick && GEAR_DEFS[pick] ? pick : null;
+      }
     }
 
     return result;
@@ -3897,7 +3998,7 @@ function persistPlayerProgress() {
     // Play the badge-unlock SFX when you clear Wave 1.
     if (state.wave === 0) playWaveClearSfx();
 
-    // Loot: random consumable and (rarer) gear.
+        // Loot: random consumable and (rarer) gear.
     const loot = lootForWave(state.wave);
     const parts = [];
     if (loot?.itemId) {
@@ -3914,18 +4015,29 @@ function persistPlayerProgress() {
         parts.push(`${g.icon} ${g.name} (Gear)`);
       }
     }
-    const lootLine = parts.length ? `Picked up: ${parts.join(" + ")}` : "No loot this time.";
+
+    const lootLine = () => parts.length ? `Picked up: ${parts.join(' + ')}` : 'No loot this time.';
 
     playAnim(els.enemySprite, "rpgAnim-faint");
 
     const nextIndex = state.wave + 1;
     const isFinal = nextIndex >= state.enemySet.length;
 
+    // Boss relic (one-time per location per hero)
+    let bossRelicId = null;
+    if (isFinal && state.wave >= 2) {
+      bossRelicId = awardBossRelicIfEligible(state.locationId || null);
+      if (bossRelicId) {
+        const rg = GEAR_DEFS[bossRelicId];
+        if (rg) parts.unshift(`${rg.icon} ${rg.name} (Boss Relic)`);
+      }
+    }
+
     // Lock controls and show a brief victory/loot screen for ~3 seconds.
     setPhase("loot");
     const title = isFinal ? "Victory!" : `Wave ${state.wave + 1} cleared!`;
     const subtitle = isFinal ? "You collect your spoils." : "You collect your spoils.";
-    openLootScreen(title, subtitle, lootLine);
+    openLootScreen(title, subtitle, lootLine());
     render();
 
     const myBattle = state.battleId;
@@ -5291,7 +5403,7 @@ function playerFireAttack() {
 
     closeMagicMenu();
     closeItemsMenu();
-    closeGearMenu();
+    // Keep the gear menu open so you can rapidly swap/compare equipment.
 
     const def = GEAR_DEFS[gearId];
     if (!def) {
@@ -5350,7 +5462,7 @@ function playerFireAttack() {
 
     closeMagicMenu();
     closeItemsMenu();
-    closeGearMenu();
+    // Keep the gear menu open so you can rapidly swap/compare equipment.
 
     state.player.gear = sanitizeGearCounts(state.player.gear);
     state.player.equipSlots = sanitizeEquipSlots(state.player.equipSlots ?? state.player.equip, state.player.gear);
