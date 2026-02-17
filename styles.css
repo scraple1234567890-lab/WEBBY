@@ -2560,8 +2560,14 @@ body.isEditingShopProduct {
   border-radius: inherit;
   background: linear-gradient(90deg, var(--hp-green-1), var(--hp-green-2));
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08) inset, 0 0 14px rgba(60,220,110,0.14);
-  transition: width 180ms ease;
+  transition: width 180ms ease, background 180ms ease, box-shadow 180ms ease;
 }
+
+.rpgHpFill.isLowHp {
+  background: linear-gradient(90deg, var(--hp-red-1), var(--hp-red-2));
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08) inset, 0 0 14px rgba(255, 90, 90, 0.18);
+}
+
 
 /* Game page readability: make panels fully opaque so menus/cards are easier to see */
 body.gamePage {
@@ -2572,6 +2578,8 @@ body.gamePage {
   /* Core bars */
   --hp-green-1: rgb(60 220 110);
   --hp-green-2: rgb(150 255 140);
+  --hp-red-1: rgb(255 88 88);
+  --hp-red-2: rgb(255 170 110);
   --focus-1: rgb(85 205 255);
   --focus-2: rgb(80 170 255);
 
@@ -2915,6 +2923,32 @@ html[data-theme="light"] .rpgLootLine {
   background: rgba(0, 0, 0, 0.04);
   border-color: rgba(0, 0, 0, 0.10);
 }
+
+/* Defeat screen (player HP hits 0) */
+.rpgDefeatInner {
+  width: min(520px, 100%);
+  max-height: none;
+  overflow: hidden;
+}
+
+.rpgDefeatHead {
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.rpgDefeatBody {
+  text-align: center;
+  gap: 12px;
+}
+
+.rpgDefeatInner .rpgLogTitle {
+  color: rgba(255, 120, 120, 0.95);
+}
+
+.rpgDefeatFoot {
+  justify-content: center;
+}
+
 
 /* Location picker */
 .rpgLocationGrid {

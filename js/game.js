@@ -88,6 +88,12 @@ if (root) {
     lootLine: document.getElementById("lootLine"),
     lootAutoNote: document.getElementById("lootAutoNote"),
 
+    // Defeat screen (when player HP hits 0)
+    defeatModal: document.getElementById("defeatModal"),
+    defeatTitle: document.getElementById("defeatTitle"),
+    defeatSubtitle: document.getElementById("defeatSubtitle"),
+    defeatRestartBtn: document.getElementById("defeatRestartBtn"),
+
     // Character picker (pre-combat)
     characterModal: document.getElementById("characterModal"),
     characterChoices: document.getElementById("characterChoices"),
@@ -868,6 +874,7 @@ function setTypeAccent(el, types) {
       closeMagicMenu();
       closeItemsMenu();
       if (isLootOpen()) { closeLootScreen(); if (lootTimer) window.clearTimeout(lootTimer); lootTimer = 0; }
+      if (isDefeatOpen()) closeDefeatScreen();
     }
   });
 
@@ -1108,6 +1115,10 @@ function isLootOpen() {
   return (els.lootModal instanceof HTMLElement) && !els.lootModal.hasAttribute("hidden");
 }
 
+function isDefeatOpen() {
+  return (els.defeatModal instanceof HTMLElement) && !els.defeatModal.hasAttribute("hidden");
+}
+
 let lootLastFocus = null;
 let lootTimer = 0;
 
@@ -1138,8 +1149,45 @@ function closeLootScreen() {
   if (prev && prev instanceof HTMLElement) prev.focus();
 }
 
+
+let defeatLastFocus = null;
+
+/** @param {string} subtitle */
+function openDefeatScreen(subtitle) {
+  if (!(els.defeatModal instanceof HTMLElement)) return;
+
+  // Close transient UI so the defeat screen is the clear focus.
+  closeMagicMenu();
+  closeItemsMenu();
+  if (isSpellPickOpen()) closeSpellPicker();
+  if (isExplainOpen()) closeExplain();
+  if (isLocationOpen()) closeLocationPicker();
+  if (isLootOpen()) { closeLootScreen(); if (lootTimer) window.clearTimeout(lootTimer); lootTimer = 0; }
+
+  if (els.defeatTitle instanceof HTMLElement) els.defeatTitle.textContent = "Defeated";
+  if (els.defeatSubtitle instanceof HTMLElement) {
+    els.defeatSubtitle.textContent = subtitle || "You were defeated.";
+  }
+
+  els.defeatModal.removeAttribute("hidden");
+  defeatLastFocus = document.activeElement;
+  updateBodyModalOpen();
+
+  const inner = els.defeatModal.querySelector(".rpgDefeatInner");
+  if (inner instanceof HTMLElement) inner.focus();
+}
+
+function closeDefeatScreen() {
+  if (!(els.defeatModal instanceof HTMLElement)) return;
+  els.defeatModal.setAttribute("hidden", "");
+  const prev = defeatLastFocus;
+  defeatLastFocus = null;
+  updateBodyModalOpen();
+  if (prev && prev instanceof HTMLElement) prev.focus();
+}
+
 function updateBodyModalOpen() {
-  const any = isExplainOpen() || isHeroOpen() || isLocationOpen() || isSpellPickOpen() || isLootOpen();
+  const any = isExplainOpen() || isHeroOpen() || isLocationOpen() || isSpellPickOpen() || isLootOpen() || isDefeatOpen();
   document.body.classList.toggle("modalOpen", any);
 }
 
@@ -1819,7 +1867,7 @@ function toSafeInt(n, fallback) {
 // --------------------
 // Items (extremely simple)
 // - One-use consumables
-// - Found deterministically after each cleared wave
+// - Found randomly after each cleared wave (equal chance per item)
 // - Saved per-hero
 // --------------------
 
@@ -2436,6 +2484,19 @@ syncKnownSpells(false);
     el.style.width = `${Math.round(safe * 100)}%`;
   }
 
+
+  // HP bar turns red under this fraction (e.g. 0.30 = 30%).
+  const HP_LOW_THRESHOLD = 0.30;
+
+  /** @param {HTMLElement|null} el @param {number} ratio */
+  function setHpBar(el, ratio) {
+    setBar(el, ratio);
+    if (!el) return;
+    const safe = clamp(ratio, 0, 1);
+    el.classList.toggle("isLowHp", safe <= HP_LOW_THRESHOLD);
+  }
+
+
   
 function persistPlayerProgress() {
   const heroId = state?.player?.id || activeHeroId;
@@ -2952,8 +3013,8 @@ function persistPlayerProgress() {
     // HP
     setText(els.playerHpText, `HP ${playerHp} / ${state.player.max}`);
     setText(els.enemyHpText, `HP ${enemyHp} / ${state.enemy.max}`);
-    setBar(els.playerHpFill, playerHp / state.player.max);
-    setBar(els.enemyHpFill, enemyHp / state.enemy.max);
+    setHpBar(els.playerHpFill, playerHp / state.player.max);
+    setHpBar(els.enemyHpFill, enemyHp / state.enemy.max);
 
     // Status
     if (state.over) {
@@ -3015,6 +3076,10 @@ function persistPlayerProgress() {
     if (state.enemy.hp <= 0) playAnim(els.enemySprite, "rpgAnim-faint");
     if (state.player.hp <= 0) playAnim(els.playerSprite, "rpgAnim-faint");
     render();
+    if (state.player.hp <= 0) {
+      openDefeatScreen(message || "You were defeated.");
+    }
+
   }
 
   // --------------------
@@ -3048,29 +3113,15 @@ function persistPlayerProgress() {
 
     /** @param {number} waveIndex */
   function lootForWave(waveIndex) {
-    const locId = state?.locationId || activeLocationId || "";
-    /** @type {Record<string, string[]>} */
-    const table = {
-      // Include "none" slots so you sometimes find nothing (still deterministic).
-      "arena": ["potion", "bomb", "rune", "none"],
-      "market-central": ["ether", "potion", "barrier", "none"],
-      "fey-forest": ["cleanse", "ember", "potion", "none"],
-      "gutterglass": ["stun", "barrier", "ether", "none"],
-    };
-
-    const row = table[locId] || ["potion", "ether", "none", "potion"];
-
-    // Deterministic pick: depends on battle + wave + location (no RNG).
-    const seed =
-      Math.max(1, toSafeInt(state?.battleId, 1)) +
-      Math.max(0, toSafeInt(waveIndex, 0)) * 7 +
-      (locId ? locId.length * 3 : 0);
-
-    const idx = ((seed % row.length) + row.length) % row.length;
-    const pick = row[idx];
-
-    if (!pick || pick === "none") return null;
-    return pick;
+    // Equal chance for every item, regardless of which fight/location you're in.
+    // Keep a small chance to find nothing so the loot screen can still say "No items."
+    void waveIndex;
+    const NONE_CHANCE = 0.25;
+    if (Math.random() < NONE_CHANCE) return null;
+    if (!Array.isArray(ITEM_IDS) || ITEM_IDS.length === 0) return null;
+    const idx = Math.floor(Math.random() * ITEM_IDS.length);
+    const pick = ITEM_IDS[idx];
+    return pick && ITEM_DEFS[pick] ? pick : null;
   }
 
 
@@ -3087,7 +3138,7 @@ function persistPlayerProgress() {
     // Play the badge-unlock SFX when you clear Wave 1.
     if (state.wave === 0) playWaveClearSfx();
 
-    // Simple loot: one item per cleared wave (deterministic by location).
+    // Simple loot: one item per cleared wave (random, equal chance per item).
     const lootId = lootForWave(state.wave);
     const lootDef = lootId ? (ITEM_DEFS[lootId] || null) : null;
     const lootLine = lootDef ? `Picked up: ${lootDef.icon} ${lootDef.name} (x1)` : "No items.";
@@ -3098,7 +3149,7 @@ function persistPlayerProgress() {
     const nextIndex = state.wave + 1;
     const isFinal = nextIndex >= state.enemySet.length;
 
-    // Lock controls and show a brief victory/loot screen for ~5 seconds.
+    // Lock controls and show a brief victory/loot screen for ~3 seconds.
     setPhase("loot");
     const title = isFinal ? "Victory!" : `Wave ${state.wave + 1} cleared!`;
     const subtitle = isFinal ? "You collect your spoils." : "You collect your spoils.";
@@ -3146,7 +3197,7 @@ function persistPlayerProgress() {
 
       setEffectBanner("—", "neutral");
       render();
-    }, 5000);
+    }, 3000);
   }
 
 
@@ -4433,6 +4484,24 @@ function playerFireAttack() {
     addLog("Choose an action.");
     render();
   }
+  function restartToHeroSelect() {
+    closeMagicMenu();
+    closeItemsMenu();
+    closeHeroPicker();
+    closeLocationPicker();
+    if (isLootOpen()) closeLootScreen();
+    if (lootTimer) window.clearTimeout(lootTimer);
+    lootTimer = 0;
+    if (isDefeatOpen()) closeDefeatScreen();
+    resetVisuals();
+    state = makeLobbyState();
+    syncKnownSpells(false);
+    renderIntent(null);
+    setEffectBanner("—", "neutral");
+    render();
+    openHeroPicker();
+  }
+
   function restart() {
     closeMagicMenu();
     closeItemsMenu();
@@ -4441,6 +4510,7 @@ function playerFireAttack() {
     if (isLootOpen()) closeLootScreen();
     if (lootTimer) window.clearTimeout(lootTimer);
     lootTimer = 0;
+    if (isDefeatOpen()) closeDefeatScreen();
     resetVisuals();
     state = makeLobbyState();
   syncKnownSpells(false);
@@ -4591,20 +4661,15 @@ function playerFireAttack() {
 
 
   if (els.heroBtn instanceof HTMLButtonElement) {
-    els.heroBtn.addEventListener("click", () => {
-      closeMagicMenu();
-      closeItemsMenu();
-      closeLocationPicker();
-      if (isLootOpen()) closeLootScreen();
-      if (lootTimer) window.clearTimeout(lootTimer);
-      lootTimer = 0;
-      resetVisuals();
-      state = makeLobbyState();
-  syncKnownSpells(false);
-      renderIntent(null);
-      setEffectBanner("—", "neutral");
-      render();
-      openHeroPicker();
+        els.heroBtn.addEventListener("click", () => {
+      restartToHeroSelect();
+    });
+  }
+
+
+  if (els.defeatRestartBtn instanceof HTMLButtonElement) {
+    els.defeatRestartBtn.addEventListener("click", () => {
+      restartToHeroSelect();
     });
   }
 
