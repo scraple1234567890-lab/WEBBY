@@ -770,10 +770,21 @@ function renderSpellMenu(spells, isPlayerTurn, focus, boundExtra) {
 
 /** @param {string} itemId */
 function itemCanUse(itemId) {
-  if (!state || !state.player) return false;
+  if (!state || !state.player || !state.enemy) return false;
+
   if (itemId === "potion") return state.player.hp < state.player.max;
   if (itemId === "ether") return state.player.focus < state.player.focusMax;
   if (itemId === "cleanse") return (state.player.burn > 0) || (state.player.bound > 0);
+
+  // Offense / tactics
+  if (itemId === "bomb") return state.enemy.hp > 0;
+  if (itemId === "ember") return state.enemy.hp > 0 && (state.enemy.burn ?? 0) < 2;
+  if (itemId === "stun") return state.enemy.hp > 0 && (state.enemy.stunned ?? 0) <= 0;
+
+  // Setups (best used before your action)
+  if (itemId === "rune") return state.enemy.hp > 0 && !(state.player.damageBoost > 1);
+  if (itemId === "barrier") return !(state.player.barrier > 0);
+
   return false;
 }
 
@@ -1816,10 +1827,17 @@ const ITEM_DEFS = /** @type {Record<string, {id:string,name:string,icon:string,d
   potion: { id: "potion", name: "Potion", icon: "🧪", desc: "Heal 7 HP" },
   ether: { id: "ether", name: "Mana Shard", icon: "💠", desc: "Restore 2 Mana" },
   cleanse: { id: "cleanse", name: "Cleanse Charm", icon: "🧿", desc: "Clear Burn + Bind" },
+
+  // Slightly more interesting drops (still very simple)
+  bomb: { id: "bomb", name: "Bomb", icon: "💣", desc: "Deal 6 damage (ignores defenses)" },
+  ember: { id: "ember", name: "Ember Oil", icon: "🕯️", desc: "Apply Burn (2) to enemy" },
+  stun: { id: "stun", name: "Stun Dust", icon: "🌫️", desc: "Enemy skips next turn" },
+  rune: { id: "rune", name: "Power Rune", icon: "🗡️", desc: "Next damage x1.3" },
+  barrier: { id: "barrier", name: "Barrier Scroll", icon: "🛡️", desc: "Next hit −30%" },
 });
 const ITEM_IDS = Object.keys(ITEM_DEFS);
 
-const STARTING_ITEMS = /** @type {Record<string, number>} */ ({ potion: 1, ether: 1 });
+const STARTING_ITEMS = /** @type {Record<string, number>} */ ({ potion: 1, ether: 1, bomb: 1 });
 
 /** @param {any} raw */
 function sanitizeItemCounts(raw) {
@@ -2249,6 +2267,7 @@ function setActiveLocation(id) {
     gusted: false,       // next damage -2
     scented: 0,          // next attacks -1 (Smell/Taste)
     burn: 0,             // ticks 2 at start of turn
+    stunned: 0,          // skips next turn
     enraged: false,
 
     // AI
@@ -2296,6 +2315,10 @@ function setActiveLocation(id) {
       evading: false,
       burn: 0,
       bound: 0,
+
+      // tactical item effects
+      barrier: 0,          // next hit −30%
+      damageBoost: 0,      // e.g. 1.3 for next damage
 
       // items (one-use consumables)
       items,
@@ -2517,6 +2540,8 @@ function persistPlayerProgress() {
     const parts = [];
     if (!state.over && state.player.guarding) parts.push("Guarding (next hit −50%)");
     if (!state.over && state.player.evading) parts.push("Evasive veil (next hit softened)");
+    if (!state.over && state.player.barrier > 0) parts.push("Barrier (next hit −30%)");
+    if (!state.over && state.player.damageBoost > 1) parts.push("Power Rune (next damage x1.3)");
     if (!state.over && state.player.bound > 0) parts.push("Bound (next move weakened)");
     if (!state.over && state.player.burn > 0) parts.push(`Burning (${state.player.burn})`);
     return parts.length ? parts.join(" • ") : "Ready";
@@ -2525,6 +2550,7 @@ function persistPlayerProgress() {
   function statusLineForEnemy() {
     const parts = [];
     if (!state.over && state.enemy.enraged) parts.push("Enraged");
+    if (!state.over && state.enemy.stunned > 0) parts.push("Stunned (skips next turn)");
     if (!state.over && state.enemy.ward > 0) parts.push("Mirror ward (reflect)");
     if (!state.over && state.enemy.fortified > 0) parts.push("Fortified (next hit −30%)");
     if (!state.over && state.enemy.guarding) parts.push("Bracing (next hit −50%)");
@@ -2751,6 +2777,16 @@ function persistPlayerProgress() {
       state.player.evading = false;
       addLog(`You slip in an evasive veil (${before} → ${final}).`);
       playAnim(els.playerSprite, "rpgAnim-guard");
+    }
+
+    // Barrier (from item): reduce next hit by 30%
+    if (state.player.barrier > 0) {
+      const before = final;
+      final = Math.ceil(final * 0.7);
+      state.player.barrier = 0;
+      addLog(`A barrier absorbs part of the blow (${before} → ${final}).`);
+      playAnim(els.playerSprite, "rpgAnim-guard");
+      spawnFx("guard", "player");
     }
 
     // Guard: usually halves next hit, but Quake pushes through.
@@ -3010,19 +3046,31 @@ function persistPlayerProgress() {
     return true;
   }
 
-  /** @param {number} waveIndex */
+    /** @param {number} waveIndex */
   function lootForWave(waveIndex) {
     const locId = state?.locationId || activeLocationId || "";
     /** @type {Record<string, string[]>} */
     const table = {
-      "arena": ["potion", "ether"],
-      "market-central": ["ether", "potion"],
-      "fey-forest": ["cleanse", "potion"],
-      "gutterglass": ["potion", "cleanse"],
+      // Include "none" slots so you sometimes find nothing (still deterministic).
+      "arena": ["potion", "bomb", "rune", "none"],
+      "market-central": ["ether", "potion", "barrier", "none"],
+      "fey-forest": ["cleanse", "ember", "potion", "none"],
+      "gutterglass": ["stun", "barrier", "ether", "none"],
     };
-    const row = table[locId] || ["potion", "ether"];
-    const idx = clamp(toSafeInt(waveIndex, 0), 0, row.length - 1);
-    return row[idx] || "potion";
+
+    const row = table[locId] || ["potion", "ether", "none", "potion"];
+
+    // Deterministic pick: depends on battle + wave + location (no RNG).
+    const seed =
+      Math.max(1, toSafeInt(state?.battleId, 1)) +
+      Math.max(0, toSafeInt(waveIndex, 0)) * 7 +
+      (locId ? locId.length * 3 : 0);
+
+    const idx = ((seed % row.length) + row.length) % row.length;
+    const pick = row[idx];
+
+    if (!pick || pick === "none") return null;
+    return pick;
   }
 
 
@@ -3041,9 +3089,9 @@ function persistPlayerProgress() {
 
     // Simple loot: one item per cleared wave (deterministic by location).
     const lootId = lootForWave(state.wave);
-    const lootDef = ITEM_DEFS[lootId] || null;
+    const lootDef = lootId ? (ITEM_DEFS[lootId] || null) : null;
     const lootLine = lootDef ? `Picked up: ${lootDef.icon} ${lootDef.name} (x1)` : "No items.";
-    if (lootDef) gainItem(lootId, 1);
+    if (lootDef && lootId) gainItem(lootId, 1);
 
     playAnim(els.enemySprite, "rpgAnim-faint");
 
@@ -3254,6 +3302,19 @@ function persistPlayerProgress() {
     // If a burn tick happened, give it a brief moment to read before
     // the enemy's action banner appears (otherwise it gets overwritten).
     const continueEnemyTurn = () => {
+
+    // Stun: skip the enemy's action once (burn already ticked above).
+    if ((state.enemy.stunned ?? 0) > 0) {
+      state.enemy.stunned = Math.max(0, toSafeInt(state.enemy.stunned, 0) - 1);
+      showMoveBanner("Stunned", "Sight");
+      addLog(`${state.enemy.name} is stunned and loses the turn.`);
+      playAnim(els.enemySprite, "rpgAnim-guard");
+      spawnFx("guard", "enemy");
+      render();
+      queuePlayerTurn();
+      return;
+    }
+
 
     // Enrage phase (deterministic)
     if (!state.enemy.enraged && state.enemy.hp <= Math.ceil(state.enemy.max * 0.4)) {
@@ -3467,6 +3528,14 @@ function persistPlayerProgress() {
       addLog("Bind dulls your strike (−2).");
     }
 
+
+    if (state.player.damageBoost > 1) {
+      const before = base;
+      base = Math.max(1, Math.round(base * state.player.damageBoost));
+      state.player.damageBoost = 0;
+      addLog(`🗡️ Power Rune empowers your damage (${before} → ${base}).`);
+    }
+
     const typed = computeTypedDamage("player", "enemy", base, atkType);
     const def = applyEnemyDefenses(typed.scaled);
 
@@ -3558,6 +3627,14 @@ function persistPlayerProgress() {
       base = Math.max(1, base - 2);
       state.player.bound = 0;
       addLog("Bind dulls your spell (−2).");
+    }
+
+
+    if (state.player.damageBoost > 1) {
+      const before = base;
+      base = Math.max(1, Math.round(base * state.player.damageBoost));
+      state.player.damageBoost = 0;
+      addLog(`🗡️ Power Rune empowers your damage (${before} → ${base}).`);
     }
 
     const typed = computeTypedDamage("player", "enemy", base, spell.type);
@@ -3690,6 +3767,14 @@ function persistPlayerProgress() {
       addLog("Bind drags your wind blade (−2).");
     }
 
+
+    if (state.player.damageBoost > 1) {
+      const before = base;
+      base = Math.max(1, Math.round(base * state.player.damageBoost));
+      state.player.damageBoost = 0;
+      addLog(`🗡️ Power Rune empowers your damage (${before} → ${base}).`);
+    }
+
     const typed = computeTypedDamage("player", "enemy", base, "Wind");
     const def = applyEnemyDefenses(typed.scaled);
 
@@ -3762,6 +3847,14 @@ function persistPlayerProgress() {
       base = Math.max(1, base - 2);
       state.player.bound = 0;
       addLog("Bind dulls your water lash (−2).");
+    }
+
+
+    if (state.player.damageBoost > 1) {
+      const before = base;
+      base = Math.max(1, Math.round(base * state.player.damageBoost));
+      state.player.damageBoost = 0;
+      addLog(`🗡️ Power Rune empowers your damage (${before} → ${base}).`);
     }
 
     const typed = computeTypedDamage("player", "enemy", base, "Water");
@@ -3840,6 +3933,14 @@ function persistPlayerProgress() {
       addLog("Bind muddies your rhythm (−2).");
     }
 
+
+    if (state.player.damageBoost > 1) {
+      const before = base;
+      base = Math.max(1, Math.round(base * state.player.damageBoost));
+      state.player.damageBoost = 0;
+      addLog(`🗡️ Power Rune empowers your damage (${before} → ${base}).`);
+    }
+
     // Resonance disrupts defensive wards and braces before the hit lands.
     const had = state.enemy.ward > 0 || state.enemy.fortified > 0 || state.enemy.guarding;
     state.enemy.ward = 0;
@@ -3913,6 +4014,14 @@ function playerSmellTasteAttack() {
     addLog("Bind muddles your senses (−2).");
   }
 
+
+  if (state.player.damageBoost > 1) {
+    const before = base;
+    base = Math.max(1, Math.round(base * state.player.damageBoost));
+    state.player.damageBoost = 0;
+    addLog(`🗡️ Power Rune empowers your damage (${before} → ${base}).`);
+  }
+
   const typed = computeTypedDamage("player", "enemy", base, "SmellTaste");
   const def = applyEnemyDefenses(typed.scaled);
 
@@ -3979,6 +4088,14 @@ function playerFireAttack() {
       base = Math.max(1, base - 2);
       state.player.bound = 0;
       addLog("Bind makes your flame falter (−2).");
+    }
+
+
+    if (state.player.damageBoost > 1) {
+      const before = base;
+      base = Math.max(1, Math.round(base * state.player.damageBoost));
+      state.player.damageBoost = 0;
+      addLog(`🗡️ Power Rune empowers your damage (${before} → ${base}).`);
     }
 
     const typed = computeTypedDamage("player", "enemy", base, "Fire");
@@ -4079,7 +4196,15 @@ function playerFireAttack() {
     if (state.player.bound > 0) {
       base = Math.max(1, base - 2);
       state.player.bound = 0;
-      addLog("Bind blurs your casting (−2). ");
+      addLog("Bind blurs your casting (−2).");
+    }
+
+
+    if (state.player.damageBoost > 1) {
+      const before = base;
+      base = Math.max(1, Math.round(base * state.player.damageBoost));
+      state.player.damageBoost = 0;
+      addLog(`🗡️ Power Rune empowers your damage (${before} → ${base}).`);
     }
 
     const typed = computeTypedDamage("player", "enemy", base, t);
@@ -4232,8 +4357,7 @@ function playerFireAttack() {
       render();
       return;
     }
-
-    // Apply effect
+    // Apply effect (simple + readable)
     if (itemId === "potion") {
       const amount = 7;
       const before = state.player.hp;
@@ -4264,11 +4388,48 @@ function playerFireAttack() {
       if (b > 0) parts.push("Burn");
       if (bd > 0) parts.push("Bind");
       addLog(`You use ${def.name} (cleared ${parts.join(" and ")}).`);
+    } else if (itemId === "bomb") {
+      const dmg = 6;
+      showMoveBanner(`${def.name}`, "Fire");
+      playAnim(els.playerSprite, "rpgAnim-attack");
+      spawnFx("fire", "enemy");
+      state.enemy.hp = clamp(state.enemy.hp - dmg, 0, state.enemy.max);
+      addLog(`You throw a ${def.name} for ${dmg} damage.`);
+      spawnFloat(`-${dmg}`, "enemy", "dmg", null);
+      playAnim(els.enemySprite, "rpgAnim-hit");
+    } else if (itemId === "ember") {
+      showMoveBanner(`${def.name}`, "Fire");
+      playAnim(els.playerSprite, "rpgAnim-attack");
+      spawnFx("fire", "enemy");
+      state.enemy.burn = Math.max(toSafeInt(state.enemy.burn, 0), 2);
+      addLog(`🔥 ${def.name} coats ${state.enemy.name} (burn 2).`);
+    } else if (itemId === "stun") {
+      showMoveBanner(`${def.name}`, "Sound");
+      playAnim(els.playerSprite, "rpgAnim-attack");
+      spawnFx("sound", "enemy");
+      state.enemy.stunned = Math.max(toSafeInt(state.enemy.stunned, 0), 1);
+      addLog(`🌫️ ${state.enemy.name} staggers (stunned).`);
+    } else if (itemId === "rune") {
+      showMoveBanner(`${def.name}`, "Sight");
+      playAnim(els.playerSprite, "rpgAnim-heal");
+      spawnFx("sight", "player");
+      state.player.damageBoost = 1.3;
+      addLog(`🗡️ ${def.name} flares (next damage x1.3).`);
+    } else if (itemId === "barrier") {
+      showMoveBanner(`${def.name}`, "Earth");
+      playAnim(els.playerSprite, "rpgAnim-guard");
+      spawnFx("guard", "player");
+      state.player.barrier = 1;
+      addLog(`🛡️ ${def.name} surrounds you (next hit −30%).`);
     }
 
-    
-
     state.player.itemUsedThisTurn = true;
+
+    if (state.enemy.hp <= 0) {
+      onEnemyDown(`${state.enemy.name} is defeated.`);
+      return;
+    }
+
     addLog("Choose an action.");
     render();
   }
