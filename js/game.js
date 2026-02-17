@@ -73,6 +73,20 @@ if (root) {
     // Location picker (pre-combat)
     locationModal: document.getElementById("locationModal"),
     locationChoices: document.getElementById("locationChoices"),
+    overworldHint: document.getElementById("overworldHint"),
+    overworldBattleBtn: document.getElementById("overworldBattleBtn"),
+    overworldPos: document.getElementById("overworldPos"),
+    owUp: document.getElementById("owUp"),
+    owDown: document.getElementById("owDown"),
+    owLeft: document.getElementById("owLeft"),
+    owRight: document.getElementById("owRight"),
+
+    // Loot / Victory screen (auto after wave clear)
+    lootModal: document.getElementById("lootModal"),
+    lootTitle: document.getElementById("lootTitle"),
+    lootSubtitle: document.getElementById("lootSubtitle"),
+    lootLine: document.getElementById("lootLine"),
+    lootAutoNote: document.getElementById("lootAutoNote"),
 
     // Character picker (pre-combat)
     characterModal: document.getElementById("characterModal"),
@@ -100,6 +114,122 @@ if (root) {
     moveBannerText: document.getElementById("moveBannerText"),
     buildTag: document.getElementById("buildTag"),
   };
+
+  // --------------------
+  // Overworld (very simple traversable map)
+  // Now rendered on top of the same map image used on the Map page.
+  // --------------------
+  const OVERWORLD = {
+    xPct: 46,
+    yPct: 52,
+    stepPct: 3.5,
+    snapRadiusPct: 4.25,
+  };
+
+  // Battle locations used by the RPG.
+  const OVERWORLD_BATTLE_IDS = ["arena", "market-central", "fey-forest", "gutterglass"];
+
+  const OVERWORLD_LOC_ICONS = {
+    "arena": "🏟️",
+    "market-central": "🏙️",
+    "fey-forest": "🌿",
+    "gutterglass": "🪞",
+  };
+
+  function getMapLocationData(id) {
+    const data = window.MAP_LOCATIONS_DATA;
+    if (!data || !Array.isArray(data.locations)) return null;
+    return data.locations.find((l) => l && l.id === id) || null;
+  }
+
+  function resetOverworld() {
+    // Start roughly in the city center.
+    OVERWORLD.xPct = 46;
+    OVERWORLD.yPct = 52;
+  }
+
+  function nearestBattleLocation() {
+    let bestId = null;
+    let bestDist = Infinity;
+
+    for (const id of OVERWORLD_BATTLE_IDS) {
+      const m = getMapLocationData(id);
+      if (!m) continue;
+      const dx = (OVERWORLD.xPct - toSafeNum(m.leftPct, 0));
+      const dy = (OVERWORLD.yPct - toSafeNum(m.topPct, 0));
+      const d = Math.hypot(dx, dy);
+      if (d < bestDist) {
+        bestDist = d;
+        bestId = id;
+      }
+    }
+
+    if (bestId && bestDist <= OVERWORLD.snapRadiusPct) return bestId;
+    return null;
+  }
+
+  function currentLocId() {
+    return nearestBattleLocation();
+  }
+
+  function setOwPos(leftPct, topPct) {
+    OVERWORLD.xPct = clamp(toSafeNum(leftPct, OVERWORLD.xPct), 0, 100);
+    OVERWORLD.yPct = clamp(toSafeNum(topPct, OVERWORLD.yPct), 0, 100);
+  }
+
+  function renderOverworldPositions() {
+    if (!(els.locationChoices instanceof HTMLElement)) return;
+    const playerEl = els.locationChoices.querySelector('.rpgOverworldPlayer');
+    if (playerEl instanceof HTMLElement) {
+      playerEl.style.left = `${OVERWORLD.xPct}%`;
+      playerEl.style.top = `${OVERWORLD.yPct}%`;
+    }
+
+    const nearId = currentLocId();
+    const pins = els.locationChoices.querySelectorAll('button.rpgOverworldPin[data-ow-loc]');
+    pins.forEach((pin) => {
+      if (!(pin instanceof HTMLElement)) return;
+      const id = pin.getAttribute('data-ow-loc');
+      if (!id) return;
+      pin.classList.toggle('isNearby', id === nearId);
+    });
+
+    if (playerEl instanceof HTMLElement) {
+      playerEl.classList.toggle('isNearLocation', !!nearId);
+    }
+  }
+
+  function updateOverworldUI() {
+    const locId = currentLocId();
+    const loc = locId ? getLocationById(locId) : null;
+
+    if (els.overworldPos instanceof HTMLElement) {
+      els.overworldPos.textContent = `Position: ${OVERWORLD.xPct.toFixed(1)}%, ${OVERWORLD.yPct.toFixed(1)}%`;
+    }
+
+    if (els.overworldHint instanceof HTMLElement) {
+      els.overworldHint.textContent = loc
+        ? `You arrive at ${loc.name}. Press Battle (or Enter).`
+        : "You wander the city. No battle marker nearby.";
+    }
+
+    if (els.overworldBattleBtn instanceof HTMLButtonElement) {
+      els.overworldBattleBtn.disabled = !loc;
+      els.overworldBattleBtn.textContent = loc ? `Battle: ${loc.name}` : "Battle here";
+    }
+  }
+
+  function moveOverworld(dx, dy) {
+    if (!isLocationOpen()) return;
+    const nx = clamp(OVERWORLD.xPct + dx * OVERWORLD.stepPct, 0, 100);
+    const ny = clamp(OVERWORLD.yPct + dy * OVERWORLD.stepPct, 0, 100);
+    if (nx === OVERWORLD.xPct && ny === OVERWORLD.yPct) return;
+    OVERWORLD.xPct = nx;
+    OVERWORLD.yPct = ny;
+    renderOverworldPositions();
+    updateOverworldUI();
+  }
+
 
   const prefersReducedMotion = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 
@@ -652,9 +782,11 @@ function renderItemMenu(isPlayerTurn) {
   if (!(els.itemsMenu instanceof HTMLElement)) return;
   els.itemsMenu.replaceChildren();
 
+  const usedThisTurn = !!(state?.player?.itemUsedThisTurn);
+
   const tip = document.createElement("div");
   tip.className = "rpgMagicEmpty";
-  tip.textContent = "One-use items. Using one spends your turn.";
+  tip.textContent = usedThisTurn ? "One-use items. (Used 1 item this turn.)" : "One-use items. You can use 1 item per turn without ending your turn.";
   els.itemsMenu.appendChild(tip);
 
   const inv = state?.player?.items && typeof state.player.items === "object" ? state.player.items : {};
@@ -683,7 +815,8 @@ function renderItemMenu(isPlayerTurn) {
     btn.textContent = `${label} (x${count})${desc}`;
 
     const usable = itemCanUse(id);
-    btn.disabled = !isPlayerTurn || !usable;
+    const usableNow = usable && !usedThisTurn;
+    btn.disabled = !isPlayerTurn || !usableNow;
     els.itemsMenu.appendChild(btn);
   });
 }
@@ -723,6 +856,7 @@ function setTypeAccent(el, types) {
       if (isLocationOpen()) closeLocationPicker();
       closeMagicMenu();
       closeItemsMenu();
+      if (isLootOpen()) { closeLootScreen(); if (lootTimer) window.clearTimeout(lootTimer); lootTimer = 0; }
     }
   });
 
@@ -959,8 +1093,42 @@ function learnSpell(spellId, fromPicker = false) {
   return (els.characterModal instanceof HTMLElement) && !els.characterModal.hasAttribute("hidden");
 }
 
+function isLootOpen() {
+  return (els.lootModal instanceof HTMLElement) && !els.lootModal.hasAttribute("hidden");
+}
+
+let lootLastFocus = null;
+let lootTimer = 0;
+
+/** @param {string} title @param {string} subtitle @param {string} line */
+function openLootScreen(title, subtitle, line) {
+  if (!(els.lootModal instanceof HTMLElement)) return;
+  closeMagicMenu();
+  closeItemsMenu();
+
+  if (els.lootTitle instanceof HTMLElement) els.lootTitle.textContent = title || "Victory";
+  if (els.lootSubtitle instanceof HTMLElement) els.lootSubtitle.textContent = subtitle || "";
+  if (els.lootLine instanceof HTMLElement) els.lootLine.textContent = line || "No items.";
+
+  els.lootModal.removeAttribute("hidden");
+  lootLastFocus = document.activeElement;
+  updateBodyModalOpen();
+
+  const inner = els.lootModal.querySelector(".rpgLootInner");
+  if (inner instanceof HTMLElement) inner.focus();
+}
+
+function closeLootScreen() {
+  if (!(els.lootModal instanceof HTMLElement)) return;
+  els.lootModal.setAttribute("hidden", "");
+  const prev = lootLastFocus;
+  lootLastFocus = null;
+  updateBodyModalOpen();
+  if (prev && prev instanceof HTMLElement) prev.focus();
+}
+
 function updateBodyModalOpen() {
-  const any = isExplainOpen() || isHeroOpen() || isLocationOpen() || isSpellPickOpen();
+  const any = isExplainOpen() || isHeroOpen() || isLocationOpen() || isSpellPickOpen() || isLootOpen();
   document.body.classList.toggle("modalOpen", any);
 }
 
@@ -1044,28 +1212,127 @@ function isLocationOpen() {
 
 
 function renderLocationChoices() {
+  // Map-based overworld using the same city map art as /map.html.
   if (!(els.locationChoices instanceof HTMLElement)) return;
 
-  els.locationChoices.innerHTML = LOCATIONS.map((loc) => {
-    const set = loc.enemySet.map((i) => ENEMIES[i]);
-    const w1 = set[0];
-    const w2 = set[1];
+  // Ensure the container has the correct class for styling.
+  els.locationChoices.classList.remove("rpgOverworldGrid");
+  els.locationChoices.classList.add("rpgOverworldMapStage");
+  els.locationChoices.style.removeProperty("--ow-cols");
 
+  const heroLabel = (() => {
+    const n = (state?.player?.name || "Hero").trim();
+    return n ? n.slice(0, 1).toUpperCase() : "H";
+  })();
+
+  const hero = getActiveHero();
+  const heroSpriteRaw = (hero && typeof hero.sprite === "string" && hero.sprite.trim()) ? hero.sprite.trim() : "./assets/images/characters/axel.png";
+  const heroSprite = (heroSpriteRaw.startsWith(".") || heroSpriteRaw.startsWith("/")) ? heroSpriteRaw : `./${heroSpriteRaw}`;
+
+  const data = window.MAP_LOCATIONS_DATA;
+  const mapUrlRaw = (data && data.image && typeof data.image.url === "string") ? data.image.url : "assets/images/city-map.png";
+  const mapUrl = (mapUrlRaw.startsWith(".") || mapUrlRaw.startsWith("/")) ? mapUrlRaw : `./${mapUrlRaw}`;
+
+  const pinHtml = OVERWORLD_BATTLE_IDS.map((id) => {
+    const m = getMapLocationData(id);
+    const loc = getLocationById(id);
+    const left = toSafeNum(m?.leftPct, 50);
+    const top = toSafeNum(m?.topPct, 50);
+    const icon = OVERWORLD_LOC_ICONS[id] || "✦";
+    const title = (loc?.name || id);
     return `
-      <button type="button" class="btn ghost rpgLocChoice" data-loc="${loc.id}">
-        <div class="rpgLocTitle">${loc.name}</div>
-        <div class="muted small">${loc.subtitle}</div>
-        <div class="rpgLocMeta muted small">Wave 1: <strong>${w1.name}</strong> <span class="rpgTypeInline">(${formatTypesDisplay(w1.types)})</span></div>
-        <div class="rpgLocMeta muted small">Wave 2: <strong>${w2.name}</strong> <span class="rpgTypeInline">(${formatTypesDisplay(w2.types)})</span></div>
+      <button type="button" class="rpgOverworldPin" data-ow-loc="${id}" style="left:${left}%; top:${top}%;" title="${title}" aria-label="Battle marker: ${title}">
+        <span class="srOnly">${title}</span>
+        <span class="rpgOverworldPinEmoji" aria-hidden="true">${icon}</span>
       </button>
     `;
   }).join("");
+
+  els.locationChoices.innerHTML = `
+    <div class="rpgOverworldMapFrame" id="owFrame" aria-label="City map">
+      <img class="rpgOverworldMapImage" src="${mapUrl}" alt="City map" loading="eager" />
+      <div class="rpgOverworldMapShade" aria-hidden="true"></div>
+      <div class="rpgOverworldPins" id="owPins" role="group" aria-label="Battle markers">
+        ${pinHtml}
+      </div>
+      <div class="rpgOverworldPlayer" id="owPlayer" aria-hidden="true" data-hero="${hero?.id || "hero"}">
+        <div class="rpgOverworldAvatar" aria-hidden="true">
+          <img class="rpgOverworldAvatarImg" src="${heroSprite}" alt="" draggable="false" loading="eager" onerror="this.remove()" />
+        </div>
+        <div class="rpgOverworldFoot" aria-hidden="true"></div>
+      </div>
+    </div>
+  `;
+
+  // Allow click/tap/drag to move the avatar around the map.
+  const frameEl = els.locationChoices.querySelector('#owFrame');
+  if (frameEl instanceof HTMLElement) {
+    // Prevent scroll-jank while dragging inside the modal.
+    frameEl.style.touchAction = 'none';
+
+    let dragging = false;
+    let activePointerId = null;
+
+    const eventToPct = (ev) => {
+      const r = frameEl.getBoundingClientRect();
+      const x = (ev.clientX - r.left) / Math.max(1, r.width);
+      const y = (ev.clientY - r.top) / Math.max(1, r.height);
+      return {
+        xPct: clamp(x * 100, 0, 100),
+        yPct: clamp(y * 100, 0, 100),
+      };
+    };
+
+    const onDown = (ev) => {
+      // If you clicked a pin, let the pin handler handle it.
+      const t = ev.target;
+      if (t && t instanceof HTMLElement && t.closest('button.rpgOverworldPin')) return;
+      if (!isLocationOpen()) return;
+      dragging = true;
+      activePointerId = ev.pointerId;
+      try { frameEl.setPointerCapture(ev.pointerId); } catch {}
+      ev.preventDefault();
+      const { xPct, yPct } = eventToPct(ev);
+      setOwPos(xPct, yPct);
+      renderOverworldPositions();
+      updateOverworldUI();
+    };
+
+    const onMove = (ev) => {
+      if (!dragging) return;
+      if (activePointerId !== null && ev.pointerId !== activePointerId) return;
+      ev.preventDefault();
+      const { xPct, yPct } = eventToPct(ev);
+      setOwPos(xPct, yPct);
+      renderOverworldPositions();
+      updateOverworldUI();
+    };
+
+    const onUp = (ev) => {
+      if (activePointerId !== null && ev.pointerId !== activePointerId) return;
+      dragging = false;
+      activePointerId = null;
+      try { frameEl.releasePointerCapture(ev.pointerId); } catch {}
+    };
+
+    frameEl.addEventListener('pointerdown', onDown);
+    frameEl.addEventListener('pointermove', onMove);
+    frameEl.addEventListener('pointerup', onUp);
+    frameEl.addEventListener('pointercancel', onUp);
+    frameEl.addEventListener('lostpointercapture', () => { dragging = false; activePointerId = null; });
+  }
+
+  // Position player + highlight nearby marker.
+  renderOverworldPositions();
+  updateOverworldUI();
 }
+
 
 function openLocationPicker() {
   if (!(els.locationModal instanceof HTMLElement)) return;
   closeMagicMenu();
 
+  resetOverworld();
   renderLocationChoices();
   els.locationModal.removeAttribute("hidden");
   locationLastFocus = document.activeElement;
@@ -1077,8 +1344,12 @@ function openLocationPicker() {
   render();
 
   // Focus the first choice for keyboard users.
-  const first = els.locationModal.querySelector("button[data-loc]");
-  if (first instanceof HTMLButtonElement) first.focus();
+  const preferred = (els.overworldBattleBtn instanceof HTMLButtonElement) ? els.overworldBattleBtn : null;
+  if (preferred) preferred.focus();
+  else {
+    const first = els.locationModal.querySelector("button[data-ow-loc]");
+    if (first instanceof HTMLButtonElement) first.focus();
+  }
 }
 
 function closeLocationPicker() {
@@ -1115,6 +1386,9 @@ function startBattleWithLocation(locId) {
 
   closeMagicMenu();
   closeItemsMenu();
+  if (isLootOpen()) closeLootScreen();
+  if (lootTimer) window.clearTimeout(lootTimer);
+  lootTimer = 0;
   closeLocationPicker();
 
   resetVisuals();
@@ -1520,6 +1794,11 @@ const HERO_STORAGE_KEY = "dragonstone_rpg_hero";
 const PROGRESS_KEY_PREFIX = "dragonstone_rpg_progress_";
 
 /** @param {any} n @param {number} fallback */
+function toSafeNum(n, fallback) {
+  const x = Number(n);
+  return Number.isFinite(x) ? x : fallback;
+}
+
 function toSafeInt(n, fallback) {
   const x = Number(n);
   if (!Number.isFinite(x)) return fallback;
@@ -2021,6 +2300,9 @@ function setActiveLocation(id) {
       // items (one-use consumables)
       items,
 
+      // turn flag: allow 1 item per turn without ending the turn
+      itemUsedThisTurn: false,
+
       // resources
       healCharges: pt.healCharges,
       focus: scaled.focusStart,
@@ -2036,6 +2318,7 @@ function setActiveLocation(id) {
   const player = makePlayerFromHero(pt);
 
   return {
+    battleId: ++battleSerial,
     turn: 1,
     phase: "player",
     wave: 0,
@@ -2059,6 +2342,7 @@ function makeLobbyState() {
   const player = makePlayerFromHero(pt);
 
   return {
+    battleId: ++battleSerial,
     turn: 1,
     phase: "select",
     wave: 0,
@@ -2079,6 +2363,9 @@ function makeLobbyState() {
 
 
   // Load saved hero choice (if any)
+
+  let battleSerial = 0;
+
   loadSavedHero();
 
   /** @type {ReturnType<typeof makeInitialState>} */
@@ -2738,6 +3025,7 @@ function persistPlayerProgress() {
     return row[idx] || "potion";
   }
 
+
   /**
    * Transition to next wave if available.
    */
@@ -2752,43 +3040,67 @@ function persistPlayerProgress() {
     if (state.wave === 0) playWaveClearSfx();
 
     // Simple loot: one item per cleared wave (deterministic by location).
-    gainItem(lootForWave(state.wave), 1);
+    const lootId = lootForWave(state.wave);
+    const lootDef = ITEM_DEFS[lootId] || null;
+    const lootLine = lootDef ? `Picked up: ${lootDef.icon} ${lootDef.name} (x1)` : "No items.";
+    if (lootDef) gainItem(lootId, 1);
 
     playAnim(els.enemySprite, "rpgAnim-faint");
 
     const nextIndex = state.wave + 1;
-    if (nextIndex >= state.enemySet.length) {
-      endGame("The duel ends. You win!");
-      return;
-    }
+    const isFinal = nextIndex >= state.enemySet.length;
 
-    // Between-wave breather (fixed, not random)
-    const bonus = 3;
-    const before = state.player.hp;
-    state.player.hp = clamp(state.player.hp + bonus, 0, state.player.max);
-    const actual = state.player.hp - before;
-    if (actual > 0) addLog(`You catch a second wind (+${actual} HP).`);
-
-    // Clear tactical one-turn states.
-    state.player.guarding = false;
-    state.player.evading = false;
-
-    // Spawn next enemy.
-    state.wave = nextIndex;
-    state.enemy = makeEnemy(state.wave, state.enemySet, state.player.level);
-
-    addLog(`Wave ${state.wave + 1}: ${state.enemy.name} arrives.`);
-    addLog("Your turn.");
-
-    setPhase("player");
-
-    // Set new intent for readability.
-    state.enemy.intent = computeEnemyIntent();
-    renderIntent(state.enemy.intent);
-
-    setEffectBanner("—", "neutral");
+    // Lock controls and show a brief victory/loot screen for ~5 seconds.
+    setPhase("loot");
+    const title = isFinal ? "Victory!" : `Wave ${state.wave + 1} cleared!`;
+    const subtitle = isFinal ? "You collect your spoils." : "You collect your spoils.";
+    openLootScreen(title, subtitle, lootLine);
     render();
+
+    const myBattle = state.battleId;
+
+    if (lootTimer) window.clearTimeout(lootTimer);
+    lootTimer = window.setTimeout(() => {
+      // If the player started a new battle, do nothing.
+      if (!state || state.battleId !== myBattle) return;
+
+      closeLootScreen();
+      lootTimer = 0;
+
+      if (isFinal) {
+        endGame("The duel ends. You win!");
+        return;
+      }
+
+      // Between-wave breather (fixed, not random)
+      const bonus = 3;
+      const before = state.player.hp;
+      state.player.hp = clamp(state.player.hp + bonus, 0, state.player.max);
+      const actual = state.player.hp - before;
+      if (actual > 0) addLog(`You catch a second wind (+${actual} HP).`);
+
+      // Clear tactical one-turn states.
+      state.player.guarding = false;
+      state.player.evading = false;
+
+      // Spawn next enemy.
+      state.wave = nextIndex;
+      state.enemy = makeEnemy(state.wave, state.enemySet, state.player.level);
+
+      addLog(`Wave ${state.wave + 1}: ${state.enemy.name} arrives.`);
+      addLog("Your turn.");
+
+      setPhase("player");
+
+      // Set new intent for readability.
+      state.enemy.intent = computeEnemyIntent();
+      renderIntent(state.enemy.intent);
+
+      setEffectBanner("—", "neutral");
+      render();
+    }, 5000);
   }
+
 
   // --------------------
   // Turn flow
@@ -2810,6 +3122,9 @@ function persistPlayerProgress() {
 
   function setPhase(phase) {
     state.phase = phase;
+
+    // New turn = items refresh (1 item per turn).
+    if (phase === "player" && state && state.player) state.player.itemUsedThisTurn = false;
     const locked = phase !== "player" && !state.over;
 
     if (els.actionsWrap instanceof HTMLElement) {
@@ -3880,6 +4195,12 @@ function playerFireAttack() {
     if (isGameOver()) return;
     if (state.phase !== "player") return;
 
+    if (state.player.itemUsedThisTurn) {
+      addLog("You already used an item this turn.");
+      render();
+      return;
+    }
+
     closeMagicMenu();
     closeItemsMenu();
 
@@ -3945,14 +4266,20 @@ function playerFireAttack() {
       addLog(`You use ${def.name} (cleared ${parts.join(" and ")}).`);
     }
 
+    
+
+    state.player.itemUsedThisTurn = true;
+    addLog("Choose an action.");
     render();
-    queueEnemyTurn();
   }
   function restart() {
     closeMagicMenu();
     closeItemsMenu();
     closeHeroPicker();
     closeLocationPicker();
+    if (isLootOpen()) closeLootScreen();
+    if (lootTimer) window.clearTimeout(lootTimer);
+    lootTimer = 0;
     resetVisuals();
     state = makeLobbyState();
   syncKnownSpells(false);
@@ -3976,7 +4303,85 @@ function playerFireAttack() {
     els.itemsToggle.addEventListener("click", toggleItemsMenu);
   }
 
-  // Items menu: buttons are generated each render.
+  
+  // --------------------
+  // Overworld wiring (movement + battle)
+  // --------------------
+
+  // Click a battle marker to snap to it.
+  if (els.locationChoices instanceof HTMLElement) {
+    els.locationChoices.addEventListener('click', (e) => {
+      const t = e.target;
+      if (!(t instanceof HTMLElement)) return;
+      const btn = t.closest('button[data-ow-loc]');
+      if (!(btn instanceof HTMLButtonElement)) return;
+      const id = btn.getAttribute('data-ow-loc');
+      if (!id) return;
+      const m = getMapLocationData(id);
+      if (m) {
+        setOwPos(m.leftPct, m.topPct);
+        renderOverworldPositions();
+        updateOverworldUI();
+      }
+    });
+  }
+  if (els.overworldBattleBtn instanceof HTMLButtonElement) {
+    els.overworldBattleBtn.addEventListener("click", () => {
+      const locId = currentLocId();
+      if (!locId) return;
+      startBattleWithLocation(locId);
+    });
+  }
+
+  const bindMoveBtn = (btn, dx, dy) => {
+    if (!(btn instanceof HTMLButtonElement)) return;
+    btn.addEventListener("click", () => moveOverworld(dx, dy));
+  };
+
+  bindMoveBtn(els.owUp, 0, -1);
+  bindMoveBtn(els.owDown, 0, 1);
+  bindMoveBtn(els.owLeft, -1, 0);
+  bindMoveBtn(els.owRight, 1, 0);
+
+  // Keyboard traversal while the overworld modal is open.
+  document.addEventListener("keydown", (e) => {
+    if (!isLocationOpen()) return;
+    // Don't steal keys if you're typing in a field.
+    const t = e.target;
+    if (t && (t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement)) return;
+
+    const k = e.key;
+    const map = {
+      "ArrowUp": [0, -1],
+      "ArrowDown": [0, 1],
+      "ArrowLeft": [-1, 0],
+      "ArrowRight": [1, 0],
+      "w": [0, -1],
+      "s": [0, 1],
+      "a": [-1, 0],
+      "d": [1, 0],
+      "W": [0, -1],
+      "S": [0, 1],
+      "A": [-1, 0],
+      "D": [1, 0],
+    };
+
+    if (k === "Enter") {
+      const locId = currentLocId();
+      if (locId) {
+        e.preventDefault();
+        startBattleWithLocation(locId);
+      }
+      return;
+    }
+
+    const step = map[k];
+    if (!step) return;
+    e.preventDefault();
+    moveOverworld(step[0], step[1]);
+  });
+
+// Items menu: buttons are generated each render.
   if (els.itemsMenu instanceof HTMLElement) {
     els.itemsMenu.addEventListener("click", (e) => {
       const target = e.target;
@@ -4029,6 +4434,9 @@ function playerFireAttack() {
       closeMagicMenu();
       closeItemsMenu();
       closeLocationPicker();
+      if (isLootOpen()) closeLootScreen();
+      if (lootTimer) window.clearTimeout(lootTimer);
+      lootTimer = 0;
       resetVisuals();
       state = makeLobbyState();
   syncKnownSpells(false);
@@ -4077,19 +4485,6 @@ function playerFireAttack() {
       renderHeroChoices();
       setEffectBanner("Hero progress reset.", "neutral");
       render();
-    });
-  }
-
-
-  if (els.locationChoices instanceof HTMLElement) {
-    els.locationChoices.addEventListener("click", (e) => {
-      const target = e.target;
-      if (!(target instanceof HTMLElement)) return;
-      const btn = target.closest("button[data-loc]");
-      if (!(btn instanceof HTMLButtonElement)) return;
-      const locId = btn.getAttribute("data-loc");
-      if (!locId) return;
-      startBattleWithLocation(locId);
     });
   }
 

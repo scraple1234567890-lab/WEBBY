@@ -8,7 +8,7 @@
 <title>Dragonstone | Tiny Turn RPG</title>
 <link href="./favicon.ico" rel="icon" sizes="any"/>
 <link href="./favicon.png" rel="icon" type="image/png"/>
-<link href="./styles.css?v=2026-02-14r" rel="stylesheet"/>
+<link href="./styles.css?v=2026-02-16p" rel="stylesheet"/>
 </head>
 <body class="gamePage">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -184,6 +184,21 @@
 </div>
 </div>
 </div>
+
+<!-- Victory / Loot Screen (auto closes after a wave is cleared) -->
+<div aria-hidden="false" aria-labelledby="lootTitle" aria-modal="true" class="rpgModal" hidden="" id="lootModal" role="dialog">
+  <div class="post rpgModalInner rpgLootInner" role="document" tabindex="-1">
+    <div class="rpgModalHead rpgLootHead">
+      <h2 class="rpgLogTitle" id="lootTitle">Victory</h2>
+    </div>
+    <div class="rpgModalBody rpgLootBody">
+      <p class="muted small" id="lootSubtitle" style="margin:0"></p>
+      <div class="rpgLootLine" id="lootLine">No items.</div>
+      <p class="muted tiny" id="lootAutoNote" style="margin:0">Continuing…</p>
+    </div>
+  </div>
+</div>
+
 <div class="rpgBottom">
 <article aria-label="Type chart" class="post rpgTypeCard">
 <div class="rpgTypeHead">
@@ -238,11 +253,36 @@
 <div aria-hidden="false" aria-labelledby="locationTitle" aria-modal="true" class="rpgModal" hidden="" id="locationModal" role="dialog">
 <div class="post rpgModalInner" role="document">
 <div class="rpgModalHead">
-<h2 class="rpgLogTitle" id="locationTitle">Choose your battleground</h2>
+<h2 class="rpgLogTitle" id="locationTitle">Overworld</h2>
 </div>
 <div class="rpgModalBody">
-<p class="muted">Pick one of four locations. Each one spawns a different enemy.</p>
-<div class="rpgLocationGrid" id="locationChoices"></div>
+<div class="rpgOverworldTop">
+  <p class="muted" id="overworldHint" style="margin:0">Use the arrow keys or buttons to travel. Move near a glowing battle marker, then battle.</p>
+  <button class="btn primary" id="overworldBattleBtn" type="button" disabled>Battle here</button>
+</div>
+
+<div class="rpgOverworldLegend" aria-label="Overworld legend">
+  <div class="rpgLegendPills" role="list">
+    <span class="rpgLegendChip rpgLegendChip--you" role="listitem"><span class="rpgLegendDot" aria-hidden="true"></span>You</span>
+    <span class="rpgLegendChip rpgLegendChip--loc" role="listitem"><span class="rpgLegendDot" aria-hidden="true"></span>Battle marker</span>
+    <span class="rpgLegendChip rpgLegendChip--empty" role="listitem"><span class="rpgLegendDot" aria-hidden="true"></span>Empty</span>
+  </div>
+  <span class="muted tiny">Move: WASD / Arrow keys</span>
+</div>
+
+<div class="rpgOverworldMapStage" id="locationChoices" role="group" aria-label="Overworld map"></div>
+<div class="rpgOverworldBottom">
+  <div class="rpgDpad" role="group" aria-label="Move">
+    <button class="btn ghost rpgDpadBtn" id="owUp" type="button" aria-label="Move up">↑</button>
+    <div class="rpgDpadMid">
+      <button class="btn ghost rpgDpadBtn" id="owLeft" type="button" aria-label="Move left">←</button>
+      <span class="rpgDpadCenter" aria-hidden="true">✦</span>
+      <button class="btn ghost rpgDpadBtn" id="owRight" type="button" aria-label="Move right">→</button>
+    </div>
+    <button class="btn ghost rpgDpadBtn" id="owDown" type="button" aria-label="Move down">↓</button>
+  </div>
+  <p class="muted small" id="overworldPos" style="margin:0">Position: —</p>
+</div>
 </div>
 </div>
 </div>
@@ -276,6 +316,6 @@
 <script src="./js/app.js" type="module"></script>
 <script src="./data/characters-data.js?v=2026-02-16"></script>
 <script src="./data/map-locations.js?v=2026-02-16"></script>
-<script defer="" src="./js/game.js?v=2026-02-16m"></script>
+<script defer="" src="./js/game.js?v=2026-02-16n"></script>
 </body>
 </html>
