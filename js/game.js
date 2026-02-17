@@ -799,13 +799,24 @@ function renderSpellMenu(spells, isPlayerTurn, focus, boundExtra) {
   spells.forEach((spell) => {
     const typed = computeTypedDamage("player", "enemy", spell.baseDamage, spell.type);
     const cost = Math.max(0, toSafeInt(spell.baseCost, 0) + boundExtra);
+
+    // Surface extra spell properties in the menu label (e.g., pierce, no-reflect, burns, etc.)
+    // We avoid the default filler text to keep the menu readable.
+    const extra = (() => {
+      const s = spellHookSummary(spell);
+      if (!s || s === "A direct damage spell.") return "";
+      return s;
+    })();
+
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "btn secondary rpgMagicItem";
     btn.setAttribute("role", "menuitem");
     btn.dataset.spellId = spell.id;
     btn.dataset.type = spell.type;
-    btn.textContent = `${spell.name} (${cost} Mana, x${fmtMult(typed.overall)})`;
+    btn.textContent = `${spell.name} (${cost} Mana, x${fmtMult(typed.overall)})${extra ? ` • ${extra}` : ""}`;
+    // Tooltip for long labels
+    if (extra) btn.title = extra;
     btn.disabled = !isPlayerTurn || focus < cost;
     els.magicMenu.appendChild(btn);
   });
@@ -1663,7 +1674,7 @@ SmellTaste: { Wind: 0.8, Water: 1.0, Fire: 1.0, Sight: 0.8, Earth: 1.0, Touch: 1
 
   /**
    * Render the "before you click" effectiveness preview line.
-   * @param {{name:string, type: MagicType, baseCost:number}} move
+   * @param {{name:string, type: MagicType, baseCost:number, extra?: string}} move
    */
   function renderEffectPreview(move) {
     if (!(els.effectPreview instanceof HTMLElement)) return;
@@ -1685,9 +1696,11 @@ SmellTaste: { Wind: 0.8, Water: 1.0, Fire: 1.0, Sight: 0.8, Earth: 1.0, Touch: 1
     const meta = move.baseCost > 0 ? needText : "+1 Mana";
 
     // Keep it short and readable
+    const extraText = (move && typeof move.extra === "string" && move.extra.trim()) ? move.extra.trim() : "";
+    const extraBit = extraText ? ` • ${extraText}` : "";
     els.effectPreview.innerHTML =
       `${move.name}: <span class="rpgEffectPreviewText">${tier.label}</span> ` +
-      `<span class="rpgEffectPreviewMeta">(x${fmtMult(eff)} • ${meta})</span>`;
+      `<span class="rpgEffectPreviewMeta">(x${fmtMult(eff)} • ${meta}${extraBit})</span>`;
   }
 
   /** @param {string} name @param {MagicType} type @param {number} baseCost */
@@ -1724,8 +1737,8 @@ SmellTaste: { Wind: 0.8, Water: 1.0, Fire: 1.0, Sight: 0.8, Earth: 1.0, Touch: 1
     els.hintLine.textContent = [baseTip, bindNote].filter(Boolean).join(" ");
   }
 
-function setPreviewMove(name, type, baseCost) {
-    previewMove = { name, type, baseCost };
+function setPreviewMove(name, type, baseCost, extra = "") {
+    previewMove = { name, type, baseCost, extra };
     renderEffectPreview(previewMove);
   }
 
@@ -2350,8 +2363,7 @@ function getActiveHero() {
   return getHeroById(activeHeroId);
 }
 
-
-  const ENEMIES = [
+const ENEMIES = [
   {
     name: "Rival Mage",
     types: /** @type {MagicType[]} */ (["Fire", "Sight"]),
@@ -2367,22 +2379,6 @@ function getActiveHero() {
     healCharges: 2,
     profile: "earthTouch",
     sprite: "./assets/images/enemy-blonde.png",
-  },
-  {
-    name: "Skyline Duelist",
-    types: /** @type {MagicType[]} */ (["Wind", "Sight"]),
-    maxHp: 24,
-    healCharges: 1,
-    profile: "windSight",
-    sprite: "./assets/images/enemy-green.png",
-  },
-  {
-    name: "Mirrorbind Adept",
-    types: /** @type {MagicType[]} */ (["Touch", "Sight"]),
-    maxHp: 26,
-    healCharges: 1,
-    profile: "mirrorTouch",
-    sprite: "./assets/images/enemy-red.png",
   },
   {
     name: "Inkward Scribe",
@@ -2405,10 +2401,11 @@ function getActiveHero() {
   },
 ];
 
+
 // --- Random encounter system (not tied to locations) ---
 // Non-boss enemies are chosen per-wave using weighted probabilities.
 // Wave 1 favors easier foes; Wave 2 favors tougher foes; Wave 3 is always a boss.
-const BOSS_ENEMY_INDEX = 5;
+const BOSS_ENEMY_INDEX = ENEMIES.length - 1;
 const NON_BOSS_ENEMY_INDICES = ENEMIES.map((_, i) => i).filter((i) => i !== BOSS_ENEMY_INDEX);
 
 /**
@@ -2446,8 +2443,8 @@ const NON_BOSS_SORTED = [...NON_BOSS_ENEMY_INDICES]
   .sort((a, b) => a.s - b.s);
 
 // Stronger contrast so wave 2 feels meaningfully tougher on average.
-const WAVE1_WEIGHTS_BY_RANK = [10, 7, 5, 3, 2];
-const WAVE2_WEIGHTS_BY_RANK = [2, 3, 5, 7, 10];
+const WAVE1_WEIGHTS_BY_RANK = [10, 5, BOSS_ENEMY_INDEX];
+const WAVE2_WEIGHTS_BY_RANK = [2, 5, BOSS_ENEMY_INDEX];
 
 function pickRandomEnemyIndexForWave(waveIndex) {
   // Only randomize waves 1-2; boss is fixed.
@@ -2486,21 +2483,23 @@ function buildEnemySetForBattle(playerLevel) {
 }
 
 const FALLBACK_LOCATIONS = [
-  { id: "ember_plaza", name: "Ember Plaza", subtitle: "Warm stones. Hot tempers.", enemySet: [0, 1, 5] },
-  { id: "quartz_library", name: "Quartz Library", subtitle: "Quiet halls. Heavy secrets.", enemySet: [1, 2, 5] },
-  { id: "gale_rooftops", name: "Gale Rooftops", subtitle: "Open sky. Unstable footing.", enemySet: [2, 3, 5] },
-  { id: "mirror_tunnels", name: "Mirror Tunnels", subtitle: "Dim lights. Echoing steps.", enemySet: [3, 4, 5] },
+  { id: "ember_plaza", name: "Ember Plaza", subtitle: "Warm stones. Hot tempers.", enemySet: [0, 1, BOSS_ENEMY_INDEX] },
+  { id: "quartz_library", name: "Quartz Library", subtitle: "Quiet halls. Heavy secrets.", enemySet: [1, 2, BOSS_ENEMY_INDEX] },
+  { id: "gale_rooftops", name: "Gale Rooftops", subtitle: "Open sky. Unstable footing.", enemySet: [0, 2, BOSS_ENEMY_INDEX] },
+  { id: "mirror_tunnels", name: "Mirror Tunnels", subtitle: "Dim lights. Echoing steps.", enemySet: [0, 1, BOSS_ENEMY_INDEX] },
 ];
+
 
 // Locations in-game are sourced from the Map dataset (data/map-locations.js) when available.
 // This keeps the RPG in sync with the site's world map.
 const GAME_LOCATION_IDS = ["arena", "market-central", "fey-forest", "gutterglass"];
 const LOCATION_ENEMY_SETS = [
-  [0, 1, 5],
-  [1, 2, 5],
-  [2, 3, 5],
-  [3, 4, 5],
+  [0, 1, BOSS_ENEMY_INDEX],
+  [1, 2, BOSS_ENEMY_INDEX],
+  [0, 2, BOSS_ENEMY_INDEX],
+  [0, 1, BOSS_ENEMY_INDEX],
 ];
+
 
 function buildLocationsFromMap() {
   const data = window.MAP_LOCATIONS_DATA;
@@ -2528,7 +2527,7 @@ const LOCATIONS = buildLocationsFromMap() || FALLBACK_LOCATIONS;
 let activeLocationId = null;
 
 /** @type {typeof ENEMIES} */
-let activeEnemySet = [ENEMIES[0], ENEMIES[1], ENEMIES[5]];
+let activeEnemySet = [ENEMIES[0], ENEMIES[1], ENEMIES[BOSS_ENEMY_INDEX]];
 
 function getLocationById(id) {
   return LOCATIONS.find((l) => l.id === id) || LOCATIONS[0];
@@ -5166,8 +5165,12 @@ function playerFireAttack() {
       if (!id) return;
       const sp = SPELLS_BY_ID[id];
       if (!sp) return;
-      setPreviewMove(sp.name, sp.type, sp.baseCost);
-      renderEffectPreview();
+      const extra = (() => {
+        const s = spellHookSummary(sp);
+        if (!s || s === "A direct damage spell.") return "";
+        return s;
+      })();
+      setPreviewMove(sp.name, sp.type, sp.baseCost, extra);
     };
 
     els.magicMenu.addEventListener("mouseover", preview);
