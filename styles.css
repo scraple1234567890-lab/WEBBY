@@ -400,6 +400,10 @@ header, main, footer {
 .btn:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(0,0,0,0.24); }
 .btn:active { transform: translateY(0px); }
 
+/* Small inline icon used inside action buttons (Attack type icon). */
+.btnTypeIcon { line-height: 1; font-size: 1.05em; flex: 0 0 auto; }
+.btnTypeText { flex: 1 1 auto; }
+
 .btn.primary {
   border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
   background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 72%, var(--panel) 28%), color-mix(in srgb, var(--accent2) 62%, var(--panel2) 38%));

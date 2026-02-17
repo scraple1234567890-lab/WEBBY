@@ -814,9 +814,25 @@ function renderSpellMenu(spells, isPlayerTurn, focus, boundExtra) {
     btn.setAttribute("role", "menuitem");
     btn.dataset.spellId = spell.id;
     btn.dataset.type = spell.type;
-    btn.textContent = `${spell.name} (${cost} Mana, x${fmtMult(typed.overall)})${extra ? ` • ${extra}` : ""}`;
-    // Tooltip for long labels
-    if (extra) btn.title = extra;
+
+    // Show the spell type icon next to the spell name in the menu.
+    // Details (cost, effectiveness, extra effects) are surfaced via tooltip + hover/focus preview line.
+    const iconSpan = document.createElement("span");
+    iconSpan.className = "btnTypeIcon";
+    iconSpan.setAttribute("aria-hidden", "true");
+    iconSpan.textContent = typeIcon(spell.type);
+
+    const textSpan = document.createElement("span");
+    textSpan.className = "btnTypeText";
+    textSpan.textContent = spell.name;
+
+    btn.replaceChildren(iconSpan, textSpan);
+
+    const tipBits = [];
+    tipBits.push(String(cost) + " Mana");
+    tipBits.push("x" + fmtMult(typed.overall));
+    if (extra) tipBits.push(extra);
+    btn.title = tipBits.join(" • ");
     btn.disabled = !isPlayerTurn || focus < cost;
     els.magicMenu.appendChild(btn);
   });
@@ -3388,11 +3404,26 @@ function persistPlayerProgress() {
 
     if (els.attackBtn instanceof HTMLButtonElement) {
       const atkLabel = TYPE_META[atkType]?.label ?? atkType;
-      els.attackBtn.textContent = `Attack (${atkLabel} x${fmtMult(atkPrev.overall)} | +1 Mana)`;
+      // Add a small type icon next to the Attack button label.
+      const atkIcon = typeIcon(atkType);
+      els.attackBtn.classList.add("hasTypeIcon");
+      els.attackBtn.innerHTML = `<span class="btnTypeIcon" aria-hidden="true">${atkIcon}</span><span class="btnTypeText">Attack (${atkLabel} x${fmtMult(atkPrev.overall)} | +1 Mana)</span>`;
       els.attackBtn.dataset.type = atkType;
     }
     // Spells unlock on level-up and are rendered dynamically.
     const spells = getKnownSpells();
+
+
+    // Add type icons next to the Magic button (based on the spell types you currently know).
+    // If you know spells of multiple types, we show a small cluster of icons.
+    if (els.magicToggle instanceof HTMLButtonElement) {
+      const uniqTypes = Array.from(new Set(spells.map((s) => s.type)));
+      const iconTypes = uniqTypes.length ? uniqTypes : [playerPrimaryType()];
+      const icons = iconTypes.map((t) => typeIcon(t)).join("");
+      els.magicToggle.classList.add("hasTypeIcon");
+      els.magicToggle.innerHTML = `<span class="btnTypeIcon" aria-hidden="true">${icons}</span><span class="btnTypeText">Magic</span>`;
+      if (iconTypes[0]) els.magicToggle.dataset.type = iconTypes[0];
+    }
 
     if (els.healBtn instanceof HTMLButtonElement) {
       els.healBtn.textContent = `Heal (${healCost} Mana, ${state.player.healCharges})`;
@@ -4751,7 +4782,19 @@ function playerFireAttack() {
     spawnFx("heal", "player");
 
     const healMult = typeof state.player.healMult === "number" ? state.player.healMult : 1;
-    const heal = Math.max(1, Math.round(5 * healMult));
+
+    // Healing should be a meaningful tempo choice, not a button that gets erased immediately.
+    // Scale primarily off Max HP (so it stays relevant), with a small level/gear multiplier.
+    const maxHp = Math.max(1, toSafeInt(state.player.max, 1));
+    const hpRatio = maxHp > 0 ? state.player.hp / maxHp : 1;
+
+    // Baseline: ~28% max HP + a small scaling term.
+    let heal = Math.round(maxHp * 0.28 + 4 * healMult);
+
+    // Emergency bump when you're low.
+    if (hpRatio <= 0.35) heal += Math.round(maxHp * 0.08);
+
+    heal = Math.max(1, heal);
     const before = state.player.hp;
     state.player.hp = clamp(state.player.hp + heal, 0, state.player.max);
     const actual = state.player.hp - before;
@@ -4760,6 +4803,14 @@ function playerFireAttack() {
 
     state.player.healCharges = Math.max(0, state.player.healCharges - 1);
     spendFocus(cost);
+
+    // A small "afterglow" shield so healing isn't immediately undone by the enemy's next swing.
+    // Uses the existing Barrier status (next hit −30%).
+    if (!(state.player.barrier > 0)) {
+      state.player.barrier = 1;
+      spawnFx("guard", "player");
+      addLog("🛡️ A gentle ward settles around you (next hit −30%).");
+    }
 
     // Cleanse one negative (strategy lever)
     if (state.player.burn > 0) {
