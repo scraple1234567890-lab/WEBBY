@@ -1452,7 +1452,9 @@ function startBattleWithLocation(locId) {
 
   resetVisuals();
 
-  state = makeInitialState(activeEnemySet, loc.id);
+  const encounterSet = buildEnemySetForBattle(getActiveHero().level);
+  activeEnemySet = encounterSet;
+  state = makeInitialState(encounterSet, loc.id);
   syncKnownSpells(false);
   state.enemy.intent = computeEnemyIntent();
   renderIntent(state.enemy.intent);
@@ -2212,25 +2214,105 @@ function getActiveHero() {
     sprite: "./assets/images/enemy-red.png",
   },
   {
-    name: "Resonance Cantor",
+    name: "Inkward Scribe",
     types: /** @type {MagicType[]} */ (["Sound", "Touch"]),
     maxHp: 25,
     healCharges: 1,
     profile: "soundTouch",
-    sprite: "./assets/images/enemy-blue.png",
+    sprite: "./assets/images/enemy-scribe.png",
   },
 
   {
-    name: "Eclipse Warden",
+    name: "Candlecrown Matron",
     types: /** @type {MagicType[]} */ (["Sight", "Sound"]),
     maxHp: 42,
     healCharges: 3,
     focusMax: 8,
     focusStart: 3,
     profile: "bossEclipse",
-    sprite: "./assets/images/enemy-red.png",
+    sprite: "./assets/images/enemy-candle-queen.png",
   },
 ];
+
+// --- Random encounter system (not tied to locations) ---
+// Non-boss enemies are chosen per-wave using weighted probabilities.
+// Wave 1 favors easier foes; Wave 2 favors tougher foes; Wave 3 is always a boss.
+const BOSS_ENEMY_INDEX = 5;
+const NON_BOSS_ENEMY_INDICES = ENEMIES.map((_, i) => i).filter((i) => i !== BOSS_ENEMY_INDEX);
+
+/**
+ * Rough difficulty score for weighting.
+ * (Higher means tougher.)
+ */
+function enemyDifficultyScore(tpl) {
+  const hp = toSafeInt(tpl.maxHp, 20);
+  const heals = toSafeInt(tpl.healCharges, 0);
+  const focusMax = typeof tpl.focusMax === "number" ? tpl.focusMax : 6;
+  // HP is the main signal; healing and extra focus add endurance.
+  return hp + heals * 6 + Math.max(0, focusMax - 6) * 2;
+}
+
+/**
+ * Weighted random choice.
+ * @param {number[]} indices
+ * @param {number[]} weights
+ */
+function weightedPick(indices, weights) {
+  let total = 0;
+  for (let i = 0; i < weights.length; i++) total += Math.max(0, weights[i] || 0);
+  if (total <= 0) return indices[0];
+
+  let r = Math.random() * total;
+  for (let i = 0; i < indices.length; i++) {
+    r -= Math.max(0, weights[i] || 0);
+    if (r <= 0) return indices[i];
+  }
+  return indices[indices.length - 1];
+}
+
+const NON_BOSS_SORTED = [...NON_BOSS_ENEMY_INDICES]
+  .map((i) => ({ i, s: enemyDifficultyScore(ENEMIES[i]) }))
+  .sort((a, b) => a.s - b.s);
+
+// Stronger contrast so wave 2 feels meaningfully tougher on average.
+const WAVE1_WEIGHTS_BY_RANK = [10, 7, 5, 3, 2];
+const WAVE2_WEIGHTS_BY_RANK = [2, 3, 5, 7, 10];
+
+function pickRandomEnemyIndexForWave(waveIndex) {
+  // Only randomize waves 1-2; boss is fixed.
+  const isWave2 = waveIndex === 1;
+  const weightsByRank = isWave2 ? WAVE2_WEIGHTS_BY_RANK : WAVE1_WEIGHTS_BY_RANK;
+
+  const indices = NON_BOSS_SORTED.map((x) => x.i);
+  const weights = NON_BOSS_SORTED.map((_, rank) => weightsByRank[rank] ?? 1);
+  return weightedPick(indices, weights);
+}
+
+/**
+ * Build a three-wave "enemy set" for one battle run.
+ * @param {number} playerLevel
+ */
+function buildEnemySetForBattle(playerLevel) {
+  const pLvl = Math.max(1, toSafeInt(playerLevel, 1));
+  const w1i = pickRandomEnemyIndexForWave(0);
+
+  // Wave 2: prefer tougher AND prefer variety (softly avoid repeating wave 1).
+  let w2i = pickRandomEnemyIndexForWave(1);
+  if (w2i === w1i && NON_BOSS_ENEMY_INDICES.length > 1) {
+    // 70% chance to reroll once for variety.
+    if (Math.random() < 0.70) {
+      const altPool = NON_BOSS_ENEMY_INDICES.filter((i) => i !== w1i);
+      // Use the same wave2 weighting, but restricted pool.
+      const altSorted = NON_BOSS_SORTED.filter((x) => altPool.includes(x.i));
+      const altIndices = altSorted.map((x) => x.i);
+      const altWeights = altSorted.map((_, rank) => WAVE2_WEIGHTS_BY_RANK[rank] ?? 1);
+      w2i = weightedPick(altIndices, altWeights);
+    }
+  }
+
+  // Wave 3 is always the boss template.
+  return [ENEMIES[w1i], ENEMIES[w2i], ENEMIES[BOSS_ENEMY_INDEX]];
+}
 
 const FALLBACK_LOCATIONS = [
   { id: "ember_plaza", name: "Ember Plaza", subtitle: "Warm stones. Hot tempers.", enemySet: [0, 1, 5] },
@@ -2275,7 +2357,7 @@ const LOCATIONS = buildLocationsFromMap() || FALLBACK_LOCATIONS;
 let activeLocationId = null;
 
 /** @type {typeof ENEMIES} */
-let activeEnemySet = [ENEMIES[0], ENEMIES[1]];
+let activeEnemySet = [ENEMIES[0], ENEMIES[1], ENEMIES[5]];
 
 function getLocationById(id) {
   return LOCATIONS.find((l) => l.id === id) || LOCATIONS[0];
@@ -2284,7 +2366,6 @@ function getLocationById(id) {
 function setActiveLocation(id) {
   const loc = getLocationById(id);
   activeLocationId = loc.id;
-  activeEnemySet = loc.enemySet.map((i) => ENEMIES[i]);
   return loc;
 }
 
@@ -2408,11 +2489,29 @@ function setActiveLocation(id) {
   }
 
 
-  function makeInitialState(enemySet = activeEnemySet, locationId = activeLocationId) {
-  const set = enemySet || activeEnemySet || [ENEMIES[0], ENEMIES[1]];
+  function makeInitialState(enemySet = null, locationId = activeLocationId) {
   const loc = locationId ? getLocationById(locationId) : null;
   const pt = getActiveHero();
   const player = makePlayerFromHero(pt);
+
+  // If no set was provided (or it looks incomplete), generate a fresh random encounter lineup.
+  let set = Array.isArray(enemySet) && enemySet.length ? enemySet : null;
+  if (!set || set.length < 3) {
+    set = buildEnemySetForBattle(player.level);
+  }
+
+  // Normalize length (Wave 3 must be a boss).
+  if (set.length < 3) {
+    const w1 = set[0] || ENEMIES[0];
+    const w2 = set[1] || w1;
+    set = [w1, w2, ENEMIES[BOSS_ENEMY_INDEX]];
+  } else {
+    // Ensure the final slot is always the boss template.
+    set = [set[0], set[1] || set[0], ENEMIES[BOSS_ENEMY_INDEX]];
+  }
+
+  // Keep global in sync so wave spawns use the same lineup.
+  activeEnemySet = set;
 
   return {
     battleId: ++battleSerial,
@@ -2434,9 +2533,12 @@ function setActiveLocation(id) {
 
 function makeLobbyState() {
   const loc = LOCATIONS[0];
-  const set = loc.enemySet.map((i) => ENEMIES[i]);
   const pt = getActiveHero();
   const player = makePlayerFromHero(pt);
+  const set = buildEnemySetForBattle(player.level);
+
+  // Keep global in sync so other helpers have a consistent reference.
+  activeEnemySet = set;
 
   return {
     battleId: ++battleSerial,
@@ -2456,7 +2558,7 @@ function makeLobbyState() {
 }
 
 
-  const GAME_BUILD = "2026-02-16-boss-wave3";
+  const GAME_BUILD = "2026-02-16-random-encounters";
 
 
   // Load saved hero choice (if any)
