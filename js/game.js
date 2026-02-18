@@ -474,12 +474,27 @@ if (root) {
 
   const prefersReducedMotion = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 
-  /** Effect preview state (updates on hover/focus/click). */
-  let previewMove = /** @type {{name:string, type: MagicType, baseCost:number}} */ ({
-    name: "Attack",
-    type: "Sight",
-    baseCost: 0,
-  });
+  /**
+   * Effect preview state.
+   * Only visible while hovering (or focusing) an action.
+   */
+  let previewMove = /** @type {null | {name:string, type: MagicType, baseCost:number, extra?: string, customHtml?: string, tone?: "good"|"bad"|"neutral"}} */ (null);
+  let previewVisible = false;
+
+  function clearEffectPreview() {
+    previewVisible = false;
+    previewMove = null;
+    if (els.effectPreview instanceof HTMLElement) {
+      // Empty content so :empty { display:none } collapses the row.
+      els.effectPreview.innerHTML = "";
+      els.effectPreview.classList.remove("isGood", "isBad", "isNeutral");
+      els.effectPreview.classList.add("isNeutral");
+      // Reset tooltip positioning (so it doesn't 'stick' somewhere)
+      els.effectPreview.style.left = "";
+      els.effectPreview.style.top = "";
+      els.effectPreview.style.transform = "";
+    }
+  }
 
 
   /**
@@ -2266,26 +2281,26 @@ function startBattleWithLocation(locId) {
   const TYPE_ORDER = /** @type {MagicType[]} */ (["Wind", "Water", "Fire", "Earth", "Sight", "Sound", "Touch", "SmellTaste"]);
 
   const TYPE_CHART_BASE = /** @type {Record<MagicType, Record<MagicType, number>>} */ ({
-Wind: { Wind: 1.0, Water: 1.0, Fire: 0.8, Sight: 1.6, Earth: 0.8, Touch: 1.0, Sound: 1.0, SmellTaste: 1.6 },
-Water: { Wind: 1.0, Water: 1.0, Fire: 1.6, Sight: 1.0, Earth: 1.6, Touch: 0.8, Sound: 0.8, SmellTaste: 1.0 },
-Fire: { Wind: 1.6, Water: 0.8, Fire: 1.0, Sight: 1.0, Earth: 1.6, Touch: 1.0, Sound: 0.8, SmellTaste: 1.0 },
-Sight: { Wind: 0.8, Water: 1.0, Fire: 1.0, Sight: 1.0, Earth: 0.8, Touch: 1.6, Sound: 1.0, SmellTaste: 1.6 },
-Earth: { Wind: 1.6, Water: 0.8, Fire: 0.8, Sight: 1.6, Earth: 1.0, Touch: 1.0, Sound: 1.0, SmellTaste: 1.0 },
-Touch: { Wind: 1.0, Water: 1.6, Fire: 1.0, Sight: 0.8, Earth: 1.0, Touch: 1.0, Sound: 1.6, SmellTaste: 0.8 },
-Sound: { Wind: 1.0, Water: 1.6, Fire: 1.6, Sight: 1.0, Earth: 1.0, Touch: 0.8, Sound: 1.0, SmellTaste: 0.8 },
-SmellTaste: { Wind: 0.8, Water: 1.0, Fire: 1.0, Sight: 0.8, Earth: 1.0, Touch: 1.6, Sound: 1.6, SmellTaste: 1.0 },
+Wind: { Wind: 1.0, Water: 1.0, Fire: 0.9, Sight: 1.15, Earth: 0.9, Touch: 1.0, Sound: 1.0, SmellTaste: 1.15 },
+Water: { Wind: 1.0, Water: 1.0, Fire: 1.15, Sight: 1.0, Earth: 1.15, Touch: 0.9, Sound: 0.9, SmellTaste: 1.0 },
+Fire: { Wind: 1.15, Water: 0.9, Fire: 1.0, Sight: 1.0, Earth: 1.15, Touch: 1.0, Sound: 0.9, SmellTaste: 1.0 },
+Sight: { Wind: 0.9, Water: 1.0, Fire: 1.0, Sight: 1.0, Earth: 0.9, Touch: 1.15, Sound: 1.0, SmellTaste: 1.15 },
+Earth: { Wind: 1.15, Water: 0.9, Fire: 0.9, Sight: 1.15, Earth: 1.0, Touch: 1.0, Sound: 1.0, SmellTaste: 1.0 },
+Touch: { Wind: 1.0, Water: 1.15, Fire: 1.0, Sight: 0.9, Earth: 1.0, Touch: 1.0, Sound: 1.15, SmellTaste: 0.9 },
+Sound: { Wind: 1.0, Water: 1.15, Fire: 1.15, Sight: 1.0, Earth: 1.0, Touch: 0.9, Sound: 1.0, SmellTaste: 0.9 },
+SmellTaste: { Wind: 0.9, Water: 1.0, Fire: 1.0, Sight: 0.9, Earth: 1.0, Touch: 1.15, Sound: 1.15, SmellTaste: 1.0 },
   });
 
 
 /** @param {MagicType} attackType @param {MagicType[]} defenderTypes */
   // Tier multipliers (match the chart’s strong/weak values).
-  const TYPE_WEAK = 0.8;
-  const TYPE_STRONG = 1.6;
+  const TYPE_WEAK = 0.9;
+  const TYPE_STRONG = 1.15;
 
   /**
    * Derive a 5-tier chart from the base chart:
-   * - For each defender type, choose ONE "strongest" attacker among the strongest set (if any) => Super (1.6^2)
-   * - For each defender type, choose ONE "worst" attacker among the weakest set (if any) => Extremely-not (0.8^2)
+   * - For each defender type, choose ONE "strongest" attacker among the strongest set (if any) => Super (TYPE_STRONG^2)
+   * - For each defender type, choose ONE "worst" attacker among the weakest set (if any) => Extremely-not (TYPE_WEAK^2)
    * This makes the 5 tiers appear in the full chart while staying grounded in the base strengths.
    */
   function buildFiveTierChart(base) {
@@ -2427,6 +2442,49 @@ SmellTaste: { Wind: 0.8, Water: 1.0, Fire: 1.0, Sight: 0.8, Earth: 1.0, Touch: 1
       `<span class="rpgEffectPreviewMeta">(x${fmtMult(eff)} • ${meta}${extraBit})</span>`;
   }
 
+/**
+ * Position the effect preview near the hovered/focused element.
+ * This prevents layout shifts (which can cause hover flicker in the magic menu)
+ * and keeps the preview from stealing pointer events.
+ * @param {HTMLElement|null} anchorEl
+ */
+function positionEffectPreview(anchorEl) {
+  if (!(els.effectPreview instanceof HTMLElement)) return;
+  const pv = els.effectPreview;
+  if (!(anchorEl instanceof HTMLElement)) return;
+
+  const rect = anchorEl.getBoundingClientRect();
+  const margin = 10;
+  const x = rect.left + rect.width / 2;
+
+  // Prefer above the button, but flip below if we're too close to the top.
+  const preferAbove = rect.top > 84;
+  pv.style.top = `${preferAbove ? (rect.top - 8) : (rect.bottom + 8)}px`;
+  pv.style.transform = preferAbove ? "translate(-50%, -100%)" : "translate(-50%, 0)";
+  pv.style.left = `${x}px`;
+
+  // Clamp after render so we know the tooltip width.
+  requestAnimationFrame(() => {
+    if (!(pv instanceof HTMLElement)) return;
+    const r = pv.getBoundingClientRect();
+    const minX = margin + r.width / 2;
+    const maxX = window.innerWidth - margin - r.width / 2;
+    const cx = clamp(x, minX, maxX);
+    pv.style.left = `${cx}px`;
+
+    // If still off-screen vertically, flip.
+    const r2 = pv.getBoundingClientRect();
+    if (r2.top < margin) {
+      pv.style.top = `${rect.bottom + 8}px`;
+      pv.style.transform = "translate(-50%, 0)";
+    } else if (r2.bottom > window.innerHeight - margin) {
+      pv.style.top = `${rect.top - 8}px`;
+      pv.style.transform = "translate(-50%, -100%)";
+    }
+  });
+}
+
+
   /** @param {string} name @param {MagicType} type @param {number} baseCost */
   
   /**
@@ -2461,9 +2519,11 @@ SmellTaste: { Wind: 0.8, Water: 1.0, Fire: 1.0, Sight: 0.8, Earth: 1.0, Touch: 1
     els.hintLine.textContent = [baseTip, bindNote].filter(Boolean).join(" ");
   }
 
-function setPreviewMove(name, type, baseCost, extra = "") {
+function setPreviewMove(name, type, baseCost, extra = "", anchorEl = null) {
+    previewVisible = true;
     previewMove = { name, type, baseCost, extra };
     renderEffectPreview(previewMove);
+    positionEffectPreview(anchorEl);
   }
 
 	/**
@@ -2471,11 +2531,12 @@ function setPreviewMove(name, type, baseCost, extra = "") {
 	 * @param {string} html
 	 * @param {"good"|"bad"|"neutral"} tone
 	 */
-	function setPreviewText(html, tone = "neutral") {
-	  // Store as the current preview so re-renders keep the same line.
+	function setPreviewText(html, tone = "neutral", anchorEl = null) {
+	  previewVisible = true;
 	  const t = state?.player?.types?.[0] || "Touch";
 	  previewMove = { name: "Preview", type: t, baseCost: 0, customHtml: html, tone };
 	  renderEffectPreview(previewMove);
+	  positionEffectPreview(anchorEl);
 	}
 
 	/**
@@ -2494,9 +2555,9 @@ function setPreviewMove(name, type, baseCost, extra = "") {
 	  return Math.max(0, next - curHp);
 	}
 
-	function showHealPreview() {
+	function showHealPreview(anchorEl = null) {
 	  const amt = previewHealAmount();
-	  setPreviewText(`Heal: <span class="rpgEffectPreviewText">+${amt} HP</span>`, "neutral");
+	  setPreviewText(`Heal: <span class="rpgEffectPreviewText">+${amt} HP</span>`, "neutral", anchorEl);
 	}
 
   /** @param {MagicType[]} types */
@@ -2578,14 +2639,15 @@ function setPreviewMove(name, type, baseCost, extra = "") {
     if (els.enemyVsYouList instanceof HTMLElement) els.enemyVsYouList.innerHTML = "";
 
     // Player moves (what the UI actually offers)
-    const atkPrev = computeTypedDamage("player", "enemy", 5, "Sight");
+    const atkType = playerPrimaryType();
+    const atkPrev = computeTypedDamage("player", "enemy", 5, atkType, { ignoreEffectiveness: true });
     const windPrev = computeTypedDamage("player", "enemy", 4, "Wind");
     const waterPrev = computeTypedDamage("player", "enemy", 5, "Water");
     const soundPrev = computeTypedDamage("player", "enemy", 5, "Sound");
     const smellPrev = computeTypedDamage("player", "enemy", 4, "SmellTaste");
     const firePrev = computeTypedDamage("player", "enemy", 6, "Fire");
 
-    appendMatchupRow(els.atkVsEnemyList, { type: "Sight", label: "Attack", mult: atkPrev.overall });
+    appendMatchupRow(els.atkVsEnemyList, { type: atkType, label: "Attack", mult: atkPrev.overall });
     appendMatchupRow(els.atkVsEnemyList, { type: "Wind", label: "Wind spell", mult: windPrev.overall });
     appendMatchupRow(els.atkVsEnemyList, { type: "Water", label: "Water spell", mult: waterPrev.overall });
 
@@ -2708,14 +2770,18 @@ function setPreviewMove(name, type, baseCost, extra = "") {
    * @param {"player"|"enemy"} defenderKey
    * @param {number} base
    * @param {MagicType} moveType
+   * @param {{ ignoreEffectiveness?: boolean }=} opts
    */
-  function computeTypedDamage(attackerKey, defenderKey, base, moveType) {
+  function computeTypedDamage(attackerKey, defenderKey, base, moveType, opts = {}) {
     const attacker = state[attackerKey];
     const defender = state[defenderKey];
-    const stab = attacker.types.includes(moveType) ? 1.2 : 1.0;
+    let stab = attacker.types.includes(moveType) ? 1.1 : 1.0;
 
     // Effectiveness is tiered (5 discrete outcomes) so it stays readable.
-    const eff = typeMultiplier(moveType, defender.types);
+    const ignoreEff = !!opts.ignoreEffectiveness;
+    // Basic strikes can be flagged to ignore type advantage entirely.
+    const eff = ignoreEff ? 1.0 : typeMultiplier(moveType, defender.types);
+    if (ignoreEff) stab = 1.0;
     const tier = effectivenessTier(eff);
 
     const scaled = Math.max(1, Math.round(base * stab * eff));
@@ -4810,11 +4876,15 @@ function persistPlayerProgress() {
     }
 
     renderIntent(state.enemy.intent);
-    // Keep hover preview consistent when you swap heroes (Attack type changes with hero).
-    if (previewMove && previewMove.name === "Attack") {
-      previewMove.type = playerPrimaryType();
+
+    // Effect preview is only visible while hovering/focusing an action.
+    if (previewVisible && previewMove) {
+      // Keep hover preview consistent when you swap heroes (Attack type changes with hero).
+      if (previewMove.name === "Attack") previewMove.type = playerPrimaryType();
+      renderEffectPreview(previewMove);
+    } else {
+      clearEffectPreview();
     }
-    renderEffectPreview(previewMove);
     renderHint();
 
     // Sprite swap (wave-based enemies)
@@ -4863,7 +4933,7 @@ function persistPlayerProgress() {
 
     // Button labels show multiplier + cost (so choices are readable)
     const atkType = playerPrimaryType();
-    const atkPrev = computeTypedDamage("player", "enemy", 5, atkType);
+    const atkPrev = computeTypedDamage("player", "enemy", 5, atkType, { ignoreEffectiveness: true });
 
     if (els.attackBtn instanceof HTMLButtonElement) {
       const atkLabel = TYPE_META[atkType]?.label ?? atkType;
@@ -5397,7 +5467,7 @@ function persistPlayerProgress() {
     }
 
     const moveType = /** @type {MagicType} */ (intent.type || "Sight");
-    const typed = computeTypedDamage("enemy", "player", base, moveType);
+    const typed = computeTypedDamage("enemy", "player", base, moveType, { ignoreEffectiveness: intent.id === "attack" });
 
     // Visual: show the type of what hits you.
     spawnFx(fxKindForType(moveType), "player");
@@ -5535,7 +5605,7 @@ function persistPlayerProgress() {
       addLog(`🗡️ Power Rune empowers your damage (${before} → ${base}).`);
     }
 
-    const typed = computeTypedDamage("player", "enemy", base, atkType);
+    const typed = computeTypedDamage("player", "enemy", base, atkType, { ignoreEffectiveness: true });
     const def = applyEnemyDefenses(typed.scaled);
 
     state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
@@ -6757,7 +6827,10 @@ function playerFireAttack() {
       const target = e.target;
       if (!(target instanceof HTMLElement)) return;
       const btn = target.closest("button[data-spell-id]");
-      if (!(btn instanceof HTMLButtonElement)) return;
+      if (!(btn instanceof HTMLButtonElement)) {
+        clearEffectPreview();
+        return;
+      }
       const id = btn.getAttribute("data-spell-id");
       if (!id) return;
       const sp = SPELLS_BY_ID[id];
@@ -6767,11 +6840,16 @@ function playerFireAttack() {
         if (!s || s === "A direct damage spell.") return "";
         return s;
       })();
-      setPreviewMove(sp.name, sp.type, sp.baseCost, extra);
+      setPreviewMove(sp.name, sp.type, sp.baseCost, extra, btn);
     };
 
     els.magicMenu.addEventListener("mouseover", preview);
     els.magicMenu.addEventListener("focusin", preview);
+    els.magicMenu.addEventListener("mouseleave", clearEffectPreview);
+    els.magicMenu.addEventListener("focusout", (e) => {
+      const rt = /** @type {any} */ (e).relatedTarget;
+      if (!(rt instanceof Node) || !els.magicMenu.contains(rt)) clearEffectPreview();
+    });
   }
 
   if (els.attackBtn instanceof HTMLButtonElement) els.attackBtn.addEventListener("click", playerAttack);
@@ -6857,18 +6935,22 @@ function playerFireAttack() {
     const resolveName = () => (typeof nameOrFn === "function" ? nameOrFn() : nameOrFn);
     const resolveType = () => (typeof typeOrFn === "function" ? typeOrFn() : typeOrFn);
     const resolveCost = () => (typeof baseCostOrFn === "function" ? baseCostOrFn() : baseCostOrFn);
-    btn.addEventListener("mouseenter", () => setPreviewMove(resolveName(), resolveType(), resolveCost()));
-    btn.addEventListener("focus", () => setPreviewMove(resolveName(), resolveType(), resolveCost()));
-    // Also update on click, since some users go straight to clicking.
-    btn.addEventListener("click", () => setPreviewMove(resolveName(), resolveType(), resolveCost()));
+    const show = () => setPreviewMove(resolveName(), resolveType(), resolveCost(), "", btn);
+    const hide = () => clearEffectPreview();
+    btn.addEventListener("mouseenter", show);
+    btn.addEventListener("focus", show);
+    btn.addEventListener("mouseleave", hide);
+    btn.addEventListener("blur", hide);
   };
   wirePreview(els.attackBtn, "Attack", () => playerPrimaryType(), 0);
   // Heal has no type matchup, so it uses a custom preview showing exact HP restored.
   const wireHealPreview = (btn) => {
     if (!(btn instanceof HTMLElement)) return;
-    const show = () => showHealPreview();
+    const show = () => showHealPreview(btn);
     btn.addEventListener("mouseenter", show);
     btn.addEventListener("focus", show);
+    btn.addEventListener("mouseleave", clearEffectPreview);
+    btn.addEventListener("blur", clearEffectPreview);
   };
   wireHealPreview(els.healBtn);
   wirePreview(els.windBtn, "Wind attack", "Wind", 2);

@@ -2818,32 +2818,51 @@ body.gamePage #restartBtn{
 
 /* Effectiveness preview (before you click) */
 .rpgEffectPreview{
-  flex-basis: 100%;
-  display: flex;
+  /* Compact pill: don't force a full-width row */
+  flex: 0 1 auto;
+  width: fit-content;
+  max-width: min(520px, calc(100vw - 24px));
+  position: fixed;
+  z-index: 9999;
+  left: 50%;
+  top: 0;
+  transform: translate(-50%, -100%);
+  pointer-events: none;
+  will-change: transform, top, left;
+
+  display: inline-flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px 10px;
   align-items: center;
-  justify-content: space-between;
-  padding: 10px 12px;
+  justify-content: flex-start;
+  padding: 8px 10px;
   border-radius: 14px;
-  background: rgba(0,0,0,0.42);
+  --pvGlow: rgba(255,255,255,0);
+  background: rgb(10 10 18);
   border: 1px solid rgba(255,255,255,0.16);
+  box-shadow: 0 14px 38px rgba(0,0,0,0.60), 0 0 0 1px rgba(255,255,255,0.08) inset, 0 10px 24px var(--pvGlow);
+  text-shadow: 0 1px 0 rgba(0,0,0,0.55);
   color: rgba(255,255,255,0.95);
   font-weight: 900;
   letter-spacing: 0.2px;
+  user-select: none;
 }
 
+
 .rpgEffectPreviewText{ opacity: 0.92; font-weight: 800; }
-.rpgEffectPreviewMeta{ opacity: 0.82; font-weight: 800; font-size: 0.88rem; }
+.rpgEffectPreviewMeta{ opacity: 0.82; font-weight: 800; font-size: 0.84rem; }
 .rpgEffectPreview.isGood{
+  --pvGlow: rgba(107,226,139,0.16);
   border-color: color-mix(in srgb, #6be28b 75%, var(--border));
-  box-shadow: 0 0 0 1px rgba(107,226,139,0.18) inset, 0 10px 24px rgba(107,226,139,0.10);
+  box-shadow: 0 14px 38px rgba(0,0,0,0.60), 0 0 0 1px rgba(255,255,255,0.08) inset, 0 0 0 1px rgba(107,226,139,0.22) inset, 0 10px 24px var(--pvGlow);
 }
 .rpgEffectPreview.isBad{
+  --pvGlow: rgba(255,77,77,0.14);
   border-color: color-mix(in srgb, #ff4d4d 70%, var(--border));
-  box-shadow: 0 0 0 1px rgba(255,77,77,0.15) inset, 0 10px 24px rgba(255,77,77,0.08);
+  box-shadow: 0 14px 38px rgba(0,0,0,0.60), 0 0 0 1px rgba(255,255,255,0.08) inset, 0 0 0 1px rgba(255,77,77,0.20) inset, 0 10px 24px var(--pvGlow);
 }
 .rpgEffectPreview.isNeutral{
+  --pvGlow: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0.16);
 }
 
@@ -5641,13 +5660,15 @@ body.homePage #contact .sectionHead p.muted{
 
 /* 5-tier effectiveness legend keys */
 .rpgTypeKey--super{
-  border-color: rgba(80,170,255,0.48);
-  background: rgba(80,170,255,0.18);
+  /* Good tier (stronger shade) */
+  border-color: rgba(107,226,139,0.62);
+  background: rgba(107,226,139,0.22);
 }
 
 .rpgTypeKey--effective{
-  border-color: rgba(80,170,255,0.35);
-  background: rgba(80,170,255,0.12);
+  /* Good tier (lighter shade) */
+  border-color: rgba(107,226,139,0.34);
+  background: rgba(107,226,139,0.10);
 }
 
 .rpgTypeKey--weak{
@@ -5656,13 +5677,15 @@ body.homePage #contact .sectionHead p.muted{
 }
 
 .rpgTypeKey--not{
-  border-color: rgba(255,120,80,0.28);
-  background: rgba(255,120,80,0.10);
+  /* Bad tier (lighter shade) */
+  border-color: rgba(255,77,77,0.30);
+  background: rgba(255,77,77,0.09);
 }
 
 .rpgTypeKey--extremeNot{
-  border-color: rgba(255,120,80,0.40);
-  background: rgba(255,120,80,0.16);
+  /* Bad tier (stronger shade) */
+  border-color: rgba(255,77,77,0.66);
+  background: rgba(255,77,77,0.22);
 }
 
 .rpgTypeKey--neutral{
@@ -5730,13 +5753,13 @@ body.homePage #contact .sectionHead p.muted{
 
 /* 5-tier effectiveness cells (used by the full type chart) */
 .rpgTypeCell.isEffective{
-  border-color: rgba(80,170,255,0.35);
-  background: rgba(80,170,255,0.12);
+  border-color: rgba(107,226,139,0.34);
+  background: rgba(107,226,139,0.10);
 }
 
 .rpgTypeCell.isSuper{
-  border-color: rgba(80,170,255,0.48);
-  background: rgba(80,170,255,0.18);
+  border-color: rgba(107,226,139,0.62);
+  background: rgba(107,226,139,0.22);
 }
 
 .rpgTypeCell.isWeak{
@@ -5745,13 +5768,14 @@ body.homePage #contact .sectionHead p.muted{
 }
 
 .rpgTypeCell.isNot{
-  border-color: rgba(255,120,80,0.28);
-  background: rgba(255,120,80,0.10);
+  border-color: rgba(255,77,77,0.30);
+  background: rgba(255,77,77,0.09);
 }
 
 .rpgTypeCell.isExtremeNot{
-  border-color: rgba(255,120,80,0.40);
-  background: rgba(255,120,80,0.16);
+  border-color: rgba(255,77,77,0.70);
+  background: rgba(255,77,77,0.24);
+  box-shadow: 0 0 0 1px rgba(255,77,77,0.12) inset;
 }
 
 .rpgTypeCell.isNeutral{
@@ -5924,13 +5948,13 @@ body.homePage #contact .sectionHead p.muted{
 }
 
 .rpgEffectBanner.isSuper{
-  border-color: rgba(80,170,255,0.35);
-  background: rgba(80,170,255,0.15);
+  border-color: rgba(107,226,139,0.55);
+  background: rgba(107,226,139,0.16);
 }
 
 .rpgEffectBanner.isNot{
-  border-color: rgba(255,120,80,0.28);
-  background: rgba(255,120,80,0.12);
+  border-color: rgba(255,77,77,0.48);
+  background: rgba(255,77,77,0.15);
 }
 
 .rpgEffectBanner.isNeutral{
@@ -6004,9 +6028,22 @@ body.gamePage .btn{
   font-size: 0.95rem;
 }
 body.gamePage .rpgEffectPreview{
+  /* Compact pill: don't force a full-width row */
+  flex: 0 1 auto;
+  width: fit-content;
+  max-width: 100%;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  align-items: center;
+  justify-content: flex-start;
   padding: 8px 10px;
-  border-radius: 12px;
-  font-size: 0.92rem;
+  border-radius: 14px;
+  background: rgb(10 10 18);
+  border: 1px solid rgba(255,255,255,0.16);
+  color: rgba(255,255,255,0.95);
+  font-weight: 900;
+  letter-spacing: 0.2px;
 }
 body.gamePage .rpgHint{
   margin-top: 4px;
