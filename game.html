@@ -68,16 +68,8 @@
 <div class="rpgCardTop">
 <div class="rpgStatStack">
 <div class="rpgHeaderRow">
-<h2 class="rpgName" id="playerName">Player</h2>
-<p class="muted small rpgStatusPill" id="playerStatus">Ready</p>
-</div>
-      <p class="muted small rpgTypeLine" id="playerTypeText">Type: Wind • Sight</p>
-
-      <!-- Equipment slot (one item) -->
-      <div aria-label="Equipment" class="rpgResourceRow">
-        <p class="muted small rpgResourceText" id="playerEquipText">Equipment: —</p>
-      </div>
-<div aria-label="Mana" class="rpgResourceRow">
+<h2 class="rpgName" id="playerName">Player</h2></div>
+      <p class="muted small rpgTypeLine" id="playerTypeText">Type: Wind • Sight</p><div aria-label="Mana" class="rpgResourceRow">
 <p class="muted small rpgResourceText" id="playerFocusText">Mana: 2 / 6</p>
 <div aria-label="Mana meter" class="rpgMiniBar">
 <div class="rpgMiniBarFill" id="playerFocusFill"></div>
@@ -102,9 +94,7 @@
 <div class="rpgCardTop">
 <div class="rpgStatStack">
 <div class="rpgHeaderRow">
-<h2 class="rpgName" id="enemyName">Rival Mage</h2>
-<p class="muted small rpgStatusPill" id="enemyStatus">Channeling</p>
-</div>
+<h2 class="rpgName" id="enemyName">Rival Mage</h2></div>
 <p class="muted small rpgTypeLine" id="enemyTypeText">Type: Fire • Sight</p>
 <div aria-label="Mana" class="rpgResourceRow">
 <p class="muted small rpgResourceText" id="enemyFocusText">Mana: 2 / 6</p>
@@ -123,9 +113,7 @@
 
 
 </div>
-<article aria-label="Battle scene" class="post rpgStage">
-<div aria-live="polite" class="rpgTurnBanner isPlayer rpgTurnBannerTop" id="turnBanner">Your turn</div>
-<div aria-label="A tiny battle scene: the player faces a rival mage." class="rpgStageInner" role="img">
+<article aria-label="Battle scene" class="post rpgStage"><div aria-label="A tiny battle scene: the player faces a rival mage." class="rpgStageInner" role="img">
 <div aria-hidden="true" class="rpgFxLayer" id="fxLayer"></div>
 <div aria-hidden="true" class="rpgMoveBanner" data-type="Sight" id="moveBanner"><span class="rpgMoveBannerText" id="moveBannerText"></span></div>
 <div aria-hidden="true" class="rpgFoe rpgFoe--player" id="playerSprite">
@@ -149,18 +137,18 @@
   <div class="rpgMagicMenu" hidden="" id="magicMenu" role="menu"></div>
 </div>
 
-<!-- Inventory: combined Items + Gear -->
-<div class="rpgMagicWrap rpgInventoryWrap">
-  <button aria-controls="inventoryMenu" aria-expanded="false" aria-haspopup="true" class="btn ghost rpgMagicToggle" id="inventoryToggle" type="button">Inventory</button>
-  <div class="rpgMagicMenu rpgInventoryMenu" hidden="" id="inventoryMenu" role="menu">
-    <div class="rpgInvTabs" role="tablist" aria-label="Inventory tabs">
-      <button class="btn ghost rpgInvTab isActive" type="button" role="tab" aria-selected="true" data-inv-tab="items">Items</button>
-      <button class="btn ghost rpgInvTab" type="button" role="tab" aria-selected="false" data-inv-tab="gear">Gear</button>
-    </div>
-    <div class="rpgInvPane" id="inventoryItemsPane"></div>
-    <div class="rpgInvPane" id="inventoryGearPane" hidden=""></div>
-  </div>
-</div>
+	<!-- Inventory: Gear first, with an Items button inside the opened menu -->
+	<div class="rpgMagicWrap rpgInventoryWrap">
+	  <button aria-controls="inventoryMenu" aria-expanded="false" aria-haspopup="true" class="btn ghost rpgMagicToggle" id="inventoryToggle" type="button">Inventory</button>
+	  <div class="rpgMagicMenu rpgInventoryMenu" hidden="" id="inventoryMenu" role="menu" data-inv-tab="gear">
+	    <div class="rpgInvTabs" role="tablist" aria-label="Inventory">
+	      <button class="btn ghost rpgInvTab isActive" type="button" role="tab" aria-selected="true" data-inv-tab="gear">Gear</button>
+	      <button class="btn ghost rpgInvTab" type="button" role="tab" aria-selected="false" data-inv-tab="items">Items</button>
+	    </div>
+	    <div class="rpgInvPane" id="inventoryGearPane" role="tabpanel" aria-label="Gear"></div>
+	    <div class="rpgInvPane" id="inventoryItemsPane" role="tabpanel" aria-label="Items" hidden></div>
+	  </div>
+	</div>
 
 <button class="btn secondary" id="healBtn" type="button">Heal</button>
 <button class="btn ghost" id="guardBtn" type="button">Guard</button>
@@ -317,21 +305,18 @@
 <div class="rpgModalBody">
 <div class="rpgOverworldTop">
   <p class="muted" id="overworldHint" style="margin:0">Use the arrow keys or buttons to travel. Move near a glowing battle marker, then battle.</p>
+</div>
+
+<div class="rpgOverworldMapStage" id="locationChoices" role="group" aria-label="Overworld map"></div>
+
+<div class="rpgOverworldActionRow" aria-label="Overworld actions">
   <button class="btn primary" id="overworldBattleBtn" type="button" disabled>Battle here</button>
 </div>
 
 <div class="rpgOverworldLegend" aria-label="Overworld legend">
   <div class="rpgLegendPills" role="list">
-    <span class="rpgLegendChip rpgLegendChip--you" role="listitem"><span class="rpgLegendDot" aria-hidden="true"></span>You</span>
     <span class="rpgLegendChip rpgLegendChip--loc" role="listitem"><span class="rpgLegendDot" aria-hidden="true"></span>Battle marker</span>
-    <span class="rpgLegendChip rpgLegendChip--empty" role="listitem"><span class="rpgLegendDot" aria-hidden="true"></span>Empty</span>
   </div>
-</div>
-
-<div class="rpgOverworldMapStage" id="locationChoices" role="group" aria-label="Overworld map"></div>
-
-<div class="rpgOverworldBackRow" aria-label="Overworld navigation">
-  <button class="btn ghost" id="overworldBackBtn" type="button">Back</button>
 </div>
 
 <div class="rpgOverworldBottom">

@@ -2933,6 +2933,8 @@ body.modalOpen {
   font-size:1.1rem;
   line-height:1.1;
   margin-top:1px;
+  overflow: hidden;
+  border-radius: 14px;
 }
 .rpgCodexSprite{
   width:44px;
@@ -2940,6 +2942,21 @@ body.modalOpen {
   object-fit:contain;
   border-radius:12px;
   background: rgba(255,255,255,0.03);
+  transform: scale(var(--spriteScale, 1));
+  transform-origin: center center;
+  will-change: transform;
+}
+
+/* Slightly larger enemy sprites in the Compendium only */
+.rpgCodexEntry--enemy .rpgCodexIcon{
+  width:56px;
+  height:56px;
+  flex:0 0 56px;
+}
+.rpgCodexEntry--enemy .rpgCodexSprite{
+  width:56px;
+  height:56px;
+  border-radius:14px;
 }
 html[data-theme="light"] .rpgCodexSprite{background: rgba(0,0,0,0.03);}
 .rpgCodexMain{display:grid;gap:3px;min-width:0;flex:1 1 auto;}
@@ -2952,6 +2969,43 @@ html[data-theme="light"] .rpgCodexSprite{background: rgba(0,0,0,0.03);}
 html[data-theme="light"] .rpgCodexDetails{border-color:rgba(0,0,0,0.12);background:rgba(0,0,0,0.02)}
 html[data-theme="light"] .rpgCodexEntry{border-color:rgba(0,0,0,0.12);background:rgba(0,0,0,0.03)}
 html[data-theme="light"] .rpgCodexTag{border-color:rgba(0,0,0,0.14);background:rgba(0,0,0,0.04)}
+
+
+/* Compendium (Codex): make expanded lists more space-efficient */
+.rpgCodexDetails[open]{
+  padding: 8px 10px;
+}
+.rpgCodexDetails[open] > summary{
+  margin-bottom: 6px;
+}
+.rpgCodexDetails[open] .rpgCodexList{
+  margin-top: 6px;
+  gap: 6px;
+}
+.rpgCodexDetails[open] .rpgCodexEntry{
+  padding: 6px 8px;
+  gap: 8px;
+  border-radius: 12px;
+}
+.rpgCodexDetails[open] .rpgCodexMain{gap:2px;}
+.rpgCodexDetails[open] .rpgCodexSub{
+  font-size: 11px;
+  line-height: 1.15;
+}
+.rpgCodexDetails[open] .rpgCodexTypes{gap:4px;}
+.rpgCodexDetails[open] .rpgCodexTypes .typeInline{
+  padding: 2px 6px;
+  font-size: 0.74rem;
+  gap: 4px;
+}
+
+/* Two-column layout on wider screens to reduce scrolling */
+@media (min-width: 720px){
+  .rpgCodexDetails[open] .rpgCodexList{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 
 /* Wave clear loot screen (auto closes) */
 .rpgLootInner {
@@ -3062,6 +3116,7 @@ html[data-theme="light"] .rpgLootLine {
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
+  margin-top: 10px;
   padding: 10px 12px;
   border-radius: 16px;
   background: color-mix(in srgb, var(--panel2) 86%, transparent);
@@ -3122,14 +3177,14 @@ html[data-theme="light"] .rpgLegendChip{
   margin-top: 6px;
 }
 
-/* Back button row under the overworld map */
-.rpgOverworldBackRow{
+/* Action row under the overworld map (Battle button lives here) */
+.rpgOverworldActionRow{
   display:flex;
   justify-content:center;
   margin-top: 10px;
 }
-.rpgOverworldBackRow .btn{
-  min-width: 140px;
+.rpgOverworldActionRow .btn{
+  min-width: 170px;
 }
 
 .rpgOverworldGrid{
@@ -3369,6 +3424,9 @@ html[data-theme="light"] .rpgTileAvatar{
   object-fit: contain;
   object-position: center bottom;
   image-rendering: auto;
+  transform: scale(var(--spriteScale, 1));
+  transform-origin: center bottom;
+  will-change: transform;
 }
 
 .rpgCharTitle{
@@ -4248,6 +4306,9 @@ html[data-theme="light"] .rpgTileAvatar{
   object-fit: contain;
   object-position: center bottom;
   image-rendering: auto;
+  transform: scale(var(--spriteScale, 1));
+  transform-origin: center bottom;
+  will-change: transform;
 }
 
 /* Pixel-art sprites stay crisp. (Portraits and photos look better without pixelation.) */
@@ -6321,28 +6382,33 @@ html[data-theme="light"] .rpgOverworldAvatar{
 .rpgGearMenuWrap{display:flex;flex-direction:column;gap:10px}
 .rpgGearSlots{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;align-items:start}
 @media (max-width:420px){.rpgGearSlots{grid-template-columns:1fr}}
-.rpgGearSlotCard{border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:8px;background:rgba(255,255,255,0.03)}
-.rpgGearSlotHead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.rpgGearSlotCard{border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:6px;background:rgba(255,255,255,0.03)}
+.rpgGearSlotHead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;flex-wrap:wrap}
 .rpgGearSlotLabel{flex:1 1 auto;min-width:0;font-weight:700;opacity:.92}
-.rpgGearSlotUnequip{margin-left:auto;white-space:nowrap;font-size:11px;padding:5px 8px}
-.rpgGearSlotDrop{width:100%;text-align:left;min-height:38px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rpgGearSlotUnequip{margin-left:auto;white-space:nowrap;font-size:10px;padding:4px 6px}
+.rpgGearSlotDrop{width:100%;text-align:left;min-height:32px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.rpgGearTip{padding:4px 6px;font-size:11px;opacity:.72}
 
 .rpgGearInventoryDrop{font-size:11px;opacity:.8;border:1px dashed rgba(255,255,255,0.26);border-radius:12px;padding:6px 8px;text-align:center;display:none}
 .rpgGearMenuWrap .rpgGearInventoryDrop[aria-hidden="false"]{display:block}
 
 .rpgGearInvWrap{display:flex;flex-direction:column;gap:6px}
 .rpgGearInvTitle{font-weight:700;opacity:.92;font-size:0.95rem}
-.rpgGearInvList{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px;max-height:min(46vh,420px);overflow:auto;padding-right:2px}
+.rpgGearInvList{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px;max-height:none;overflow:visible;padding-right:0}
 
 @media (max-width:560px){
   .rpgGearInvList{grid-template-columns:1fr;max-height:none;overflow:visible;padding-right:0}
 }
 
-.rpgGearInvItem{width:100%;text-align:left;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:10px;row-gap:1px;align-items:center;padding:8px}
-.rpgGearSlotPill{grid-row:1 / span 2;align-self:start;font-size:10px;padding:3px 7px;border-radius:999px;border:1px solid rgba(255,255,255,0.18);opacity:.85;white-space:nowrap}
-.rpgGearInvMain{font-weight:750;display:flex;align-items:center;gap:8px;min-width:0}
+.rpgGearInvItem{width:100%;text-align:left;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:8px;row-gap:0px;align-items:center;padding:6px}
+.rpgGearSlotPill{grid-row:1 / span 2;align-self:start;font-size:9px;padding:2px 6px;border-radius:999px;border:1px solid rgba(255,255,255,0.18);opacity:.85;white-space:nowrap}
+.rpgGearInvMain{font-weight:750;display:flex;align-items:center;gap:8px;min-width:0;font-size:12px}
 .rpgGearInvName{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rpgGearInvSub{font-size:11px;opacity:.82}
+/* Compact meta row: count + rarity + clamped description */
+.rpgGearInvSub{display:flex;align-items:center;gap:6px;min-width:0;font-size:10px;opacity:.82}
+.rpgGearInvSub .rpgRarityPill{margin-left:0;font-size:9px;padding:2px 6px}
+.rpgGearInvDesc{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.78}
 
 /* Rarity pills (items & gear) */
 .rpgRarityPill{margin-left:auto;font-size:10px;padding:2px 7px;border-radius:999px;border:1px solid rgba(255,255,255,0.18);opacity:.95;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
@@ -6369,6 +6435,18 @@ html[data-theme="light"] .rarity--legendary{background:rgba(255,206,107,0.22)}
 .rpgGearInvItem.isEquipped{border-color:rgba(255,255,255,0.32)}
 
 /* Gear menu layout: wide enough for slots, tighter padding */
+/* Inventory split button: Inventory | Items (visually one control) */
+.rpgInventoryWrap .rpgInvSplit{display:inline-flex;align-items:stretch}
+.rpgInventoryWrap .rpgInvSplit .rpgInvSplitMain{border-top-right-radius:0;border-bottom-right-radius:0}
+.rpgInventoryWrap .rpgInvSplit .rpgInvSplitSub{border-top-left-radius:0;border-bottom-left-radius:0;margin-left:-1px;min-width:0;padding-left:12px;padding-right:12px}
+@media (max-width:520px){
+  .rpgInventoryWrap .rpgInvSplit{width:100%}
+  .rpgInventoryWrap .rpgInvSplit .btn{flex:1 1 0;width:auto}
+}
+
+#inventoryMenu[data-inv-focus="items"] .rpgInvTab[data-inv-tab="items"],
+#inventoryMenu[data-inv-focus="gear"] .rpgInvTab[data-inv-tab="gear"]{outline:2px solid rgba(255,255,255,0.22);outline-offset:2px}
+
 /* Inventory menu (combined Items + Gear) */
 #inventoryMenu.rpgMagicMenu{min-width:320px;width:min(620px,calc(100vw - 32px));max-width:620px;padding:8px;gap:8px}
 #inventoryMenu.rpgMagicMenu .btn{justify-content:flex-start}
@@ -6378,13 +6456,48 @@ html[data-theme="light"] .rarity--legendary{background:rgba(255,206,107,0.22)}
 
 #inventoryMenu .rpgMagicEmpty{font-size:12px;line-height:1.2;padding:6px 8px}
 
+/* Extra-compact hint text inside the Gear pane */
+.rpgGearTip{font-size:11px;opacity:.74;padding:4px 6px}
+
+/* Combined inventory sections (Gear + Items visible at a glance)
+   Desktop: 2 columns (Gear | Items)
+   Small screens: 1 column with capped section bodies so Items isn't hidden
+*/
+#inventoryMenu .rpgInvCombinedPane{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:10px;
+  /* override .rpgInvPane scrolling: we scroll each section body instead */
+  max-height:none;
+  overflow:visible;
+  padding-right:0;
+}
+#inventoryMenu .rpgInvSection{border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.03);border-radius:14px;padding:6px;display:flex;flex-direction:column;gap:6px}
+#inventoryMenu .rpgInvSectionHead{display:flex;align-items:center;justify-content:space-between;padding:4px 8px 6px;border-bottom:1px solid rgba(255,255,255,0.10);font-size:11px;font-weight:850;text-transform:uppercase;letter-spacing:.08em;opacity:.92}
+#inventoryMenu .rpgInvSectionHead .muted{font-weight:600;text-transform:none;letter-spacing:0;opacity:.72}
+
+/* Scroll within each section so both headers remain visible */
+#inventoryMenu #inventoryGearPane,
+#inventoryMenu #inventoryItemsPane{
+  overflow:auto;
+  max-height:min(44vh,420px);
+  padding-right:2px;
+}
+
+@media (max-width:520px){
+  #inventoryMenu .rpgInvCombinedPane{grid-template-columns:1fr}
+  #inventoryMenu #inventoryGearPane,
+  #inventoryMenu #inventoryItemsPane{max-height:min(28vh,260px)}
+}
+
 /* Tabs */
 #inventoryMenu .rpgInvTabs{display:flex;gap:6px;align-items:center}
 #inventoryMenu .rpgInvTabs .btn{width:auto;min-width:0;flex:1 1 0;justify-content:center;padding:7px 10px;border-radius:999px}
 #inventoryMenu .rpgInvTab.isActive{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.24)}
 
-/* Pane scrolling keeps the menu compact */
-#inventoryMenu .rpgInvPane{max-height:min(58vh,520px);overflow:auto;padding-right:2px}
+/* Pane scrolling keeps the menu compact (legacy tab panes).
+   The combined pane manages scrolling inside each section. */
+#inventoryMenu .rpgInvPane:not(.rpgInvCombinedPane){max-height:min(58vh,520px);overflow:auto;padding-right:2px}
 #inventoryMenu .rpgInvPane[hidden]{display:none}
 
 /* Items list (compact rows) */

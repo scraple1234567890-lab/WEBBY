@@ -47,6 +47,7 @@ if (root) {
     magicToggle: document.getElementById("magicToggle"),
     magicMenu: document.getElementById("magicMenu"),
     inventoryToggle: document.getElementById("inventoryToggle"),
+    inventoryItemsShortcut: document.getElementById("inventoryItemsShortcut"),
     inventoryMenu: document.getElementById("inventoryMenu"),
     inventoryItemsPane: document.getElementById("inventoryItemsPane"),
     inventoryGearPane: document.getElementById("inventoryGearPane"),
@@ -137,6 +138,206 @@ if (root) {
     buildTag: document.getElementById("buildTag"),
   };
 
+  // --------------------
+  // Sprite sizing normalizer
+  // --------------------
+  // Goal: make sprites *look* similarly sized even when:
+  // - the image has lots of transparent padding, and/or
+  // - the image is landscape in a portrait container (object-fit: contain makes it look short).
+  //
+  // We compute a per-image scale factor and store it in CSS var --spriteScale on the <img>.
+  // The CSS already uses: transform: scale(var(--spriteScale, 1));
+
+  /** @type {Map<string, {ratioW:number, ratioH:number, areaFill:number}>} */
+  const SPRITE_BOUNDS_CACHE = new Map();
+
+  /**
+   * Compute how "filled" an image appears inside its current box with object-fit: contain.
+   * @param {number} boxW
+   * @param {number} boxH
+   * @param {number} iw
+   * @param {number} ih
+   * @returns {{heightFill:number, widthFill:number}}
+   */
+  function containFill(boxW, boxH, iw, ih) {
+    if (!(boxW > 0 && boxH > 0 && iw > 0 && ih > 0)) return { heightFill: 0, widthFill: 0 };
+    const s = Math.min(boxW / iw, boxH / ih);
+    const drawW = iw * s;
+    const drawH = ih * s;
+    return {
+      widthFill: clamp(drawW / boxW, 0.01, 1),
+      heightFill: clamp(drawH / boxH, 0.01, 1),
+    };
+  }
+
+  /**
+   * Auto-scale a sprite to reduce perceived size differences.
+   *
+   * @param {HTMLImageElement} img
+   * @param {{ target?: number, min?: number, max?: number, fillH?: number }=} opts
+   */
+  function autoScaleSprite(img, opts) {
+    if (!(img instanceof HTMLImageElement)) return;
+
+    // Target area-fill (helps padding-heavy sprites).
+    const target = clamp(Number(opts?.target ?? 0.93), 0.70, 0.98);
+
+    // We generally only scale up. Shrinking tends to make "big" sprites feel worse.
+    const minScale = clamp(Number(opts?.min ?? 1.0), 0.70, 1.2);
+
+    // Allow higher max so landscape sprites can actually fill a tall battle box.
+    const maxScale = clamp(Number(opts?.max ?? 2.85), 1.0, 3.25);
+
+    // Optional: ensure the *visible sprite* reaches at least this fraction of its box height.
+    // This is the key fix for "wide sprites look short" cases.
+    const fillH = (typeof opts?.fillH === "number" && isFinite(opts.fillH))
+      ? clamp(Number(opts.fillH), 0.55, 0.98)
+      : null;
+
+    const src = String(img.currentSrc || img.src || img.getAttribute("src") || "").trim();
+    if (!src) return;
+
+    /**
+     * Apply scaling using any cached bounds info we have.
+     * @param {{ratioW:number, ratioH:number, areaFill:number}|null} meta
+     */
+    const apply = (meta) => {
+      // Important: measure the *container* box, not the image itself.
+      // getBoundingClientRect() includes transforms, so measuring the image would create feedback
+      // (scale changes the rect, which changes the next computed scale).
+      const boxEl = img.parentElement || img;
+      const rect = boxEl.getBoundingClientRect ? boxEl.getBoundingClientRect() : img.getBoundingClientRect();
+      const boxW = rect?.width || boxEl.clientWidth || 0;
+      const boxH = rect?.height || boxEl.clientHeight || 0;
+      const iw = img.naturalWidth || 0;
+      const ih = img.naturalHeight || 0;
+
+      // 1) Padding compensation (if we have bounds; otherwise assume 1).
+      const areaFill = meta?.areaFill ?? 1;
+      let scaleArea = target / clamp(areaFill, 0.01, 1);
+      if (!isFinite(scaleArea)) scaleArea = 1;
+
+      // 2) Landscape compensation (fillH). Works even without bounds info.
+      let scaleHeight = 1;
+      if (fillH != null && boxW > 0 && boxH > 0 && iw > 0 && ih > 0) {
+        const fill = containFill(boxW, boxH, iw, ih);
+        // If we have bounds, multiply by how much of the bitmap is "real" vertically.
+        const visH = fill.heightFill * clamp(meta?.ratioH ?? 1, 0.01, 1);
+        if (visH > 0) {
+          scaleHeight = fillH / visH;
+        }
+      }
+
+      let scale = Math.max(minScale, 1, scaleArea, scaleHeight);
+      scale = clamp(scale, minScale, maxScale);
+
+      // Avoid micro-jitter when values are near 1.
+      if (Math.abs(scale - 1) < 0.03) scale = 1;
+
+      img.style.setProperty("--spriteScale", String(Number(scale.toFixed(3))));
+    };
+
+    // If we already computed bounds, apply immediately and then again on the next frame
+    // (ensures layout is settled for getBoundingClientRect).
+    const cached = SPRITE_BOUNDS_CACHE.get(src) || null;
+    if (cached) {
+      apply(cached);
+      requestAnimationFrame(() => apply(cached));
+      return;
+    }
+
+    // Fallback: apply without bounds first (still fixes landscape sprites),
+    // then try to compute bounds for padding compensation.
+    apply(null);
+    requestAnimationFrame(() => apply(null));
+
+    const run = () => {
+      try {
+        const nw = img.naturalWidth;
+        const nh = img.naturalHeight;
+        if (!(nw > 0 && nh > 0)) return;
+
+        // Downscale for analysis to keep this lightweight.
+        const maxDim = 256;
+        const s = Math.min(1, maxDim / nw, maxDim / nh);
+        const cw = Math.max(1, Math.round(nw * s));
+        const ch = Math.max(1, Math.round(nh * s));
+
+        const canvas = document.createElement("canvas");
+        canvas.width = cw;
+        canvas.height = ch;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        if (!ctx) return;
+
+        ctx.clearRect(0, 0, cw, ch);
+        ctx.drawImage(img, 0, 0, cw, ch);
+
+        const { data } = ctx.getImageData(0, 0, cw, ch);
+        let minX = cw, minY = ch, maxX = -1, maxY = -1;
+        const alphaThresh = 10;
+
+        for (let y = 0; y < ch; y++) {
+          const row = y * cw * 4;
+          for (let x = 0; x < cw; x++) {
+            const a = data[row + x * 4 + 3];
+            if (a > alphaThresh) {
+              if (x < minX) minX = x;
+              if (x > maxX) maxX = x;
+              if (y < minY) minY = y;
+              if (y > maxY) maxY = y;
+            }
+          }
+        }
+
+        if (maxX < 0 || maxY < 0) return;
+
+        const boxW = (maxX - minX + 1);
+        const boxH = (maxY - minY + 1);
+        const ratioW = clamp(boxW / cw, 0.01, 1);
+        const ratioH = clamp(boxH / ch, 0.01, 1);
+
+        // Area-fill metric so wide sprites do not get penalized as harshly.
+        const areaFill = clamp(Math.sqrt(ratioW * ratioH), 0.01, 1);
+
+        const meta = { ratioW, ratioH, areaFill };
+        SPRITE_BOUNDS_CACHE.set(src, meta);
+
+        apply(meta);
+        requestAnimationFrame(() => apply(meta));
+      } catch {
+        // Bounds compute failed (e.g., rare canvas/CORS issues).
+        // Landscape boost still applies from the earlier fallback.
+      }
+    };
+
+    if (img.complete && img.naturalWidth) run();
+    else img.addEventListener("load", run, { once: true });
+  }
+
+  function autoScaleSpritesIn(scope) {
+    if (!scope) return;
+    const imgs = scope.querySelectorAll("img");
+    imgs.forEach((im) => {
+      if (!(im instanceof HTMLImageElement)) return;
+
+      // RPG battle sprites
+      if (im.classList.contains("rpgSpriteImg")) {
+        autoScaleSprite(im, { target: 0.93, max: 2.85, fillH: 0.86 });
+        return;
+      }
+
+      // Compendium sprites
+      if (im.classList.contains("rpgCodexSprite")) {
+        autoScaleSprite(im, { target: 0.92, max: 2.15, fillH: 0.92 });
+        return;
+      }
+
+      // Hero picker portraits
+      if (im.closest(".rpgCharSprite")) {
+        autoScaleSprite(im, { target: 0.92, max: 2.15, fillH: 0.92 });
+      }
+    });
+  }
   // --------------------
   // Overworld (very simple traversable map)
   // Now rendered on top of the same map image used on the Map page.
@@ -249,6 +450,10 @@ if (root) {
     if (els.overworldBattleBtn instanceof HTMLButtonElement) {
       // Only show the battle button when you're actually at a battle-ready location.
       // (Otherwise it clutters the UI and implies you can fight anywhere.)
+      const actionRow = els.overworldBattleBtn.closest('.rpgOverworldActionRow');
+      if (actionRow instanceof HTMLElement) {
+        actionRow.toggleAttribute('hidden', !loc);
+      }
       els.overworldBattleBtn.toggleAttribute('hidden', !loc);
       els.overworldBattleBtn.disabled = !loc;
       els.overworldBattleBtn.textContent = loc ? `Battle: ${loc.name || loc.id}` : "Battle here";
@@ -491,51 +696,95 @@ function playWaveClearSfx() {
   // Inventory menu helpers (combined Items + Gear)
   // --------------------
 
-  /** @type {"items"|"gear"} */
-  let inventoryTab = "items";
+  /** @param {"gear"|"items"} which */
+  function setInventoryTab(which) {
+    if (!(els.inventoryMenu instanceof HTMLElement)) return;
+    const tab = which === "items" ? "items" : "gear";
+    els.inventoryMenu.dataset.invTab = tab;
+
+    // Panes
+    if (els.inventoryGearPane instanceof HTMLElement) {
+      els.inventoryGearPane.hidden = tab !== "gear";
+    }
+    if (els.inventoryItemsPane instanceof HTMLElement) {
+      els.inventoryItemsPane.hidden = tab !== "items";
+    }
+
+    // Tab buttons
+    els.inventoryMenu.querySelectorAll('button[data-inv-tab]').forEach((b) => {
+      if (!(b instanceof HTMLButtonElement)) return;
+      const t = b.getAttribute('data-inv-tab');
+      const active = t === tab;
+      b.classList.toggle('isActive', active);
+      b.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+  }
 
   function isInventoryOpen() {
     return (els.inventoryMenu instanceof HTMLElement) && !els.inventoryMenu.hidden;
   }
 
-  /** @param {"items"|"gear"} tab */
-  function setInventoryTab(tab) {
-    inventoryTab = tab;
-    if (!(els.inventoryMenu instanceof HTMLElement)) return;
-
-    const itemsBtn = els.inventoryMenu.querySelector('button[data-inv-tab="items"]');
-    const gearBtn = els.inventoryMenu.querySelector('button[data-inv-tab="gear"]');
-
-    if (itemsBtn instanceof HTMLButtonElement) {
-      const on = tab === "items";
-      itemsBtn.classList.toggle("isActive", on);
-      itemsBtn.setAttribute("aria-selected", on ? "true" : "false");
-    }
-    if (gearBtn instanceof HTMLButtonElement) {
-      const on = tab === "gear";
-      gearBtn.classList.toggle("isActive", on);
-      gearBtn.setAttribute("aria-selected", on ? "true" : "false");
-    }
-
-    if (els.inventoryItemsPane instanceof HTMLElement) els.inventoryItemsPane.toggleAttribute("hidden", tab !== "items");
-    if (els.inventoryGearPane instanceof HTMLElement) els.inventoryGearPane.toggleAttribute("hidden", tab !== "gear");
-  }
-
   function setInventoryMenuOpen(open) {
     if (els.inventoryMenu instanceof HTMLElement) {
       els.inventoryMenu.hidden = !open;
+      if (!open) {
+        delete els.inventoryMenu.dataset.invFocus;
+      }
     }
+    const exp = open ? "true" : "false";
     if (els.inventoryToggle instanceof HTMLButtonElement) {
-      els.inventoryToggle.setAttribute("aria-expanded", open ? "true" : "false");
+      els.inventoryToggle.setAttribute("aria-expanded", exp);
     }
-    if (open) setInventoryTab(inventoryTab);
+    if (els.inventoryItemsShortcut instanceof HTMLButtonElement) {
+      els.inventoryItemsShortcut.setAttribute("aria-expanded", exp);
+    }
+  }
+
+  function flashInvFocus(which) {
+    if (!(els.inventoryMenu instanceof HTMLElement)) return;
+    if (!which) return;
+    els.inventoryMenu.dataset.invFocus = which;
+    window.setTimeout(() => {
+      if (els.inventoryMenu instanceof HTMLElement) delete els.inventoryMenu.dataset.invFocus;
+    }, prefersReducedMotion ? 0 : 900);
+  }
+
+  /** @param {"gear"|"items"|null=} focus */
+  function openInventoryMenu(focus = null) {
+    if (!(els.inventoryMenu instanceof HTMLElement)) return;
+    // Keep only one dropdown open at a time.
+    if (els.magicMenu instanceof HTMLElement && !els.magicMenu.hidden) closeMagicMenu();
+    setInventoryMenuOpen(true);
+
+    const tab = focus === "items" ? "items" : "gear";
+    setInventoryTab(tab);
+
+    // Reset scroll + focus first available action.
+    if (tab === "items" && (els.inventoryItemsPane instanceof HTMLElement)) {
+      els.inventoryItemsPane.scrollTop = 0;
+      window.setTimeout(() => {
+        const b = els.inventoryItemsPane.querySelector('button:not([disabled])');
+        if (b instanceof HTMLButtonElement) b.focus({ preventScroll: true });
+      }, 0);
+      flashInvFocus("items");
+    }
+    if (tab === "gear" && (els.inventoryGearPane instanceof HTMLElement)) {
+      els.inventoryGearPane.scrollTop = 0;
+      window.setTimeout(() => {
+        const b = els.inventoryGearPane.querySelector('button:not([disabled])');
+        if (b instanceof HTMLButtonElement) b.focus({ preventScroll: true });
+      }, 0);
+      flashInvFocus("gear");
+    }
   }
 
   function toggleInventoryMenu() {
     if (!(els.inventoryMenu instanceof HTMLElement)) return;
-    // Keep only one dropdown open at a time.
-    if (els.magicMenu instanceof HTMLElement && !els.magicMenu.hidden) closeMagicMenu();
-    setInventoryMenuOpen(els.inventoryMenu.hidden);
+    if (isInventoryOpen()) {
+      setInventoryMenuOpen(false);
+      return;
+    }
+    openInventoryMenu("gear");
   }
 
   function closeInventoryMenu() {
@@ -545,14 +794,17 @@ function playWaveClearSfx() {
   // Close inventory menu when clicking outside.
   document.addEventListener("click", (e) => {
     if (!(els.inventoryMenu instanceof HTMLElement)) return;
-    if (!(els.inventoryToggle instanceof HTMLElement)) return;
+
+    const toggles = [els.inventoryToggle, els.inventoryItemsShortcut].filter((x) => x instanceof HTMLElement);
+    if (toggles.length === 0) return;
+
     const path = typeof e.composedPath === "function" ? e.composedPath() : [];
     const t = e.target;
+
     const inMenu = (Array.isArray(path) && path.includes(els.inventoryMenu)) || (t instanceof Node && els.inventoryMenu.contains(t));
-    const inToggle = (Array.isArray(path) && path.includes(els.inventoryToggle)) || (t instanceof Node && els.inventoryToggle.contains(t));
+    const inToggle = toggles.some((el) => (Array.isArray(path) && path.includes(el)) || (t instanceof Node && el.contains(t)));
     if (!inMenu && !inToggle) closeInventoryMenu();
   });
-
 
 const TYPE_META = /** @type {Record<MagicType, {icon: string, label: string}>} */ ({
   Wind:  { icon: "🍃", label: "Wind" },
@@ -986,7 +1238,9 @@ function renderGearMenu(isPlayerTurn, container = els.inventoryGearPane) {
 
   const tip = document.createElement("div");
   tip.className = "rpgMagicEmpty";
-  tip.textContent = "Drag gear onto a slot to equip it. (Click also works.)";
+  tip.classList.add("rpgGearTip");
+  // Keep the Gear pane compact; clicking owned gear equips it.
+  tip.textContent = "Tip: click gear to equip.";
   container.appendChild(tip);
 
   const wrap = document.createElement("div");
@@ -1184,19 +1438,38 @@ function renderGearMenu(isPlayerTurn, container = els.inventoryGearPane) {
     const nm = document.createElement("span");
     nm.className = "rpgGearInvName";
     nm.textContent = `${def.icon} ${def.name}`;
+    // Help with long names (hover to see the full text).
+    nm.title = def.name;
     main.appendChild(nm);
+
+    btn.appendChild(main);
+
+    // Compact meta row: count + rarity + (clamped) description.
+    const sub = document.createElement("span");
+    sub.className = "rpgGearInvSub";
+
+    const countPill = document.createElement("span");
+    countPill.className = "rpgInvCountPill";
+    countPill.textContent = `x${have}`;
+    sub.appendChild(countPill);
 
     const rp = document.createElement("span");
     rp.className = `rpgRarityPill rarity--${(def.rarity || "common")}`;
     rp.textContent = rarityLabel(def.rarity || "common");
-    main.appendChild(rp);
+    sub.appendChild(rp);
 
-    btn.appendChild(main);
+    if (def.desc) {
+      const desc = document.createElement("span");
+      desc.className = "rpgGearInvDesc";
+      desc.textContent = String(def.desc);
+      desc.title = String(def.desc);
+      sub.appendChild(desc);
+    }
 
-    const sub = document.createElement("span");
-    sub.className = "rpgGearInvSub";
-    sub.textContent = `x${have} • ${def.desc}`;
     btn.appendChild(sub);
+
+    // Full details on hover.
+    btn.title = `${def.name} (${rarityLabel(def.rarity || "common")})${def.desc ? `\n${def.desc}` : ""}`.trim();
 
     // Mark as equipped in its slot
     const isEq = slots?.[def.slot] === id;
@@ -1527,6 +1800,7 @@ function isDefeatOpen() {
 let lootLastFocus = null;
 let lootTimer = 0;
 
+let lootResolve = null; // {battleId:number,isFinal:boolean,nextIndex:number}
 /** @param {string} title @param {string} subtitle @param {string} line */
 function openLootScreen(title, subtitle, line) {
   if (!(els.lootModal instanceof HTMLElement)) return;
@@ -1552,6 +1826,61 @@ function closeLootScreen() {
   lootLastFocus = null;
   updateBodyModalOpen();
   if (prev && prev instanceof HTMLElement) prev.focus();
+
+  // If the loot screen was dismissed early (or auto-timed out), continue the flow.
+  const lr = lootResolve;
+  if (lr && state && state.battleId === lr.battleId) {
+    lootResolve = null;
+    resolveLootDismissal(lr);
+  }
+}
+
+/**
+ * Continue the battle flow after the loot screen is dismissed.
+ * @param {{battleId:number,isFinal:boolean,nextIndex:number}} lr
+ */
+function resolveLootDismissal(lr) {
+  if (!lr || !state || state.battleId !== lr.battleId) return;
+
+  // Final wave: return to the character menu after rewards.
+  if (lr.isFinal) {
+    endGame("The duel ends. You win!");
+    // Pop the character menu after the win is logged/rendered.
+    window.setTimeout(() => {
+      if (!state || state.battleId !== lr.battleId) return;
+      if (isDefeatOpen()) return;
+      openHeroPicker();
+    }, 140);
+    return;
+  }
+
+  // Between-wave breather (fixed, not random).
+  const bonus = 3;
+  const before = state.player.hp;
+  state.player.hp = clamp(state.player.hp + bonus, 0, state.player.max);
+  const actual = state.player.hp - before;
+  if (actual > 0) addLog(`You catch a second wind (+${actual} HP).`);
+
+  // Clear tactical one-turn states.
+  state.player.guarding = false;
+  state.player.evading = false;
+
+  // Spawn next enemy.
+  const nextIndex = lr.nextIndex;
+  state.wave = nextIndex;
+  state.enemy = makeEnemy(state.wave, state.enemySet, state.player.level);
+
+  addLog(`Wave ${state.wave + 1}: ${state.enemy.name} arrives.`);
+  addLog("Your turn.");
+
+  setPhase("player");
+
+  // Set new intent for readability.
+  state.enemy.intent = computeEnemyIntent();
+  renderIntent(state.enemy.intent);
+
+  setEffectBanner("—", "neutral");
+  render();
 }
 
 
@@ -1567,7 +1896,7 @@ function openDefeatScreen(subtitle) {
   if (isSpellPickOpen()) closeSpellPicker();
   if (isExplainOpen()) closeExplain();
   if (isLocationOpen()) closeLocationPicker();
-  if (isLootOpen()) { closeLootScreen(); if (lootTimer) window.clearTimeout(lootTimer); lootTimer = 0; }
+  if (isLootOpen()) { lootResolve = null; closeLootScreen(); if (lootTimer) window.clearTimeout(lootTimer); lootTimer = 0; }
 
   if (els.defeatTitle instanceof HTMLElement) els.defeatTitle.textContent = "Defeated";
   if (els.defeatSubtitle instanceof HTMLElement) {
@@ -1618,6 +1947,9 @@ function renderHeroChoices() {
       </button>
     `;
   }).join("");
+
+  // Normalize sprite sizing inside the hero picker so all portraits feel consistent.
+  autoScaleSpritesIn(els.characterChoices);
 }
 
 function openHeroPicker() {
@@ -1851,6 +2183,7 @@ function startBattleWithLocation(locId) {
 
   closeMagicMenu();
   closeInventoryMenu();
+  lootResolve = null;
   if (isLootOpen()) closeLootScreen();
   if (lootTimer) window.clearTimeout(lootTimer);
   lootTimer = 0;
@@ -2544,11 +2877,11 @@ function makeRarityPill(r) {
 }
 
 /**
- * @param {{icon?:string,title:string, sub?:string, types?:MagicType[], rightPill?:HTMLElement|null, tag?:string, sprite?:string}} opts
+ * @param {{icon?:string,title:string, sub?:string, types?:MagicType[], rightPill?:HTMLElement|null, tag?:string, sprite?:string, className?:string}} opts
  */
 function makeCodexEntry(opts) {
   const row = document.createElement('div');
-  row.className = 'rpgCodexEntry';
+  row.className = `rpgCodexEntry${(typeof opts.className === 'string' && opts.className.trim()) ? ` ${opts.className.trim()}` : ''}`;
 
   const icon = document.createElement('div');
   icon.className = 'rpgCodexIcon';
@@ -2561,6 +2894,9 @@ function makeCodexEntry(opts) {
     img.alt = '';
     img.src = spriteSrc;
     icon.appendChild(img);
+
+    // Keep compendium sprites visually consistent even when the PNGs have different padding.
+    autoScaleSprite(img, { target: 0.92, max: 1.32 });
   } else {
     icon.textContent = opts.icon || '✦';
   }
@@ -2614,6 +2950,128 @@ function makeCodexEntry(opts) {
   return row;
 }
 
+/**
+ * Compute approximate enemy encounter rates for the current weighted system.
+ * Rates are calculated for Wave 1 and Wave 2; Wave 3 is always the boss.
+ * The Wave 2 rates account for the 70% anti-repeat reroll (when Wave 2 initially matches Wave 1).
+ * @returns {Map<number, {w1:number,w2:number,any:number,boss:boolean}>}
+ */
+function computeEnemyEncounterRates() {
+  /** @type {Map<number, {w1:number,w2:number,any:number,boss:boolean}>} */
+  const out = new Map();
+
+  const bossIdx = (typeof BOSS_ENEMY_INDEX === 'number') ? BOSS_ENEMY_INDEX : -1;
+  if (bossIdx >= 0) {
+    out.set(bossIdx, { w1: 0, w2: 0, any: 1, boss: true });
+  }
+
+  const sorted = Array.isArray(NON_BOSS_SORTED) ? NON_BOSS_SORTED : [];
+  if (!sorted.length) return out;
+
+  const weightsFor = (weightsByRank) => {
+    const w = sorted.map((_, rank) => (weightsByRank && typeof weightsByRank[rank] === 'number') ? weightsByRank[rank] : 1);
+    let total = 0;
+    for (const x of w) total += Math.max(0, x || 0);
+    const pByIndex = new Map();
+    sorted.forEach((x, rank) => {
+      const ww = Math.max(0, w[rank] || 0);
+      pByIndex.set(x.i, total > 0 ? (ww / total) : 0);
+    });
+    return { weights: w, total, pByIndex };
+  };
+
+  const wave1 = weightsFor(WAVE1_WEIGHTS_BY_RANK);
+  const wave2init = weightsFor(WAVE2_WEIGHTS_BY_RANK);
+
+  // Wave 2 final distribution includes anti-repeat reroll.
+  /** @type {Map<number, number>} */
+  const p2final = new Map();
+  for (const x of sorted) p2final.set(x.i, 0);
+
+  const n = sorted.length;
+  const canReroll = n > 1;
+
+  // Precompute alternative wave2 distributions when excluding a specific wave1 enemy.
+  /** @type {Map<number, Map<number, number>>} */
+  const altDistByExclude = new Map();
+  if (canReroll) {
+    for (const ex of sorted) {
+      const altSorted = sorted.filter((z) => z.i !== ex.i);
+      const altWeights = altSorted.map((_, rank) => (WAVE2_WEIGHTS_BY_RANK && typeof WAVE2_WEIGHTS_BY_RANK[rank] === 'number') ? WAVE2_WEIGHTS_BY_RANK[rank] : 1);
+      let altTotal = 0;
+      for (const w of altWeights) altTotal += Math.max(0, w || 0);
+      const altMap = new Map();
+      altSorted.forEach((z, rank) => {
+        const ww = Math.max(0, altWeights[rank] || 0);
+        altMap.set(z.i, altTotal > 0 ? (ww / altTotal) : 0);
+      });
+      altDistByExclude.set(ex.i, altMap);
+    }
+  }
+
+  // P(final w2 = k) = Σ_i P(w1=i) * [ P(init=k, k!=i) + P(init=i)*0.30*(k==i) + P(init=i)*0.70*P_alt(k|exclude i) ]
+  for (const wi of sorted) {
+    const i = wi.i;
+    const pW1 = wave1.pByIndex.get(i) || 0;
+    if (pW1 <= 0) continue;
+
+    // baseline: init=k and k!=i
+    for (const wk of sorted) {
+      const k = wk.i;
+      if (k === i) continue;
+      const pInit = wave2init.pByIndex.get(k) || 0;
+      if (pInit > 0) p2final.set(k, (p2final.get(k) || 0) + pW1 * pInit);
+    }
+
+    const pInitI = wave2init.pByIndex.get(i) || 0;
+    if (pInitI > 0) {
+      if (!canReroll) {
+        // No reroll possible: wave2 is always the only enemy.
+        p2final.set(i, (p2final.get(i) || 0) + pW1 * pInitI);
+      } else {
+        // 30% keep the repeat.
+        p2final.set(i, (p2final.get(i) || 0) + pW1 * pInitI * 0.30);
+
+        // 70% reroll from alt pool.
+        const alt = altDistByExclude.get(i);
+        if (alt) {
+          for (const [k, pAlt] of alt.entries()) {
+            if (pAlt > 0) p2final.set(k, (p2final.get(k) || 0) + pW1 * pInitI * 0.70 * pAlt);
+          }
+        }
+      }
+    }
+  }
+
+  // Fill final output for non-boss enemies.
+  for (const x of sorted) {
+    const idx = x.i;
+    const p1 = wave1.pByIndex.get(idx) || 0;
+    const p2 = p2final.get(idx) || 0;
+
+    // Overlap term for "appears at least once" within a battle run.
+    // Repeat only possible when wave1=idx AND wave2 final=idx.
+    let overlap = 0;
+    const pInit = wave2init.pByIndex.get(idx) || 0;
+    if (canReroll) overlap = p1 * pInit * 0.30;
+    else overlap = p1 * pInit;
+
+    const any = clamp(p1 + p2 - overlap, 0, 1);
+    out.set(idx, { w1: clamp(p1, 0, 1), w2: clamp(p2, 0, 1), any, boss: false });
+  }
+
+  return out;
+}
+
+function formatPct(p) {
+  const n = Math.max(0, Number(p) || 0);
+  if (n <= 0) return '0%';
+  const v = n * 100;
+  if (v < 0.1) return '<0.1%';
+  const s = v.toFixed(1);
+  return s.endsWith('.0') ? `${Math.round(v)}%` : `${s}%`;
+}
+
 function renderCodex() {
   // ENEMIES
   if (els.codexEnemiesCount instanceof HTMLElement) {
@@ -2621,11 +3079,16 @@ function renderCodex() {
   }
   if (els.codexEnemies instanceof HTMLElement) {
     clearEl(els.codexEnemies);
+    const rates = computeEnemyEncounterRates();
     const list = Array.isArray(ENEMIES) ? ENEMIES : [];
     list.forEach((e, idx) => {
       const isBoss = idx === (typeof BOSS_ENEMY_INDEX === 'number' ? BOSS_ENEMY_INDEX : -1);
       const icon = isBoss ? '👑' : '⚔️';
-      const sub = `HP ${toSafeInt(e?.maxHp, 0)} • Heals ${toSafeInt(e?.healCharges, 0)}`;
+      const r = rates.get(idx);
+      const appear = isBoss
+        ? 'Appears: Wave 3 100%'
+        : (r ? `Appears: W1 ${formatPct(r.w1)} • W2 ${formatPct(r.w2)}` : 'Appears: —');
+      const sub = `HP ${toSafeInt(e?.maxHp, 0)} • Heals ${toSafeInt(e?.healCharges, 0)} • ${appear}`;
       els.codexEnemies.appendChild(makeCodexEntry({
         icon,
         title: String(e?.name || 'Enemy'),
@@ -2633,6 +3096,7 @@ function renderCodex() {
         sub,
         tag: isBoss ? 'Boss' : '',
         sprite: String(e?.sprite || ''),
+        className: 'rpgCodexEntry--enemy',
       }));
     });
   }
@@ -3027,6 +3491,8 @@ function heroFromCharacterData(c) {
     safeTypes.map((t) => TYPE_META[t]?.label ?? t).join(" • ") +
     (hasUnknownSecondary ? " • TBD" : "");
 
+  const cid = String(c?.id || "").toLowerCase();
+
   // Mild per-hero tuning (kept close to the old roster).
   const preset = {
     relen: { maxHp: 20, focusStart: 2 },
@@ -3034,7 +3500,11 @@ function heroFromCharacterData(c) {
     mira: { maxHp: 21, focusStart: 2 },
     devante: { maxHp: 19, focusStart: 2 },
     elroy: { maxHp: 23, focusStart: 2 },
-  }[String(c?.id || "").toLowerCase()] || { maxHp: 20, focusStart: 2 };
+  }[cid] || { maxHp: 20, focusStart: 2 };
+
+  // Game-page-only sprite override(s)
+  let sprite = String(c?.image || "./assets/images/characters/relen.png");
+  if (cid === "relen") sprite = "./assets/images/characters/relen-game.png";
 
   return {
     id: String(c?.id || "hero"),
@@ -3045,7 +3515,7 @@ function heroFromCharacterData(c) {
     healCharges: 3,
     focusMax: 6,
     focusStart: preset.focusStart,
-    sprite: String(c?.image || "./assets/images/characters/relen.png"),
+    sprite,
     blurb: String(c?.summary || c?.hook || "").trim() || "A battle-ready mage.",
   };
 }
@@ -3078,7 +3548,7 @@ const PLAYABLE_HEROES = buildPlayableHeroes() || [
     healCharges: 3,
     focusMax: 6,
     focusStart: 2,
-    sprite: "./assets/images/characters/relen.png",
+    sprite: "./assets/images/characters/relen-game.png",
     blurb: "Wind + Sight. A young prodigy with light-built precision.",
   },
   {
@@ -4263,6 +4733,8 @@ function persistPlayerProgress() {
       if (els.enemySpriteImg.getAttribute("src") !== state.enemy.sprite) {
         els.enemySpriteImg.setAttribute("src", state.enemy.sprite);
       }
+      // Normalize visual size across different sprite padding.
+      autoScaleSprite(els.enemySpriteImg, { target: 0.93, max: 2.85, fillH: 0.86 });
       // Pixel-art enemies stay crisp, but allow portrait-style enemy art too.
       const enemyIsPortrait = state.enemy.spriteIsPixel === false;
       els.enemySpriteImg.classList.toggle("isPixel", !enemyIsPortrait);
@@ -4273,6 +4745,9 @@ function persistPlayerProgress() {
       if (els.playerSpriteImg.getAttribute("src") !== state.player.sprite) {
         els.playerSpriteImg.setAttribute("src", state.player.sprite);
       }
+
+      // Normalize visual size across different sprite padding.
+      autoScaleSprite(els.playerSpriteImg, { target: 0.93, max: 2.85, fillH: 0.86 });
 
       // Use crisp pixel rendering for pixel sprites, but keep portraits smooth.
       const isPortrait = String(state.player.sprite).includes("/assets/images/characters/") ||
@@ -4390,6 +4865,7 @@ function persistPlayerProgress() {
     if (els.magicToggle instanceof HTMLButtonElement) els.magicToggle.disabled = disableActions || !hasAnySpell;
 
     if (els.inventoryToggle instanceof HTMLButtonElement) els.inventoryToggle.disabled = disableActions;
+    if (els.inventoryItemsShortcut instanceof HTMLButtonElement) els.inventoryItemsShortcut.disabled = disableActions;
     if (els.healBtn instanceof HTMLButtonElement) els.healBtn.disabled = !canHeal;
     if (els.restartBtn instanceof HTMLButtonElement) els.restartBtn.disabled = false;
   }
@@ -4555,45 +5031,15 @@ function persistPlayerProgress() {
 
     const myBattle = state.battleId;
 
+    // Remember what should happen after the loot screen closes (timer or Escape).
+    lootResolve = { battleId: myBattle, isFinal, nextIndex };
+
     if (lootTimer) window.clearTimeout(lootTimer);
     lootTimer = window.setTimeout(() => {
       // If the player started a new battle, do nothing.
       if (!state || state.battleId !== myBattle) return;
-
       closeLootScreen();
       lootTimer = 0;
-
-      if (isFinal) {
-        endGame("The duel ends. You win!");
-        return;
-      }
-
-      // Between-wave breather (fixed, not random)
-      const bonus = 3;
-      const before = state.player.hp;
-      state.player.hp = clamp(state.player.hp + bonus, 0, state.player.max);
-      const actual = state.player.hp - before;
-      if (actual > 0) addLog(`You catch a second wind (+${actual} HP).`);
-
-      // Clear tactical one-turn states.
-      state.player.guarding = false;
-      state.player.evading = false;
-
-      // Spawn next enemy.
-      state.wave = nextIndex;
-      state.enemy = makeEnemy(state.wave, state.enemySet, state.player.level);
-
-      addLog(`Wave ${state.wave + 1}: ${state.enemy.name} arrives.`);
-      addLog("Your turn.");
-
-      setPhase("player");
-
-      // Set new intent for readability.
-      state.enemy.intent = computeEnemyIntent();
-      renderIntent(state.enemy.intent);
-
-      setEffectBanner("—", "neutral");
-      render();
     }, 3000);
   }
 
@@ -4636,6 +5082,7 @@ function persistPlayerProgress() {
     lockBtn(els.guardBtn, locked);
     lockBtn(els.magicToggle, locked);
     lockBtn(els.inventoryToggle, locked);
+    lockBtn(els.inventoryItemsShortcut, locked);
     lockBtn(els.windBtn, locked);
     lockBtn(els.waterBtn, locked);
     lockBtn(els.soundBtn, locked);
@@ -6016,6 +6463,7 @@ function playerFireAttack() {
     closeInventoryMenu();
     closeHeroPicker();
     closeLocationPicker();
+    lootResolve = null;
     if (isLootOpen()) closeLootScreen();
     if (lootTimer) window.clearTimeout(lootTimer);
     lootTimer = 0;
@@ -6034,6 +6482,7 @@ function playerFireAttack() {
     closeInventoryMenu();
     closeHeroPicker();
     closeLocationPicker();
+    lootResolve = null;
     if (isLootOpen()) closeLootScreen();
     if (lootTimer) window.clearTimeout(lootTimer);
     lootTimer = 0;
@@ -6055,10 +6504,6 @@ function playerFireAttack() {
 
   if (els.magicToggle instanceof HTMLButtonElement) {
     els.magicToggle.addEventListener("click", toggleMagicMenu);
-  }
-
-  if (els.inventoryToggle instanceof HTMLButtonElement) {
-    els.inventoryToggle.addEventListener("click", toggleInventoryMenu);
   }
 
   if (els.inventoryToggle instanceof HTMLButtonElement) {
@@ -6157,13 +6602,29 @@ function playerFireAttack() {
       const target = e.target;
       if (!(target instanceof HTMLElement)) return;
 
-      // Tabs
-      const tabBtn = target.closest("button[data-inv-tab]");
-      if (tabBtn instanceof HTMLButtonElement) {
-        const tab = tabBtn.getAttribute("data-inv-tab");
-        if (tab === "items" || tab === "gear") setInventoryTab(tab);
-        return;
-      }
+	      // Tabs (Gear / Items)
+	      const tabBtn = target.closest('button[data-inv-tab]');
+	      if (tabBtn instanceof HTMLButtonElement) {
+	        const tab = tabBtn.getAttribute('data-inv-tab');
+	        if (tab === 'gear' || tab === 'items') {
+	          setInventoryTab(tab);
+	          if (tab === 'items' && (els.inventoryItemsPane instanceof HTMLElement)) {
+	            els.inventoryItemsPane.scrollTop = 0;
+	            window.setTimeout(() => {
+	              const b = els.inventoryItemsPane.querySelector('button:not([disabled])');
+	              if (b instanceof HTMLButtonElement) b.focus({ preventScroll: true });
+	            }, 0);
+	          }
+	          if (tab === 'gear' && (els.inventoryGearPane instanceof HTMLElement)) {
+	            els.inventoryGearPane.scrollTop = 0;
+	            window.setTimeout(() => {
+	              const b = els.inventoryGearPane.querySelector('button:not([disabled])');
+	              if (b instanceof HTMLButtonElement) b.focus({ preventScroll: true });
+	            }, 0);
+	          }
+	        }
+	        return;
+	      }
 
       // Items
       const itemBtn = target.closest("button[data-item-id]");
