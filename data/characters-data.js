@@ -105,17 +105,17 @@ window.CHARACTERS_DATA = {
     },
     {
       "id": "axel",
-      "name": "Axel",
+      "name": "Belle",
       "group": "Core cast",
       "spoiler_tier": "book2",
-      "hook": "Sight-led. Secondary discipline: xxx.",
-      "summary": "A core cast member whose magic types are Sight and xxx.",
+      "hook": "Sound-led. Fire-threaded. Laughs like a matchstrike.",
+      "summary": "A core cast member whose magic types are Sound and Fire.",
       "alignment": "Neutral",
-      "element": "xxx",
-      "school": "Sight",
+      "element": "Fire",
+      "school": "Sound",
       "facts": [
-        "Types: Sight + xxx",
-        "Secondary type is a placeholder (xxx) until you decide what it really is.",
+        "Types: Sound + Fire",
+        "Uses rhythm and resonance to shape heat into precise bursts.",
         "Known for fast reads, faster exits, and a habit of never repeating routes.",
         "Has ties to the Black Market and the Illegal District (by necessity, not loyalty)."
       ],
@@ -123,13 +123,14 @@ window.CHARACTERS_DATA = {
         "character",
         "core",
         "runner",
-        "sight",
         "spoiler:book2",
-        "underground"
+        "underground",
+        "sound",
+        "fire"
       ],
       "aliases": [
         "The Runner",
-        "Axel “Stillpoint”"
+        "Belle “Stillpoint”"
       ],
       "image": "./assets/images/characters/axel.png",
       "href": "./characters/axel.html",

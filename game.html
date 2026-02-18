@@ -60,6 +60,7 @@
   <div aria-label="Game controls" class="rpgTopControls" role="group">
     <button class="btn heroCta rpgTopBtn" id="heroBtn" title="Restart and pick a hero" type="button"><span aria-hidden="true" class="rpgTopBtnIcon">↻</span>New battle</button>
     <button class="btn ghost rpgTopBtn" id="spellPickBtn" type="button" hidden=""><span aria-hidden="true" class="rpgTopBtnIcon">📜</span>Choose spell</button>
+    <button class="btn ghost rpgTopBtn" id="codexBtn" type="button"><span aria-hidden="true" class="rpgTopBtnIcon">📚</span>Compendium</button>
     <button class="btn ghost rpgTopBtn" id="explainBtn" type="button"><span aria-hidden="true" class="rpgTopBtnIcon">?</span>Explain</button>
   </div>
 <div aria-label="Battlefield" class="rpgGrid" role="group">
@@ -148,16 +149,17 @@
   <div class="rpgMagicMenu" hidden="" id="magicMenu" role="menu"></div>
 </div>
 
-<!-- Extremely simple item system: one-use consumables, found after waves. -->
-<div class="rpgMagicWrap">
-  <button aria-controls="itemsMenu" aria-expanded="false" aria-haspopup="true" class="btn ghost rpgMagicToggle" id="itemsToggle" type="button">Items</button>
-  <div class="rpgMagicMenu" hidden="" id="itemsMenu" role="menu"></div>
-</div>
-
-<!-- Equipment slot: persistent gear, 1 slot. -->
-<div class="rpgMagicWrap">
-  <button aria-controls="gearMenu" aria-expanded="false" aria-haspopup="true" class="btn ghost rpgMagicToggle" id="gearToggle" type="button">Gear</button>
-  <div class="rpgMagicMenu" hidden="" id="gearMenu" role="menu"></div>
+<!-- Inventory: combined Items + Gear -->
+<div class="rpgMagicWrap rpgInventoryWrap">
+  <button aria-controls="inventoryMenu" aria-expanded="false" aria-haspopup="true" class="btn ghost rpgMagicToggle" id="inventoryToggle" type="button">Inventory</button>
+  <div class="rpgMagicMenu rpgInventoryMenu" hidden="" id="inventoryMenu" role="menu">
+    <div class="rpgInvTabs" role="tablist" aria-label="Inventory tabs">
+      <button class="btn ghost rpgInvTab isActive" type="button" role="tab" aria-selected="true" data-inv-tab="items">Items</button>
+      <button class="btn ghost rpgInvTab" type="button" role="tab" aria-selected="false" data-inv-tab="gear">Gear</button>
+    </div>
+    <div class="rpgInvPane" id="inventoryItemsPane"></div>
+    <div class="rpgInvPane" id="inventoryGearPane" hidden=""></div>
+  </div>
 </div>
 
 <button class="btn secondary" id="healBtn" type="button">Heal</button>
@@ -194,6 +196,36 @@
 <button class="btn primary" id="explainOk" type="button">Got it</button>
 </div>
 </div>
+</div>
+
+<div aria-labelledby="codexTitle" aria-modal="true" class="rpgModal" hidden="" id="codexModal" role="dialog">
+  <div class="post rpgModalInner" role="document">
+    <div class="rpgModalHead">
+      <h2 class="rpgLogTitle" id="codexTitle">Compendium</h2>
+      <button aria-label="Close compendium" class="iconBtn" id="codexClose" type="button">✕</button>
+    </div>
+    <div class="rpgModalBody">
+      <p class="muted small" style="margin-top:0">A quick index of everything you can run into, pick up, or equip.</p>
+
+      <details class="rpgCodexDetails" open>
+        <summary><span>Enemies</span><span class="muted tiny" id="codexEnemiesCount"></span></summary>
+        <div class="rpgCodexList" id="codexEnemies"></div>
+      </details>
+
+      <details class="rpgCodexDetails">
+        <summary><span>Items</span><span class="muted tiny" id="codexItemsCount"></span></summary>
+        <div class="rpgCodexList" id="codexItems"></div>
+      </details>
+
+      <details class="rpgCodexDetails">
+        <summary><span>Gear</span><span class="muted tiny" id="codexGearCount"></span></summary>
+        <div class="rpgCodexList" id="codexGear"></div>
+      </details>
+    </div>
+    <div class="rpgModalFoot">
+      <button class="btn primary" id="codexOk" type="button">Close</button>
+    </div>
+  </div>
 </div>
 
 <!-- Victory / Loot Screen (auto closes after a wave is cleared) -->
@@ -294,10 +326,14 @@
     <span class="rpgLegendChip rpgLegendChip--loc" role="listitem"><span class="rpgLegendDot" aria-hidden="true"></span>Battle marker</span>
     <span class="rpgLegendChip rpgLegendChip--empty" role="listitem"><span class="rpgLegendDot" aria-hidden="true"></span>Empty</span>
   </div>
-  <span class="muted tiny">Move: WASD / Arrow keys</span>
 </div>
 
 <div class="rpgOverworldMapStage" id="locationChoices" role="group" aria-label="Overworld map"></div>
+
+<div class="rpgOverworldBackRow" aria-label="Overworld navigation">
+  <button class="btn ghost" id="overworldBackBtn" type="button">Back</button>
+</div>
+
 <div class="rpgOverworldBottom">
   <div class="rpgDpad" role="group" aria-label="Move">
     <button class="btn ghost rpgDpadBtn" id="owUp" type="button" aria-label="Move up">↑</button>
@@ -308,7 +344,6 @@
     </div>
     <button class="btn ghost rpgDpadBtn" id="owDown" type="button" aria-label="Move down">↓</button>
   </div>
-  <p class="muted small" id="overworldPos" style="margin:0">Position: —</p>
 </div>
 </div>
 </div>

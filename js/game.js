@@ -46,10 +46,10 @@ if (root) {
     heroBtn: document.getElementById("heroBtn"),
     magicToggle: document.getElementById("magicToggle"),
     magicMenu: document.getElementById("magicMenu"),
-    itemsToggle: document.getElementById("itemsToggle"),
-    itemsMenu: document.getElementById("itemsMenu"),
-    gearToggle: document.getElementById("gearToggle"),
-    gearMenu: document.getElementById("gearMenu"),
+    inventoryToggle: document.getElementById("inventoryToggle"),
+    inventoryMenu: document.getElementById("inventoryMenu"),
+    inventoryItemsPane: document.getElementById("inventoryItemsPane"),
+    inventoryGearPane: document.getElementById("inventoryGearPane"),
     windBtn: document.getElementById("windBtn"),
     secondaryTypeBtn: document.getElementById("secondaryTypeBtn"),
     waterBtn: document.getElementById("waterBtn"),
@@ -65,6 +65,18 @@ if (root) {
     explainClose: document.getElementById("explainClose"),
     explainOk: document.getElementById("explainOk"),
 
+    // Compendium (codex)
+    codexBtn: document.getElementById("codexBtn"),
+    codexModal: document.getElementById("codexModal"),
+    codexClose: document.getElementById("codexClose"),
+    codexOk: document.getElementById("codexOk"),
+    codexEnemiesCount: document.getElementById("codexEnemiesCount"),
+    codexItemsCount: document.getElementById("codexItemsCount"),
+    codexGearCount: document.getElementById("codexGearCount"),
+    codexEnemies: document.getElementById("codexEnemies"),
+    codexItems: document.getElementById("codexItems"),
+    codexGear: document.getElementById("codexGear"),
+
     // Spell picker (level-up)
     spellPickBtn: document.getElementById("spellPickBtn"),
     spellPickModal: document.getElementById("spellPickModal"),
@@ -78,6 +90,7 @@ if (root) {
     locationChoices: document.getElementById("locationChoices"),
     overworldHint: document.getElementById("overworldHint"),
     overworldBattleBtn: document.getElementById("overworldBattleBtn"),
+    overworldBackBtn: document.getElementById("overworldBackBtn"),
     overworldPos: document.getElementById("overworldPos"),
     owUp: document.getElementById("owUp"),
     owDown: document.getElementById("owDown"),
@@ -181,6 +194,17 @@ if (root) {
     return nearestBattleLocation();
   }
 
+  function getBattleableOverworldLocation() {
+    const locId = nearestBattleLocation();
+    if (!locId) return null;
+    // Only consider it battle-ready if the RPG location picker actually includes it.
+    // (Avoids falling back to LOCATIONS[0] when an ID is missing.)
+    const loc = (typeof LOCATIONS !== 'undefined' && Array.isArray(LOCATIONS))
+      ? (LOCATIONS.find((l) => l && l.id === locId) || null)
+      : null;
+    return loc;
+  }
+
   function setOwPos(leftPct, topPct) {
     OVERWORLD.xPct = clamp(toSafeNum(leftPct, OVERWORLD.xPct), 0, 100);
     OVERWORLD.yPct = clamp(toSafeNum(topPct, OVERWORLD.yPct), 0, 100);
@@ -194,7 +218,8 @@ if (root) {
       playerEl.style.top = `${OVERWORLD.yPct}%`;
     }
 
-    const nearId = currentLocId();
+    const nearLoc = getBattleableOverworldLocation();
+    const nearId = nearLoc ? nearLoc.id : null;
     const pins = els.locationChoices.querySelectorAll('button.rpgOverworldPin[data-ow-loc]');
     pins.forEach((pin) => {
       if (!(pin instanceof HTMLElement)) return;
@@ -209,8 +234,7 @@ if (root) {
   }
 
   function updateOverworldUI() {
-    const locId = currentLocId();
-    const loc = locId ? getLocationById(locId) : null;
+    const loc = getBattleableOverworldLocation();
 
     if (els.overworldPos instanceof HTMLElement) {
       els.overworldPos.textContent = `Position: ${OVERWORLD.xPct.toFixed(1)}%, ${OVERWORLD.yPct.toFixed(1)}%`;
@@ -223,8 +247,11 @@ if (root) {
     }
 
     if (els.overworldBattleBtn instanceof HTMLButtonElement) {
+      // Only show the battle button when you're actually at a battle-ready location.
+      // (Otherwise it clutters the UI and implies you can fight anywhere.)
+      els.overworldBattleBtn.toggleAttribute('hidden', !loc);
       els.overworldBattleBtn.disabled = !loc;
-      els.overworldBattleBtn.textContent = loc ? `Battle: ${loc.name}` : "Battle here";
+      els.overworldBattleBtn.textContent = loc ? `Battle: ${loc.name || loc.id}` : "Battle here";
     }
   }
 
@@ -439,7 +466,7 @@ function playWaveClearSfx() {
   function toggleMagicMenu() {
     if (!(els.magicMenu instanceof HTMLElement)) return;
     // Keep only one dropdown open at a time.
-    if (els.itemsMenu instanceof HTMLElement && !els.itemsMenu.hidden) closeItemsMenu();
+    if (isInventoryOpen()) closeInventoryMenu();
     setMagicMenuOpen(els.magicMenu.hidden);
   }
 
@@ -461,78 +488,69 @@ function playWaveClearSfx() {
   });
 
   // --------------------
-  // Items menu helpers (simple one-use consumables)
+  // Inventory menu helpers (combined Items + Gear)
   // --------------------
 
-  function setItemsMenuOpen(open) {
-    if (els.itemsMenu instanceof HTMLElement) {
-      els.itemsMenu.hidden = !open;
-    }
-    if (els.itemsToggle instanceof HTMLButtonElement) {
-      els.itemsToggle.setAttribute("aria-expanded", open ? "true" : "false");
-    }
+  /** @type {"items"|"gear"} */
+  let inventoryTab = "items";
+
+  function isInventoryOpen() {
+    return (els.inventoryMenu instanceof HTMLElement) && !els.inventoryMenu.hidden;
   }
 
-  function toggleItemsMenu() {
-    if (!(els.itemsMenu instanceof HTMLElement)) return;
+  /** @param {"items"|"gear"} tab */
+  function setInventoryTab(tab) {
+    inventoryTab = tab;
+    if (!(els.inventoryMenu instanceof HTMLElement)) return;
+
+    const itemsBtn = els.inventoryMenu.querySelector('button[data-inv-tab="items"]');
+    const gearBtn = els.inventoryMenu.querySelector('button[data-inv-tab="gear"]');
+
+    if (itemsBtn instanceof HTMLButtonElement) {
+      const on = tab === "items";
+      itemsBtn.classList.toggle("isActive", on);
+      itemsBtn.setAttribute("aria-selected", on ? "true" : "false");
+    }
+    if (gearBtn instanceof HTMLButtonElement) {
+      const on = tab === "gear";
+      gearBtn.classList.toggle("isActive", on);
+      gearBtn.setAttribute("aria-selected", on ? "true" : "false");
+    }
+
+    if (els.inventoryItemsPane instanceof HTMLElement) els.inventoryItemsPane.toggleAttribute("hidden", tab !== "items");
+    if (els.inventoryGearPane instanceof HTMLElement) els.inventoryGearPane.toggleAttribute("hidden", tab !== "gear");
+  }
+
+  function setInventoryMenuOpen(open) {
+    if (els.inventoryMenu instanceof HTMLElement) {
+      els.inventoryMenu.hidden = !open;
+    }
+    if (els.inventoryToggle instanceof HTMLButtonElement) {
+      els.inventoryToggle.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+    if (open) setInventoryTab(inventoryTab);
+  }
+
+  function toggleInventoryMenu() {
+    if (!(els.inventoryMenu instanceof HTMLElement)) return;
     // Keep only one dropdown open at a time.
     if (els.magicMenu instanceof HTMLElement && !els.magicMenu.hidden) closeMagicMenu();
-    setItemsMenuOpen(els.itemsMenu.hidden);
+    setInventoryMenuOpen(els.inventoryMenu.hidden);
   }
 
-  function closeItemsMenu() {
-    setItemsMenuOpen(false);
+  function closeInventoryMenu() {
+    setInventoryMenuOpen(false);
   }
 
-  // Close items menu when clicking outside.
+  // Close inventory menu when clicking outside.
   document.addEventListener("click", (e) => {
-    if (!(els.itemsMenu instanceof HTMLElement)) return;
-    if (!(els.itemsToggle instanceof HTMLElement)) return;
-    const t = e.target;
-    if (t instanceof Node) {
-      const inMenu = els.itemsMenu.contains(t);
-      const inToggle = els.itemsToggle.contains(t);
-      if (!inMenu && !inToggle) closeItemsMenu();
-    }
-  });
-
-
-  // --------------------
-  // Gear menu helpers (equipment: 1 slot)
-  // --------------------
-
-  function setGearMenuOpen(open) {
-    if (els.gearMenu instanceof HTMLElement) {
-      els.gearMenu.hidden = !open;
-    }
-    if (els.gearToggle instanceof HTMLButtonElement) {
-      els.gearToggle.setAttribute("aria-expanded", open ? "true" : "false");
-    }
-  }
-
-  function toggleGearMenu() {
-    if (!(els.gearMenu instanceof HTMLElement)) return;
-    // Keep only one dropdown open at a time.
-    if (els.magicMenu instanceof HTMLElement && !els.magicMenu.hidden) closeMagicMenu();
-    if (els.itemsMenu instanceof HTMLElement && !els.itemsMenu.hidden) closeItemsMenu();
-    setGearMenuOpen(els.gearMenu.hidden);
-  }
-
-  function closeGearMenu() {
-    setGearMenuOpen(false);
-  }
-
-  // Close gear menu when clicking outside.
-  document.addEventListener("click", (e) => {
-    if (!(els.gearMenu instanceof HTMLElement)) return;
-    if (!(els.gearToggle instanceof HTMLElement)) return;
-    // Use composedPath so we don't accidentally treat an in-menu click as "outside"
-    // after we re-render and replace the clicked button.
+    if (!(els.inventoryMenu instanceof HTMLElement)) return;
+    if (!(els.inventoryToggle instanceof HTMLElement)) return;
     const path = typeof e.composedPath === "function" ? e.composedPath() : [];
     const t = e.target;
-    const inMenu = (Array.isArray(path) && path.includes(els.gearMenu)) || (t instanceof Node && els.gearMenu.contains(t));
-    const inToggle = (Array.isArray(path) && path.includes(els.gearToggle)) || (t instanceof Node && els.gearToggle.contains(t));
-    if (!inMenu && !inToggle) closeGearMenu();
+    const inMenu = (Array.isArray(path) && path.includes(els.inventoryMenu)) || (t instanceof Node && els.inventoryMenu.contains(t));
+    const inToggle = (Array.isArray(path) && path.includes(els.inventoryToggle)) || (t instanceof Node && els.inventoryToggle.contains(t));
+    if (!inMenu && !inToggle) closeInventoryMenu();
   });
 
 
@@ -863,17 +881,21 @@ function itemCanUse(itemId) {
   return false;
 }
 
-/** @param {boolean} isPlayerTurn */
-function renderItemMenu(isPlayerTurn) {
-  if (!(els.itemsMenu instanceof HTMLElement)) return;
-  els.itemsMenu.replaceChildren();
+/**
+ * Render the Items pane inside Inventory.
+ * @param {boolean} isPlayerTurn
+ * @param {HTMLElement=} container
+ */
+function renderItemMenu(isPlayerTurn, container = els.inventoryItemsPane) {
+  if (!(container instanceof HTMLElement)) return;
+  container.replaceChildren();
 
   const usedThisTurn = !!(state?.player?.itemUsedThisTurn);
 
   const tip = document.createElement("div");
   tip.className = "rpgMagicEmpty";
   tip.textContent = usedThisTurn ? "One-use items. (Used 1 item this turn.)" : "One-use items. You can use 1 item per turn without ending your turn.";
-  els.itemsMenu.appendChild(tip);
+  container.appendChild(tip);
 
   const inv = state?.player?.items && typeof state.player.items === "object" ? state.player.items : {};
   const rows = ITEM_IDS
@@ -884,26 +906,59 @@ function renderItemMenu(isPlayerTurn) {
     const empty = document.createElement("div");
     empty.className = "rpgMagicEmpty";
     empty.textContent = "No items.";
-    els.itemsMenu.appendChild(empty);
+    container.appendChild(empty);
     return;
   }
+
+  const list = document.createElement("div");
+  list.className = "rpgInvItemsList";
+  container.appendChild(list);
 
   rows.forEach(({ id, count }) => {
     const def = ITEM_DEFS[id];
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "btn secondary rpgMagicItem";
+    btn.className = "btn ghost rpgInvItemRow";
     btn.setAttribute("role", "menuitem");
     btn.dataset.itemId = id;
 
     const label = def ? `${def.icon} ${def.name}` : id;
-    const desc = def?.desc ? ` • ${def.desc}` : "";
-    btn.textContent = `${label} (x${count})${desc}`;
+    const desc = def?.desc ? String(def.desc) : "";
+
+    const main = document.createElement("span");
+    main.className = "rpgInvItemMain";
+
+    const name = document.createElement("span");
+    name.className = "rpgInvItemName";
+    name.textContent = label;
+    main.appendChild(name);
+
+    const meta = document.createElement("span");
+    meta.className = "rpgInvItemMeta";
+
+    const countPill = document.createElement("span");
+    countPill.className = "rpgInvCountPill";
+    countPill.textContent = `x${count}`;
+    meta.appendChild(countPill);
+
+    const pill = document.createElement("span");
+    const rarKey = def?.rarity ? def.rarity : "common";
+    pill.className = `rpgRarityPill rarity--${rarKey}`;
+    pill.textContent = def?.rarity ? rarityLabel(def.rarity) : "Common";
+    meta.appendChild(pill);
+
+    const sub = document.createElement("div");
+    sub.className = "rpgInvItemSub";
+    sub.textContent = desc;
+
+    btn.appendChild(main);
+    btn.appendChild(meta);
+    if (desc) btn.appendChild(sub);
 
     const usable = itemCanUse(id);
     const usableNow = usable && !usedThisTurn;
     btn.disabled = !isPlayerTurn || !usableNow;
-    els.itemsMenu.appendChild(btn);
+    list.appendChild(btn);
   });
 }
 
@@ -912,12 +967,16 @@ function renderItemMenu(isPlayerTurn) {
 // Gear UI (equipment slots)
 // --------------------
 
-/** @param {boolean} isPlayerTurn */
-function renderGearMenu(isPlayerTurn) {
-  if (!(els.gearMenu instanceof HTMLElement)) return;
+/**
+ * Render the Gear pane inside Inventory.
+ * @param {boolean} isPlayerTurn
+ * @param {HTMLElement=} container
+ */
+function renderGearMenu(isPlayerTurn, container = els.inventoryGearPane) {
+  if (!(container instanceof HTMLElement)) return;
   if (!state?.player) return;
 
-  els.gearMenu.replaceChildren();
+  container.replaceChildren();
 
   // Keep player gear state sanitized.
   state.player.gear = sanitizeGearCounts(state.player.gear);
@@ -928,11 +987,11 @@ function renderGearMenu(isPlayerTurn) {
   const tip = document.createElement("div");
   tip.className = "rpgMagicEmpty";
   tip.textContent = "Drag gear onto a slot to equip it. (Click also works.)";
-  els.gearMenu.appendChild(tip);
+  container.appendChild(tip);
 
   const wrap = document.createElement("div");
   wrap.className = "rpgGearMenuWrap";
-  els.gearMenu.appendChild(wrap);
+  container.appendChild(wrap);
 
   // Slots
   const slotsGrid = document.createElement("div");
@@ -995,6 +1054,10 @@ function renderGearMenu(isPlayerTurn) {
     const card = document.createElement("div");
     card.className = "rpgGearSlotCard";
     card.setAttribute("data-gear-slot", slot);
+
+    // Rarity tint (visual quick-read)
+    const curDefForTint = curId && GEAR_DEFS[curId] ? GEAR_DEFS[curId] : null;
+    if (curDefForTint && curDefForTint.rarity) card.dataset.rarity = curDefForTint.rarity;
     slotsGrid.appendChild(card);
 
     const head = document.createElement("div");
@@ -1068,6 +1131,10 @@ function renderGearMenu(isPlayerTurn) {
         const order = { weapon: 0, armor: 1, trinket: 2 };
         return (order[A.slot] ?? 99) - (order[B.slot] ?? 99);
       }
+      // Higher rarity first within a slot
+      const ra = rarityRank(A.rarity);
+      const rb = rarityRank(B.rarity);
+      if (ra !== rb) return rb - ra;
       return A.name.localeCompare(B.name);
     });
 
@@ -1113,7 +1180,17 @@ function renderGearMenu(isPlayerTurn) {
 
     const main = document.createElement("span");
     main.className = "rpgGearInvMain";
-    main.textContent = `${def.icon} ${def.name}`;
+
+    const nm = document.createElement("span");
+    nm.className = "rpgGearInvName";
+    nm.textContent = `${def.icon} ${def.name}`;
+    main.appendChild(nm);
+
+    const rp = document.createElement("span");
+    rp.className = `rpgRarityPill rarity--${(def.rarity || "common")}`;
+    rp.textContent = rarityLabel(def.rarity || "common");
+    main.appendChild(rp);
+
     btn.appendChild(main);
 
     const sub = document.createElement("span");
@@ -1162,11 +1239,11 @@ function setTypeAccent(el, types) {
     if (e.key === "Escape") {
       if (isSpellPickOpen()) closeSpellPicker();
       if (isExplainOpen()) closeExplain();
+      if (isCodexOpen()) closeCodex();
       if (isHeroOpen()) closeHeroPicker();
       if (isLocationOpen()) closeLocationPicker();
       closeMagicMenu();
-      closeItemsMenu();
-      closeGearMenu();
+      closeInventoryMenu();
       if (isLootOpen()) { closeLootScreen(); if (lootTimer) window.clearTimeout(lootTimer); lootTimer = 0; }
       if (isDefeatOpen()) closeDefeatScreen();
     }
@@ -1185,6 +1262,7 @@ function setTypeAccent(el, types) {
   function openExplain() {
   if (!(els.explainModal instanceof HTMLElement)) return;
   closeMagicMenu();
+  closeInventoryMenu();
   els.explainModal.removeAttribute("hidden");
   explainLastFocus = document.activeElement;
   updateBodyModalOpen();
@@ -1203,6 +1281,39 @@ function setTypeAccent(el, types) {
   if (prev && prev instanceof HTMLElement) prev.focus();
 }
 
+
+
+
+  // --------------------
+  // Codex / Compendium modal helpers
+  // --------------------
+
+  let codexLastFocus = null;
+
+  function isCodexOpen() {
+    return (els.codexModal instanceof HTMLElement) && !els.codexModal.hasAttribute("hidden");
+  }
+
+  function openCodex() {
+    if (!(els.codexModal instanceof HTMLElement)) return;
+    closeMagicMenu();
+    closeInventoryMenu();
+    // Build/update the lists on open so they stay in sync with defs.
+    renderCodex();
+    els.codexModal.removeAttribute("hidden");
+    codexLastFocus = document.activeElement;
+    updateBodyModalOpen();
+    if (els.codexClose instanceof HTMLButtonElement) els.codexClose.focus();
+  }
+
+  function closeCodex() {
+    if (!(els.codexModal instanceof HTMLElement)) return;
+    els.codexModal.setAttribute("hidden", "");
+    const prev = codexLastFocus;
+    codexLastFocus = null;
+    updateBodyModalOpen();
+    if (prev && prev instanceof HTMLElement) prev.focus();
+  }
 
 // --------------------
 // Spell picker modal helpers
@@ -1420,7 +1531,7 @@ let lootTimer = 0;
 function openLootScreen(title, subtitle, line) {
   if (!(els.lootModal instanceof HTMLElement)) return;
   closeMagicMenu();
-  closeItemsMenu();
+  closeInventoryMenu();
 
   if (els.lootTitle instanceof HTMLElement) els.lootTitle.textContent = title || "Victory";
   if (els.lootSubtitle instanceof HTMLElement) els.lootSubtitle.textContent = subtitle || "";
@@ -1452,7 +1563,7 @@ function openDefeatScreen(subtitle) {
 
   // Close transient UI so the defeat screen is the clear focus.
   closeMagicMenu();
-  closeItemsMenu();
+  closeInventoryMenu();
   if (isSpellPickOpen()) closeSpellPicker();
   if (isExplainOpen()) closeExplain();
   if (isLocationOpen()) closeLocationPicker();
@@ -1481,7 +1592,7 @@ function closeDefeatScreen() {
 }
 
 function updateBodyModalOpen() {
-  const any = isExplainOpen() || isHeroOpen() || isLocationOpen() || isSpellPickOpen() || isLootOpen() || isDefeatOpen();
+  const any = isExplainOpen() || isCodexOpen() || isHeroOpen() || isLocationOpen() || isSpellPickOpen() || isLootOpen() || isDefeatOpen();
   document.body.classList.toggle("modalOpen", any);
 }
 
@@ -1698,8 +1809,9 @@ function openLocationPicker() {
 
   // Focus the first choice for keyboard users.
   const preferred = (els.overworldBattleBtn instanceof HTMLButtonElement) ? els.overworldBattleBtn : null;
-  if (preferred) preferred.focus();
-  else {
+  if (preferred && !preferred.hasAttribute('hidden') && !preferred.disabled) {
+    preferred.focus();
+  } else {
     const first = els.locationModal.querySelector("button[data-ow-loc]");
     if (first instanceof HTMLButtonElement) first.focus();
   }
@@ -1738,7 +1850,7 @@ function startBattleWithLocation(locId) {
   const loc = setActiveLocation(locId);
 
   closeMagicMenu();
-  closeItemsMenu();
+  closeInventoryMenu();
   if (isLootOpen()) closeLootScreen();
   if (lootTimer) window.clearTimeout(lootTimer);
   lootTimer = 0;
@@ -1764,11 +1876,21 @@ function startBattleWithLocation(locId) {
   if (els.explainBtn instanceof HTMLButtonElement) {
     els.explainBtn.addEventListener("click", () => openExplain());
   }
+  if (els.codexBtn instanceof HTMLButtonElement) {
+    els.codexBtn.addEventListener("click", () => openCodex());
+  }
   if (els.explainClose instanceof HTMLButtonElement) {
     els.explainClose.addEventListener("click", () => closeExplain());
   }
   if (els.explainOk instanceof HTMLButtonElement) {
     els.explainOk.addEventListener("click", () => closeExplain());
+  }
+
+  if (els.codexClose instanceof HTMLButtonElement) {
+    els.codexClose.addEventListener("click", () => closeCodex());
+  }
+  if (els.codexOk instanceof HTMLButtonElement) {
+    els.codexOk.addEventListener("click", () => closeCodex());
   }
 
   // Spell picker wiring
@@ -1791,6 +1913,12 @@ function startBattleWithLocation(locId) {
   if (els.explainModal instanceof HTMLElement) {
     els.explainModal.addEventListener("click", (e) => {
       if (e.target === els.explainModal) closeExplain();
+    });
+  }
+
+  if (els.codexModal instanceof HTMLElement) {
+    els.codexModal.addEventListener("click", (e) => {
+      if (e.target === els.codexModal) closeCodex();
     });
   }
 
@@ -2206,6 +2334,93 @@ function toSafeInt(n, fallback) {
   return Math.trunc(x);
 }
 
+
+
+// --------------------
+// Rarity (simple)
+// --------------------
+
+/** @typedef {"common"|"uncommon"|"rare"|"epic"|"legendary"} RarityKey */
+
+const RARITY_ORDER = /** @type {RarityKey[]} */ (["common", "uncommon", "rare", "epic", "legendary"]);
+
+const RARITY_META = /** @type {Record<RarityKey, {label:string}>} */ ({
+  common: { label: "Common" },
+  uncommon: { label: "Uncommon" },
+  rare: { label: "Rare" },
+  epic: { label: "Epic" },
+  legendary: { label: "Legendary" },
+});
+
+const ITEM_RARITY_WEIGHTS = /** @type {Record<RarityKey, number>} */ ({
+  common: 60,
+  uncommon: 28,
+  rare: 10,
+  epic: 2,
+  legendary: 0,
+});
+
+const GEAR_RARITY_WEIGHTS = /** @type {Record<RarityKey, number>} */ ({
+  common: 55,
+  uncommon: 28,
+  rare: 13,
+  epic: 4,
+  legendary: 0,
+});
+
+/** @param {RarityKey|any} r */
+function rarityLabel(r) {
+  /** @type {RarityKey} */
+  const key = (RARITY_META && RARITY_META[r]) ? r : "common";
+  return RARITY_META[key].label;
+}
+
+/** @param {Record<RarityKey, number>} weights */
+function rollRarity(weights) {
+  const entries = Object.entries(weights || {}).filter(([, w]) => Number(w) > 0);
+  if (!entries.length) return /** @type {RarityKey} */ ("common");
+  const total = entries.reduce((s, [, w]) => s + Number(w), 0);
+  let r = Math.random() * total;
+  for (const [k, w] of entries) {
+    r -= Number(w);
+    if (r <= 0) return /** @type {RarityKey} */ (k);
+  }
+  return /** @type {RarityKey} */ (entries[entries.length - 1][0]);
+}
+
+/** @param {any[]} list */
+function pickOne(list) {
+  if (!Array.isArray(list) || !list.length) return null;
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+/**
+ * Pick an ID from pools by rarity, falling back to more common rarities.
+ * @param {Record<RarityKey, string[]>} pools
+ * @param {RarityKey} wanted
+ */
+function pickByRarity(pools, wanted) {
+  const idx = Math.max(0, RARITY_ORDER.indexOf(wanted));
+  for (let i = idx; i >= 0; i--) {
+    const r = RARITY_ORDER[i];
+    const list = pools?.[r];
+    const pick = pickOne(list);
+    if (pick) return pick;
+  }
+  // last resort: any
+  for (const r of RARITY_ORDER) {
+    const pick = pickOne(pools?.[r]);
+    if (pick) return pick;
+  }
+  return null;
+}
+
+/** @param {RarityKey|any} r */
+function rarityRank(r) {
+  const key = (RARITY_META && RARITY_META[r]) ? r : "common";
+  return RARITY_ORDER.indexOf(key);
+}
+
 // --------------------
 // Items (extremely simple)
 // - One-use consumables
@@ -2213,19 +2428,28 @@ function toSafeInt(n, fallback) {
 // - Saved per-hero
 // --------------------
 
-const ITEM_DEFS = /** @type {Record<string, {id:string,name:string,icon:string,desc:string}>} */ ({
-  potion: { id: "potion", name: "Potion", icon: "🧪", desc: "Heal 7 HP" },
-  ether: { id: "ether", name: "Mana Shard", icon: "💠", desc: "Restore 2 Mana" },
-  cleanse: { id: "cleanse", name: "Cleanse Charm", icon: "🧿", desc: "Clear Burn + Bind" },
+const ITEM_DEFS = /** @type {Record<string, {id:string,name:string,icon:string,desc:string,rarity:RarityKey}>} */ ({
+  potion: { id: "potion", name: "Potion", icon: "🧪", desc: "Heal 7 HP", rarity: "common" },
+  ether: { id: "ether", name: "Mana Shard", icon: "💠", desc: "Restore 2 Mana", rarity: "common" },
+  cleanse: { id: "cleanse", name: "Cleanse Charm", icon: "🧿", desc: "Clear Burn + Bind", rarity: "uncommon" },
 
   // Slightly more interesting drops (still very simple)
-  bomb: { id: "bomb", name: "Bomb", icon: "💣", desc: "Deal 6 damage (ignores defenses)" },
-  ember: { id: "ember", name: "Ember Oil", icon: "🕯️", desc: "Apply Burn (2) to enemy" },
-  stun: { id: "stun", name: "Stun Dust", icon: "🌫️", desc: "Enemy skips next turn" },
-  rune: { id: "rune", name: "Power Rune", icon: "🗡️", desc: "Next damage x1.3" },
-  barrier: { id: "barrier", name: "Barrier Scroll", icon: "🛡️", desc: "Next hit −30%" },
+  bomb: { id: "bomb", name: "Bomb", icon: "💣", desc: "Deal 6 damage (ignores defenses)", rarity: "uncommon" },
+  ember: { id: "ember", name: "Ember Oil", icon: "🕯️", desc: "Apply Burn (2) to enemy", rarity: "uncommon" },
+  stun: { id: "stun", name: "Stun Dust", icon: "🌫️", desc: "Enemy skips next turn", rarity: "rare" },
+  rune: { id: "rune", name: "Power Rune", icon: "🗡️", desc: "Next damage x1.3", rarity: "rare" },
+  barrier: { id: "barrier", name: "Barrier Scroll", icon: "🛡️", desc: "Next hit −30%", rarity: "epic" },
 });
 const ITEM_IDS = Object.keys(ITEM_DEFS);
+
+const ITEM_IDS_BY_RARITY = /** @type {Record<RarityKey, string[]>} */ ({
+  common: ITEM_IDS.filter((id) => ITEM_DEFS[id]?.rarity === "common"),
+  uncommon: ITEM_IDS.filter((id) => ITEM_DEFS[id]?.rarity === "uncommon"),
+  rare: ITEM_IDS.filter((id) => ITEM_DEFS[id]?.rarity === "rare"),
+  epic: ITEM_IDS.filter((id) => ITEM_DEFS[id]?.rarity === "epic"),
+  legendary: ITEM_IDS.filter((id) => ITEM_DEFS[id]?.rarity === "legendary"),
+});
+
 
 const STARTING_ITEMS = /** @type {Record<string, number>} */ ({ potion: 1, ether: 1, bomb: 1 });
 
@@ -2257,49 +2481,225 @@ const EQUIP_SLOT_LABEL = /** @type {Record<"weapon"|"armor"|"trinket", string>} 
   trinket: "Trinket",
 });
 
-/** @type {Record<string, {id:string,slot:"weapon"|"armor"|"trinket",name:string,icon:string,desc:string, hpBonus?:number, focusBonus?:number, powerPct?:number, healPct?:number, drPct?:number}>} */
+/** @type {Record<string, {id:string,slot:"weapon"|"armor"|"trinket",name:string,icon:string,desc:string, rarity:RarityKey, bossUnique?:boolean, hpBonus?:number, focusBonus?:number, powerPct?:number, healPct?:number, drPct?:number}>} */
 const GEAR_DEFS = {
   // Trinkets (small, flexible bonuses)
-  apprentice_ring: { id: "apprentice_ring", slot: "trinket", name: "Apprentice Ring", icon: "💍", desc: "+2 Max HP", hpBonus: 2 },
-  focus_band: { id: "focus_band", slot: "trinket", name: "Focus Band", icon: "🔷", desc: "+1 Max Mana", focusBonus: 1 },
-  ward_clasp: { id: "ward_clasp", slot: "trinket", name: "Ward Clasp", icon: "🧷", desc: "10% damage reduction", drPct: 0.10 },
-  ember_charm: { id: "ember_charm", slot: "trinket", name: "Ember Charm", icon: "🔥", desc: "+8% damage", powerPct: 0.08 },
-  sage_brooch: { id: "sage_brooch", slot: "trinket", name: "Sage Brooch", icon: "🌿", desc: "+8% healing", healPct: 0.08 },
-  quartz_charm: { id: "quartz_charm", slot: "trinket", name: "Quartz Charm", icon: "💎", desc: "+3 Max HP", hpBonus: 3 },
-  anchor_talisman: { id: "anchor_talisman", slot: "trinket", name: "Anchor Talisman", icon: "⚓", desc: "6% damage reduction", drPct: 0.06 },
-  duelist_coin: { id: "duelist_coin", slot: "trinket", name: "Duelist Coin", icon: "🪙", desc: "+6% damage", powerPct: 0.06 },
-  wisp_locket: { id: "wisp_locket", slot: "trinket", name: "Wisp Locket", icon: "🫧", desc: "+1 Max Mana, +4% healing", focusBonus: 1, healPct: 0.04 },
-  bulwark_token: { id: "bulwark_token", slot: "trinket", name: "Bulwark Token", icon: "🛡️", desc: "8% damage reduction", drPct: 0.08 },
+  apprentice_ring: { id: "apprentice_ring", slot: "trinket", name: "Apprentice Ring", icon: "💍", desc: "+2 Max HP", rarity: "common", hpBonus: 2 },
+  focus_band: { id: "focus_band", slot: "trinket", name: "Focus Band", icon: "🔷", desc: "+1 Max Mana", rarity: "common", focusBonus: 1 },
+  ward_clasp: { id: "ward_clasp", slot: "trinket", name: "Ward Clasp", icon: "🧷", desc: "10% damage reduction", rarity: "uncommon", drPct: 0.10 },
+  ember_charm: { id: "ember_charm", slot: "trinket", name: "Ember Charm", icon: "🔥", desc: "+8% damage", rarity: "uncommon", powerPct: 0.08 },
+  sage_brooch: { id: "sage_brooch", slot: "trinket", name: "Sage Brooch", icon: "🌿", desc: "+8% healing", rarity: "uncommon", healPct: 0.08 },
+  quartz_charm: { id: "quartz_charm", slot: "trinket", name: "Quartz Charm", icon: "💎", desc: "+3 Max HP", rarity: "uncommon", hpBonus: 3 },
+  anchor_talisman: { id: "anchor_talisman", slot: "trinket", name: "Anchor Talisman", icon: "⚓", desc: "6% damage reduction", rarity: "common", drPct: 0.06 },
+  duelist_coin: { id: "duelist_coin", slot: "trinket", name: "Duelist Coin", icon: "🪙", desc: "+6% damage", rarity: "common", powerPct: 0.06 },
+  wisp_locket: { id: "wisp_locket", slot: "trinket", name: "Wisp Locket", icon: "🫧", desc: "+1 Max Mana, +4% healing", rarity: "rare", focusBonus: 1, healPct: 0.04 },
+  bulwark_token: { id: "bulwark_token", slot: "trinket", name: "Bulwark Token", icon: "🛡️", desc: "8% damage reduction", rarity: "uncommon", drPct: 0.08 },
 
   // Weapons (lean into offense / Mana)
-  tidal_blade: { id: "tidal_blade", slot: "weapon", name: "Tidal Blade", icon: "🗡️", desc: "+10% damage", powerPct: 0.10 },
-  emberbrand_sabre: { id: "emberbrand_sabre", slot: "weapon", name: "Emberbrand Sabre", icon: "🗡️", desc: "+12% damage", powerPct: 0.12 },
-  gale_dagger: { id: "gale_dagger", slot: "weapon", name: "Gale Dagger", icon: "🗡️", desc: "+9% damage", powerPct: 0.09 },
-  echo_lance: { id: "echo_lance", slot: "weapon", name: "Echo Lance", icon: "🪓", desc: "+8% damage", powerPct: 0.08 },
-  duelist_foil: { id: "duelist_foil", slot: "weapon", name: "Duelist Foil", icon: "🗡️", desc: "+6% damage, +1 Max Mana", powerPct: 0.06, focusBonus: 1 },
-  runic_mace: { id: "runic_mace", slot: "weapon", name: "Runic Mace", icon: "🔨", desc: "+2 Max HP, +6% damage", hpBonus: 2, powerPct: 0.06 },
-  spring_wand: { id: "spring_wand", slot: "weapon", name: "Spring Wand", icon: "🪄", desc: "+10% healing", healPct: 0.10 },
-  mana_scepter: { id: "mana_scepter", slot: "weapon", name: "Mana Scepter", icon: "🪄", desc: "+1 Max Mana", focusBonus: 1 },
-  prism_rod: { id: "prism_rod", slot: "weapon", name: "Prism Rod", icon: "🔮", desc: "+2 Max Mana", focusBonus: 2 },
+  tidal_blade: { id: "tidal_blade", slot: "weapon", name: "Tidal Blade", icon: "🗡️", desc: "+10% damage", rarity: "uncommon", powerPct: 0.10 },
+  emberbrand_sabre: { id: "emberbrand_sabre", slot: "weapon", name: "Emberbrand Sabre", icon: "🗡️", desc: "+12% damage", rarity: "epic", powerPct: 0.12 },
+  gale_dagger: { id: "gale_dagger", slot: "weapon", name: "Gale Dagger", icon: "🗡️", desc: "+9% damage", rarity: "uncommon", powerPct: 0.09 },
+  echo_lance: { id: "echo_lance", slot: "weapon", name: "Echo Lance", icon: "🪓", desc: "+8% damage", rarity: "common", powerPct: 0.08 },
+  duelist_foil: { id: "duelist_foil", slot: "weapon", name: "Duelist Foil", icon: "🗡️", desc: "+6% damage, +1 Max Mana", rarity: "rare", powerPct: 0.06, focusBonus: 1 },
+  runic_mace: { id: "runic_mace", slot: "weapon", name: "Runic Mace", icon: "🔨", desc: "+2 Max HP, +6% damage", rarity: "uncommon", hpBonus: 2, powerPct: 0.06 },
+  spring_wand: { id: "spring_wand", slot: "weapon", name: "Spring Wand", icon: "🪄", desc: "+10% healing", rarity: "uncommon", healPct: 0.10 },
+  mana_scepter: { id: "mana_scepter", slot: "weapon", name: "Mana Scepter", icon: "🪄", desc: "+1 Max Mana", rarity: "common", focusBonus: 1 },
+  prism_rod: { id: "prism_rod", slot: "weapon", name: "Prism Rod", icon: "🔮", desc: "+2 Max Mana", rarity: "rare", focusBonus: 2 },
 
   // Armor (survivability)
-  stoneguard_vest: { id: "stoneguard_vest", slot: "armor", name: "Stoneguard Vest", icon: "🛡️", desc: "+4 Max HP", hpBonus: 4 },
-  ironbark_mail: { id: "ironbark_mail", slot: "armor", name: "Ironbark Mail", icon: "🥋", desc: "+6 Max HP, 6% damage reduction", hpBonus: 6, drPct: 0.06 },
-  warded_coat: { id: "warded_coat", slot: "armor", name: "Warded Coat", icon: "🧥", desc: "12% damage reduction", drPct: 0.12 },
-  mirrorweave_mantle: { id: "mirrorweave_mantle", slot: "armor", name: "Mirrorweave Mantle", icon: "🪞", desc: "8% damage reduction, +1 Max Mana", drPct: 0.08, focusBonus: 1 },
-  mossweave_cloak: { id: "mossweave_cloak", slot: "armor", name: "Mossweave Cloak", icon: "🧶", desc: "+2 Max HP, +6% healing", hpBonus: 2, healPct: 0.06 },
-  emberproof_jacket: { id: "emberproof_jacket", slot: "armor", name: "Emberproof Jacket", icon: "🧥", desc: "10% damage reduction", drPct: 0.10 },
-  scholar_robe: { id: "scholar_robe", slot: "armor", name: "Scholar Robe", icon: "🎓", desc: "+2 Max HP, +1 Max Mana", hpBonus: 2, focusBonus: 1 },
-  tidebreaker_coat: { id: "tidebreaker_coat", slot: "armor", name: "Tidebreaker Coat", icon: "🌊", desc: "+3 Max HP, 6% damage reduction", hpBonus: 3, drPct: 0.06 },
-  pactwarden_wrap: { id: "pactwarden_wrap", slot: "armor", name: "Pactwarden Wrap", icon: "🧣", desc: "6% damage reduction, +6% healing", drPct: 0.06, healPct: 0.06 },
+  stoneguard_vest: { id: "stoneguard_vest", slot: "armor", name: "Stoneguard Vest", icon: "🛡️", desc: "+4 Max HP", rarity: "common", hpBonus: 4 },
+  ironbark_mail: { id: "ironbark_mail", slot: "armor", name: "Ironbark Mail", icon: "🥋", desc: "+6 Max HP, 6% damage reduction", rarity: "rare", hpBonus: 6, drPct: 0.06 },
+  warded_coat: { id: "warded_coat", slot: "armor", name: "Warded Coat", icon: "🧥", desc: "12% damage reduction", rarity: "epic", drPct: 0.12 },
+  mirrorweave_mantle: { id: "mirrorweave_mantle", slot: "armor", name: "Mirrorweave Mantle", icon: "🪞", desc: "8% damage reduction, +1 Max Mana", rarity: "rare", drPct: 0.08, focusBonus: 1 },
+  mossweave_cloak: { id: "mossweave_cloak", slot: "armor", name: "Mossweave Cloak", icon: "🧶", desc: "+2 Max HP, +6% healing", rarity: "uncommon", hpBonus: 2, healPct: 0.06 },
+  emberproof_jacket: { id: "emberproof_jacket", slot: "armor", name: "Emberproof Jacket", icon: "🧥", desc: "10% damage reduction", rarity: "uncommon", drPct: 0.10 },
+  scholar_robe: { id: "scholar_robe", slot: "armor", name: "Scholar Robe", icon: "🎓", desc: "+2 Max HP, +1 Max Mana", rarity: "uncommon", hpBonus: 2, focusBonus: 1 },
+  tidebreaker_coat: { id: "tidebreaker_coat", slot: "armor", name: "Tidebreaker Coat", icon: "🌊", desc: "+3 Max HP, 6% damage reduction", rarity: "uncommon", hpBonus: 3, drPct: 0.06 },
+  pactwarden_wrap: { id: "pactwarden_wrap", slot: "armor", name: "Pactwarden Wrap", icon: "🧣", desc: "6% damage reduction, +6% healing", rarity: "rare", drPct: 0.06, healPct: 0.06 },
 
   // Boss relics (unique per area boss; NOT in the random drop pool)
-  arena_victor_blade: { id: "arena_victor_blade", slot: "weapon", name: "Victor's Blade", icon: "🏆", desc: "+14% damage", powerPct: 0.14, bossUnique: true },
-  market_ledger_mail: { id: "market_ledger_mail", slot: "armor", name: "Ledger Mail", icon: "🧾", desc: "+1 Max Mana, 10% damage reduction", focusBonus: 1, drPct: 0.10, bossUnique: true },
-  feyleaf_circlet: { id: "feyleaf_circlet", slot: "trinket", name: "Feyleaf Circlet", icon: "🍃", desc: "+2 Max HP, +10% healing", hpBonus: 2, healPct: 0.10, bossUnique: true },
-  gutterglass_prism: { id: "gutterglass_prism", slot: "weapon", name: "Gutterglass Prism", icon: "🪞", desc: "+1 Max Mana, +8% damage", focusBonus: 1, powerPct: 0.08, bossUnique: true },
+  arena_victor_blade: { id: "arena_victor_blade", slot: "weapon", name: "Victor's Blade", icon: "🏆", desc: "+14% damage", rarity: "legendary", powerPct: 0.14, bossUnique: true },
+  market_ledger_mail: { id: "market_ledger_mail", slot: "armor", name: "Ledger Mail", icon: "🧾", desc: "+1 Max Mana, 10% damage reduction", rarity: "legendary", focusBonus: 1, drPct: 0.10, bossUnique: true },
+  feyleaf_circlet: { id: "feyleaf_circlet", slot: "trinket", name: "Feyleaf Circlet", icon: "🍃", desc: "+2 Max HP, +10% healing", rarity: "legendary", hpBonus: 2, healPct: 0.10, bossUnique: true },
+  gutterglass_prism: { id: "gutterglass_prism", slot: "weapon", name: "Gutterglass Prism", icon: "🪞", desc: "+1 Max Mana, +8% damage", rarity: "legendary", focusBonus: 1, powerPct: 0.08, bossUnique: true },
 };
 const GEAR_IDS = Object.keys(GEAR_DEFS);
+
+
+// --------------------
+// Compendium rendering
+// --------------------
+
+function clearEl(el) {
+  if (!(el instanceof HTMLElement)) return;
+  while (el.firstChild) el.removeChild(el.firstChild);
+}
+
+/** @param {RarityKey|any} r */
+function makeRarityPill(r) {
+  const span = document.createElement('span');
+  span.className = `rpgRarityPill rarity--${(RARITY_META && RARITY_META[r]) ? r : 'common'}`;
+  span.textContent = rarityLabel(r);
+  return span;
+}
+
+/**
+ * @param {{icon?:string,title:string, sub?:string, types?:MagicType[], rightPill?:HTMLElement|null, tag?:string, sprite?:string}} opts
+ */
+function makeCodexEntry(opts) {
+  const row = document.createElement('div');
+  row.className = 'rpgCodexEntry';
+
+  const icon = document.createElement('div');
+  icon.className = 'rpgCodexIcon';
+
+  const spriteSrc = (typeof opts.sprite === 'string' && opts.sprite.trim()) ? opts.sprite.trim() : '';
+  if (spriteSrc) {
+    const img = document.createElement('img');
+    img.className = 'rpgCodexSprite';
+    img.loading = 'lazy';
+    img.alt = '';
+    img.src = spriteSrc;
+    icon.appendChild(img);
+  } else {
+    icon.textContent = opts.icon || '✦';
+  }
+
+  row.appendChild(icon);
+
+  const main = document.createElement('div');
+  main.className = 'rpgCodexMain';
+
+  const top = document.createElement('div');
+  top.className = 'rpgCodexTopRow';
+
+  const name = document.createElement('div');
+  name.className = 'rpgCodexName';
+  name.textContent = opts.title;
+  top.appendChild(name);
+
+  if (opts.tag) {
+    const tag = document.createElement('span');
+    tag.className = 'rpgCodexTag';
+    tag.textContent = opts.tag;
+    top.appendChild(tag);
+  }
+
+  if (opts.rightPill) {
+    top.appendChild(opts.rightPill);
+  }
+
+  main.appendChild(top);
+
+  if (Array.isArray(opts.types) && opts.types.length) {
+    const tWrap = document.createElement('div');
+    tWrap.className = 'rpgCodexTypes';
+    for (const t of opts.types) {
+      const pill = document.createElement('span');
+      pill.className = `typeInline typeInline--${t}`;
+      pill.textContent = `${typeIcon(t)} ${TYPE_META[t]?.label ?? t}`;
+      tWrap.appendChild(pill);
+    }
+    main.appendChild(tWrap);
+  }
+
+  if (opts.sub) {
+    const sub = document.createElement('div');
+    sub.className = 'rpgCodexSub';
+    sub.textContent = opts.sub;
+    main.appendChild(sub);
+  }
+
+  row.appendChild(main);
+  return row;
+}
+
+function renderCodex() {
+  // ENEMIES
+  if (els.codexEnemiesCount instanceof HTMLElement) {
+    els.codexEnemiesCount.textContent = `${Array.isArray(ENEMIES) ? ENEMIES.length : 0}`;
+  }
+  if (els.codexEnemies instanceof HTMLElement) {
+    clearEl(els.codexEnemies);
+    const list = Array.isArray(ENEMIES) ? ENEMIES : [];
+    list.forEach((e, idx) => {
+      const isBoss = idx === (typeof BOSS_ENEMY_INDEX === 'number' ? BOSS_ENEMY_INDEX : -1);
+      const icon = isBoss ? '👑' : '⚔️';
+      const sub = `HP ${toSafeInt(e?.maxHp, 0)} • Heals ${toSafeInt(e?.healCharges, 0)}`;
+      els.codexEnemies.appendChild(makeCodexEntry({
+        icon,
+        title: String(e?.name || 'Enemy'),
+        types: Array.isArray(e?.types) ? e.types : [],
+        sub,
+        tag: isBoss ? 'Boss' : '',
+        sprite: String(e?.sprite || ''),
+      }));
+    });
+  }
+
+  // ITEMS
+  const itemList = Object.values(ITEM_DEFS || {});
+  if (els.codexItemsCount instanceof HTMLElement) {
+    els.codexItemsCount.textContent = `${itemList.length}`;
+  }
+  if (els.codexItems instanceof HTMLElement) {
+    clearEl(els.codexItems);
+    itemList
+      .slice()
+      .sort((a, b) => (rarityRank(a?.rarity) - rarityRank(b?.rarity)) || String(a?.name||'').localeCompare(String(b?.name||'')))
+      .forEach((it) => {
+        els.codexItems.appendChild(makeCodexEntry({
+          icon: String(it?.icon || '🎒'),
+          title: String(it?.name || it?.id || 'Item'),
+          sub: String(it?.desc || ''),
+          rightPill: makeRarityPill(it?.rarity),
+        }));
+      });
+  }
+
+  // GEAR
+  const gearList = Object.values(GEAR_DEFS || {});
+  if (els.codexGearCount instanceof HTMLElement) {
+    els.codexGearCount.textContent = `${gearList.length}`;
+  }
+  if (els.codexGear instanceof HTMLElement) {
+    clearEl(els.codexGear);
+
+    const bySlot = { weapon: [], armor: [], trinket: [] };
+    gearList.forEach((g) => {
+      const slot = g?.slot;
+      if (slot === 'weapon' || slot === 'armor' || slot === 'trinket') bySlot[slot].push(g);
+    });
+
+    for (const slot of EQUIP_SLOTS) {
+      const header = document.createElement('div');
+      header.className = 'rpgCodexTag';
+      header.style.width = 'fit-content';
+      header.textContent = `${EQUIP_SLOT_LABEL[slot]}`;
+      els.codexGear.appendChild(header);
+
+      const list = bySlot[slot]
+        .slice()
+        .sort((a, b) => {
+          const bossA = a?.bossUnique ? 1 : 0;
+          const bossB = b?.bossUnique ? 1 : 0;
+          if (bossA != bossB) return bossA - bossB; // normal gear first, boss relics last
+          return (rarityRank(a?.rarity) - rarityRank(b?.rarity)) || String(a?.name||'').localeCompare(String(b?.name||''));
+        });
+
+      list.forEach((g) => {
+        const tag = g?.bossUnique ? 'Boss Relic' : '';
+        els.codexGear.appendChild(makeCodexEntry({
+          icon: String(g?.icon || '🧰'),
+          title: String(g?.name || g?.id || 'Gear'),
+          sub: String(g?.desc || ''),
+          rightPill: makeRarityPill(g?.rarity),
+          tag,
+        }));
+      });
+    }
+  }
+}
 
 // Exclude boss relics from the random drop pool (they are awarded only by bosses).
 const GEAR_DROP_IDS = GEAR_IDS.filter((id) => !GEAR_DEFS[id]?.bossUnique);
@@ -2311,6 +2711,31 @@ const GEAR_IDS_BY_SLOT = /** @type {Record<"weapon"|"armor"|"trinket", string[]>
   trinket: GEAR_DROP_IDS.filter((id) => GEAR_DEFS[id]?.slot === "trinket"),
 });
 const GEAR_DROP_SLOTS = EQUIP_SLOTS.filter((s) => Array.isArray(GEAR_IDS_BY_SLOT[s]) && GEAR_IDS_BY_SLOT[s].length > 0);
+
+const GEAR_IDS_BY_SLOT_RARITY = /** @type {Record<"weapon"|"armor"|"trinket", Record<RarityKey, string[]>>} */ ({
+  weapon: {
+    common: GEAR_IDS_BY_SLOT.weapon.filter((id) => (GEAR_DEFS[id]?.rarity || "common") === "common"),
+    uncommon: GEAR_IDS_BY_SLOT.weapon.filter((id) => (GEAR_DEFS[id]?.rarity || "common") === "uncommon"),
+    rare: GEAR_IDS_BY_SLOT.weapon.filter((id) => (GEAR_DEFS[id]?.rarity || "common") === "rare"),
+    epic: GEAR_IDS_BY_SLOT.weapon.filter((id) => (GEAR_DEFS[id]?.rarity || "common") === "epic"),
+    legendary: [],
+  },
+  armor: {
+    common: GEAR_IDS_BY_SLOT.armor.filter((id) => (GEAR_DEFS[id]?.rarity || "common") === "common"),
+    uncommon: GEAR_IDS_BY_SLOT.armor.filter((id) => (GEAR_DEFS[id]?.rarity || "common") === "uncommon"),
+    rare: GEAR_IDS_BY_SLOT.armor.filter((id) => (GEAR_DEFS[id]?.rarity || "common") === "rare"),
+    epic: GEAR_IDS_BY_SLOT.armor.filter((id) => (GEAR_DEFS[id]?.rarity || "common") === "epic"),
+    legendary: [],
+  },
+  trinket: {
+    common: GEAR_IDS_BY_SLOT.trinket.filter((id) => (GEAR_DEFS[id]?.rarity || "common") === "common"),
+    uncommon: GEAR_IDS_BY_SLOT.trinket.filter((id) => (GEAR_DEFS[id]?.rarity || "common") === "uncommon"),
+    rare: GEAR_IDS_BY_SLOT.trinket.filter((id) => (GEAR_DEFS[id]?.rarity || "common") === "rare"),
+    epic: GEAR_IDS_BY_SLOT.trinket.filter((id) => (GEAR_DEFS[id]?.rarity || "common") === "epic"),
+    legendary: [],
+  },
+});
+
 
 // Only new heroes get starter gear. Existing saves remain unchanged.
 const STARTING_GEAR = /** @type {Record<string, number>} */ ({ apprentice_ring: 1 });
@@ -2658,14 +3083,14 @@ const PLAYABLE_HEROES = buildPlayableHeroes() || [
   },
   {
     id: "axel",
-    name: "Axel",
-    types: /** @type {MagicType[]} */ (["Touch", "Earth"]),
+	    name: "Belle",
+    types: /** @type {MagicType[]} */ (["Sound", "Fire"]),
     maxHp: 22,
     healCharges: 3,
     focusMax: 6,
     focusStart: 2,
     sprite: "./assets/images/characters/axel.png",
-    blurb: "Touch + Earth. Steel-nerved grip with stone grit.",
+    blurb: "Sound + Fire. Resonant pulse with matchbright snap.",
   },
   {
     id: "mira",
@@ -2757,6 +3182,45 @@ const ENEMIES = [
     profile: "soundTouch",
     sprite: "./assets/images/enemy-scribe.png",
   },
+  {
+    name: "Tidehand Alchemist",
+    types: /** @type {MagicType[]} */ (["Touch", "Water"]),
+    maxHp: 27,
+    healCharges: 1,
+    profile: "waterTouch",
+    sprite: "./assets/images/enemy-tidehand.png",
+    spriteIsPixel: false,
+  },
+
+  {
+    name: "Chorusflame Knight",
+    types: /** @type {MagicType[]} */ (["Sound", "Fire"]),
+    maxHp: 31,
+    healCharges: 1,
+    profile: "soundFire",
+    sprite: "./assets/images/enemy-chorusflame.png",
+    spriteIsPixel: false,
+  },
+
+  {
+    name: "Ravenwind Oracle",
+    types: /** @type {MagicType[]} */ (["Sight", "Wind"]),
+    maxHp: 26,
+    healCharges: 1,
+    profile: "windSight",
+    sprite: "./assets/images/enemy-ravenwind.png",
+    spriteIsPixel: false,
+  },
+
+  {
+    name: "Verdant Scentwarden",
+    types: /** @type {MagicType[]} */ (["SmellTaste", "Earth"]),
+    maxHp: 28,
+    healCharges: 1,
+    profile: "smellEarth",
+    sprite: "./assets/images/enemy-verdant-mender.png",
+    spriteIsPixel: false,
+  },
 
   {
     name: "Candlecrown Matron",
@@ -2775,6 +3239,8 @@ const ENEMIES = [
 // Non-boss enemies are chosen per-wave using weighted probabilities.
 // Wave 1 favors easier foes; Wave 2 favors tougher foes; Wave 3 is always a boss.
 const BOSS_ENEMY_INDEX = ENEMIES.length - 1;
+const VERDANT_ENEMY_INDEX = Math.max(0, ENEMIES.findIndex((e) => e.profile === "smellEarth"));
+
 const NON_BOSS_ENEMY_INDICES = ENEMIES.map((_, i) => i).filter((i) => i !== BOSS_ENEMY_INDEX);
 
 /**
@@ -2812,8 +3278,8 @@ const NON_BOSS_SORTED = [...NON_BOSS_ENEMY_INDICES]
   .sort((a, b) => a.s - b.s);
 
 // Stronger contrast so wave 2 feels meaningfully tougher on average.
-const WAVE1_WEIGHTS_BY_RANK = [10, 5, BOSS_ENEMY_INDEX];
-const WAVE2_WEIGHTS_BY_RANK = [2, 5, BOSS_ENEMY_INDEX];
+const WAVE1_WEIGHTS_BY_RANK = [10, 6, 3, 1];
+const WAVE2_WEIGHTS_BY_RANK = [1, 3, 6, 9];
 
 function pickRandomEnemyIndexForWave(waveIndex) {
   // Only randomize waves 1-2; boss is fixed.
@@ -2865,7 +3331,7 @@ const GAME_LOCATION_IDS = ["arena", "market-central", "fey-forest", "gutterglass
 const LOCATION_ENEMY_SETS = [
   [0, 1, BOSS_ENEMY_INDEX],
   [1, 2, BOSS_ENEMY_INDEX],
-  [0, 2, BOSS_ENEMY_INDEX],
+  [VERDANT_ENEMY_INDEX, 5, BOSS_ENEMY_INDEX],
   [0, 1, BOSS_ENEMY_INDEX],
 ];
 
@@ -2989,6 +3455,7 @@ function setActiveLocation(id) {
     aiStep: 0,
     intent: null,        // filled at start of player's turn
     sprite: t.sprite,
+    spriteIsPixel: t.spriteIsPixel !== false,
   };
 }
 
@@ -3392,6 +3859,8 @@ function persistPlayerProgress() {
     mirrorbind: 2,
     stonebind: 2,
     hushbind: 2,
+    wavebind: 2,
+    surge: 2,
     ignite: 3,
     siphon: 3,
   };
@@ -3447,6 +3916,38 @@ function persistPlayerProgress() {
     return { id: "attack", name: "Strike", type: "Sight", base: 4, note: "" };
   }
 
+
+
+
+
+  if (e.profile === "soundFire") {
+    const pattern = ["ignite", "resonate", "ward", "resonate", "attack"];
+    let next = pattern[e.aiStep % pattern.length];
+
+    // If you're already burning, they don't waste a turn re-igniting.
+    if (next === "ignite" && p.burn > 0) next = "resonate";
+    if (next === "ward" && e.ward > 0) next = "attack";
+
+    if (next === "ignite") return { id: "ignite", name: "Ignite", type: "Fire", base: 4, note: "Applies Burn (2)" };
+    if (next === "resonate") return { id: "resonate", name: "Resonant Blast", type: "Sound", base: 6, note: "" };
+    if (next === "ward") return { id: "ward", name: "Mirror Ward", type: null, base: 0, note: "Next hit reduced + reflects" };
+    return { id: "attack", name: "Strike", type: "Sound", base: 4, note: "" };
+  }
+  if (e.profile === "waterTouch") {
+    const pattern = ["surge", "wavebind", "fortify", "surge", "attack"];
+    let next = pattern[e.aiStep % pattern.length];
+
+    // If burn is present (either side), prioritize Surging Current to douse it.
+    if (next !== "surge" && (p.burn > 0 || e.burn > 0)) next = "surge";
+
+    // If you're already bound, they pivot to water damage.
+    if (next === "wavebind" && p.bound > 0) next = "surge";
+
+    if (next === "surge") return { id: "surge", name: "Surging Current", type: "Water", base: 5, note: "Douses Burn" };
+    if (next === "wavebind") return { id: "wavebind", name: "Wavebind", type: "Touch", base: 3, note: "Applies Bind" };
+    if (next === "fortify") return { id: "fortify", name: "Brineguard", type: null, base: 0, note: "Next hit reduced" };
+    return { id: "attack", name: "Strike", type: "Sight", base: 4, note: "" };
+  }
   if (e.profile === "windSight") {
     const pattern = ["squall", "lance", "ward", "squall", "attack"];
     const next = pattern[e.aiStep % pattern.length];
@@ -3481,6 +3982,20 @@ function persistPlayerProgress() {
     if (next === "resonate") return { id: "resonate", name: "Resonant Blast", type: "Sound", base: 5, note: "" };
     if (next === "ward") return { id: "ward", name: "Mirror Ward", type: null, base: 0, note: "Next hit reduced + reflects" };
     return { id: "attack", name: "Strike", type: "Sight", base: 4, note: "" };
+  }
+
+
+  if (e.profile === "smellEarth") {
+    const pattern = ["attack", "quake", "fortify", "shatter", "attack"];
+    let next = pattern[e.aiStep % pattern.length];
+
+    // Avoid wasting a turn re-fortifying.
+    if (next === "fortify" && e.fortified > 0) next = "attack";
+
+    if (next === "quake") return { id: "quake", name: "Quake", type: "Earth", base: 6, note: "Shakes through guard" };
+    if (next === "fortify") return { id: "fortify", name: "Fortify", type: null, base: 0, note: "Next hit reduced" };
+    if (next === "shatter") return { id: "shatter", name: "Shatter", type: "Earth", base: 5, note: "Punishes Guard" };
+    return { id: "attack", name: "Scented Swipe", type: "SmellTaste", base: 4, note: "" };
   }
 
 // Default: Earth/Touch pattern.
@@ -3704,7 +4219,7 @@ function persistPlayerProgress() {
       const parts = EQUIP_SLOTS.map((slot) => {
         const id = slots[slot];
         const g = id && GEAR_DEFS[id] ? GEAR_DEFS[id] : null;
-        return `${EQUIP_SLOT_LABEL[slot]}: ${g ? `${g.icon} ${g.name}` : "—"}`;
+        return `${EQUIP_SLOT_LABEL[slot]}: ${g ? `${g.icon} ${g.name} (${rarityLabel(g.rarity || "common")})` : "—"}`;
       });
 
       els.playerEquipText.textContent = `Equipment: ${parts.join(" • ")}`;
@@ -3748,8 +4263,9 @@ function persistPlayerProgress() {
       if (els.enemySpriteImg.getAttribute("src") !== state.enemy.sprite) {
         els.enemySpriteImg.setAttribute("src", state.enemy.sprite);
       }
-      // Enemy art is pixel sprites.
-      els.enemySpriteImg.classList.add("isPixel");
+      // Pixel-art enemies stay crisp, but allow portrait-style enemy art too.
+      const enemyIsPortrait = state.enemy.spriteIsPixel === false;
+      els.enemySpriteImg.classList.toggle("isPixel", !enemyIsPortrait);
     }
 
     // Player sprite swap (hero selection)
@@ -3854,8 +4370,7 @@ function persistPlayerProgress() {
     const disableActions = !isPlayerTurn;
     if (disableActions) {
       closeMagicMenu();
-      closeItemsMenu();
-      closeGearMenu();
+      closeInventoryMenu();
     }
 
     // Render spell menu with up-to-date enable/disable state.
@@ -3874,8 +4389,7 @@ function persistPlayerProgress() {
     const hasAnySpell = spells.length > 0;
     if (els.magicToggle instanceof HTMLButtonElement) els.magicToggle.disabled = disableActions || !hasAnySpell;
 
-    if (els.itemsToggle instanceof HTMLButtonElement) els.itemsToggle.disabled = disableActions;
-    if (els.gearToggle instanceof HTMLButtonElement) els.gearToggle.disabled = disableActions;
+    if (els.inventoryToggle instanceof HTMLButtonElement) els.inventoryToggle.disabled = disableActions;
     if (els.healBtn instanceof HTMLButtonElement) els.healBtn.disabled = !canHeal;
     if (els.restartBtn instanceof HTMLButtonElement) els.restartBtn.disabled = false;
   }
@@ -3904,7 +4418,7 @@ function persistPlayerProgress() {
     const next = clamp(prev + Math.max(1, toSafeInt(count, 1)), 0, 99);
     state.player.items[itemId] = next;
     const def = ITEM_DEFS[itemId];
-    addLog(`🎁 Found: ${def.icon} ${def.name} (x${Math.max(1, toSafeInt(count, 1))}).`);
+    addLog(`🎁 Found: ${def.icon} ${def.name} [${rarityLabel(def.rarity)}] (x${Math.max(1, toSafeInt(count, 1))}).`);
     persistPlayerProgress();
   }
 
@@ -3929,7 +4443,7 @@ function persistPlayerProgress() {
     const next = clamp(prev + Math.max(1, toSafeInt(count, 1)), 0, 99);
     state.player.gear[gearId] = next;
     const def = GEAR_DEFS[gearId];
-    addLog(`🧰 Found gear: ${def.icon} ${def.name} (x${Math.max(1, toSafeInt(count, 1))}).`);
+    addLog(`🧰 Found gear: ${def.icon} ${def.name} [${rarityLabel(def.rarity)}] (x${Math.max(1, toSafeInt(count, 1))}).`);
     persistPlayerProgress();
   }
 
@@ -3961,8 +4475,8 @@ function persistPlayerProgress() {
     if (!isBossWave) {
       const NONE_CHANCE = 0.25;
       if (Math.random() >= NONE_CHANCE && Array.isArray(ITEM_IDS) && ITEM_IDS.length > 0) {
-        const idx = Math.floor(Math.random() * ITEM_IDS.length);
-        const pick = ITEM_IDS[idx];
+        const wanted = rollRarity(ITEM_RARITY_WEIGHTS);
+        const pick = pickByRarity(ITEM_IDS_BY_RARITY, wanted);
         result.itemId = pick && ITEM_DEFS[pick] ? pick : null;
       }
     }
@@ -3974,11 +4488,10 @@ function persistPlayerProgress() {
     // Pick a slot first, then a random piece within that slot (keeps drops varied across Weapon/Armor/Trinket).
     if (Math.random() < gearChance && Array.isArray(GEAR_DROP_SLOTS) && GEAR_DROP_SLOTS.length > 0) {
       const slot = GEAR_DROP_SLOTS[Math.floor(Math.random() * GEAR_DROP_SLOTS.length)];
-      const list = Array.isArray(GEAR_IDS_BY_SLOT?.[slot]) ? GEAR_IDS_BY_SLOT[slot] : [];
-      if (list.length > 0) {
-        const pick = list[Math.floor(Math.random() * list.length)];
-        result.gearId = pick && GEAR_DEFS[pick] ? pick : null;
-      }
+      const pools = GEAR_IDS_BY_SLOT_RARITY?.[slot];
+      const wanted = rollRarity(GEAR_RARITY_WEIGHTS);
+      const pick = pickByRarity(pools || /** @type {any} */ ({}), wanted);
+      result.gearId = pick && GEAR_DEFS[pick] ? pick : null;
     }
 
     return result;
@@ -4005,14 +4518,14 @@ function persistPlayerProgress() {
       const d = ITEM_DEFS[loot.itemId];
       if (d) {
         gainItem(loot.itemId, 1);
-        parts.push(`${d.icon} ${d.name} (x1)`);
+        parts.push(`${d.icon} ${d.name} [${rarityLabel(d.rarity)}] (x1)`);
       }
     }
     if (loot?.gearId) {
       const g = GEAR_DEFS[loot.gearId];
       if (g) {
         gainGear(loot.gearId, 1);
-        parts.push(`${g.icon} ${g.name} (Gear)`);
+        parts.push(`${g.icon} ${g.name} [${rarityLabel(g.rarity)}] (Gear)`);
       }
     }
 
@@ -4029,7 +4542,7 @@ function persistPlayerProgress() {
       bossRelicId = awardBossRelicIfEligible(state.locationId || null);
       if (bossRelicId) {
         const rg = GEAR_DEFS[bossRelicId];
-        if (rg) parts.unshift(`${rg.icon} ${rg.name} (Boss Relic)`);
+        if (rg) parts.unshift(`${rg.icon} ${rg.name} [${rarityLabel(rg.rarity)}] (Boss Relic)`);
       }
     }
 
@@ -4122,7 +4635,7 @@ function persistPlayerProgress() {
     lockBtn(els.healBtn, locked);
     lockBtn(els.guardBtn, locked);
     lockBtn(els.magicToggle, locked);
-    lockBtn(els.itemsToggle, locked);
+    lockBtn(els.inventoryToggle, locked);
     lockBtn(els.windBtn, locked);
     lockBtn(els.waterBtn, locked);
     lockBtn(els.soundBtn, locked);
@@ -4137,16 +4650,16 @@ function persistPlayerProgress() {
       });
     }
 
-    // Dynamic item buttons inside the Items menu.
-    if (els.itemsMenu instanceof HTMLElement) {
-      els.itemsMenu.querySelectorAll("button[data-item-id]").forEach((b) => {
-        if (b instanceof HTMLButtonElement) b.disabled = locked;
+    // Dynamic buttons inside the Inventory menu.
+    if (els.inventoryMenu instanceof HTMLElement) {
+      els.inventoryMenu.querySelectorAll("button").forEach((b) => {
+        if (b instanceof HTMLButtonElement) b.disabled = locked && b.id !== "restartBtn";
       });
     }
 
     if (locked) {
       closeMagicMenu();
-      closeItemsMenu();
+      closeInventoryMenu();
     }
 
     if (phase === "player") setTurnBanner("Your turn", "player");
@@ -4374,14 +4887,29 @@ function persistPlayerProgress() {
       p.burn = Math.max(p.burn, 2);
       addLog("Flame clings to you (burn).");
     }
-    if (intent.id === "stonebind" || intent.id === "mirrorbind" || intent.id === "hushbind") {
+
+    if (intent.id === "surge") {
+      let did = false;
+      if (p.burn > 0) {
+        p.burn = 0;
+        did = true;
+      }
+      if (e.burn > 0) {
+        e.burn = 0;
+        did = true;
+      }
+      if (did) addLog("💧 The surge douses the flames.");
+    }
+    if (intent.id === "stonebind" || intent.id === "mirrorbind" || intent.id === "hushbind" || intent.id === "wavebind") {
   p.bound = 1;
   addLog(
     intent.id === "stonebind"
       ? "Stonebind locks your movement (bind)."
       : intent.id === "hushbind"
         ? "Hushbind seals your motion (bind)."
-        : "Mirrorbind locks your movement (bind)."
+        : intent.id === "wavebind"
+          ? "Wavebind tethers your limbs (bind)."
+          : "Mirrorbind locks your movement (bind)."
   );
 }
     if (intent.id === "siphon") {
@@ -4447,7 +4975,7 @@ function persistPlayerProgress() {
     if (isGameOver()) return;
     if (state.phase !== "player") return;
     closeMagicMenu();
-    closeItemsMenu();
+    closeInventoryMenu();
 
     const atkType = playerPrimaryType();
     showMoveBanner("Attack", atkType);
@@ -4515,7 +5043,7 @@ function persistPlayerProgress() {
     if (isGameOver()) return;
     if (state.phase !== "player") return;
     closeMagicMenu();
-    closeItemsMenu();
+    closeInventoryMenu();
 
     const spell = SPELLS_BY_ID[spellId];
     if (!spell) {
@@ -5180,7 +5708,7 @@ function playerFireAttack() {
     if (isGameOver()) return;
     if (state.phase !== "player") return;
     closeMagicMenu();
-    closeItemsMenu();
+    closeInventoryMenu();
 
     const extra = state.player.bound > 0 ? 1 : 0;
     const cost = 1 + extra;
@@ -5249,8 +5777,7 @@ function playerFireAttack() {
     if (isGameOver()) return;
     if (state.phase !== "player") return;
     closeMagicMenu();
-    closeItemsMenu();
-    closeGearMenu();
+    closeInventoryMenu();
 
     if (!state.player.guarding) {
       state.player.guarding = true;
@@ -5283,8 +5810,7 @@ function playerFireAttack() {
     }
 
     closeMagicMenu();
-    closeItemsMenu();
-    closeGearMenu();
+
 
     const def = ITEM_DEFS[itemId];
     if (!def) {
@@ -5402,8 +5928,7 @@ function playerFireAttack() {
     if (state.phase !== "player") return;
 
     closeMagicMenu();
-    closeItemsMenu();
-    // Keep the gear menu open so you can rapidly swap/compare equipment.
+    // Keep Inventory open so you can rapidly swap/compare equipment.
 
     const def = GEAR_DEFS[gearId];
     if (!def) {
@@ -5461,8 +5986,7 @@ function playerFireAttack() {
     if (state.phase !== "player") return;
 
     closeMagicMenu();
-    closeItemsMenu();
-    // Keep the gear menu open so you can rapidly swap/compare equipment.
+    // Keep Inventory open so you can rapidly swap/compare equipment.
 
     state.player.gear = sanitizeGearCounts(state.player.gear);
     state.player.equipSlots = sanitizeEquipSlots(state.player.equipSlots ?? state.player.equip, state.player.gear);
@@ -5489,8 +6013,7 @@ function playerFireAttack() {
 
   function restartToHeroSelect() {
     closeMagicMenu();
-    closeItemsMenu();
-    closeGearMenu();
+    closeInventoryMenu();
     closeHeroPicker();
     closeLocationPicker();
     if (isLootOpen()) closeLootScreen();
@@ -5508,8 +6031,7 @@ function playerFireAttack() {
 
   function restart() {
     closeMagicMenu();
-    closeItemsMenu();
-    closeGearMenu();
+    closeInventoryMenu();
     closeHeroPicker();
     closeLocationPicker();
     if (isLootOpen()) closeLootScreen();
@@ -5535,12 +6057,12 @@ function playerFireAttack() {
     els.magicToggle.addEventListener("click", toggleMagicMenu);
   }
 
-  if (els.itemsToggle instanceof HTMLButtonElement) {
-    els.itemsToggle.addEventListener("click", toggleItemsMenu);
+  if (els.inventoryToggle instanceof HTMLButtonElement) {
+    els.inventoryToggle.addEventListener("click", toggleInventoryMenu);
   }
 
-  if (els.gearToggle instanceof HTMLButtonElement) {
-    els.gearToggle.addEventListener("click", toggleGearMenu);
+  if (els.inventoryToggle instanceof HTMLButtonElement) {
+    els.inventoryToggle.addEventListener("click", toggleInventoryMenu);
   }
 
   
@@ -5567,9 +6089,16 @@ function playerFireAttack() {
   }
   if (els.overworldBattleBtn instanceof HTMLButtonElement) {
     els.overworldBattleBtn.addEventListener("click", () => {
-      const locId = currentLocId();
-      if (!locId) return;
-      startBattleWithLocation(locId);
+      const loc = getBattleableOverworldLocation();
+      if (!loc) return;
+      startBattleWithLocation(loc.id);
+    });
+  }
+
+  // Back button (close the overworld modal)
+  if (els.overworldBackBtn instanceof HTMLButtonElement) {
+    els.overworldBackBtn.addEventListener("click", () => {
+      closeLocationPicker();
     });
   }
 
@@ -5607,10 +6136,10 @@ function playerFireAttack() {
     };
 
     if (k === "Enter") {
-      const locId = currentLocId();
-      if (locId) {
+      const loc = getBattleableOverworldLocation();
+      if (loc) {
         e.preventDefault();
-        startBattleWithLocation(locId);
+        startBattleWithLocation(loc.id);
       }
       return;
     }
@@ -5621,40 +6150,44 @@ function playerFireAttack() {
     moveOverworld(step[0], step[1]);
   });
 
-// Items menu: buttons are generated each render.
-  if (els.itemsMenu instanceof HTMLElement) {
-    els.itemsMenu.addEventListener("click", (e) => {
+
+  // Inventory menu: tabs + items + gear actions
+  if (els.inventoryMenu instanceof HTMLElement) {
+    els.inventoryMenu.addEventListener("click", (e) => {
       const target = e.target;
       if (!(target instanceof HTMLElement)) return;
-      const btn = target.closest("button[data-item-id]");
-      if (!(btn instanceof HTMLButtonElement)) return;
-      const id = btn.getAttribute("data-item-id");
-      if (!id) return;
-      playerUseItem(id);
-    });
-  }
 
-  // Gear menu: equip/unequip actions
-  if (els.gearMenu instanceof HTMLElement) {
-    els.gearMenu.addEventListener("click", (e) => {
-      const target = e.target;
-      if (!(target instanceof HTMLElement)) return;
-      const btn = target.closest("button[data-gear-action]");
-      if (!(btn instanceof HTMLButtonElement)) return;
-
-      const action = btn.getAttribute("data-gear-action");
-
-      if (action === "unequip-slot") {
-        const slot = btn.getAttribute("data-gear-slot");
-        if (slot === "weapon" || slot === "armor" || slot === "trinket") {
-          playerUnequipGear(slot);
-        }
+      // Tabs
+      const tabBtn = target.closest("button[data-inv-tab]");
+      if (tabBtn instanceof HTMLButtonElement) {
+        const tab = tabBtn.getAttribute("data-inv-tab");
+        if (tab === "items" || tab === "gear") setInventoryTab(tab);
         return;
       }
 
-      const id = btn.getAttribute("data-gear-id");
-      if (!id) return;
-      playerEquipGear(id);
+      // Items
+      const itemBtn = target.closest("button[data-item-id]");
+      if (itemBtn instanceof HTMLButtonElement) {
+        const id = itemBtn.getAttribute("data-item-id");
+        if (id) playerUseItem(id);
+        return;
+      }
+
+      // Gear
+      const gearBtn = target.closest("button[data-gear-action]");
+      if (gearBtn instanceof HTMLButtonElement) {
+        const action = gearBtn.getAttribute("data-gear-action");
+        if (action === "unequip-slot") {
+          const slot = gearBtn.getAttribute("data-gear-slot");
+          if (slot === "weapon" || slot === "armor" || slot === "trinket") {
+            playerUnequipGear(slot);
+          }
+          return;
+        }
+
+        const id = gearBtn.getAttribute("data-gear-id");
+        if (id) playerEquipGear(id);
+      }
     });
   }
 

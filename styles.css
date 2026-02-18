@@ -2896,6 +2896,63 @@ body.modalOpen {
   gap: 8px;
 }
 
+/* Compendium (Codex) modal */
+.rpgCodexDetails{
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 16px;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.03);
+}
+.rpgCodexDetails > summary{
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-weight: 800;
+  list-style: none;
+}
+.rpgCodexDetails > summary::-webkit-details-marker{display:none;}
+.rpgCodexList{display:grid;gap:8px;margin-top:10px;}
+.rpgCodexEntry{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  padding: 8px 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+}
+.rpgCodexIcon{
+  width:44px;
+  height:44px;
+  flex:0 0 44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1.1rem;
+  line-height:1.1;
+  margin-top:1px;
+}
+.rpgCodexSprite{
+  width:44px;
+  height:44px;
+  object-fit:contain;
+  border-radius:12px;
+  background: rgba(255,255,255,0.03);
+}
+html[data-theme="light"] .rpgCodexSprite{background: rgba(0,0,0,0.03);}
+.rpgCodexMain{display:grid;gap:3px;min-width:0;flex:1 1 auto;}
+.rpgCodexTopRow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0;}
+.rpgCodexName{font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rpgCodexSub{font-size:12px;opacity:.84;line-height:1.25;}
+.rpgCodexTypes{display:flex;gap:6px;flex-wrap:wrap;}
+.rpgCodexTag{font-size:10px;padding:2px 7px;border-radius:999px;border:1px solid rgba(255,255,255,0.18);opacity:.92;white-space:nowrap;background:rgba(255,255,255,0.06);}
+
+html[data-theme="light"] .rpgCodexDetails{border-color:rgba(0,0,0,0.12);background:rgba(0,0,0,0.02)}
+html[data-theme="light"] .rpgCodexEntry{border-color:rgba(0,0,0,0.12);background:rgba(0,0,0,0.03)}
+html[data-theme="light"] .rpgCodexTag{border-color:rgba(0,0,0,0.14);background:rgba(0,0,0,0.04)}
+
 /* Wave clear loot screen (auto closes) */
 .rpgLootInner {
   width: min(520px, 100%);
@@ -3063,6 +3120,16 @@ html[data-theme="light"] .rpgLegendChip{
   gap: 12px;
   flex-wrap: wrap;
   margin-top: 6px;
+}
+
+/* Back button row under the overworld map */
+.rpgOverworldBackRow{
+  display:flex;
+  justify-content:center;
+  margin-top: 10px;
+}
+.rpgOverworldBackRow .btn{
+  min-width: 140px;
 }
 
 .rpgOverworldGrid{
@@ -6273,17 +6340,60 @@ html[data-theme="light"] .rpgOverworldAvatar{
 
 .rpgGearInvItem{width:100%;text-align:left;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:10px;row-gap:1px;align-items:center;padding:8px}
 .rpgGearSlotPill{grid-row:1 / span 2;align-self:start;font-size:10px;padding:3px 7px;border-radius:999px;border:1px solid rgba(255,255,255,0.18);opacity:.85;white-space:nowrap}
-.rpgGearInvMain{font-weight:750}
+.rpgGearInvMain{font-weight:750;display:flex;align-items:center;gap:8px;min-width:0}
+.rpgGearInvName{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rpgGearInvSub{font-size:11px;opacity:.82}
+
+/* Rarity pills (items & gear) */
+.rpgRarityPill{margin-left:auto;font-size:10px;padding:2px 7px;border-radius:999px;border:1px solid rgba(255,255,255,0.18);opacity:.95;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.rarity--common{background:rgba(255,255,255,0.06)}
+.rarity--uncommon{background:rgba(107,226,139,0.12);border-color:rgba(107,226,139,0.28)}
+.rarity--rare{background:rgba(93,170,255,0.12);border-color:rgba(93,170,255,0.28)}
+.rarity--epic{background:rgba(212,167,255,0.12);border-color:rgba(212,167,255,0.30)}
+.rarity--legendary{background:rgba(255,206,107,0.14);border-color:rgba(255,206,107,0.34)}
+
+/* Subtle rarity tint on equipped slot cards */
+.rpgGearSlotCard[data-rarity="uncommon"]{border-color:rgba(107,226,139,0.34)}
+.rpgGearSlotCard[data-rarity="rare"]{border-color:rgba(93,170,255,0.34)}
+.rpgGearSlotCard[data-rarity="epic"]{border-color:rgba(212,167,255,0.36)}
+.rpgGearSlotCard[data-rarity="legendary"]{border-color:rgba(255,206,107,0.40)}
+
+html[data-theme="light"] .rpgRarityPill{border-color:rgba(0,0,0,0.12)}
+html[data-theme="light"] .rarity--common{background:rgba(0,0,0,0.04)}
+html[data-theme="light"] .rarity--uncommon{background:rgba(107,226,139,0.18)}
+html[data-theme="light"] .rarity--rare{background:rgba(93,170,255,0.18)}
+html[data-theme="light"] .rarity--epic{background:rgba(212,167,255,0.18)}
+html[data-theme="light"] .rarity--legendary{background:rgba(255,206,107,0.22)}
 
 .rpgDropHover{outline:2px solid rgba(255,255,255,0.35);outline-offset:2px}
 .rpgGearInvItem.isEquipped{border-color:rgba(255,255,255,0.32)}
 
 /* Gear menu layout: wide enough for slots, tighter padding */
-#gearMenu.rpgMagicMenu{min-width:320px;width:min(560px,calc(100vw - 32px));max-width:560px;padding:8px;gap:6px}
-#gearMenu.rpgMagicMenu .btn{justify-content:flex-start}
+/* Inventory menu (combined Items + Gear) */
+#inventoryMenu.rpgMagicMenu{min-width:320px;width:min(620px,calc(100vw - 32px));max-width:620px;padding:8px;gap:8px}
+#inventoryMenu.rpgMagicMenu .btn{justify-content:flex-start}
 @media (max-width:520px){
-  #gearMenu.rpgMagicMenu{min-width:unset;max-width:unset;width:100%}
+  #inventoryMenu.rpgMagicMenu{min-width:unset;max-width:unset;width:100%}
 }
-#gearMenu .rpgMagicEmpty{font-size:12px;line-height:1.2;padding:6px 8px}
+
+#inventoryMenu .rpgMagicEmpty{font-size:12px;line-height:1.2;padding:6px 8px}
+
+/* Tabs */
+#inventoryMenu .rpgInvTabs{display:flex;gap:6px;align-items:center}
+#inventoryMenu .rpgInvTabs .btn{width:auto;min-width:0;flex:1 1 0;justify-content:center;padding:7px 10px;border-radius:999px}
+#inventoryMenu .rpgInvTab.isActive{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.24)}
+
+/* Pane scrolling keeps the menu compact */
+#inventoryMenu .rpgInvPane{max-height:min(58vh,520px);overflow:auto;padding-right:2px}
+#inventoryMenu .rpgInvPane[hidden]{display:none}
+
+/* Items list (compact rows) */
+.rpgInvItemsList{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px}
+@media (max-width:560px){.rpgInvItemsList{grid-template-columns:1fr}}
+.rpgInvItemRow{width:100%;text-align:left;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;column-gap:10px;row-gap:1px;align-items:center;padding:8px}
+.rpgInvItemMeta{display:flex;align-items:center;gap:6px}
+.rpgInvItemMain{font-weight:750;display:flex;align-items:center;gap:8px;min-width:0}
+.rpgInvItemName{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rpgInvCountPill{font-size:10px;padding:2px 7px;border-radius:999px;border:1px solid rgba(255,255,255,0.18);opacity:.95;white-space:nowrap}
+.rpgInvItemSub{grid-column:1 / span 2;font-size:11px;opacity:.82}
 
