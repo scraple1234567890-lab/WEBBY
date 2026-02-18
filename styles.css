@@ -5639,9 +5639,30 @@ body.homePage #contact .sectionHead p.muted{
   background: rgba(80,170,255,0.12);
 }
 
+/* 5-tier effectiveness legend keys */
+.rpgTypeKey--super{
+  border-color: rgba(80,170,255,0.48);
+  background: rgba(80,170,255,0.18);
+}
+
+.rpgTypeKey--effective{
+  border-color: rgba(80,170,255,0.35);
+  background: rgba(80,170,255,0.12);
+}
+
 .rpgTypeKey--weak{
   border-color: rgba(255,120,80,0.28);
   background: rgba(255,120,80,0.10);
+}
+
+.rpgTypeKey--not{
+  border-color: rgba(255,120,80,0.28);
+  background: rgba(255,120,80,0.10);
+}
+
+.rpgTypeKey--extremeNot{
+  border-color: rgba(255,120,80,0.40);
+  background: rgba(255,120,80,0.16);
 }
 
 .rpgTypeKey--neutral{
@@ -5707,9 +5728,30 @@ body.homePage #contact .sectionHead p.muted{
   background: rgba(80,170,255,0.12);
 }
 
+/* 5-tier effectiveness cells (used by the full type chart) */
+.rpgTypeCell.isEffective{
+  border-color: rgba(80,170,255,0.35);
+  background: rgba(80,170,255,0.12);
+}
+
+.rpgTypeCell.isSuper{
+  border-color: rgba(80,170,255,0.48);
+  background: rgba(80,170,255,0.18);
+}
+
 .rpgTypeCell.isWeak{
   border-color: rgba(255,120,80,0.28);
   background: rgba(255,120,80,0.10);
+}
+
+.rpgTypeCell.isNot{
+  border-color: rgba(255,120,80,0.28);
+  background: rgba(255,120,80,0.10);
+}
+
+.rpgTypeCell.isExtremeNot{
+  border-color: rgba(255,120,80,0.40);
+  background: rgba(255,120,80,0.16);
 }
 
 .rpgTypeCell.isNeutral{
@@ -6404,10 +6446,10 @@ html[data-theme="light"] .rpgOverworldAvatar{
 .rpgGearInvItem{width:100%;text-align:left;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:8px;row-gap:0px;align-items:center;padding:6px}
 .rpgGearSlotPill{grid-row:1 / span 2;align-self:start;font-size:9px;padding:2px 6px;border-radius:999px;border:1px solid rgba(255,255,255,0.18);opacity:.85;white-space:nowrap}
 .rpgGearInvMain{font-weight:750;display:flex;align-items:center;gap:8px;min-width:0;font-size:12px}
-.rpgGearInvName{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-/* Compact meta row: count + rarity + clamped description */
+.rpgGearInvName{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rpgGearInvRarity{flex:0 0 auto;font-size:9px;padding:2px 6px}
+/* Compact meta row: count + (clamped) description */
 .rpgGearInvSub{display:flex;align-items:center;gap:6px;min-width:0;font-size:10px;opacity:.82}
-.rpgGearInvSub .rpgRarityPill{margin-left:0;font-size:9px;padding:2px 6px}
 .rpgGearInvDesc{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.78}
 
 /* Rarity pills (items & gear) */

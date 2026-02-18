@@ -1101,7 +1101,7 @@ function renderSpellMenu(spells, isPlayerTurn, focus, boundExtra) {
 
     const tipBits = [];
     tipBits.push(String(cost) + " Mana");
-    tipBits.push("x" + fmtMult(typed.overall));
+    tipBits.push("x" + fmtMult(typed.eff));
     if (extra) tipBits.push(extra);
     btn.title = tipBits.join(" • ");
     btn.disabled = !isPlayerTurn || focus < cost;
@@ -1236,12 +1236,6 @@ function renderGearMenu(isPlayerTurn, container = els.inventoryGearPane) {
 
   const canChange = !!isPlayerTurn && state.phase === "player" && !isGameOver();
 
-  const tip = document.createElement("div");
-  tip.className = "rpgMagicEmpty";
-  tip.classList.add("rpgGearTip");
-  // Keep the Gear pane compact; clicking owned gear equips it.
-  tip.textContent = "Tip: click gear to equip.";
-  container.appendChild(tip);
 
   const wrap = document.createElement("div");
   wrap.className = "rpgGearMenuWrap";
@@ -1323,14 +1317,6 @@ function renderGearMenu(isPlayerTurn, container = els.inventoryGearPane) {
     label.textContent = EQUIP_SLOT_LABEL[slot];
     head.appendChild(label);
 
-    const uneq = document.createElement("button");
-    uneq.type = "button";
-    uneq.className = "btn ghost rpgGearSlotUnequip";
-    uneq.textContent = "Unequip";
-    uneq.dataset.gearAction = "unequip-slot";
-    uneq.dataset.gearSlot = slot;
-    uneq.disabled = !canChange || !curId;
-    head.appendChild(uneq);
 
     const drop = document.createElement("button");
     drop.type = "button";
@@ -1442,9 +1428,15 @@ function renderGearMenu(isPlayerTurn, container = els.inventoryGearPane) {
     nm.title = def.name;
     main.appendChild(nm);
 
+    // Put rarity on the main row so it doesn't steal space from the description.
+    const rp = document.createElement("span");
+    rp.className = `rpgRarityPill rpgGearInvRarity rarity--${(def.rarity || "common")}`;
+    rp.textContent = rarityLabel(def.rarity || "common");
+    main.appendChild(rp);
+
     btn.appendChild(main);
 
-    // Compact meta row: count + rarity + (clamped) description.
+    // Compact meta row: count + (clamped) description.
     const sub = document.createElement("span");
     sub.className = "rpgGearInvSub";
 
@@ -1452,11 +1444,6 @@ function renderGearMenu(isPlayerTurn, container = els.inventoryGearPane) {
     countPill.className = "rpgInvCountPill";
     countPill.textContent = `x${have}`;
     sub.appendChild(countPill);
-
-    const rp = document.createElement("span");
-    rp.className = `rpgRarityPill rarity--${(def.rarity || "common")}`;
-    rp.textContent = rarityLabel(def.rarity || "common");
-    sub.appendChild(rp);
 
     if (def.desc) {
       const desc = document.createElement("span");
@@ -2273,11 +2260,12 @@ function startBattleWithLocation(locId) {
   /** @typedef {"Wind"|"Water"|"Fire"|"Sight"|"Earth"|"Touch"|"Sound"|"SmellTaste"} MagicType */
 
   /**
-   * Type effectiveness chart: attackType -> defenderType -> multiplier.
-   * Dual types multiply.
-   * NOTE: Balance is intentionally "obvious" so matchups are readable.
+   * Base type chart (3 tiers). We'll derive a 5-tier chart from this so the "strongest" and "weakest"
+   * relationships show up as Super / Extremely-not-effective even on single-type matchups.
    */
-  const TYPE_CHART = /** @type {Record<MagicType, Record<MagicType, number>>} */ ({
+  const TYPE_ORDER = /** @type {MagicType[]} */ (["Wind", "Water", "Fire", "Earth", "Sight", "Sound", "Touch", "SmellTaste"]);
+
+  const TYPE_CHART_BASE = /** @type {Record<MagicType, Record<MagicType, number>>} */ ({
 Wind: { Wind: 1.0, Water: 1.0, Fire: 0.8, Sight: 1.6, Earth: 0.8, Touch: 1.0, Sound: 1.0, SmellTaste: 1.6 },
 Water: { Wind: 1.0, Water: 1.0, Fire: 1.6, Sight: 1.0, Earth: 1.6, Touch: 0.8, Sound: 0.8, SmellTaste: 1.0 },
 Fire: { Wind: 1.6, Water: 0.8, Fire: 1.0, Sight: 1.0, Earth: 1.6, Touch: 1.0, Sound: 0.8, SmellTaste: 1.0 },
@@ -2290,25 +2278,111 @@ SmellTaste: { Wind: 0.8, Water: 1.0, Fire: 1.0, Sight: 0.8, Earth: 1.0, Touch: 1
 
 
 /** @param {MagicType} attackType @param {MagicType[]} defenderTypes */
+  // Tier multipliers (match the chart’s strong/weak values).
+  const TYPE_WEAK = 0.8;
+  const TYPE_STRONG = 1.6;
+
+  /**
+   * Derive a 5-tier chart from the base chart:
+   * - For each defender type, choose ONE "strongest" attacker among the strongest set (if any) => Super (1.6^2)
+   * - For each defender type, choose ONE "worst" attacker among the weakest set (if any) => Extremely-not (0.8^2)
+   * This makes the 5 tiers appear in the full chart while staying grounded in the base strengths.
+   */
+  function buildFiveTierChart(base) {
+    /** @type {Record<MagicType, Record<MagicType, number>>} */
+    const out = /** @type {any} */ ({});
+    for (const atk of TYPE_ORDER) out[atk] = { ...(base[atk] || {}) };
+
+    for (const def of TYPE_ORDER) {
+      let max = -Infinity;
+      let min = Infinity;
+      for (const atk of TYPE_ORDER) {
+        const m = base[atk]?.[def] ?? 1;
+        if (m > max) max = m;
+        if (m < min) min = m;
+      }
+
+      // Pick a single "strongest" attacker for this defender (stable order tie-break).
+      if (max > 1) {
+        const superAtk = TYPE_ORDER.find((atk) => (base[atk]?.[def] ?? 1) === max);
+        if (superAtk) out[superAtk][def] = TYPE_STRONG * TYPE_STRONG;
+      }
+
+      // Pick a single "worst" attacker for this defender (stable order tie-break).
+      if (min < 1) {
+        const extremeAtk = TYPE_ORDER.find((atk) => (base[atk]?.[def] ?? 1) === min);
+        if (extremeAtk) out[extremeAtk][def] = TYPE_WEAK * TYPE_WEAK;
+      }
+    }
+
+    return out;
+  }
+
+  const TYPE_CHART = buildFiveTierChart(TYPE_CHART_BASE);
+
+  /** @param {MagicType} attackType @param {MagicType[]} defenderTypes */
+  function typeEffectScore(attackType, defenderTypes) {
+    // Discrete scoring: each defender type contributes -2/-1/0/+1/+2 based on the 5-tier chart.
+    // This keeps outcomes readable (and prevents in-between multipliers like 1.28 on mixed dual types).
+    let score = 0;
+    for (const dt of defenderTypes) {
+      const m = TYPE_CHART[attackType]?.[dt] ?? 1;
+      if (m >= (TYPE_STRONG * TYPE_STRONG) - 1e-6) score += 2;
+      else if (m > 1) score += 1;
+      else if (m <= (TYPE_WEAK * TYPE_WEAK) + 1e-6) score -= 2;
+      else if (m < 1) score -= 1;
+    }
+    return clamp(score, -2, 2);
+  }
+
+  const TYPE_TIER_MULT = /** @type {Record<string, number>} */ ({
+    "-2": TYPE_WEAK * TYPE_WEAK,
+    "-1": TYPE_WEAK,
+    "0": 1.0,
+    "1": TYPE_STRONG,
+    "2": TYPE_STRONG * TYPE_STRONG,
+  });
+
+  const EFFECT_TIER_CUTS = {
+    extreme: (TYPE_TIER_MULT["-2"] + TYPE_TIER_MULT["-1"]) / 2,
+    weak: (TYPE_TIER_MULT["-1"] + TYPE_TIER_MULT["0"]) / 2,
+    strong: (TYPE_TIER_MULT["0"] + TYPE_TIER_MULT["1"]) / 2,
+    super: (TYPE_TIER_MULT["1"] + TYPE_TIER_MULT["2"]) / 2,
+  };
+
+  /** @param {MagicType} attackType @param {MagicType[]} defenderTypes */
   function typeMultiplier(attackType, defenderTypes) {
-    let mult = 1;
-    for (const dt of defenderTypes) mult *= TYPE_CHART[attackType]?.[dt] ?? 1;
-    return mult;
+    const s = typeEffectScore(attackType, defenderTypes);
+    return TYPE_TIER_MULT[String(s)] ?? 1;
+  }
+
+  /** @param {number} mult */
+  function effectivenessTier(mult) {
+    if (mult < EFFECT_TIER_CUTS.extreme) return { score: -2, label: "Extremely not effective", tone: "bad", bannerTone: "not" };
+    if (mult < EFFECT_TIER_CUTS.weak) return { score: -1, label: "Not effective", tone: "bad", bannerTone: "not" };
+    if (mult < EFFECT_TIER_CUTS.strong) return { score: 0, label: "Neutral", tone: "neutral", bannerTone: "neutral" };
+    if (mult < EFFECT_TIER_CUTS.super) return { score: 1, label: "Effective", tone: "good", bannerTone: "super" };
+    return { score: 2, label: "Super effective", tone: "good", bannerTone: "super" };
   }
 
   /** @param {number} mult */
   function effectivenessText(mult) {
-    if (mult >= 1.30) return "Super effective!";
-    if (mult <= 0.85) return "Not very effective…";
-    return "";
+    const t = effectivenessTier(mult);
+    if (t.score === 0) return "";
+    if (t.score === 2) return "Super effective";
+    if (t.score === 1) return "Effective";
+    if (t.score === -1) return "Not effective";
+    return "Extremely not effective";
   }
-
 
   /** @param {number} mult */
   function effectivenessTierLabel(mult) {
-    if (mult >= 1.30) return { label: "Extra effective", tone: "good" };
-    if (mult <= 0.85) return { label: "Weak", tone: "bad" };
-    return { label: "Normal", tone: "neutral" };
+    const t = effectivenessTier(mult);
+    if (t.score === 2) return { label: "Super effective", tone: "good" };
+    if (t.score === 1) return { label: "Effective", tone: "good" };
+    if (t.score === -1) return { label: "Not effective", tone: "bad" };
+    if (t.score === -2) return { label: "Extremely not effective", tone: "bad" };
+    return { label: "Neutral", tone: "neutral" };
   }
 
   /**
@@ -2583,17 +2657,24 @@ function setPreviewMove(name, type, baseCost, extra = "") {
       tr.appendChild(rowHead);
 
       for (const def of order) {
-        const mult = TYPE_CHART[atk]?.[def] ?? 1;
+        // Use the same tiered effectiveness logic the battle system uses.
+        // (Even though this matrix is single-type columns today, this keeps it consistent.)
+        const mult = typeMultiplier(atk, [def]);
+        const tier = effectivenessTier(mult);
         const td = document.createElement("td");
         td.className = "rpgTypeCell";
 
-        // Reuse the same thresholds used elsewhere in the UI.
-        if (mult >= 1.30) td.classList.add("isStrong");
-        else if (mult <= 0.90) td.classList.add("isWeak");
+        // 5 discrete outcomes: extremely not effective, not effective, neutral, effective, super effective.
+        if (tier.score === 2) td.classList.add("isSuper");
+        else if (tier.score === 1) td.classList.add("isEffective");
+        else if (tier.score === -1) td.classList.add("isNot");
+        else if (tier.score === -2) td.classList.add("isExtremeNot");
         else td.classList.add("isNeutral");
 
+        // Display a number in the grid (so players can scan exact values).
+        // Values remain discrete because typeMultiplier() snaps to the 5-tier system.
         td.textContent = `x${fmtMult(mult)}`;
-        td.title = `${TYPE_META[atk]?.label ?? atk} → ${TYPE_META[def]?.label ?? def}: x${fmtMult(mult)}`;
+        td.title = `${TYPE_META[atk]?.label ?? atk} → ${TYPE_META[def]?.label ?? def}: ${tier.label} (x${fmtMult(mult)})`;
         tr.appendChild(td);
       }
 
@@ -2632,14 +2713,22 @@ function setPreviewMove(name, type, baseCost, extra = "") {
     const attacker = state[attackerKey];
     const defender = state[defenderKey];
     const stab = attacker.types.includes(moveType) ? 1.2 : 1.0;
+
+    // Effectiveness is tiered (5 discrete outcomes) so it stays readable.
     const eff = typeMultiplier(moveType, defender.types);
+    const tier = effectivenessTier(eff);
+
     const scaled = Math.max(1, Math.round(base * stab * eff));
     return {
       scaled,
       stab,
       eff,
       overall: stab * eff,
-      note: effectivenessText(stab * eff),
+      tierLabel: tier.label,
+      tierScore: tier.score,
+      bannerTone: tier.bannerTone,
+      // Log note (only when not neutral)
+      note: effectivenessText(eff),
     };
   }
 
@@ -4497,7 +4586,7 @@ function persistPlayerProgress() {
 
     const typed = computeTypedDamage("enemy", "player", intent.base, intent.type);
     const badge = typed.note ? `, ${typed.note}` : "";
-    els.enemyIntentText.textContent = `Intent: ${intent.name} (${intent.type} x${fmtMult(typed.overall)}${badge})`;
+    els.enemyIntentText.textContent = `Intent: ${intent.name} (${intent.type} x${fmtMult(typed.eff)}${badge})`;
   }
 
   // --------------------
@@ -5325,9 +5414,9 @@ function persistPlayerProgress() {
 
     addLog(`${e.name} uses ${intent.name} for ${afterDef} damage.`);
     if (typed.note) addLog(typed.note);
-    setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
+    setEffectBanner(`${typed.tierLabel} (x${fmtMult(typed.eff)})`, typed.bannerTone);
     playAnim(els.playerSprite, "rpgAnim-hit");
-    spawnFloat(`-${afterDef}`, "player", "dmg", typed.overall);
+    spawnFloat(`-${afterDef}`, "player", "dmg", typed.eff);
 
     // Apply deterministic status effects
     if (intent.id === "ignite") {
@@ -5452,10 +5541,10 @@ function persistPlayerProgress() {
     state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
     addLog(`You strike ${state.enemy.name} for ${def.final} damage.`);
     if (typed.note) addLog(typed.note);
-    setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
+    setEffectBanner(`${typed.tierLabel} (x${fmtMult(typed.eff)})`, typed.bannerTone);
     playAnim(els.enemySprite, "rpgAnim-hit");
     spawnFx(fxKindForType(atkType), "enemy");
-    spawnFloat(`-${def.final}`, "enemy", "dmg", typed.overall);
+    spawnFloat(`-${def.final}`, "enemy", "dmg", typed.eff);
 
     // Mirror reflect
     if (def.reflected > 0) {
@@ -5558,11 +5647,11 @@ function persistPlayerProgress() {
 
     addLog(`You cast ${spell.name} for ${def.final} damage.`);
     if (typed.note) addLog(typed.note);
-    setEffectBanner(`${typed.note || "Hit"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
+    setEffectBanner(`${typed.tierLabel} (x${fmtMult(typed.eff)})`, typed.bannerTone);
 
     playAnim(els.enemySprite, "rpgAnim-hit");
     spawnFx(fxKindForType(spell.type), "enemy");
-    spawnFloat(`-${def.final}`, "enemy", "dmg", typed.overall);
+    spawnFloat(`-${def.final}`, "enemy", "dmg", typed.eff);
 
     // Mirror ward reflection (if any)
     if (def.reflected > 0) {
@@ -5691,7 +5780,7 @@ function persistPlayerProgress() {
     state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
     addLog(`You send a wind blade for ${def.final} damage.`);
     if (typed.note) addLog(typed.note);
-    setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
+    setEffectBanner(`${typed.tierLabel} (x${fmtMult(typed.eff)})`, typed.bannerTone);
     playAnim(els.enemySprite, "rpgAnim-hit");
 
     spawnFx("wind", "enemy");
@@ -5773,10 +5862,10 @@ function persistPlayerProgress() {
     state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
     addLog(`You crash water onto ${state.enemy.name} for ${def.final} damage.`);
     if (typed.note) addLog(typed.note);
-    setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
+    setEffectBanner(`${typed.tierLabel} (x${fmtMult(typed.eff)})`, typed.bannerTone);
     playAnim(els.enemySprite, "rpgAnim-hit");
     spawnFx("water", "enemy");
-    spawnFloat(`-${def.final}`, "enemy", "dmg", typed.overall);
+    spawnFloat(`-${def.final}`, "enemy", "dmg", typed.eff);
 
     // Mirror reflect (if any ward remained)
     if (def.reflected > 0) {
@@ -5864,10 +5953,10 @@ function persistPlayerProgress() {
     state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
     addLog(`You unleash a sonic burst for ${def.final} damage.`);
     if (typed.note) addLog(typed.note);
-    setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
+    setEffectBanner(`${typed.tierLabel} (x${fmtMult(typed.eff)})`, typed.bannerTone);
     playAnim(els.enemySprite, "rpgAnim-hit");
     spawnFx("sound", "enemy");
-    spawnFloat(`-${def.final}`, "enemy", "dmg", typed.overall);
+    spawnFloat(`-${def.final}`, "enemy", "dmg", typed.eff);
 
     if (def.reflected > 0) {
       state.player.hp = clamp(state.player.hp - def.reflected, 0, state.player.max);
@@ -5938,10 +6027,10 @@ function playerSmellTasteAttack() {
   state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
   addLog(`You release an aroma hex for ${def.final} damage.`);
   if (typed.note) addLog(typed.note);
-  setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
+  setEffectBanner(`${typed.tierLabel} (x${fmtMult(typed.eff)})`, typed.bannerTone);
   playAnim(els.enemySprite, "rpgAnim-hit");
   spawnFx("smell", "enemy");
-  spawnFloat(`-${def.final}`, "enemy", "dmg", typed.overall);
+  spawnFloat(`-${def.final}`, "enemy", "dmg", typed.eff);
 
   // Mirror reflect (if any ward remained)
   if (def.reflected > 0) {
@@ -6014,10 +6103,10 @@ function playerFireAttack() {
     state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
     addLog(`You hurl flame for ${def.final} damage.`);
     if (typed.note) addLog(typed.note);
-    setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
+    setEffectBanner(`${typed.tierLabel} (x${fmtMult(typed.eff)})`, typed.bannerTone);
     playAnim(els.enemySprite, "rpgAnim-hit");
     spawnFx("fire", "enemy");
-    spawnFloat(`-${def.final}`, "enemy", "dmg", typed.overall);
+    spawnFloat(`-${def.final}`, "enemy", "dmg", typed.eff);
 
     if (def.reflected > 0) {
       state.player.hp = clamp(state.player.hp - def.reflected, 0, state.player.max);
@@ -6123,10 +6212,10 @@ function playerFireAttack() {
     state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
     addLog(`You channel ${label} magic for ${def.final} damage.`);
     if (typed.note) addLog(typed.note);
-    setEffectBanner(`${typed.note || "Impact"} (x${fmtMult(typed.overall)})`, toneFromMultiplier(typed.overall));
+    setEffectBanner(`${typed.tierLabel} (x${fmtMult(typed.eff)})`, typed.bannerTone);
     playAnim(els.enemySprite, "rpgAnim-hit");
     spawnFx(fxKindForType(t), "enemy");
-    spawnFloat(`-${def.final}`, "enemy", "dmg", typed.overall);
+    spawnFloat(`-${def.final}`, "enemy", "dmg", typed.eff);
 
     if (def.reflected > 0) {
       state.player.hp = clamp(state.player.hp - def.reflected, 0, state.player.max);
@@ -6756,7 +6845,7 @@ function playerFireAttack() {
   }
 
   
-  // Effectiveness preview (hover/focus shows Extra/Normal/Weak before you click)
+  // Effectiveness preview (hover/focus shows tiered effectiveness before you click)
   /**
    * @param {HTMLElement|null} btn
    * @param {string | (() => string)} nameOrFn
