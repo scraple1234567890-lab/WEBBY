@@ -4020,102 +4020,20 @@ function computeEnemyEncounterRates() {
 
   const bossIdx = (typeof BOSS_ENEMY_INDEX === 'number') ? BOSS_ENEMY_INDEX : -1;
   if (bossIdx >= 0) {
+    // Boss appears only on Wave 3.
     out.set(bossIdx, { w1: 0, w2: 0, any: 1, boss: true });
   }
 
-  const sorted = Array.isArray(NON_BOSS_SORTED) ? NON_BOSS_SORTED : [];
-  if (!sorted.length) return out;
+  // Waves 1-2: equal odds across all non-boss enemies.
+  const pool = Array.isArray(NON_BOSS_ENEMY_INDICES) ? NON_BOSS_ENEMY_INDICES : [];
+  const n = pool.length;
+  if (!n) return out;
 
-  const weightsFor = (weightsByRank) => {
-    const w = sorted.map((_, rank) => (weightsByRank && typeof weightsByRank[rank] === 'number') ? weightsByRank[rank] : 1);
-    let total = 0;
-    for (const x of w) total += Math.max(0, x || 0);
-    const pByIndex = new Map();
-    sorted.forEach((x, rank) => {
-      const ww = Math.max(0, w[rank] || 0);
-      pByIndex.set(x.i, total > 0 ? (ww / total) : 0);
-    });
-    return { weights: w, total, pByIndex };
-  };
+  const p = 1 / n;
+  const any = clamp(1 - Math.pow(1 - p, 2), 0, 1); // independent waves, repeats allowed
 
-  const wave1 = weightsFor(WAVE1_WEIGHTS_BY_RANK);
-  const wave2init = weightsFor(WAVE2_WEIGHTS_BY_RANK);
-
-  // Wave 2 final distribution includes anti-repeat reroll.
-  /** @type {Map<number, number>} */
-  const p2final = new Map();
-  for (const x of sorted) p2final.set(x.i, 0);
-
-  const n = sorted.length;
-  const canReroll = n > 1;
-
-  // Precompute alternative wave2 distributions when excluding a specific wave1 enemy.
-  /** @type {Map<number, Map<number, number>>} */
-  const altDistByExclude = new Map();
-  if (canReroll) {
-    for (const ex of sorted) {
-      const altSorted = sorted.filter((z) => z.i !== ex.i);
-      const altWeights = altSorted.map((_, rank) => (WAVE2_WEIGHTS_BY_RANK && typeof WAVE2_WEIGHTS_BY_RANK[rank] === 'number') ? WAVE2_WEIGHTS_BY_RANK[rank] : 1);
-      let altTotal = 0;
-      for (const w of altWeights) altTotal += Math.max(0, w || 0);
-      const altMap = new Map();
-      altSorted.forEach((z, rank) => {
-        const ww = Math.max(0, altWeights[rank] || 0);
-        altMap.set(z.i, altTotal > 0 ? (ww / altTotal) : 0);
-      });
-      altDistByExclude.set(ex.i, altMap);
-    }
-  }
-
-  // P(final w2 = k) = Σ_i P(w1=i) * [ P(init=k, k!=i) + P(init=i)*0.30*(k==i) + P(init=i)*0.70*P_alt(k|exclude i) ]
-  for (const wi of sorted) {
-    const i = wi.i;
-    const pW1 = wave1.pByIndex.get(i) || 0;
-    if (pW1 <= 0) continue;
-
-    // baseline: init=k and k!=i
-    for (const wk of sorted) {
-      const k = wk.i;
-      if (k === i) continue;
-      const pInit = wave2init.pByIndex.get(k) || 0;
-      if (pInit > 0) p2final.set(k, (p2final.get(k) || 0) + pW1 * pInit);
-    }
-
-    const pInitI = wave2init.pByIndex.get(i) || 0;
-    if (pInitI > 0) {
-      if (!canReroll) {
-        // No reroll possible: wave2 is always the only enemy.
-        p2final.set(i, (p2final.get(i) || 0) + pW1 * pInitI);
-      } else {
-        // 30% keep the repeat.
-        p2final.set(i, (p2final.get(i) || 0) + pW1 * pInitI * 0.30);
-
-        // 70% reroll from alt pool.
-        const alt = altDistByExclude.get(i);
-        if (alt) {
-          for (const [k, pAlt] of alt.entries()) {
-            if (pAlt > 0) p2final.set(k, (p2final.get(k) || 0) + pW1 * pInitI * 0.70 * pAlt);
-          }
-        }
-      }
-    }
-  }
-
-  // Fill final output for non-boss enemies.
-  for (const x of sorted) {
-    const idx = x.i;
-    const p1 = wave1.pByIndex.get(idx) || 0;
-    const p2 = p2final.get(idx) || 0;
-
-    // Overlap term for "appears at least once" within a battle run.
-    // Repeat only possible when wave1=idx AND wave2 final=idx.
-    let overlap = 0;
-    const pInit = wave2init.pByIndex.get(idx) || 0;
-    if (canReroll) overlap = p1 * pInit * 0.30;
-    else overlap = p1 * pInit;
-
-    const any = clamp(p1 + p2 - overlap, 0, 1);
-    out.set(idx, { w1: clamp(p1, 0, 1), w2: clamp(p2, 0, 1), any, boss: false });
+  for (const idx of pool) {
+    out.set(idx, { w1: p, w2: p, any, boss: false });
   }
 
   return out;
@@ -5168,8 +5086,9 @@ const ENEMIES = [
 
 
 // --- Random encounter system (not tied to locations) ---
-// Non-boss enemies are chosen per-wave using weighted probabilities.
-// Wave 1 favors easier foes; Wave 2 favors tougher foes; Wave 3 is always a boss.
+// Non-boss enemies are chosen per-wave.
+// As of this build: Wave 1 and Wave 2 are uniform-random across all non-boss enemies
+// (equal chance per enemy per wave). Wave 3 is always a boss.
 const BOSS_ENEMY_INDEX = ENEMIES.length - 1;
 const VERDANT_ENEMY_INDEX = Math.max(0, ENEMIES.findIndex((e) => e.profile === "smellEarth"));
 
@@ -5209,18 +5128,18 @@ const NON_BOSS_SORTED = [...NON_BOSS_ENEMY_INDICES]
   .map((i) => ({ i, s: enemyDifficultyScore(ENEMIES[i]) }))
   .sort((a, b) => a.s - b.s);
 
+// (Legacy weighting retained for potential future tuning; not used while uniform waves are enabled.)
 // Stronger contrast so wave 2 feels meaningfully tougher on average.
 const WAVE1_WEIGHTS_BY_RANK = [10, 6, 3, 1];
 const WAVE2_WEIGHTS_BY_RANK = [1, 3, 6, 9];
 
 function pickRandomEnemyIndexForWave(waveIndex) {
-  // Only randomize waves 1-2; boss is fixed.
-  const isWave2 = waveIndex === 1;
-  const weightsByRank = isWave2 ? WAVE2_WEIGHTS_BY_RANK : WAVE1_WEIGHTS_BY_RANK;
-
-  const indices = NON_BOSS_SORTED.map((x) => x.i);
-  const weights = NON_BOSS_SORTED.map((_, rank) => weightsByRank[rank] ?? 1);
-  return weightedPick(indices, weights);
+  // Equal chance per non-boss enemy on waves 1-2.
+  // Wave 3 is always boss elsewhere.
+  const pool = NON_BOSS_ENEMY_INDICES;
+  if (!pool.length) return 0;
+  const pick = Math.floor(Math.random() * pool.length);
+  return pool[clamp(pick, 0, pool.length - 1)];
 }
 
 /**
@@ -5231,19 +5150,9 @@ function buildEnemySetForBattle(playerLevel) {
   const pLvl = Math.max(1, toSafeInt(playerLevel, 1));
   const w1i = pickRandomEnemyIndexForWave(0);
 
-  // Wave 2: prefer tougher AND prefer variety (softly avoid repeating wave 1).
-  let w2i = pickRandomEnemyIndexForWave(1);
-  if (w2i === w1i && NON_BOSS_ENEMY_INDICES.length > 1) {
-    // 70% chance to reroll once for variety.
-    if (Math.random() < 0.70) {
-      const altPool = NON_BOSS_ENEMY_INDICES.filter((i) => i !== w1i);
-      // Use the same wave2 weighting, but restricted pool.
-      const altSorted = NON_BOSS_SORTED.filter((x) => altPool.includes(x.i));
-      const altIndices = altSorted.map((x) => x.i);
-      const altWeights = altSorted.map((_, rank) => WAVE2_WEIGHTS_BY_RANK[rank] ?? 1);
-      w2i = weightedPick(altIndices, altWeights);
-    }
-  }
+  // Wave 2: also uniform-random (independent of wave 1).
+  // Repeats are allowed (and do not skew equal per-wave odds).
+  const w2i = pickRandomEnemyIndexForWave(1);
 
   // Wave 3 is always the boss template.
   return [ENEMIES[w1i], ENEMIES[w2i], ENEMIES[BOSS_ENEMY_INDEX]];
