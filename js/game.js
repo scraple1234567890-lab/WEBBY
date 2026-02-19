@@ -151,6 +151,8 @@ if (root) {
     effectBanner: document.getElementById("effectBanner"),
     moveBanner: document.getElementById("moveBanner"),
     moveBannerText: document.getElementById("moveBannerText"),
+    bossAppears: document.getElementById("bossAppears"),
+
     buildTag: document.getElementById("buildTag"),
   };
 
@@ -503,7 +505,16 @@ if (root) {
     if (els.effectPreview instanceof HTMLElement) {
       // Empty content so :empty { display:none } collapses the row.
       els.effectPreview.innerHTML = "";
-      els.effectPreview.classList.remove("isGood", "isBad", "isNeutral");
+      // Remove all tone/tier classes so the next hover is always accurate.
+      els.effectPreview.classList.remove(
+        "isGood",
+        "isBad",
+        "isNeutral",
+        "isSuper",
+        "isEffective",
+        "isNot",
+        "isExtremeNot"
+      );
       els.effectPreview.classList.add("isNeutral");
       // Reset tooltip positioning (so it doesn't 'stick' somewhere)
       els.effectPreview.style.left = "";
@@ -606,6 +617,45 @@ if (root) {
     moveBannerTimer = window.setTimeout(() => banner.classList.remove("isShow"), 560);
   }
 
+
+
+// Boss intro callout ("BOSS APPEARS") on the battlefield.
+let __bossAppearsTimer = 0;
+
+function showBossAppearsCallout() {
+  const el = els.bossAppears;
+  if (!(el instanceof HTMLElement)) return;
+
+  if (__bossAppearsTimer) window.clearTimeout(__bossAppearsTimer);
+
+  // Play the boss stinger SFX when the callout appears.
+  playBossAppearsSfx();
+
+  // Show and (if allowed) animate.
+  el.hidden = false;
+  el.classList.remove("isShow");
+
+  if (prefersReducedMotion) {
+    // Keep it readable without animation, but still respect the 2s timing.
+    el.style.opacity = "1";
+    __bossAppearsTimer = window.setTimeout(() => {
+      el.style.opacity = "";
+      el.hidden = true;
+    }, 2000);
+    return;
+  }
+
+  // Force reflow to restart the CSS animation reliably.
+  // eslint-disable-next-line no-unused-expressions
+  el.offsetWidth;
+  el.classList.add("isShow");
+
+  __bossAppearsTimer = window.setTimeout(() => {
+    el.classList.remove("isShow");
+    el.hidden = true;
+  }, 2050);
+}
+
   // Center toast between fighters (used for Skill Point gain, etc.)
   let __centerToastTimer = 0;
 
@@ -680,33 +730,59 @@ function __getWaveClearAudio() {
   }
 }
 
+// --------------------
+// SFX: Boss appears callout
+// --------------------
+const BOSS_APPEARS_SFX_SRC = "assets/audio/boss-appears.mp3";
+let __bossAppearsAudio = null;
+
+function __getBossAppearsAudio() {
+  if (__bossAppearsAudio) return __bossAppearsAudio;
+  try {
+    const a = new Audio(BOSS_APPEARS_SFX_SRC);
+    a.preload = "auto";
+    a.volume = 0.9;
+    __bossAppearsAudio = a;
+    return a;
+  } catch {
+    return null;
+  }
+}
+
 function __primeWaveClearAudioOnce() {
   if (__waveClearPrimed) return;
   __waveClearPrimed = true;
 
-  const a = __getWaveClearAudio();
-  if (!a) return;
+  const wave = __getWaveClearAudio();
+  const boss = __getBossAppearsAudio();
+  if (!wave && !boss) return;
 
-  try {
-    const prevMuted = a.muted;
-    a.muted = true;
-    const p = a.play();
-    if (p && typeof p.then === "function") {
-      p.then(() => {
+  const prime = (a) => {
+    if (!a) return;
+    try {
+      const prevMuted = a.muted;
+      a.muted = true;
+      const p = a.play();
+      if (p && typeof p.then === "function") {
+        p.then(() => {
+          a.pause();
+          a.currentTime = 0;
+          a.muted = prevMuted;
+        }).catch(() => {
+          a.muted = prevMuted;
+        });
+      } else {
         a.pause();
         a.currentTime = 0;
         a.muted = prevMuted;
-      }).catch(() => {
-        a.muted = prevMuted;
-      });
-    } else {
-      a.pause();
-      a.currentTime = 0;
-      a.muted = prevMuted;
+      }
+    } catch {
+      // ignore
     }
-  } catch {
-    // ignore
-  }
+  };
+
+  prime(wave);
+  prime(boss);
 }
 
 // Prime audio on the first user gesture (needed on many browsers)
@@ -716,6 +792,20 @@ function __primeWaveClearAudioOnce() {
 
 function playWaveClearSfx() {
   const a = __getWaveClearAudio();
+  if (!a) return;
+  try {
+    a.currentTime = 0;
+  } catch {
+    // ignore
+  }
+  const p = a.play();
+  if (p && typeof p.catch === "function") {
+    p.catch(() => {});
+  }
+}
+
+function playBossAppearsSfx() {
+  const a = __getBossAppearsAudio();
   if (!a) return;
   try {
     a.currentTime = 0;
@@ -1447,12 +1537,14 @@ function renderSpellMenu(spells, isPlayerTurn, focus, boundExtra) {
 
     const textSpan = document.createElement("span");
     textSpan.className = "btnTypeText";
-    textSpan.textContent = spell.name;
+    const pow = toSafeInt(spell.baseDamage, 0);
+    textSpan.textContent = `${spell.name} (Pow ${pow})`;
 
     btn.replaceChildren(iconSpan, textSpan);
 
     const tipBits = [];
     tipBits.push(String(cost) + " Mana");
+    tipBits.push(`Pow ${toSafeInt(spell.baseDamage, 0)}`);
     tipBits.push("x" + fmtMult(typed.eff));
     if (extra) tipBits.push(extra);
     btn.title = tipBits.join(" • ");
@@ -2386,7 +2478,7 @@ function renderSpellPickChoices(poolIds) {
 
       const dmgPill = document.createElement("span");
       dmgPill.className = "pill";
-      dmgPill.textContent = `Base ${toSafeInt(spell.baseDamage, 0)} dmg`;
+      dmgPill.textContent = `Pow ${toSafeInt(spell.baseDamage, 0)}`;
 
       meta.appendChild(typeSpan);
       meta.appendChild(costPill);
@@ -2510,7 +2602,7 @@ function openLootScreen(title, subtitle, line, summary = []) {
   if (els.lootSubtitle instanceof HTMLElement) els.lootSubtitle.textContent = subtitle || "";
   if (els.lootLine instanceof HTMLElement) els.lootLine.textContent = line || "No items.";
 
-  // Summary chips (XP, level ups, skill points)
+  // Summary chips (level ups, skill points, spell choices)
   if (els.lootSummary instanceof HTMLElement) {
     els.lootSummary.innerHTML = "";
     const items = Array.isArray(summary) ? summary : [];
@@ -2591,25 +2683,45 @@ function resolveLootDismissal(lr) {
   state.player.guarding = false;
   state.player.evading = false;
 
-  // Spawn next enemy.
-  const nextIndex = lr.nextIndex;
-  state.wave = nextIndex;
-  state.enemy = makeEnemy(state.wave, state.enemySet, state.player.level);
+// Spawn next enemy.
+const nextIndex = lr.nextIndex;
+state.wave = nextIndex;
+state.enemy = makeEnemy(state.wave, state.enemySet, state.player.level);
 
-  // Boss wave: switch to boss theme.
-  if (state.wave >= 2) __enterBossMusic();
+const isBossWave = state.wave >= 2 || state.enemy.profile === "bossEclipse";
 
-  addLog(`Wave ${state.wave + 1}: ${state.enemy.name} arrives.`);
-  addLog("Your turn.");
+// Boss wave: switch to boss theme.
+if (isBossWave) __enterBossMusic();
 
-  setPhase("player");
+addLog(`Wave ${state.wave + 1}: ${state.enemy.name} arrives.`);
 
-  // Set new intent for readability.
-  state.enemy.intent = computeEnemyIntent();
-  renderIntent(state.enemy.intent);
+// Set new intent for readability.
+state.enemy.intent = computeEnemyIntent();
+renderIntent(state.enemy.intent);
 
-  setEffectBanner("—", "neutral");
+setEffectBanner("—", "neutral");
+
+if (isBossWave) {
+  // Brief pre-combat callout, then give control to the player.
+  setPhase("resolving");
   render();
+  showBossAppearsCallout();
+
+  const bid = state.battleId;
+  const waveAtShow = state.wave;
+  window.setTimeout(() => {
+    if (!state || state.battleId !== bid) return;
+    if (state.wave !== waveAtShow) return;
+    addLog("Your turn.");
+    setPhase("player");
+    render();
+  }, 2000);
+  return;
+}
+
+addLog("Your turn.");
+setPhase("player");
+render();
 }
 
 
@@ -3163,40 +3275,64 @@ SmellTaste: { Wind: 0.9, Water: 1.0, Fire: 1.0, Sight: 0.9, Earth: 1.0, Touch: 1
    */
   function renderEffectPreview(move) {
     if (!(els.effectPreview instanceof HTMLElement)) return;
+    const pv = els.effectPreview;
+
+    const clearToneClasses = () => {
+      pv.classList.remove(
+        "isGood",
+        "isBad",
+        "isNeutral",
+        "isSuper",
+        "isEffective",
+        "isNot",
+        "isExtremeNot"
+      );
+    };
 
     // Custom preview (used for non-typed actions like Heal).
     if (move && typeof move.customHtml === "string" && move.customHtml.trim()) {
       const tone = move.tone === "good" || move.tone === "bad" ? move.tone : "neutral";
-      els.effectPreview.classList.remove("isGood", "isBad", "isNeutral");
-      if (tone === "good") els.effectPreview.classList.add("isGood");
-      else if (tone === "bad") els.effectPreview.classList.add("isBad");
-      else els.effectPreview.classList.add("isNeutral");
-      els.effectPreview.innerHTML = move.customHtml;
+      clearToneClasses();
+      if (tone === "good") pv.classList.add("isGood");
+      else if (tone === "bad") pv.classList.add("isBad");
+      else pv.classList.add("isNeutral");
+      pv.innerHTML = move.customHtml;
       return;
     }
 
+    // Typed preview: match the *exact* 5-tier outcomes and colors used by the type chart.
     const eff = typeMultiplier(move.type, state.enemy.types);
-    const tier = effectivenessTierLabel(eff);
+    const tier = effectivenessTier(eff);
 
-    els.effectPreview.classList.remove("isGood", "isBad", "isNeutral");
-    if (tier.tone === "good") els.effectPreview.classList.add("isGood");
-    else if (tier.tone === "bad") els.effectPreview.classList.add("isBad");
-    else els.effectPreview.classList.add("isNeutral");
+    clearToneClasses();
+    if (tier.score === 2) pv.classList.add("isSuper");
+    else if (tier.score === 1) pv.classList.add("isEffective");
+    else if (tier.score === -1) pv.classList.add("isNot");
+    else if (tier.score === -2) pv.classList.add("isExtremeNot");
+    else pv.classList.add("isNeutral");
 
     // Mana cost note (only for magic)
-    const extra = state.player.bound > 0 ? 1 : 0;
-    const cost = move.baseCost > 0 ? move.baseCost + extra : 0;
+    const boundExtra = state.player.bound > 0 ? 1 : 0;
+    const cost = move.baseCost > 0 ? move.baseCost + boundExtra : 0;
     const needs = cost > 0 && state.player.focus < cost;
 
-    const needText = needs ? `Need ${cost} Mana` : (cost > 0 ? `${cost} Mana` : "+1 Mana");
-    const meta = move.baseCost > 0 ? needText : "+1 Mana";
+    const costText = needs ? `Need ${cost} Mana` : (cost > 0 ? `${cost} Mana` : "+1 Mana");
 
-    // Keep it short and readable
+    const power = Math.max(0, toSafeInt(move.basePower, 0));
+    const powerText = power > 0 ? `Pow ${power}` : "";
+
+    // Extra helper text (spell hook summary, etc.)
     const extraText = (move && typeof move.extra === "string" && move.extra.trim()) ? move.extra.trim() : "";
-    const extraBit = extraText ? ` • ${extraText}` : "";
-    els.effectPreview.innerHTML =
+
+    // Match the chart’s format (xN) and keep the tooltip compact.
+    const metaParts = [`x${fmtMult(eff)}`, costText];
+    if (powerText) metaParts.unshift(powerText);
+    if (extraText) metaParts.push(extraText);
+    const meta = metaParts.join(" • ");
+
+    pv.innerHTML =
       `${move.name}: <span class="rpgEffectPreviewText">${tier.label}</span> ` +
-      `<span class="rpgEffectPreviewMeta">(${meta}${extraBit})</span>`;
+      `<span class="rpgEffectPreviewMeta">(${meta})</span>`;
   }
 
 /**
@@ -3276,9 +3412,9 @@ function positionEffectPreview(anchorEl) {
     els.hintLine.textContent = [baseTip, bindNote].filter(Boolean).join(" ");
   }
 
-function setPreviewMove(name, type, baseCost, extra = "", anchorEl = null) {
+function setPreviewMove(name, type, baseCost, basePower = 0, extra = "", anchorEl = null) {
     previewVisible = true;
-    previewMove = { name, type, baseCost, extra };
+    previewMove = { name, type, baseCost, basePower, extra };
     renderEffectPreview(previewMove);
     positionEffectPreview(anchorEl);
   }
@@ -6172,7 +6308,7 @@ function persistPlayerProgress() {
       // Add a small type icon next to the Attack button label.
       const atkIcon = typeIcon(atkType);
       els.attackBtn.classList.add("hasTypeIcon");
-      els.attackBtn.innerHTML = `<span class="btnTypeIcon" aria-hidden="true">${atkIcon}</span><span class="btnTypeText">Attack (${atkLabel} | +1 Mana)</span>`;
+      els.attackBtn.innerHTML = `<span class="btnTypeIcon" aria-hidden="true">${atkIcon}</span><span class="btnTypeText">Attack (${atkLabel} | Pow 5)</span>`;
       els.attackBtn.dataset.type = atkType;
     }
     // Spells unlock on level-up and are rendered dynamically.
@@ -6418,7 +6554,6 @@ function persistPlayerProgress() {
     const title = isFinal ? "Victory!" : `Wave ${state.wave + 1} cleared!`;
     const subtitle = isFinal ? "You collect your spoils." : "You collect your spoils.";
     const summary = [];
-    if (xpRes && xpRes.xpAdded) summary.push({ kind: "xp", text: `✨ XP +${xpRes.xpAdded}` });
     if (xpRes && xpRes.leveled && xpRes.levelsGained > 0) {
       summary.push({ kind: "lvl", text: `🌟 Level ${xpRes.levelBefore} → ${xpRes.levelAfter}` });
     }
@@ -8080,7 +8215,7 @@ function playerFireAttack() {
         if (!s || s === "A direct damage spell.") return "";
         return s;
       })();
-      setPreviewMove(sp.name, sp.type, sp.baseCost, extra, btn);
+      setPreviewMove(sp.name, sp.type, sp.baseCost, toSafeInt(sp.baseDamage, 0), extra, btn);
     };
 
     els.magicMenu.addEventListener("mouseover", preview);
@@ -8170,19 +8305,20 @@ function playerFireAttack() {
    * @param {MagicType | (() => MagicType)} typeOrFn
    * @param {number | (() => number)} baseCostOrFn
    */
-  const wirePreview = (btn, nameOrFn, typeOrFn, baseCostOrFn) => {
+  const wirePreview = (btn, nameOrFn, typeOrFn, baseCostOrFn, basePowerOrFn = 0) => {
     if (!(btn instanceof HTMLElement)) return;
     const resolveName = () => (typeof nameOrFn === "function" ? nameOrFn() : nameOrFn);
     const resolveType = () => (typeof typeOrFn === "function" ? typeOrFn() : typeOrFn);
     const resolveCost = () => (typeof baseCostOrFn === "function" ? baseCostOrFn() : baseCostOrFn);
-    const show = () => setPreviewMove(resolveName(), resolveType(), resolveCost(), "", btn);
+    const resolvePower = () => (typeof basePowerOrFn === "function" ? basePowerOrFn() : basePowerOrFn);
+    const show = () => setPreviewMove(resolveName(), resolveType(), resolveCost(), resolvePower(), "", btn);
     const hide = () => clearEffectPreview();
     btn.addEventListener("mouseenter", show);
     btn.addEventListener("focus", show);
     btn.addEventListener("mouseleave", hide);
     btn.addEventListener("blur", hide);
   };
-  wirePreview(els.attackBtn, "Attack", () => playerPrimaryType(), 0);
+  wirePreview(els.attackBtn, "Attack", () => playerPrimaryType(), 0, 5);
   // Heal has no type matchup, so it uses a custom preview showing exact HP restored.
   const wireHealPreview = (btn) => {
     if (!(btn instanceof HTMLElement)) return;
@@ -8193,7 +8329,7 @@ function playerFireAttack() {
     btn.addEventListener("blur", clearEffectPreview);
   };
   wireHealPreview(els.healBtn);
-  wirePreview(els.windBtn, "Wind attack", "Wind", 2);
+  wirePreview(els.windBtn, "Wind attack", "Wind", 2, 4);
   wirePreview(
     els.secondaryTypeBtn,
     () => {
@@ -8208,12 +8344,24 @@ function playerFireAttack() {
     () => {
       const t = Array.isArray(state.player.types) ? state.player.types[1] : null;
       return t ? magicBaseCost(t) : 2;
+    },
+    () => {
+      const t = Array.isArray(state.player.types) ? state.player.types[1] : null;
+      if (t === "Fire") return 6;
+      if (t === "Water") return 5;
+      if (t === "Sound") return 5;
+      if (t === "SmellTaste") return 4;
+      if (t === "Wind") return 4;
+      if (t === "Sight") return 5;
+      if (t === "Earth") return 5;
+      if (t === "Touch") return 4;
+      return 5;
     }
   );
-  wirePreview(els.waterBtn, "Water attack", "Water", 2);
-  wirePreview(els.soundBtn, "Sound attack", "Sound", 2);
-  wirePreview(els.smellTasteBtn, "Smell/Taste attack", "SmellTaste", 2);
-  wirePreview(els.fireBtn, "Fire attack", "Fire", 3);
+  wirePreview(els.waterBtn, "Water attack", "Water", 2, 5);
+  wirePreview(els.soundBtn, "Sound attack", "Sound", 2, 5);
+  wirePreview(els.smellTasteBtn, "Smell/Taste attack", "SmellTaste", 2, 4);
+  wirePreview(els.fireBtn, "Fire attack", "Fire", 3, 6);
 
 // Initialize (hero → location)
   state = makeLobbyState();

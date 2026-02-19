@@ -65,7 +65,8 @@
     <button class="btn ghost rpgTopBtn" id="musicBtn" type="button" title="Toggle background music"><span aria-hidden="true" class="rpgTopBtnIcon">🎵</span><span id="musicBtnLabel">Music</span></button>
     <button class="btn ghost rpgTopBtn" id="explainBtn" type="button"><span aria-hidden="true" class="rpgTopBtnIcon">?</span>Explain</button>
   </div>
-<div aria-label="Battlefield" class="rpgGrid" role="group">
+	<article aria-label="Battlefield" class="rpgBattlefield">
+	<div aria-label="Combatants" class="rpgGrid" role="group">
 <article aria-label="Player" class="post rpgCard" id="playerCard">
 <div class="rpgCardTop">
 <div class="rpgStatStack">
@@ -111,13 +112,13 @@
 <p class="rpgHpText rpgHpText--inline" id="enemyHpText">HP 18 / 18</p>
 </div></div>
 </div>
-</article></div>
+	</article></div>
 
-
-</div>
-<article aria-label="Battle scene" class="post rpgStage"><div aria-label="A tiny battle scene: the player faces a rival mage." class="rpgStageInner" role="img">
+	<div aria-label="Battle scene" class="rpgStage">
+	  <div aria-label="A tiny battle scene: the player faces a rival mage." class="rpgStageInner" role="img">
 <div aria-hidden="true" class="rpgFxLayer" id="fxLayer"></div>
 <div aria-hidden="true" class="rpgMoveBanner" data-type="Sight" id="moveBanner"><span class="rpgMoveBannerText" id="moveBannerText"></span></div>
+<div aria-hidden="true" class="rpgBossAppears" id="bossAppears" hidden><span class="rpgBossAppearsText">BOSS APPEARS</span></div>
 <div aria-hidden="true" class="rpgFoe rpgFoe--player" id="playerSprite">
 <img alt="" class="rpgSpriteImg" id="playerSpriteImg" loading="lazy" src="./assets/images/player-brown.png"/>
 <span aria-hidden="true" class="rpgShield" id="playerShield"></span>
@@ -126,8 +127,11 @@
 <img alt="" class="rpgSpriteImg" id="enemySpriteImg" loading="lazy" src="./assets/images/enemy-blue.png"/>
 <span aria-hidden="true" class="rpgShield" id="enemyShield"></span>
 </div>
-</div>
-</article>
+	</div>
+	</div>
+	</article>
+
+	</div>
 <div aria-label="Actions" class="rpgActions">
 <div aria-live="polite" class="rpgEffectPreview isNeutral" id="effectPreview"></div>
 

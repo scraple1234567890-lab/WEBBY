@@ -2737,6 +2737,7 @@ body.gamePage {
   letter-spacing: .02em;
   text-transform: uppercase;
   user-select: none;
+  filter: saturate(1.18) contrast(1.06);
 }
 
 
@@ -2890,7 +2891,7 @@ body.gamePage #restartBtn{
   padding: 8px 10px;
   border-radius: 14px;
   --pvGlow: rgba(255,255,255,0);
-  background: rgb(10 10 18);
+  background: var(--pvBg, rgb(10 10 18));
   border: 1px solid rgba(255,255,255,0.16);
   box-shadow: 0 14px 38px rgba(0,0,0,0.60), 0 0 0 1px rgba(255,255,255,0.08) inset, 0 10px 24px var(--pvGlow);
   text-shadow: 0 1px 0 rgba(0,0,0,0.55);
@@ -2898,11 +2899,12 @@ body.gamePage #restartBtn{
   font-weight: 900;
   letter-spacing: 0.2px;
   user-select: none;
+  filter: saturate(1.18) contrast(1.06);
 }
 
 
-.rpgEffectPreviewText{ opacity: 0.92; font-weight: 800; }
-.rpgEffectPreviewMeta{ opacity: 0.82; font-weight: 800; font-size: 0.84rem; }
+.rpgEffectPreviewText{ opacity: 1; font-weight: 900; }
+.rpgEffectPreviewMeta{ opacity: 0.95; font-weight: 900; font-size: 0.84rem; }
 .rpgEffectPreview.isGood{
   --pvGlow: rgba(107,226,139,0.16);
   border-color: color-mix(in srgb, #6be28b 75%, var(--border));
@@ -2914,9 +2916,67 @@ body.gamePage #restartBtn{
   box-shadow: 0 14px 38px rgba(0,0,0,0.60), 0 0 0 1px rgba(255,255,255,0.08) inset, 0 0 0 1px rgba(255,77,77,0.20) inset, 0 10px 24px var(--pvGlow);
 }
 .rpgEffectPreview.isNeutral{
-  --pvGlow: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0.16);
+  /* Opaque, lightly frosted neutral */
+  --pvBg: rgba(255,255,255,0.10); /* fallback */
+  --pvBg: color-mix(in srgb, white 14%, rgb(10 10 18));
+  --pvGlow: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.22);
+  box-shadow: 0 14px 38px rgba(0,0,0,0.60),
+              0 0 0 1px rgba(255,255,255,0.10) inset,
+              0 10px 24px var(--pvGlow);
 }
+
+/* 5-tier effectiveness styling for the hover preview (match the type chart grid) */
+.rpgEffectPreview.isEffective{
+  /* More solid green tint (match type chart tier but readable in a small pill) */
+  --pvBg: rgba(107,226,139,0.22); /* fallback */
+  --pvBg: color-mix(in srgb, #6be28b 34%, rgb(10 10 18));
+  --pvGlow: rgba(107,226,139,0.30);
+  border-color: rgba(107,226,139,0.60);
+  box-shadow: 0 14px 38px rgba(0,0,0,0.60),
+              0 0 0 1px rgba(255,255,255,0.12) inset,
+              0 0 0 1px rgba(107,226,139,0.32) inset,
+              0 0 22px rgba(107,226,139,0.22),
+              0 14px 30px var(--pvGlow);
+}
+.rpgEffectPreview.isSuper{
+  /* Stronger green tint */
+  --pvBg: rgba(107,226,139,0.34); /* fallback */
+  --pvBg: color-mix(in srgb, #6be28b 46%, rgb(10 10 18));
+  --pvGlow: rgba(107,226,139,0.44);
+  border-color: rgba(107,226,139,0.86);
+  box-shadow: 0 14px 38px rgba(0,0,0,0.60),
+              0 0 0 1px rgba(255,255,255,0.14) inset,
+              0 0 0 1px rgba(107,226,139,0.44) inset,
+              0 0 28px rgba(107,226,139,0.26),
+              0 16px 34px var(--pvGlow);
+}
+.rpgEffectPreview.isNot{
+  /* More solid red tint */
+  --pvBg: rgba(255,77,77,0.20); /* fallback */
+  --pvBg: color-mix(in srgb, #ff4d4d 32%, rgb(10 10 18));
+  --pvGlow: rgba(255,77,77,0.30);
+  border-color: rgba(255,77,77,0.58);
+  box-shadow: 0 14px 38px rgba(0,0,0,0.60),
+              0 0 0 1px rgba(255,255,255,0.12) inset,
+              0 0 0 1px rgba(255,77,77,0.30) inset,
+              0 0 22px rgba(255,77,77,0.22),
+              0 14px 30px var(--pvGlow);
+}
+.rpgEffectPreview.isExtremeNot{
+  /* Stronger red tint */
+  --pvBg: rgba(255,77,77,0.34); /* fallback */
+  --pvBg: color-mix(in srgb, #ff4d4d 46%, rgb(10 10 18));
+  --pvGlow: rgba(255,77,77,0.46);
+  border-color: rgba(255,77,77,0.88);
+  box-shadow: 0 14px 38px rgba(0,0,0,0.60),
+              0 0 0 1px rgba(255,255,255,0.14) inset,
+              0 0 0 1px rgba(255,77,77,0.42) inset,
+              0 0 28px rgba(255,77,77,0.26),
+              0 16px 34px var(--pvGlow);
+}
+
+
 
 /* Explain modal (Focus + Types) */
 body.modalOpen {
@@ -3950,6 +4010,67 @@ html[data-theme="light"] .rpgTileAvatar{
 }
 
 /* ============================
+   Battlefield wrapper (stats + scene share one big background)
+   ============================ */
+
+.rpgBattlefield{
+  position: relative;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--border) 76%, var(--accent2) 10%);
+  background:
+    /* Soft dark veil for readability */
+    linear-gradient(180deg, rgba(10, 6, 22, 0.28), rgba(10, 6, 22, 0.78)),
+    /* Magical scene backdrop */
+    url("./assets/images/magic-battle-bg.png") center / cover no-repeat,
+    /* Subtle arcane glows */
+    radial-gradient(120px 80px at 22% 24%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 70%),
+    radial-gradient(150px 100px at 78% 24%, color-mix(in srgb, var(--accent2) 18%, transparent), transparent 70%);
+  overflow: hidden;
+}
+
+.rpgBattlefield::before{
+  content: "";
+  position: absolute;
+  left: -50px;
+  right: -50px;
+  bottom: -90px;
+  height: 170px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--accent3) 20%, transparent), transparent 60%);
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+.rpgBattlefield > *{
+  position: relative;
+  z-index: 1;
+}
+
+.rpgBattlefield .rpgGrid{
+  margin-bottom: 12px;
+}
+
+/* Make the stat cards feel like glass over the battlefield */
+.rpgBattlefield .rpgCard{
+  background: color-mix(in srgb, var(--panel2) 74%, rgba(10,6,22,0.38));
+  border-color: color-mix(in srgb, var(--border) 70%, rgba(255,255,255,0.15));
+  backdrop-filter: blur(6px);
+}
+
+/* Stage becomes a transparent layout container (background is on .rpgBattlefield) */
+.rpgBattlefield .rpgStage{ padding: 0; }
+
+.rpgBattlefield .rpgStageInner{
+  /* A little shorter so there's less empty "sky" above the sprites */
+  height: 320px;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--border) 65%, rgba(255,255,255,0.12));
+}
+
+.rpgBattlefield .rpgStageInner::before{ display: none; }
+
+/* ============================
    Battle FX layer (type-based)
    ============================ */
 
@@ -4008,6 +4129,45 @@ html[data-theme="light"] .rpgTileAvatar{
 .rpgMoveBanner[data-type="Touch"]{ --accent: var(--type-touch); }
 .rpgMoveBanner[data-type="Sound"]{ --accent: var(--type-sound); }
 .rpgMoveBanner[data-type="SmellTaste"]{ --accent: var(--type-smelltaste); }
+
+/* Boss intro callout ("BOSS APPEARS") */
+.rpgBossAppears{
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  transform: translate(-50%, -50%);
+  z-index: 8;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.rpgBossAppearsText{
+  display: inline-block;
+  padding: 12px 18px;
+  border-radius: 999px;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+  font-size: clamp(16px, 2.6vw, 22px);
+  line-height: 1;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.98);
+  background: rgba(10, 6, 18, 0.96);
+  border: 2px solid color-mix(in srgb, var(--accent2) 70%, white 8%);
+  box-shadow: 0 18px 44px rgba(0,0,0,0.38);
+  text-shadow: 0 1px 0 rgba(0,0,0,0.55);
+}
+
+.rpgBossAppears.isShow{
+  animation: rpg-boss-appears 2000ms ease-in-out forwards;
+}
+
+@keyframes rpg-boss-appears{
+  0%{ opacity: 0; transform: translate(-50%, -50%) scale(0.96); filter: blur(0.6px); }
+  18%{ opacity: 1; transform: translate(-50%, -50%) scale(1.00); filter: blur(0px); }
+  70%{ opacity: 1; }
+  100%{ opacity: 0; transform: translate(-50%, -56%) scale(1.02); }
+}
+
 
 .rpgFx{
   position: absolute;
@@ -4487,13 +4647,14 @@ html[data-theme="light"] .rpgTileAvatar{
    (Desktop/tablet keeps the exact same layout.) */
 @media (max-width: 520px){
   body.gamePage .rpgStageInner{
-    height: 230px;
+    /* Reduce extra headroom on small screens */
+    height: 250px;
   }
 
   body.gamePage .rpgFoe{
     width: clamp(120px, 38vw, 170px);
     height: clamp(150px, 48vw, 210px);
-    bottom: 12px;
+    bottom: 10px;
   }
   body.gamePage .rpgFoe--player{ left: 10px; }
   body.gamePage .rpgFoe--enemy{ right: 10px; }
@@ -4517,6 +4678,51 @@ html[data-theme="light"] .rpgTileAvatar{
   body.gamePage .rpgFx--enemy{ right: 12px; }
   body.gamePage .rpgFloat--player{ left: 38px; }
   body.gamePage .rpgFloat--enemy{ right: 38px; }
+
+  /* Mobile polish: make the action bar feel less cramped, without changing desktop */
+  body.gamePage .rpgActions{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  }
+
+  body.gamePage .rpgEffectPreview{
+    grid-column: 1 / -1;
+  }
+
+  /* Give Attack a full row so the dynamic label never squishes */
+  body.gamePage #attackBtn{
+    grid-column: 1 / -1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Make all controls fill their grid cell cleanly */
+  body.gamePage .rpgActions .btn{
+    min-width: 0;
+    width: 100%;
+    font-size: 0.92rem;
+    padding: 10px 12px;
+  }
+
+  body.gamePage .rpgMagicWrap{
+    width: auto;
+  }
+  body.gamePage .rpgMagicToggle{
+    width: 100%;
+  }
+
+  /* If a menu is open, let it span full width so the list isn't squeezed */
+  body.gamePage .rpgMagicWrap:has(.rpgMagicToggle[aria-expanded="true"]),
+  body.gamePage .rpgInventoryWrap:has(.rpgMagicToggle[aria-expanded="true"]){
+    grid-column: 1 / -1;
+  }
+
+  /* Slightly tighter stat typography on very small screens */
+  body.gamePage .rpgTypeLine{ font-size: 0.84rem; }
+  body.gamePage .rpgResourceText{ font-size: 0.86rem; }
 }
 
 
@@ -6287,6 +6493,12 @@ body.gamePage .rpgWrap{
 body.gamePage .rpgGrid{
   gap: 10px;
 }
+body.gamePage .rpgBattlefield{
+  padding: 14px;
+}
+body.gamePage .rpgBattlefield .rpgGrid{
+  margin-bottom: 10px;
+}
 body.gamePage .rpgCard{
   padding: 14px;
 }
@@ -6302,13 +6514,18 @@ body.gamePage .rpgMiniBar{
   height: 8px;
 }
 body.gamePage .rpgStage{
-  padding: 12px;
+  padding: 0;
 }
 body.gamePage .rpgStageInner{
-  height: 250px;
+  /* Shorter stage so sprites sit higher in-frame */
+  height: 300px;
+}
+body.gamePage .rpgFoe{
+  /* Lift sprites up a touch (less empty space above their heads) */
+  bottom: 28px;
 }
 @media (min-width: 860px){
-  body.gamePage .rpgStageInner{ height: 280px; }
+  body.gamePage .rpgStageInner{ height: 320px; }
 }
 body.gamePage .rpgActions{
   padding: 10px;
@@ -6321,23 +6538,10 @@ body.gamePage .btn{
   font-size: 0.95rem;
 }
 body.gamePage .rpgEffectPreview{
-  /* Compact pill: don't force a full-width row */
-  flex: 0 1 auto;
-  width: fit-content;
-  max-width: 100%;
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: 6px 10px;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 8px 10px;
-  border-radius: 14px;
-  background: rgb(10 10 18);
-  border: 1px solid rgba(255,255,255,0.16);
-  color: rgba(255,255,255,0.95);
-  font-weight: 900;
-  letter-spacing: 0.2px;
+  /* Keep the hover-preview visuals (glow/tint) from the global rules; only allow sizing tweaks here. */
+  max-width: min(520px, calc(100vw - 24px));
 }
+
 body.gamePage .rpgHint{
   margin-top: 4px;
   padding: 6px 10px;
