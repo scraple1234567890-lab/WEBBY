@@ -68,11 +68,6 @@ if (root) {
 
     // Compendium (codex)
     codexBtn: document.getElementById("codexBtn"),
-
-    // Background music (game page only)
-    musicBtn: document.getElementById("musicBtn"),
-    musicBtnLabel: document.getElementById("musicBtnLabel"),
-
     codexModal: document.getElementById("codexModal"),
     codexClose: document.getElementById("codexClose"),
     codexOk: document.getElementById("codexOk"),
@@ -91,16 +86,6 @@ if (root) {
     spellPickLater: document.getElementById("spellPickLater"),
     spellPickHint: document.getElementById("spellPickHint"),
 
-    // Perks (skill points)
-    perkBtn: document.getElementById("perkBtn"),
-    perkModal: document.getElementById("perkModal"),
-    perkClose: document.getElementById("perkClose"),
-    perkOk: document.getElementById("perkOk"),
-    perkPoints: document.getElementById("perkPoints"),
-    perkHeroLine: document.getElementById("perkHeroLine"),
-    perkDetails: document.getElementById("perkDetails"),
-    perkList: document.getElementById("perkList"),
-
     // Location picker (pre-combat)
     locationModal: document.getElementById("locationModal"),
     locationChoices: document.getElementById("locationChoices"),
@@ -117,9 +102,8 @@ if (root) {
     lootModal: document.getElementById("lootModal"),
     lootTitle: document.getElementById("lootTitle"),
     lootSubtitle: document.getElementById("lootSubtitle"),
-    lootSummary: document.getElementById("lootSummary"),
     lootLine: document.getElementById("lootLine"),
-    lootContinueBtn: document.getElementById("lootContinueBtn"),
+    lootAutoNote: document.getElementById("lootAutoNote"),
 
     // Defeat screen (when player HP hits 0)
     defeatModal: document.getElementById("defeatModal"),
@@ -606,48 +590,6 @@ if (root) {
     moveBannerTimer = window.setTimeout(() => banner.classList.remove("isShow"), 560);
   }
 
-  // Center toast between fighters (used for Skill Point gain, etc.)
-  let __centerToastTimer = 0;
-
-  /**
-   * Spawn a brief center toast on the battlefield (between the sprites).
-   * @param {string} text
-   * @param {string} kind
-   */
-  function spawnCenterToast(text, kind = "sp") {
-    if (prefersReducedMotion) return;
-    if (!(els.fxLayer instanceof HTMLElement)) return;
-
-    const t = document.createElement("div");
-    t.className = `rpgCenterToast rpgCenterToast--${kind}`;
-    t.textContent = String(text || "");
-    els.fxLayer.appendChild(t);
-
-    const kill = () => {
-      t.removeEventListener("animationend", kill);
-      if (t.parentElement) t.parentElement.removeChild(t);
-    };
-
-    // Remove on animation end (and also via timeout as a safety net).
-    t.addEventListener("animationend", kill, { once: true });
-    window.setTimeout(kill, 850);
-
-    if (__centerToastTimer) window.clearTimeout(__centerToastTimer);
-    __centerToastTimer = window.setTimeout(() => {}, 0);
-  }
-
-  /**
-   * Show a brief Skill Point notification between characters.
-   * @param {number} n
-   */
-  function showSkillPointToast(n) {
-    const nn = Math.max(0, toSafeInt(n, 0));
-    if (nn <= 0) return;
-    const label = nn === 1 ? "+1 Skill Point" : `+${nn} Skill Points`;
-    spawnCenterToast(label, "sp");
-  }
-
-
 
 
   function stageShake() {
@@ -727,284 +669,6 @@ function playWaveClearSfx() {
     p.catch(() => {});
   }
 }
-
-
-  // --------------------
-  // Background music (game page only)
-  // --------------------
-  const MUSIC_TRACKS = [
-    { src: "assets/audio/crystal-fields-of-aeria.mp3", title: "Crystal Fields of Aeria" },
-    { src: "assets/audio/crystal-fields-of-aeria-alt.mp3", title: "Crystal Fields of Aeria (Alt)" },
-  ];
-
-  const MUSIC_PREF_KEY = "rpg_music_enabled_v1";
-  const MUSIC_VOL_KEY = "rpg_music_volume_v1";
-
-  let __musicAudio = null;
-  let __musicIndex = 0;
-  let __musicEnabled = true;
-  let __musicNeedGesture = false;
-  let __musicWasPlayingBeforeHide = false;
-
-  // Boss music (plays during boss wave)
-  const BOSS_TRACK = { src: "assets/audio/arcane-showdown.mp3", title: "Arcane Showdown" };
-
-  let __bossAudio = null;
-  let __bossActive = false;
-  let __bossNeedGesture = false;
-  let __savedBg = null; // {idx:number,time:number,wasPlaying:boolean}
-
-  function __getBossAudio() {
-    if (__bossAudio) return __bossAudio;
-    try {
-      const a = new Audio();
-      a.preload = "auto";
-      a.loop = true;
-      a.volume = 0.35;
-      __bossAudio = a;
-      return a;
-    } catch {
-      return null;
-    }
-  }
-
-  function __pauseAllMusic() {
-    const bg = __getMusicAudio();
-    if (bg) { try { bg.pause(); } catch {} }
-    const b = __bossAudio;
-    if (b) { try { b.pause(); } catch {} }
-  }
-
-  function __tryStartBossMusic() {
-    if (!__musicEnabled) return;
-    if (!__bossActive) return;
-    const a = __getBossAudio();
-    if (!a) return;
-    if (!a.src) a.src = BOSS_TRACK.src;
-    const p = a.play();
-    if (p && typeof p.then === "function") {
-      p.then(() => { __bossNeedGesture = false; }).catch(() => { __bossNeedGesture = true; });
-    }
-  }
-
-  function __enterBossMusic() {
-    if (__bossActive) return;
-    __bossActive = true;
-
-    // Snapshot current background state so we can resume after the boss.
-    const bg = __getMusicAudio();
-    let time = 0;
-    let wasPlaying = false;
-    if (bg) {
-      try { time = bg.currentTime || 0; } catch {}
-      wasPlaying = !bg.paused;
-      try { bg.pause(); } catch {}
-    }
-    __savedBg = { idx: __musicIndex, time, wasPlaying };
-
-    const b = __getBossAudio();
-    if (!b) return;
-    // Match volume to the current background music volume.
-    try { b.volume = bg ? bg.volume : b.volume; } catch {}
-    b.src = BOSS_TRACK.src;
-    try { b.currentTime = 0; } catch {}
-    __tryStartBossMusic();
-  }
-
-  function __exitBossMusic() {
-    if (!__bossActive) return;
-    __bossActive = false;
-
-    const b = __bossAudio;
-    if (b) {
-      try { b.pause(); } catch {}
-      try { b.currentTime = 0; } catch {}
-    }
-
-    if (!__musicEnabled) { __savedBg = null; return; }
-    const bg = __getMusicAudio();
-    if (!bg) { __savedBg = null; return; }
-
-    const saved = __savedBg;
-    __savedBg = null;
-    if (saved && typeof saved.idx === "number") {
-      __setMusicTrack(saved.idx);
-      try { bg.currentTime = saved.time || 0; } catch {}
-      if (saved.wasPlaying) __tryStartMusic();
-    } else {
-      __tryStartMusic();
-    }
-  }
-
-
-  function __musicLsGet(key) {
-    try { return window.localStorage.getItem(key); } catch { return null; }
-  }
-
-  function __musicLsSet(key, val) {
-    try { window.localStorage.setItem(key, val); } catch { /* ignore */ }
-  }
-
-  function __getMusicAudio() {
-    if (__musicAudio) return __musicAudio;
-    try {
-      const a = new Audio();
-      a.preload = "auto";
-      a.loop = false;
-      a.volume = 0.35;
-
-      a.addEventListener("ended", () => {
-        if (!__musicEnabled) return;
-        __musicIndex = (__musicIndex + 1) % MUSIC_TRACKS.length;
-        __setMusicTrack(__musicIndex);
-        const p = a.play();
-        if (p && typeof p.catch === "function") p.catch(() => { __musicNeedGesture = true; });
-      });
-
-      __musicAudio = a;
-      return a;
-    } catch {
-      return null;
-    }
-  }
-
-  function __setMusicTrack(i) {
-    const a = __getMusicAudio();
-    if (!a) return;
-    const len = MUSIC_TRACKS.length || 1;
-    const idx = ((toSafeInt(i, 0) % len) + len) % len;
-    __musicIndex = idx;
-
-    const src = MUSIC_TRACKS[idx]?.src;
-    if (!src) return;
-    // Always assign (relative paths may resolve to absolute URLs in .src)
-    a.src = src;
-    try { a.currentTime = 0; } catch { /* ignore */ }
-  }
-
-  function __updateMusicBtn() {
-    if (!(els.musicBtn instanceof HTMLButtonElement)) return;
-    const label = __musicEnabled ? "Music: On" : "Music: Off";
-    if (els.musicBtnLabel instanceof HTMLElement) {
-      els.musicBtnLabel.textContent = label;
-    } else {
-      els.musicBtn.textContent = label;
-    }
-    els.musicBtn.setAttribute("aria-pressed", __musicEnabled ? "true" : "false");
-    els.musicBtn.classList.toggle("isActive", __musicEnabled);
-  }
-
-  function __pauseMusic() {
-    const a = __getMusicAudio();
-    if (!a) return;
-    try { a.pause(); } catch { /* ignore */ }
-  }
-
-  function __tryStartMusic() {
-    if (!__musicEnabled) return;
-    if (__bossActive) return;
-    const a = __getMusicAudio();
-    if (!a) return;
-    if (!a.src) __setMusicTrack(__musicIndex);
-
-    const p = a.play();
-    if (p && typeof p.then === "function") {
-      p.then(() => { __musicNeedGesture = false; }).catch(() => { __musicNeedGesture = true; });
-    }
-  }
-
-  function __unlockMusicIfNeeded() {
-    if (!__musicEnabled) return;
-    if (__bossActive) {
-      if (!__bossNeedGesture) return;
-      __tryStartBossMusic();
-      return;
-    }
-    if (!__musicNeedGesture) return;
-    __tryStartMusic();
-  }
-
-  function __setMusicEnabled(on) {
-    __musicEnabled = !!on;
-    __musicLsSet(MUSIC_PREF_KEY, __musicEnabled ? "1" : "0");
-    __updateMusicBtn();
-    if (!__musicEnabled) {
-      __pauseAllMusic();
-    } else {
-      if (__bossActive) __tryStartBossMusic();
-      else __tryStartMusic();
-    }
-  }
-
-  function __loadMusicPrefs() {
-    const rawEnabled = __musicLsGet(MUSIC_PREF_KEY);
-    if (rawEnabled === "0" || rawEnabled === "false") __musicEnabled = false;
-    if (rawEnabled === "1" || rawEnabled === "true") __musicEnabled = true;
-
-    const rawVol = __musicLsGet(MUSIC_VOL_KEY);
-    if (rawVol != null && rawVol !== "") {
-      const v = Number(rawVol);
-      if (isFinite(v)) {
-        const a = __getMusicAudio();
-        if (a) a.volume = clamp(v, 0, 1);
-        if (__bossAudio) __bossAudio.volume = clamp(v, 0, 1);
-      }
-    }
-  }
-
-  // Init music on the game page only
-  (function __initMusic() {
-    __loadMusicPrefs();
-    __setMusicTrack(0);
-    __updateMusicBtn();
-
-    // Attempt autoplay (will be blocked on some browsers until the first gesture)
-    __tryStartMusic();
-
-    // Gesture unlock (needed in many browsers)
-    ["pointerdown", "keydown", "touchstart"].forEach((evt) => {
-      window.addEventListener(evt, __unlockMusicIfNeeded, { passive: true });
-    });
-
-    // Music button toggles enabled/disabled
-    if (els.musicBtn instanceof HTMLButtonElement) {
-      els.musicBtn.addEventListener("click", (e) => {
-        // Alt/Option click: skip to next track (optional).
-        // During boss music, this simply restarts the boss track.
-        if (e && (e.altKey || e.metaKey)) {
-          if (__bossActive) {
-            const b = __getBossAudio();
-            if (b) { try { b.currentTime = 0; } catch {} }
-            if (__musicEnabled) __tryStartBossMusic();
-            return;
-          }
-          __musicIndex = (__musicIndex + 1) % MUSIC_TRACKS.length;
-          __setMusicTrack(__musicIndex);
-          if (__musicEnabled) __tryStartMusic();
-          return;
-        }
-        __setMusicEnabled(!__musicEnabled);
-      });
-    }
-
-    // Pause when tab is hidden; resume if it was playing
-    document.addEventListener("visibilitychange", () => {
-      const bg = __getMusicAudio();
-      const b = __bossAudio;
-      if (document.hidden) {
-        __musicWasPlayingBeforeHide = __bossActive ? (b ? !b.paused : false) : (bg ? !bg.paused : false);
-        __pauseAllMusic();
-      } else {
-        if (__musicEnabled && __musicWasPlayingBeforeHide) {
-          if (__bossActive) __tryStartBossMusic();
-          else __tryStartMusic();
-        }
-      }
-    });
-
-    window.addEventListener("beforeunload", __pauseAllMusic);
-  })();
-
 
   // --------------------
   // Magic menu helpers
@@ -1380,7 +1044,6 @@ function syncKnownSpells(announce = false) {
   state.player.pendingSpellQueue = pending;
 
   updateSpellPickButtonUI();
-  updatePerkButtonUI();
 
   const pendingAdded = Math.max(0, pending.length - beforePending);
 
@@ -1849,21 +1512,14 @@ function setTypeAccent(el, types) {
 
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
-      // The loot/victory screen is intentionally not dismissible via Escape.
-      // (Player must explicitly continue.)
-      if (isLootOpen()) {
-        if (els.lootContinueBtn instanceof HTMLButtonElement) els.lootContinueBtn.focus();
-        return;
-      }
-
       if (isSpellPickOpen()) closeSpellPicker();
-      if (isPerkOpen()) closePerks();
       if (isExplainOpen()) closeExplain();
       if (isCodexOpen()) closeCodex();
       if (isHeroOpen()) closeHeroPicker();
       if (isLocationOpen()) closeLocationPicker();
       closeMagicMenu();
       closeInventoryMenu();
+      if (isLootOpen()) { closeLootScreen(); if (lootTimer) window.clearTimeout(lootTimer); lootTimer = 0; }
       if (isDefeatOpen()) closeDefeatScreen();
     }
   });
@@ -1934,350 +1590,6 @@ function setTypeAccent(el, types) {
     if (prev && prev instanceof HTMLElement) prev.focus();
   }
 
-  // --------------------
-  // Perks modal helpers
-  // --------------------
-
-  let perkLastFocus = null;
-  // Remember the currently inspected perk inside the modal so the list can stay compact.
-  let perkSelectedId = null;
-
-  function isPerkOpen() {
-    return (els.perkModal instanceof HTMLElement) && !els.perkModal.hasAttribute("hidden");
-  }
-
-  function openPerks() {
-    if (!(els.perkModal instanceof HTMLElement)) return;
-    closeMagicMenu();
-    closeInventoryMenu();
-    renderPerks();
-    els.perkModal.removeAttribute("hidden");
-    perkLastFocus = document.activeElement;
-    updateBodyModalOpen();
-    if (els.perkClose instanceof HTMLButtonElement) els.perkClose.focus();
-  }
-
-  function closePerks() {
-    if (!(els.perkModal instanceof HTMLElement)) return;
-    els.perkModal.setAttribute("hidden", "");
-    const prev = perkLastFocus;
-    perkLastFocus = null;
-    updateBodyModalOpen();
-    if (prev && prev instanceof HTMLElement) prev.focus();
-  }
-
-    function renderPerks() {
-    if (!(els.perkList instanceof HTMLElement)) return;
-    if (!(els.perkPoints instanceof HTMLElement)) return;
-
-    const heroId = state?.player?.id || activeHeroId;
-    const hero = getHeroById(heroId);
-    const defs = getPerkDefsForHero(heroId);
-
-    // Pull the most up-to-date view (state when available, otherwise localStorage).
-    const prog = loadHeroProgress(heroId);
-    const points = state?.player?.id === heroId
-      ? clamp(toSafeInt(state.player.skillPoints, 0), 0, 99)
-      : clamp(toSafeInt(prog.skillPoints, 0), 0, 99);
-    const unlocked = state?.player?.id === heroId
-      ? sanitizePerkIds(state.player.perks ?? state.player.perkIds, heroId)
-      : sanitizePerkIds(prog.perks ?? prog.perkIds, heroId);
-
-    els.perkPoints.textContent = `Skill Points: ${points}`;
-
-    if (els.perkHeroLine instanceof HTMLElement) {
-      const heroName = hero?.name ? String(hero.name) : "your hero";
-      els.perkHeroLine.innerHTML = `Current hero: <strong>${escapeHtml(heroName)}</strong> • Unlocked <strong>${unlocked.length}</strong>/<strong>${defs.length}</strong> perks`;
-    }
-
-    if (!defs.length) {
-      if (els.perkDetails instanceof HTMLElement) els.perkDetails.setAttribute("hidden", "");
-      els.perkList.innerHTML = `<div class="muted">No perks defined for this hero yet.</div>`;
-      return;
-    }
-
-    const unlockedSet = new Set(unlocked);
-    const byId = new Map(defs.map((p) => [p.id, p]));
-
-    // Pick a default selection early so nodes can highlight correctly.
-    if (!perkSelectedId || !byId.has(perkSelectedId)) {
-      perkSelectedId = defs[0]?.id || null;
-    }
-
-    const GROUP_ORDER = ["Offense", "Defense", "Utility"];
-
-    // Group -> Line -> Perks (tiers)
-    /** @type {Map<string, Map<string, any[]>>} */
-    const grouped = new Map();
-
-    defs.forEach((p) => {
-      const g = (p.group && typeof p.group === "string") ? p.group : "Utility";
-      const line = (p.line && typeof p.line === "string") ? p.line : g;
-      if (!grouped.has(g)) grouped.set(g, new Map());
-      const lines = grouped.get(g);
-      if (!lines.has(line)) lines.set(line, []);
-      lines.get(line).push(p);
-    });
-
-    function groupSort(a, b) {
-      const ia = GROUP_ORDER.indexOf(a);
-      const ib = GROUP_ORDER.indexOf(b);
-      if (ia === -1 && ib === -1) return a.localeCompare(b);
-      if (ia === -1) return 1;
-      if (ib === -1) return -1;
-      return ia - ib;
-    }
-
-    function lineSort(a, b, linesMap) {
-      const la = linesMap.get(a) || [];
-      const lb = linesMap.get(b) || [];
-      const oa = Math.min(...la.map((p) => (typeof p.lineOrder === "number" ? p.lineOrder : 999)));
-      const ob = Math.min(...lb.map((p) => (typeof p.lineOrder === "number" ? p.lineOrder : 999)));
-      if (oa !== ob) return oa - ob;
-      return a.localeCompare(b);
-    }
-
-    function perkNodeHtml(p) {
-      const isUnlocked = unlockedSet.has(p.id);
-      const cost = Math.max(0, toSafeInt(p.cost, 1));
-      const icon = (p.icon && typeof p.icon === "string") ? p.icon : "✨";
-
-      const reqs = Array.isArray(p.requires) ? p.requires : [];
-      const missing = reqs.filter((rid) => !unlockedSet.has(rid));
-      const prereqMet = missing.length === 0;
-
-      const need = Math.max(0, cost - points);
-      const canBuy = !isUnlocked && prereqMet && points >= cost;
-
-      const pillText = isUnlocked ? "Unlocked"
-        : (canBuy ? `Cost ${cost}`
-          : (!prereqMet ? "Locked" : `Need ${need}`));
-
-      const tier = Math.max(1, toSafeInt(p.tier, 1));
-      const tierTag = `Tier ${tier}`;
-      const isSelected = perkSelectedId === p.id;
-
-      return `
-        <button type="button"
-          class="rpgPerkNode ${isUnlocked ? "isUnlocked" : ""} ${(!isUnlocked && !canBuy) ? "isLocked" : ""} ${isSelected ? "isSelected" : ""}"
-          data-perk-node="${escapeHtml(p.id)}"
-          aria-pressed="${isSelected ? "true" : "false"}">
-          <span class="rpgPerkIcon" aria-hidden="true">${escapeHtml(icon)}</span>
-          <span class="rpgPerkNodeTopText">
-            <span class="rpgPerkNodeTitle" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</span>
-            <span class="rpgPerkNodeTier muted tiny">${escapeHtml(tierTag)}</span>
-          </span>
-          <span class="rpgPerkPill ${isUnlocked ? "isUnlocked" : "isNeed"}">${escapeHtml(pillText)}</span>
-        </button>
-      `;
-    }
-
-    function renderPerkDetails(heroId, perkId) {
-      if (!(els.perkDetails instanceof HTMLElement)) return;
-      const def = byId.get(perkId);
-      if (!def) {
-        els.perkDetails.setAttribute("hidden", "");
-        return;
-      }
-
-      const isUnlocked = unlockedSet.has(def.id);
-      const cost = Math.max(0, toSafeInt(def.cost, 1));
-      const icon = (def.icon && typeof def.icon === "string") ? def.icon : "✨";
-      const tier = Math.max(1, toSafeInt(def.tier, 1));
-
-      const reqs = Array.isArray(def.requires) ? def.requires : [];
-      const missing = reqs.filter((rid) => !unlockedSet.has(rid));
-      const prereqMet = missing.length === 0;
-      const canBuy = !isUnlocked && prereqMet && points >= cost;
-
-      const missingNames = missing.map((rid) => {
-        const r = byId.get(rid);
-        return r?.name ? String(r.name) : String(rid);
-      });
-
-      // Small, readable effect chips.
-      const fx = (def.effects && typeof def.effects === "object") ? def.effects : {};
-      /** @type {string[]} */
-      const chips = [];
-      const hpB = Math.max(0, toSafeInt(fx.hpBonus, 0));
-      const mB = Math.max(0, toSafeInt(fx.focusBonus, 0));
-      const pP = clamp(Number(fx.powerPct ?? 0), 0, 0.50);
-      const hP = clamp(Number(fx.healPct ?? 0), 0, 0.50);
-      const dR = clamp(Number(fx.drPct ?? 0), 0, 0.50);
-      const xP = clamp(Number(fx.xpPct ?? 0), 0, 0.50);
-      const sM = clamp(toSafeInt(fx.startMana ?? 0, 0), 0, 3);
-
-      if (hpB) chips.push(`+${hpB} Max HP`);
-      if (mB) chips.push(`+${mB} Max Mana`);
-      if (pP) chips.push(`+${Math.round(pP * 100)}% Damage`);
-      if (hP) chips.push(`+${Math.round(hP * 100)}% Healing`);
-      if (dR) chips.push(`-${Math.round(dR * 100)}% Dmg Taken`);
-      if (xP) chips.push(`+${Math.round(xP * 100)}% XP`);
-      if (sM) chips.push(`+${sM} Start Mana`);
-
-      const prereqLine = prereqMet
-        ? (reqs.length ? `Prereqs met` : `No prerequisites`)
-        : `Requires: ${missingNames.join(", ")}`;
-
-      const btnText = isUnlocked
-        ? "Unlocked"
-        : (canBuy ? `Unlock (${cost} SP)`
-          : (!prereqMet ? "Locked" : `Need ${Math.max(0, cost - points)} SP`));
-
-      els.perkDetails.removeAttribute("hidden");
-      els.perkDetails.innerHTML = `
-        <div class="rpgPerkDetailsTop">
-          <div class="rpgPerkDetailsTitle">
-            <span class="rpgPerkDetailsIcon" aria-hidden="true">${escapeHtml(icon)}</span>
-            <div class="rpgPerkDetailsTitleText">
-              <div class="rpgPerkDetailsName">${escapeHtml(def.name)}</div>
-              <div class="muted tiny">Tier ${tier} • ${escapeHtml(prereqLine)}</div>
-            </div>
-          </div>
-          <button type="button" class="btn ${isUnlocked ? "ghost" : "primary"} rpgPerkDetailsBtn" ${canBuy ? "" : "disabled"} data-perk-unlock="${escapeHtml(def.id)}">${escapeHtml(btnText)}</button>
-        </div>
-        <div class="rpgPerkDetailsDesc">${escapeHtml(def.desc || "")}</div>
-        ${chips.length ? `<div class="rpgPerkFx">${chips.map((t) => `<span class="pill">${escapeHtml(t)}</span>`).join("")}</div>` : ""}
-      `;
-
-      const unlockBtn = els.perkDetails.querySelector("button[data-perk-unlock]");
-      if (unlockBtn instanceof HTMLButtonElement) {
-        unlockBtn.addEventListener("click", () => {
-          const id = unlockBtn.getAttribute("data-perk-unlock") || "";
-          if (!id) return;
-          tryUnlockPerk(heroId, id);
-        }, { once: true });
-      }
-    }
-
-    // Build sections
-    const groupKeys = Array.from(grouped.keys()).sort(groupSort);
-
-    els.perkList.innerHTML = groupKeys.map((g) => {
-      const linesMap = grouped.get(g) || new Map();
-      const lineKeys = Array.from(linesMap.keys()).sort((a, b) => lineSort(a, b, linesMap));
-
-      const note = g === "Offense" ? "Damage & pressure"
-        : (g === "Defense" ? "Survival & mitigation" : "Mana, starts, recovery & XP");
-
-      const treeHtml = `
-        <div class="rpgPerkTree">
-          ${lineKeys.map((lineName) => {
-            const list = (linesMap.get(lineName) || []).slice();
-
-            // Sort by tier, then by cost, then by name.
-            list.sort((a, b) => {
-              const ta = Math.max(1, toSafeInt(a.tier, 1));
-              const tb = Math.max(1, toSafeInt(b.tier, 1));
-              if (ta !== tb) return ta - tb;
-              const ca = Math.max(0, toSafeInt(a.cost, 1));
-              const cb = Math.max(0, toSafeInt(b.cost, 1));
-              if (ca !== cb) return ca - cb;
-              return String(a.name || "").localeCompare(String(b.name || ""));
-            });
-
-            const nodes = list.map(perkNodeHtml).join("");
-
-            return `
-              <div class="rpgPerkLineRow">
-                <div class="rpgPerkLineLabel">
-                  <div class="rpgPerkLineName">${escapeHtml(lineName)}</div>
-                  <div class="muted tiny">${list.length} tiers</div>
-                </div>
-                <div class="rpgPerkLineNodes" role="list">
-                  ${nodes}
-                </div>
-              </div>
-            `;
-          }).join("")}
-        </div>
-      `;
-
-      return `
-        <div class="rpgPerkSection">
-          <div class="rpgPerkSectionHead">
-            <h3 class="rpgPerkSectionTitle">${escapeHtml(g)}</h3>
-            <div class="rpgPerkSectionNote muted">${escapeHtml(note)}</div>
-          </div>
-          ${treeHtml}
-        </div>
-      `;
-    }).join("");
-
-    // Render the compact detail pane.
-    if (perkSelectedId) renderPerkDetails(heroId, perkSelectedId);
-
-    // Clicking a node selects it (details update). Unlocking happens from the detail pane.
-    Array.from(els.perkList.querySelectorAll("[data-perk-node]")).forEach((n) => {
-      if (!(n instanceof HTMLButtonElement)) return;
-      n.addEventListener("click", () => {
-        const id = n.getAttribute("data-perk-node") || "";
-        if (!id) return;
-        perkSelectedId = id;
-        // Visual highlight
-        Array.from(els.perkList.querySelectorAll(".rpgPerkNode.isSelected")).forEach((old) => old.classList.remove("isSelected"));
-        n.classList.add("isSelected");
-        Array.from(els.perkList.querySelectorAll("[data-perk-node]")).forEach((b) => {
-          if (b instanceof HTMLButtonElement) b.setAttribute("aria-pressed", (b === n) ? "true" : "false");
-        });
-        renderPerkDetails(heroId, id);
-      });
-    });
-  }
-
-  /** @param {string} heroId @param {string} perkId */
-    /** @param {string} heroId @param {string} perkId */
-  function tryUnlockPerk(heroId, perkId) {
-    const defs = getPerkDefsForHero(heroId);
-    const def = defs.find((p) => p.id === perkId);
-    if (!def) return;
-
-    const prog = loadHeroProgress(heroId);
-    const unlocked = sanitizePerkIds(prog.perks ?? prog.perkIds, heroId);
-    if (unlocked.includes(perkId)) return;
-
-    const unlockedSet = new Set(unlocked);
-    const reqs = Array.isArray(def.requires) ? def.requires : [];
-    const prereqMet = reqs.every((rid) => unlockedSet.has(rid));
-    if (!prereqMet) {
-      // Optional feedback in battle log (only if currently in a run).
-      if (state?.log && Array.isArray(state.log)) {
-        const byId = new Map(defs.map((p) => [p.id, p]));
-        const missing = reqs.filter((rid) => !unlockedSet.has(rid)).map((rid) => byId.get(rid)?.name || rid);
-        addLog(`🔒 Perk locked. Requires: ${missing.join(", ")}.`);
-      }
-      return;
-    }
-
-    const cost = Math.max(0, toSafeInt(def.cost, 1));
-    const points = clamp(toSafeInt(prog.skillPoints, 0), 0, 99);
-    if (points < cost) return;
-
-    const next = {
-      ...prog,
-      skillPoints: clamp(points - cost, 0, 99),
-      perks: [...unlocked, perkId],
-    };
-
-    saveHeroProgress(heroId, next);
-
-    // Sync live state if this hero is active.
-    if (state?.player?.id === heroId) {
-      state.player.skillPoints = next.skillPoints;
-      state.player.perks = next.perks;
-      syncPlayerLevel(false);
-      persistPlayerProgress();
-      render();
-    }
-
-    // Feedback (log only when in-game).
-    if (state?.log && Array.isArray(state.log)) {
-      addLog(`✨ Perk unlocked: ${def.name}.`);
-    }
-
-    renderPerks();
-  }
-
 // --------------------
 // Spell picker modal helpers
 // --------------------
@@ -2295,15 +1607,6 @@ function updateSpellPickButtonUI() {
   els.spellPickBtn.disabled = pending <= 0;
   const label = pending <= 1 ? "Choose spell" : `Choose spell (${pending})`;
   els.spellPickBtn.innerHTML = `<span aria-hidden="true" class="rpgTopBtnIcon">📜</span>${label}`;
-}
-
-function updatePerkButtonUI() {
-  if (!(els.perkBtn instanceof HTMLButtonElement)) return;
-  const heroId = state?.player?.id || activeHeroId;
-  const prog = loadHeroProgress(heroId);
-  const points = state?.player?.id === heroId ? clamp(toSafeInt(state.player.skillPoints, 0), 0, 99) : clamp(toSafeInt(prog.skillPoints, 0), 0, 99);
-  const badge = points > 0 ? ` <span class="pill">+${points}</span>` : "";
-  els.perkBtn.innerHTML = `<span aria-hidden="true" class="rpgTopBtnIcon">✨</span>Perks${badge}`;
 }
 
 /** @param {Spell} spell */
@@ -2500,8 +1803,8 @@ let lootLastFocus = null;
 let lootTimer = 0;
 
 let lootResolve = null; // {battleId:number,isFinal:boolean,nextIndex:number}
-/** @param {string} title @param {string} subtitle @param {string} line @param {Array<any>} summary */
-function openLootScreen(title, subtitle, line, summary = []) {
+/** @param {string} title @param {string} subtitle @param {string} line */
+function openLootScreen(title, subtitle, line) {
   if (!(els.lootModal instanceof HTMLElement)) return;
   closeMagicMenu();
   closeInventoryMenu();
@@ -2510,37 +1813,12 @@ function openLootScreen(title, subtitle, line, summary = []) {
   if (els.lootSubtitle instanceof HTMLElement) els.lootSubtitle.textContent = subtitle || "";
   if (els.lootLine instanceof HTMLElement) els.lootLine.textContent = line || "No items.";
 
-  // Summary chips (XP, level ups, skill points)
-  if (els.lootSummary instanceof HTMLElement) {
-    els.lootSummary.innerHTML = "";
-    const items = Array.isArray(summary) ? summary : [];
-    if (items.length === 0) {
-      els.lootSummary.setAttribute("hidden", "");
-    } else {
-      els.lootSummary.removeAttribute("hidden");
-      for (const it of items) {
-        const text = (typeof it === "string") ? it : String(it?.text || "");
-        const kind = (typeof it === "object" && it && it.kind) ? String(it.kind) : "neutral";
-        const chip = document.createElement("div");
-        chip.className = `rpgLootChip rpgLootChip--${kind}`;
-        chip.textContent = text;
-        els.lootSummary.appendChild(chip);
-      }
-    }
-  }
-
-
   els.lootModal.removeAttribute("hidden");
   lootLastFocus = document.activeElement;
   updateBodyModalOpen();
 
-  // Put focus on the explicit Continue button so keyboard users can press Enter.
-  if (els.lootContinueBtn instanceof HTMLButtonElement) {
-    els.lootContinueBtn.focus();
-  } else {
-    const inner = els.lootModal.querySelector(".rpgLootInner");
-    if (inner instanceof HTMLElement) inner.focus();
-  }
+  const inner = els.lootModal.querySelector(".rpgLootInner");
+  if (inner instanceof HTMLElement) inner.focus();
 }
 
 function closeLootScreen() {
@@ -2568,8 +1846,6 @@ function resolveLootDismissal(lr) {
 
   // Final wave: return to the character menu after rewards.
   if (lr.isFinal) {
-    // Boss fight is over; return to normal background music.
-    __exitBossMusic();
     endGame("The duel ends. You win!");
     // Pop the character menu after the win is logged/rendered.
     window.setTimeout(() => {
@@ -2596,9 +1872,6 @@ function resolveLootDismissal(lr) {
   state.wave = nextIndex;
   state.enemy = makeEnemy(state.wave, state.enemySet, state.player.level);
 
-  // Boss wave: switch to boss theme.
-  if (state.wave >= 2) __enterBossMusic();
-
   addLog(`Wave ${state.wave + 1}: ${state.enemy.name} arrives.`);
   addLog("Your turn.");
 
@@ -2617,8 +1890,6 @@ let defeatLastFocus = null;
 
 /** @param {string} subtitle */
 function openDefeatScreen(subtitle) {
-  // Stop boss music when a run ends.
-  __exitBossMusic();
   if (!(els.defeatModal instanceof HTMLElement)) return;
 
   // Close transient UI so the defeat screen is the clear focus.
@@ -2652,7 +1923,7 @@ function closeDefeatScreen() {
 }
 
 function updateBodyModalOpen() {
-  const any = isExplainOpen() || isCodexOpen() || isPerkOpen() || isHeroOpen() || isLocationOpen() || isSpellPickOpen() || isLootOpen() || isDefeatOpen();
+  const any = isExplainOpen() || isCodexOpen() || isHeroOpen() || isLocationOpen() || isSpellPickOpen() || isLootOpen() || isDefeatOpen();
   document.body.classList.toggle("modalOpen", any);
 }
 
@@ -2672,7 +1943,7 @@ function renderHeroChoices() {
         <div>
           <div class="rpgCharTitle">${h.name}</div>
           <div class="rpgCharMeta muted small"><span class="pill">${types}</span></div>
-          <div class="rpgCharStats muted">Lv ${prog.level} • XP ${prog.xp}/${xpNeed} • SP ${toSafeInt(prog.skillPoints, 0)}</div>
+          <div class="rpgCharStats muted">Lv ${prog.level} • XP ${prog.xp}/${xpNeed}</div>
           <div class="rpgCharStats muted">HP ${scaled.maxHp} • Mana ${scaled.focusStart}/${scaled.focusMax} • Heals ${h.healCharges}</div>
         </div>
       </button>
@@ -2922,9 +2193,6 @@ function startBattleWithLocation(locId) {
 
   resetVisuals();
 
-  // Ensure boss music is not stuck on from a previous run.
-  __exitBossMusic();
-
   const encounterSet = buildEnemySetForBattle(getActiveHero().level);
   activeEnemySet = encounterSet;
   state = makeInitialState(encounterSet, loc.id);
@@ -2946,9 +2214,6 @@ function startBattleWithLocation(locId) {
   if (els.codexBtn instanceof HTMLButtonElement) {
     els.codexBtn.addEventListener("click", () => openCodex());
   }
-  if (els.perkBtn instanceof HTMLButtonElement) {
-    els.perkBtn.addEventListener("click", () => openPerks());
-  }
   if (els.explainClose instanceof HTMLButtonElement) {
     els.explainClose.addEventListener("click", () => closeExplain());
   }
@@ -2961,22 +2226,6 @@ function startBattleWithLocation(locId) {
   }
   if (els.codexOk instanceof HTMLButtonElement) {
     els.codexOk.addEventListener("click", () => closeCodex());
-  }
-
-  // Perks wiring
-  if (els.perkClose instanceof HTMLButtonElement) {
-    els.perkClose.addEventListener("click", () => closePerks());
-  }
-  if (els.perkOk instanceof HTMLButtonElement) {
-    els.perkOk.addEventListener("click", () => closePerks());
-  }
-
-  // Loot/Victory wiring (manual continue)
-  if (els.lootContinueBtn instanceof HTMLButtonElement) {
-    els.lootContinueBtn.addEventListener("click", () => {
-      // Only close if the modal is currently open.
-      if (isLootOpen()) closeLootScreen();
-    });
   }
 
   // Spell picker wiring
@@ -3005,12 +2254,6 @@ function startBattleWithLocation(locId) {
   if (els.codexModal instanceof HTMLElement) {
     els.codexModal.addEventListener("click", (e) => {
       if (e.target === els.codexModal) closeCodex();
-    });
-  }
-
-  if (els.perkModal instanceof HTMLElement) {
-    els.perkModal.addEventListener("click", (e) => {
-      if (e.target === els.perkModal) closePerks();
     });
   }
 
@@ -3196,7 +2439,7 @@ SmellTaste: { Wind: 0.9, Water: 1.0, Fire: 1.0, Sight: 0.9, Earth: 1.0, Touch: 1
     const extraBit = extraText ? ` • ${extraText}` : "";
     els.effectPreview.innerHTML =
       `${move.name}: <span class="rpgEffectPreviewText">${tier.label}</span> ` +
-      `<span class="rpgEffectPreviewMeta">(${meta}${extraBit})</span>`;
+      `<span class="rpgEffectPreviewMeta">(x${fmtMult(eff)} • ${meta}${extraBit})</span>`;
   }
 
 /**
@@ -3577,16 +2820,6 @@ function toSafeInt(n, fallback) {
   const x = Number(n);
   if (!Number.isFinite(x)) return fallback;
   return Math.trunc(x);
-}
-
-/** @param {any} v */
-function escapeHtml(v) {
-  return String(v ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll("\"", "&quot;")
-    .replaceAll("'", "&#39;");
 }
 
 
@@ -4223,388 +3456,6 @@ function xpToNext(level) {
   return Math.max(12, Math.round(20 + t * 12 + t * t * 4));
 }
 
-// --------------------
-// Perks (skill points)
-// --------------------
-
-/**
- * A perk is a tiny, passive bonus you unlock with skill points for a specific hero.
- * Keep effects small: this system is meant to add flavor without turning fights into a pure perk race.
- *
- * @typedef {{
- *  id:string,
- *  name:string,
- *  group?:"Offense"|"Defense"|"Utility"|string,
- *  line?:string,        // "skill tree" row label
- *  tier?:number,        // 1..N within a line
- *  requires?:string[],  // prerequisite perk ids
- *  lineOrder?:number,   // optional sorting within a group
- *  desc:string,
- *  cost:number,
- *  icon?:string,
- *  effects?:{
- *    hpBonus?:number,
- *    focusBonus?:number,
- *    powerPct?:number,
- *    healPct?:number,
- *    drPct?:number,
- *    xpPct?:number,
- *    startMana?:number,
- *  }
- * }} PerkDef
- */
-
-/** Generic perks for any playable hero that doesn't have a custom list yet. */
-/** @type {PerkDef[]} */
-const GENERIC_PERKS = [
-  // Offense: Damage (tiered)
-  { id: "gen_damage_1", name: "Sharpened Intent", group: "Offense", line: "Damage", tier: 1, lineOrder: 1, icon: "⚔️", cost: 1, desc: "+4% damage dealt.", effects: { powerPct: 0.04 } },
-  { id: "gen_damage_2", name: "Edge Control", group: "Offense", line: "Damage", tier: 2, lineOrder: 1, icon: "🗡️", cost: 1, desc: "+7% damage dealt.", effects: { powerPct: 0.07 } },
-  { id: "gen_damage_3", name: "Finishing Angle", group: "Offense", line: "Damage", tier: 3, lineOrder: 1, icon: "🎯", cost: 2, desc: "+10% damage dealt.", effects: { powerPct: 0.10 } },
-
-  // Defense: Guard (tiered)
-  { id: "gen_guard_1", name: "Basic Guard", group: "Defense", line: "Guard", tier: 1, lineOrder: 1, icon: "🛡️", cost: 1, desc: "+4% damage reduction.", effects: { drPct: 0.04 } },
-  { id: "gen_guard_2", name: "Firm Stance", group: "Defense", line: "Guard", tier: 2, lineOrder: 1, icon: "🧱", cost: 1, desc: "+7% damage reduction.", effects: { drPct: 0.07 } },
-  { id: "gen_guard_3", name: "Iron Wall", group: "Defense", line: "Guard", tier: 3, lineOrder: 1, icon: "🏰", cost: 2, desc: "+10% damage reduction.", effects: { drPct: 0.10 } },
-
-  // Defense: Vitality (tiered)
-  { id: "gen_vital_1", name: "Sturdy Frame", group: "Defense", line: "Vitality", tier: 1, lineOrder: 2, icon: "🫀", cost: 1, desc: "+2 Max HP.", effects: { hpBonus: 2 } },
-  { id: "gen_vital_2", name: "Hardy Body", group: "Defense", line: "Vitality", tier: 2, lineOrder: 2, icon: "💪", cost: 1, desc: "+4 Max HP.", effects: { hpBonus: 4 } },
-  { id: "gen_vital_3", name: "Unbreakable", group: "Defense", line: "Vitality", tier: 3, lineOrder: 2, icon: "🪨", cost: 2, desc: "+6 Max HP.", effects: { hpBonus: 6 } },
-
-  // Utility: Mana (tiered)
-  { id: "gen_mana_1", name: "Mana Pocket", group: "Utility", line: "Mana", tier: 1, lineOrder: 1, icon: "🔷", cost: 1, desc: "+1 Max Mana.", effects: { focusBonus: 1 } },
-  { id: "gen_mana_2", name: "Mana Reservoir", group: "Utility", line: "Mana", tier: 2, lineOrder: 1, icon: "💠", cost: 2, desc: "+2 Max Mana.", effects: { focusBonus: 2 } },
-  { id: "gen_mana_3", name: "Mana Well", group: "Utility", line: "Mana", tier: 3, lineOrder: 1, icon: "🌌", cost: 2, desc: "+3 Max Mana.", effects: { focusBonus: 3 } },
-
-  // Utility: Opening (tiered)
-  { id: "gen_open_1", name: "Quick Start", group: "Utility", line: "Opening", tier: 1, lineOrder: 2, icon: "⚡", cost: 1, desc: "Start battles with +1 Mana.", effects: { startMana: 1 } },
-  { id: "gen_open_2", name: "Strong Start", group: "Utility", line: "Opening", tier: 2, lineOrder: 2, icon: "⚡", cost: 2, desc: "Start battles with +2 Mana.", effects: { startMana: 2 } },
-  { id: "gen_open_3", name: "Perfect Start", group: "Utility", line: "Opening", tier: 3, lineOrder: 2, icon: "⚡", cost: 2, desc: "Start battles with +3 Mana.", effects: { startMana: 3 } },
-
-  // Utility: Recovery (tiered)
-  { id: "gen_heal_1", name: "Minor Remedy", group: "Utility", line: "Recovery", tier: 1, lineOrder: 3, icon: "🩹", cost: 1, desc: "+8% healing.", effects: { healPct: 0.08 } },
-  { id: "gen_heal_2", name: "Steady Remedy", group: "Utility", line: "Recovery", tier: 2, lineOrder: 3, icon: "🧪", cost: 1, desc: "+12% healing.", effects: { healPct: 0.12 } },
-  { id: "gen_heal_3", name: "Major Remedy", group: "Utility", line: "Recovery", tier: 3, lineOrder: 3, icon: "🏥", cost: 2, desc: "+16% healing.", effects: { healPct: 0.16 } },
-
-  // Utility: Study (tiered)
-  { id: "gen_xp_1", name: "Practice Notes", group: "Utility", line: "Study", tier: 1, lineOrder: 4, icon: "📒", cost: 1, desc: "+10% XP gained.", effects: { xpPct: 0.10 } },
-  { id: "gen_xp_2", name: "Field Notes", group: "Utility", line: "Study", tier: 2, lineOrder: 4, icon: "📓", cost: 1, desc: "+12% XP gained.", effects: { xpPct: 0.12 } },
-  { id: "gen_xp_3", name: "Master Notes", group: "Utility", line: "Study", tier: 3, lineOrder: 4, icon: "📚", cost: 2, desc: "+15% XP gained.", effects: { xpPct: 0.15 } },
-];
-
-/** @type {Record<string, PerkDef[]>} */
-const PERKS_BY_HERO = {
-  // Sight + Wind (Relen)
-  relen: [
-    // Damage line
-    { id: "relen_crosswind_timing", name: "Crosswind Timing", group: "Offense", line: "Damage", tier: 1, lineOrder: 1, icon: "🌀", cost: 1, desc: "+4% damage dealt.", effects: { powerPct: 0.04 } },
-    { id: "relen_keen_angles", name: "Keen Angles", group: "Offense", line: "Damage", tier: 2, lineOrder: 1, icon: "🔭", cost: 1, desc: "+6% damage dealt.", effects: { powerPct: 0.06 } },
-    { id: "relen_vector_thesis", name: "Vector Thesis", group: "Offense", line: "Damage", tier: 3, lineOrder: 1, icon: "📐", cost: 2, desc: "+10% damage dealt.", effects: { powerPct: 0.10 } },
-
-    // Guard line
-    { id: "relen_slipstream_guard", name: "Slipstream Guard", group: "Defense", line: "Guard", tier: 1, lineOrder: 1, icon: "🪽", cost: 1, desc: "+4% damage reduction.", effects: { drPct: 0.04 } },
-    { id: "relen_windveil", name: "Windveil", group: "Defense", line: "Guard", tier: 2, lineOrder: 1, icon: "🌫️", cost: 1, desc: "+6% damage reduction.", effects: { drPct: 0.06 } },
-    { id: "relen_cyclone_aegis", name: "Cyclone Aegis", group: "Defense", line: "Guard", tier: 3, lineOrder: 1, icon: "🛡️", cost: 2, desc: "+10% damage reduction.", effects: { drPct: 0.10 } },
-
-    // Vitality line
-    { id: "relen_feather_padding", name: "Feather Padding", group: "Defense", line: "Vitality", tier: 1, lineOrder: 2, icon: "🪶", cost: 1, desc: "+2 Max HP.", effects: { hpBonus: 2 } },
-    { id: "relen_featherfall", name: "Featherfall", group: "Defense", line: "Vitality", tier: 2, lineOrder: 2, icon: "🪶", cost: 1, desc: "+3 Max HP.", effects: { hpBonus: 3 } },
-    { id: "relen_aerie_fortitude", name: "Aerie Fortitude", group: "Defense", line: "Vitality", tier: 3, lineOrder: 2, icon: "🪶", cost: 2, desc: "+6 Max HP.", effects: { hpBonus: 6 } },
-
-    // Mana line
-    { id: "relen_updraft_reserve", name: "Updraft Reserve", group: "Utility", line: "Mana", tier: 1, lineOrder: 1, icon: "🌬️", cost: 1, desc: "+1 Max Mana.", effects: { focusBonus: 1 } },
-    { id: "relen_deep_reserve", name: "Deep Reserve", group: "Utility", line: "Mana", tier: 2, lineOrder: 1, icon: "💠", cost: 2, desc: "+2 Max Mana.", effects: { focusBonus: 2 } },
-    { id: "relen_cloudwell", name: "Cloudwell", group: "Utility", line: "Mana", tier: 3, lineOrder: 1, icon: "☁️", cost: 2, desc: "+3 Max Mana.", effects: { focusBonus: 3 } },
-
-    // Opening line
-    { id: "relen_first_breath", name: "First Breath", group: "Utility", line: "Opening", tier: 1, lineOrder: 2, icon: "🌤️", cost: 1, desc: "Start battles with +1 Mana.", effects: { startMana: 1 } },
-    { id: "relen_second_breath", name: "Second Breath", group: "Utility", line: "Opening", tier: 2, lineOrder: 2, icon: "🌥️", cost: 2, desc: "Start battles with +2 Mana.", effects: { startMana: 2 } },
-    { id: "relen_third_breath", name: "Third Breath", group: "Utility", line: "Opening", tier: 3, lineOrder: 2, icon: "⛅", cost: 2, desc: "Start battles with +3 Mana.", effects: { startMana: 3 } },
-
-    // Recovery line
-    { id: "relen_gale_mending", name: "Gale Mending", group: "Utility", line: "Recovery", tier: 1, lineOrder: 3, icon: "🩹", cost: 1, desc: "+8% healing.", effects: { healPct: 0.08 } },
-    { id: "relen_windstitch", name: "Windstitch", group: "Utility", line: "Recovery", tier: 2, lineOrder: 3, icon: "🧵", cost: 1, desc: "+12% healing.", effects: { healPct: 0.12 } },
-    { id: "relen_eye_of_calm", name: "Eye of Calm", group: "Utility", line: "Recovery", tier: 3, lineOrder: 3, icon: "🧿", cost: 2, desc: "+16% healing.", effects: { healPct: 0.16 } },
-
-    // Study line
-    { id: "relen_archivist", name: "Archivist Habit", group: "Utility", line: "Study", tier: 1, lineOrder: 4, icon: "📚", cost: 1, desc: "+10% XP gained.", effects: { xpPct: 0.10 } },
-    { id: "relen_margin_notes", name: "Margin Notes", group: "Utility", line: "Study", tier: 2, lineOrder: 4, icon: "📝", cost: 1, desc: "+12% XP gained.", effects: { xpPct: 0.12 } },
-    { id: "relen_skybound_thesis", name: "Skybound Thesis", group: "Utility", line: "Study", tier: 3, lineOrder: 4, icon: "📖", cost: 2, desc: "+15% XP gained.", effects: { xpPct: 0.15 } },
-  ],
-
-  // Sound + Fire (Axel)
-  axel: [
-    // Damage line
-    { id: "axel_reverb_strikes", name: "Reverb Strikes", group: "Offense", line: "Damage", tier: 1, lineOrder: 1, icon: "📣", cost: 1, desc: "+4% damage dealt.", effects: { powerPct: 0.04 } },
-    { id: "axel_resonant_core", name: "Resonant Core", group: "Offense", line: "Damage", tier: 2, lineOrder: 1, icon: "🎶", cost: 1, desc: "+8% damage dealt.", effects: { powerPct: 0.08 } },
-    { id: "axel_crescendo", name: "Crescendo", group: "Offense", line: "Damage", tier: 3, lineOrder: 1, icon: "🔥", cost: 2, desc: "+12% damage dealt.", effects: { powerPct: 0.12 } },
-
-    // Guard line
-    { id: "axel_cindershield", name: "Cindershield", group: "Defense", line: "Guard", tier: 1, lineOrder: 1, icon: "🛡️", cost: 1, desc: "+4% damage reduction.", effects: { drPct: 0.04 } },
-    { id: "axel_ashward", name: "Ashward", group: "Defense", line: "Guard", tier: 2, lineOrder: 1, icon: "🌫️", cost: 1, desc: "+7% damage reduction.", effects: { drPct: 0.07 } },
-    { id: "axel_coalplate", name: "Coalplate", group: "Defense", line: "Guard", tier: 3, lineOrder: 1, icon: "🪨", cost: 2, desc: "+10% damage reduction.", effects: { drPct: 0.10 } },
-
-    // Vitality line
-    { id: "axel_matchbright_lungs", name: "Matchbright Lungs", group: "Defense", line: "Vitality", tier: 1, lineOrder: 2, icon: "🫁", cost: 1, desc: "+2 Max HP.", effects: { hpBonus: 2 } },
-    { id: "axel_furnace_heart", name: "Furnace Heart", group: "Defense", line: "Vitality", tier: 2, lineOrder: 2, icon: "❤️‍🔥", cost: 2, desc: "+4 Max HP.", effects: { hpBonus: 4 } },
-    { id: "axel_inferno_heart", name: "Inferno Heart", group: "Defense", line: "Vitality", tier: 3, lineOrder: 2, icon: "🫀", cost: 2, desc: "+6 Max HP.", effects: { hpBonus: 6 } },
-
-    // Mana line
-    { id: "axel_spare_breath", name: "Spare Breath", group: "Utility", line: "Mana", tier: 1, lineOrder: 1, icon: "🔷", cost: 1, desc: "+1 Max Mana.", effects: { focusBonus: 1 } },
-    { id: "axel_reserve_tank", name: "Reserve Tank", group: "Utility", line: "Mana", tier: 2, lineOrder: 1, icon: "💠", cost: 2, desc: "+2 Max Mana.", effects: { focusBonus: 2 } },
-    { id: "axel_backstage_cache", name: "Backstage Cache", group: "Utility", line: "Mana", tier: 3, lineOrder: 1, icon: "🎒", cost: 2, desc: "+3 Max Mana.", effects: { focusBonus: 3 } },
-
-    // Opening line
-    { id: "axel_overtones", name: "Overtones", group: "Utility", line: "Opening", tier: 1, lineOrder: 2, icon: "✨", cost: 1, desc: "Start battles with +1 Mana.", effects: { startMana: 1 } },
-    { id: "axel_hot_mic", name: "Hot Mic", group: "Utility", line: "Opening", tier: 2, lineOrder: 2, icon: "🎤", cost: 2, desc: "Start battles with +2 Mana.", effects: { startMana: 2 } },
-    { id: "axel_headliner", name: "Headliner", group: "Utility", line: "Opening", tier: 3, lineOrder: 2, icon: "🌟", cost: 2, desc: "Start battles with +3 Mana.", effects: { startMana: 3 } },
-
-    // Recovery line
-    { id: "axel_afterglow", name: "Afterglow", group: "Utility", line: "Recovery", tier: 1, lineOrder: 3, icon: "🩹", cost: 1, desc: "+8% healing.", effects: { healPct: 0.08 } },
-    { id: "axel_warm_hands", name: "Warm Hands", group: "Utility", line: "Recovery", tier: 2, lineOrder: 3, icon: "🫶", cost: 1, desc: "+12% healing.", effects: { healPct: 0.12 } },
-    { id: "axel_flare_aid", name: "Flare Aid", group: "Utility", line: "Recovery", tier: 3, lineOrder: 3, icon: "🚑", cost: 2, desc: "+16% healing.", effects: { healPct: 0.16 } },
-
-    // Study line
-    { id: "axel_stage_practice", name: "Stage Practice", group: "Utility", line: "Study", tier: 1, lineOrder: 4, icon: "📝", cost: 1, desc: "+10% XP gained.", effects: { xpPct: 0.10 } },
-    { id: "axel_tour_journal", name: "Tour Journal", group: "Utility", line: "Study", tier: 2, lineOrder: 4, icon: "📓", cost: 1, desc: "+12% XP gained.", effects: { xpPct: 0.12 } },
-    { id: "axel_masterclass", name: "Masterclass", group: "Utility", line: "Study", tier: 3, lineOrder: 4, icon: "📚", cost: 2, desc: "+15% XP gained.", effects: { xpPct: 0.15 } },
-  ],
-
-  // Smell/Taste + Fire (Mira)
-  mira: [
-    // Damage line
-    { id: "mira_zestful_jolt", name: "Zestful Jolt", group: "Offense", line: "Damage", tier: 1, lineOrder: 1, icon: "🍋", cost: 1, desc: "+4% damage dealt.", effects: { powerPct: 0.04 } },
-    { id: "mira_bittersweet_edge", name: "Bittersweet Edge", group: "Offense", line: "Damage", tier: 2, lineOrder: 1, icon: "🍊", cost: 1, desc: "+6% damage dealt.", effects: { powerPct: 0.06 } },
-    { id: "mira_infusion_burst", name: "Infusion Burst", group: "Offense", line: "Damage", tier: 3, lineOrder: 1, icon: "🫖", cost: 2, desc: "+10% damage dealt.", effects: { powerPct: 0.10 } },
-
-    // Guard line
-    { id: "mira_saffron_ward", name: "Saffron Ward", group: "Defense", line: "Guard", tier: 1, lineOrder: 1, icon: "🌾", cost: 1, desc: "+4% damage reduction.", effects: { drPct: 0.04 } },
-    { id: "mira_aromatic_guard", name: "Aromatic Guard", group: "Defense", line: "Guard", tier: 2, lineOrder: 1, icon: "🛡️", cost: 1, desc: "+8% damage reduction.", effects: { drPct: 0.08 } },
-    { id: "mira_incense_armor", name: "Incense Armor", group: "Defense", line: "Guard", tier: 3, lineOrder: 1, icon: "🕯️", cost: 2, desc: "+10% damage reduction.", effects: { drPct: 0.10 } },
-
-    // Vitality line
-    { id: "mira_hearthy_meal", name: "Hearty Meal", group: "Defense", line: "Vitality", tier: 1, lineOrder: 2, icon: "🥘", cost: 1, desc: "+2 Max HP.", effects: { hpBonus: 2 } },
-    { id: "mira_spice_bloom", name: "Spice Bloom", group: "Defense", line: "Vitality", tier: 2, lineOrder: 2, icon: "🌶️", cost: 1, desc: "+4 Max HP.", effects: { hpBonus: 4 } },
-    { id: "mira_iron_kettle", name: "Iron Kettle", group: "Defense", line: "Vitality", tier: 3, lineOrder: 2, icon: "🫖", cost: 2, desc: "+6 Max HP.", effects: { hpBonus: 6 } },
-
-    // Mana line
-    { id: "mira_smoldering_reserve", name: "Smoldering Reserve", group: "Utility", line: "Mana", tier: 1, lineOrder: 1, icon: "🧪", cost: 1, desc: "+1 Max Mana.", effects: { focusBonus: 1 } },
-    { id: "mira_pantry_stash", name: "Pantry Stash", group: "Utility", line: "Mana", tier: 2, lineOrder: 1, icon: "🥫", cost: 2, desc: "+2 Max Mana.", effects: { focusBonus: 2 } },
-    { id: "mira_cellar_stock", name: "Cellar Stock", group: "Utility", line: "Mana", tier: 3, lineOrder: 1, icon: "🍯", cost: 2, desc: "+3 Max Mana.", effects: { focusBonus: 3 } },
-
-    // Opening line
-    { id: "mira_quick_sip", name: "Quick Sip", group: "Utility", line: "Opening", tier: 1, lineOrder: 2, icon: "🥤", cost: 1, desc: "Start battles with +1 Mana.", effects: { startMana: 1 } },
-    { id: "mira_hot_pour", name: "Hot Pour", group: "Utility", line: "Opening", tier: 2, lineOrder: 2, icon: "☕", cost: 2, desc: "Start battles with +2 Mana.", effects: { startMana: 2 } },
-    { id: "mira_rolling_boil", name: "Rolling Boil", group: "Utility", line: "Opening", tier: 3, lineOrder: 2, icon: "♨️", cost: 2, desc: "Start battles with +3 Mana.", effects: { startMana: 3 } },
-
-    // Recovery line
-    { id: "mira_simmering_remedy", name: "Simmering Remedy", group: "Utility", line: "Recovery", tier: 1, lineOrder: 3, icon: "🩺", cost: 1, desc: "+8% healing.", effects: { healPct: 0.08 } },
-    { id: "mira_herbal_blend", name: "Herbal Blend", group: "Utility", line: "Recovery", tier: 2, lineOrder: 3, icon: "🌿", cost: 1, desc: "+12% healing.", effects: { healPct: 0.12 } },
-    { id: "mira_full_tonic", name: "Full Tonic", group: "Utility", line: "Recovery", tier: 3, lineOrder: 3, icon: "🧴", cost: 2, desc: "+16% healing.", effects: { healPct: 0.16 } },
-
-    // Study line
-    { id: "mira_recipe_notes", name: "Recipe Notes", group: "Utility", line: "Study", tier: 1, lineOrder: 4, icon: "🧾", cost: 1, desc: "+10% XP gained.", effects: { xpPct: 0.10 } },
-    { id: "mira_margin_recipe", name: "Margin Recipe", group: "Utility", line: "Study", tier: 2, lineOrder: 4, icon: "📝", cost: 1, desc: "+12% XP gained.", effects: { xpPct: 0.12 } },
-    { id: "mira_master_chef", name: "Master Chef", group: "Utility", line: "Study", tier: 3, lineOrder: 4, icon: "👩‍🍳", cost: 2, desc: "+15% XP gained.", effects: { xpPct: 0.15 } },
-  ],
-
-  // Water + Sound (Devante)
-  devante: [
-    // Damage line
-    { id: "devante_ripple_strike", name: "Ripple Strike", group: "Offense", line: "Damage", tier: 1, lineOrder: 1, icon: "〰️", cost: 1, desc: "+4% damage dealt.", effects: { powerPct: 0.04 } },
-    { id: "devante_tidecut", name: "Tidecut", group: "Offense", line: "Damage", tier: 2, lineOrder: 1, icon: "🌊", cost: 1, desc: "+6% damage dealt.", effects: { powerPct: 0.06 } },
-    { id: "devante_surge_chord", name: "Surge Chord", group: "Offense", line: "Damage", tier: 3, lineOrder: 1, icon: "🔊", cost: 2, desc: "+10% damage dealt.", effects: { powerPct: 0.10 } },
-
-    // Guard line
-    { id: "devante_breakwater", name: "Breakwater", group: "Defense", line: "Guard", tier: 1, lineOrder: 1, icon: "🧱", cost: 1, desc: "+4% damage reduction.", effects: { drPct: 0.04 } },
-    { id: "devante_undertow", name: "Undertow", group: "Defense", line: "Guard", tier: 2, lineOrder: 1, icon: "🪨", cost: 1, desc: "+6% damage reduction.", effects: { drPct: 0.06 } },
-    { id: "devante_reefwall", name: "Reefwall", group: "Defense", line: "Guard", tier: 3, lineOrder: 1, icon: "🪸", cost: 2, desc: "+10% damage reduction.", effects: { drPct: 0.10 } },
-
-    // Vitality line
-    { id: "devante_salt_hardening", name: "Salt Hardening", group: "Defense", line: "Vitality", tier: 1, lineOrder: 2, icon: "🧂", cost: 1, desc: "+2 Max HP.", effects: { hpBonus: 2 } },
-    { id: "devante_seaglass_skin", name: "Sea Glass Skin", group: "Defense", line: "Vitality", tier: 2, lineOrder: 2, icon: "🟦", cost: 1, desc: "+3 Max HP.", effects: { hpBonus: 3 } },
-    { id: "devante_tidebone", name: "Tidebone", group: "Defense", line: "Vitality", tier: 3, lineOrder: 2, icon: "🦴", cost: 2, desc: "+6 Max HP.", effects: { hpBonus: 6 } },
-
-    // Mana line
-    { id: "devante_tidal_focus", name: "Tidal Focus", group: "Utility", line: "Mana", tier: 1, lineOrder: 1, icon: "💧", cost: 1, desc: "+1 Max Mana.", effects: { focusBonus: 1 } },
-    { id: "devante_deep_reservoir", name: "Deep Reservoir", group: "Utility", line: "Mana", tier: 2, lineOrder: 1, icon: "🌌", cost: 2, desc: "+2 Max Mana.", effects: { focusBonus: 2 } },
-    { id: "devante_abyssal_reserve", name: "Abyssal Reserve", group: "Utility", line: "Mana", tier: 3, lineOrder: 1, icon: "🕳️", cost: 2, desc: "+3 Max Mana.", effects: { focusBonus: 3 } },
-
-    // Opening line
-    { id: "devante_bubble_start", name: "Bubble Start", group: "Utility", line: "Opening", tier: 1, lineOrder: 2, icon: "🫧", cost: 1, desc: "Start battles with +1 Mana.", effects: { startMana: 1 } },
-    { id: "devante_surge_start", name: "Surge Start", group: "Utility", line: "Opening", tier: 2, lineOrder: 2, icon: "🌊", cost: 2, desc: "Start battles with +2 Mana.", effects: { startMana: 2 } },
-    { id: "devante_undertone_start", name: "Undertone Start", group: "Utility", line: "Opening", tier: 3, lineOrder: 2, icon: "🎚️", cost: 2, desc: "Start battles with +3 Mana.", effects: { startMana: 3 } },
-
-    // Recovery line
-    { id: "devante_echo_current", name: "Echo Current", group: "Utility", line: "Recovery", tier: 1, lineOrder: 3, icon: "🩹", cost: 1, desc: "+8% healing.", effects: { healPct: 0.08 } },
-    { id: "devante_rippling_relief", name: "Rippling Relief", group: "Utility", line: "Recovery", tier: 2, lineOrder: 3, icon: "💦", cost: 1, desc: "+12% healing.", effects: { healPct: 0.12 } },
-    { id: "devante_choir_of_tides", name: "Choir of Tides", group: "Utility", line: "Recovery", tier: 3, lineOrder: 3, icon: "🎵", cost: 2, desc: "+16% healing.", effects: { healPct: 0.16 } },
-
-    // Study line
-    { id: "devante_cartographer", name: "Cartographer", group: "Utility", line: "Study", tier: 1, lineOrder: 4, icon: "🗺️", cost: 1, desc: "+10% XP gained.", effects: { xpPct: 0.10 } },
-    { id: "devante_sea_log", name: "Sea Log", group: "Utility", line: "Study", tier: 2, lineOrder: 4, icon: "📓", cost: 1, desc: "+12% XP gained.", effects: { xpPct: 0.12 } },
-    { id: "devante_soundings", name: "Soundings", group: "Utility", line: "Study", tier: 3, lineOrder: 4, icon: "📚", cost: 2, desc: "+15% XP gained.", effects: { xpPct: 0.15 } },
-  ],
-
-  // Binding + ??? (Elroy)
-  elroy: [
-    // Damage line
-    { id: "elroy_quick_knots", name: "Quick Knots", group: "Offense", line: "Damage", tier: 1, lineOrder: 1, icon: "🧷", cost: 1, desc: "+4% damage dealt.", effects: { powerPct: 0.04 } },
-    { id: "elroy_binding_cut", name: "Binding Cut", group: "Offense", line: "Damage", tier: 2, lineOrder: 1, icon: "🪢", cost: 1, desc: "+6% damage dealt.", effects: { powerPct: 0.06 } },
-    { id: "elroy_sigiled_edge", name: "Sigiled Edge", group: "Offense", line: "Damage", tier: 3, lineOrder: 1, icon: "🔷", cost: 2, desc: "+10% damage dealt.", effects: { powerPct: 0.10 } },
-
-    // Guard line
-    { id: "elroy_ward_stitch", name: "Ward Stitch", group: "Defense", line: "Guard", tier: 1, lineOrder: 1, icon: "🧿", cost: 1, desc: "+4% damage reduction.", effects: { drPct: 0.04 } },
-    { id: "elroy_guarded_thread", name: "Guarded Thread", group: "Defense", line: "Guard", tier: 2, lineOrder: 1, icon: "🧵", cost: 1, desc: "+6% damage reduction.", effects: { drPct: 0.06 } },
-    { id: "elroy_warding_weave", name: "Warding Weave", group: "Defense", line: "Guard", tier: 3, lineOrder: 1, icon: "🪡", cost: 2, desc: "+10% damage reduction.", effects: { drPct: 0.10 } },
-
-    // Vitality line
-    { id: "elroy_fiber_padding", name: "Fiber Padding", group: "Defense", line: "Vitality", tier: 1, lineOrder: 2, icon: "🧶", cost: 1, desc: "+2 Max HP.", effects: { hpBonus: 2 } },
-    { id: "elroy_hardened_charm", name: "Hardened Charm", group: "Defense", line: "Vitality", tier: 2, lineOrder: 2, icon: "🪬", cost: 2, desc: "+4 Max HP.", effects: { hpBonus: 4 } },
-    { id: "elroy_iron_bind", name: "Iron Bind", group: "Defense", line: "Vitality", tier: 3, lineOrder: 2, icon: "⛓️", cost: 2, desc: "+6 Max HP.", effects: { hpBonus: 6 } },
-
-    // Mana line
-    { id: "elroy_steady_focus", name: "Steady Focus", group: "Utility", line: "Mana", tier: 1, lineOrder: 1, icon: "🧠", cost: 1, desc: "+1 Max Mana.", effects: { focusBonus: 1 } },
-    { id: "elroy_sigiled_focus", name: "Sigiled Focus", group: "Utility", line: "Mana", tier: 2, lineOrder: 1, icon: "🔷", cost: 2, desc: "+2 Max Mana.", effects: { focusBonus: 2 } },
-    { id: "elroy_etched_reserve", name: "Etched Reserve", group: "Utility", line: "Mana", tier: 3, lineOrder: 1, icon: "🗝️", cost: 2, desc: "+3 Max Mana.", effects: { focusBonus: 3 } },
-
-    // Opening line
-    { id: "elroy_first_sigil", name: "First Sigil", group: "Utility", line: "Opening", tier: 1, lineOrder: 2, icon: "✨", cost: 1, desc: "Start battles with +1 Mana.", effects: { startMana: 1 } },
-    { id: "elroy_second_sigil", name: "Second Sigil", group: "Utility", line: "Opening", tier: 2, lineOrder: 2, icon: "✨", cost: 2, desc: "Start battles with +2 Mana.", effects: { startMana: 2 } },
-    { id: "elroy_third_sigil", name: "Third Sigil", group: "Utility", line: "Opening", tier: 3, lineOrder: 2, icon: "✨", cost: 2, desc: "Start battles with +3 Mana.", effects: { startMana: 3 } },
-
-    // Recovery line
-    { id: "elroy_renewal_thread", name: "Renewal Thread", group: "Utility", line: "Recovery", tier: 1, lineOrder: 3, icon: "🩹", cost: 1, desc: "+8% healing.", effects: { healPct: 0.08 } },
-    { id: "elroy_restitch", name: "Restitch", group: "Utility", line: "Recovery", tier: 2, lineOrder: 3, icon: "🪡", cost: 1, desc: "+12% healing.", effects: { healPct: 0.12 } },
-    { id: "elroy_full_reweave", name: "Full Reweave", group: "Utility", line: "Recovery", tier: 3, lineOrder: 3, icon: "🧵", cost: 2, desc: "+16% healing.", effects: { healPct: 0.16 } },
-
-    // Study line
-    { id: "elroy_field_ledger", name: "Field Ledger", group: "Utility", line: "Study", tier: 1, lineOrder: 4, icon: "📒", cost: 1, desc: "+10% XP gained.", effects: { xpPct: 0.10 } },
-    { id: "elroy_margin_ledger", name: "Margin Ledger", group: "Utility", line: "Study", tier: 2, lineOrder: 4, icon: "📝", cost: 1, desc: "+12% XP gained.", effects: { xpPct: 0.12 } },
-    { id: "elroy_master_record", name: "Master Record", group: "Utility", line: "Study", tier: 3, lineOrder: 4, icon: "📚", cost: 2, desc: "+15% XP gained.", effects: { xpPct: 0.15 } },
-  ],
-};
-
-/** @type {Set<string>} */
-const ALL_PERK_IDS = new Set([
-  ...Object.values(PERKS_BY_HERO).flat(),
-  ...GENERIC_PERKS,
-].map((p) => p.id));
-
-/** @param {string} heroId */
-function getPerkDefsForHero(heroId) {
-  const key = String(heroId || "");
-  if (!window.__perkDefCache) window.__perkDefCache = new Map();
-  /** @type {Map<string, any[]>} */
-  const cache = window.__perkDefCache;
-
-  if (cache.has(key)) return cache.get(key);
-
-  const base = (Array.isArray(PERKS_BY_HERO[key]) && PERKS_BY_HERO[key].length)
-    ? PERKS_BY_HERO[key]
-    : GENERIC_PERKS;
-
-  const norm = normalizePerkDefs(base);
-  cache.set(key, norm);
-  return norm;
-}
-
-/**
- * Normalize perk defs into a simple "skill tree" shape:
- * - Ensures {group, line, tier} exist.
- * - Infers `requires` for perks in the same (group,line) when missing:
- *   Tier 2+ requires the previous tier.
- * @param {any[]} list
- */
-function normalizePerkDefs(list) {
-  const src = Array.isArray(list) ? list : [];
-  /** @type {any[]} */
-  const out = src.map((p) => ({ ...p }));
-
-  // Build lines in insertion order for stable UI.
-  /** @type {Map<string, any[]>} */
-  const byLine = new Map();
-  out.forEach((p) => {
-    if (!p || typeof p !== "object") return;
-    p.group = (p.group && typeof p.group === "string") ? p.group : "Utility";
-    p.line = (p.line && typeof p.line === "string") ? p.line : p.group;
-    const k = `${p.group}::${p.line}`;
-    if (!byLine.has(k)) byLine.set(k, []);
-    byLine.get(k).push(p);
-  });
-
-  byLine.forEach((arr) => {
-    // Assign tiers if missing (use order within the line).
-    arr.forEach((p, i) => {
-      if (typeof p.tier !== "number" || !isFinite(p.tier)) p.tier = i + 1;
-      p.tier = Math.max(1, toSafeInt(p.tier, 1));
-      if (!Array.isArray(p.requires)) p.requires = null;
-    });
-
-    // Sort by tier, then keep stable for any ties.
-    arr.sort((a, b) => {
-      const ta = Math.max(1, toSafeInt(a.tier, 1));
-      const tb = Math.max(1, toSafeInt(b.tier, 1));
-      if (ta !== tb) return ta - tb;
-      return 0;
-    });
-
-    // Infer requires: Tier 2+ requires previous tier, unless explicitly set.
-    for (let i = 0; i < arr.length; i++) {
-      const p = arr[i];
-      if (Array.isArray(p.requires)) continue;
-      if (i === 0) p.requires = [];
-      else p.requires = [arr[i - 1].id];
-    }
-  });
-
-  return out;
-}
-
-/** @param {any} raw @param {string} heroId */
-function sanitizePerkIds(raw, heroId) {
-  const allowed = new Set(getPerkDefsForHero(heroId).map((p) => p.id));
-  const src = Array.isArray(raw) ? raw : [];
-  return src.filter((id) => typeof id === "string" && allowed.has(id));
-}
-
-/** @param {string} heroId @param {string[]} perkIds */
-function perkBonusesFromIds(heroId, perkIds) {
-  const defs = getPerkDefsForHero(heroId);
-  const byId = new Map(defs.map((p) => [p.id, p]));
-
-  let hpBonus = 0;
-  let focusBonus = 0;
-  let powerPct = 0;
-  let healPct = 0;
-  let drPct = 0;
-  let xpPct = 0;
-  let startMana = 0;
-
-  (Array.isArray(perkIds) ? perkIds : []).forEach((id) => {
-    const p = byId.get(id);
-    if (!p) return;
-    const fx = p.effects || {};
-    hpBonus += Math.max(0, toSafeInt(fx.hpBonus, 0));
-    focusBonus += Math.max(0, toSafeInt(fx.focusBonus, 0));
-    powerPct += clamp(Number(fx.powerPct ?? 0), 0, 0.50);
-    healPct += clamp(Number(fx.healPct ?? 0), 0, 0.50);
-    drPct += clamp(Number(fx.drPct ?? 0), 0, 0.50);
-    xpPct += clamp(Number(fx.xpPct ?? 0), 0, 0.50);
-    startMana += Math.max(0, toSafeInt(fx.startMana, 0));
-  });
-
-  // Keep stacking sane.
-  powerPct = clamp(powerPct, 0, 0.50);
-  healPct = clamp(healPct, 0, 0.50);
-  drPct = clamp(drPct, 0, 0.50);
-  xpPct = clamp(xpPct, 0, 0.50);
-  startMana = clamp(startMana, 0, 3);
-
-  return { hpBonus, focusBonus, powerPct, healPct, drPct, xpPct, startMana };
-}
-
 /** @param {string} heroId */
 
 function loadHeroProgress(heroId) {
@@ -4613,8 +3464,6 @@ function loadHeroProgress(heroId) {
     return {
       level: 1,
       xp: 0,
-      skillPoints: 0,
-      perks: [],
       spells: undefined,
       items: { ...STARTING_ITEMS },
       gear: { ...STARTING_GEAR },
@@ -4638,27 +3487,11 @@ function loadHeroProgress(heroId) {
 
     const bossUniques = sanitizeBossUniques(obj?.bossUniques);
 
-    // Perks: backwards compatible and (optionally) retroactive points for existing saves.
-    const perks = sanitizePerkIds(obj?.perks ?? obj?.perkIds, heroId);
-    const defs = getPerkDefsForHero(heroId);
-    const costById = new Map(defs.map((p) => [p.id, Math.max(0, toSafeInt(p.cost, 1))]));
-    const spent = perks.reduce((sum, id) => sum + (costById.get(id) || 0), 0);
-
-    let skillPoints = 0;
-    if (typeof obj?.skillPoints === "number") {
-      skillPoints = clamp(toSafeInt(obj.skillPoints, 0), 0, 99);
-    } else {
-      // If this save predates perks, grant points earned so far (level-1) minus anything already spent.
-      skillPoints = clamp(Math.max(0, (level - 1) - spent), 0, 99);
-    }
-
-    return { level, xp, skillPoints, perks, spells, items, gear, equipSlots, bossUniques };
+    return { level, xp, spells, items, gear, equipSlots, bossUniques };
   } catch {
     return {
       level: 1,
       xp: 0,
-      skillPoints: 0,
-      perks: [],
       spells: undefined,
       items: { ...STARTING_ITEMS },
       gear: { ...STARTING_GEAR },
@@ -4679,10 +3512,6 @@ function saveHeroProgress(heroId, prog) {
       level: Math.max(1, toSafeInt(prog.level, 1)),
       xp: Math.max(0, toSafeInt(prog.xp, 0)),
     };
-
-    // Perks + skill points are hero-specific.
-    payload.skillPoints = clamp(toSafeInt(prog?.skillPoints, 0), 0, 99);
-    payload.perks = sanitizePerkIds(prog?.perks ?? prog?.perkIds, heroId);
 
     if (Array.isArray(prog.spells)) {
       payload.spells = prog.spells.filter((id) => typeof id === "string" && !!SPELLS_BY_ID[id]);
@@ -5266,18 +4095,10 @@ function setActiveLocation(id) {
     const equipSlots = sanitizeEquipSlots(prog.equipSlots ?? prog.equip, gear);
     const bonus = gearBonusesFromSlots(equipSlots);
 
-    // Perks are tied to the hero (stored in progress).
-    const perkIds = sanitizePerkIds(prog.perks ?? prog.perkIds, pt.id);
-    const perkBonus = perkBonusesFromIds(pt.id, perkIds);
-
     const bossUniques = sanitizeBossUniques(prog.bossUniques);
 
-    const maxWithGear = scaled.maxHp + bonus.hpBonus + perkBonus.hpBonus;
-    const focusMaxWithGear = scaled.focusMax + bonus.focusBonus + perkBonus.focusBonus;
-
-    const powerPct = clamp(bonus.powerPct + perkBonus.powerPct, 0, 0.75);
-    const healPct = clamp(bonus.healPct + perkBonus.healPct, 0, 0.75);
-    const drPct = clamp(bonus.drPct + perkBonus.drPct, 0, 0.75);
+    const maxWithGear = scaled.maxHp + bonus.hpBonus;
+    const focusMaxWithGear = scaled.focusMax + bonus.focusBonus;
 
     const savedSpells = Array.isArray(prog.spells) ? prog.spells : knownSpellIdsFor(pt.types, prog.level);
     let spells = sanitizeKnownSpellIds(savedSpells, pt.types, prog.level);
@@ -5298,16 +4119,11 @@ function setActiveLocation(id) {
       level: prog.level,
       xp: prog.xp,
       xpToNext: xpToNext(prog.level),
-      powerMult: scaled.powerMult * (1 + powerPct),
-      healMult: scaled.healMult * (1 + healPct),
-      equipDR: drPct,
-      xpMult: 1 + clamp(perkBonus.xpPct, 0, 0.50),
+      powerMult: scaled.powerMult * (1 + bonus.powerPct),
+      healMult: scaled.healMult * (1 + bonus.healPct),
+      equipDR: bonus.drPct,
       baseMaxHp: pt.maxHp,
       baseFocusMax: pt.focusMax,
-
-      // skill points
-      skillPoints: clamp(toSafeInt(prog.skillPoints, 0), 0, 99),
-      perks: perkIds,
 
       // vitals
       hp: maxWithGear,
@@ -5336,7 +4152,7 @@ function setActiveLocation(id) {
 
       // resources
       healCharges: pt.healCharges,
-      focus: clamp(scaled.focusStart + perkBonus.startMana, 0, focusMaxWithGear),
+      focus: clamp(scaled.focusStart, 0, focusMaxWithGear),
       focusMax: focusMaxWithGear,
     };
   }
@@ -5458,20 +4274,6 @@ syncKnownSpells(false);
     el.textContent = text;
   }
 
-  /** Render enemy header with distinct typography (name vs level/wave badges). */
-  function setEnemyHeader(el, name, level, waveIndex1, waveTotal, isBoss) {
-    if (!el) return;
-    const safeName = escapeHtml(name);
-    const lvText = `Lv ${Number.isFinite(level) ? level : 1}`;
-    const waveText = `Wave ${Number.isFinite(waveIndex1) ? waveIndex1 : 1}/${Number.isFinite(waveTotal) ? waveTotal : 1}`;
-    el.innerHTML = `
-      <span class="enemyTitle">${safeName}</span>
-      <span class="enemyBadge enemyBadge--lv">${escapeHtml(lvText)}</span>
-      <span class="enemyBadge enemyBadge--wave">${escapeHtml(waveText)}</span>
-      ${isBoss ? '<span class="enemyBadge enemyBadge--boss">BOSS</span>' : ''}
-    `.trim();
-  }
-
   /** @param {HTMLElement|null} el @param {number} ratio */
   function setBar(el, ratio) {
     if (!el) return;
@@ -5499,8 +4301,6 @@ function persistPlayerProgress() {
   saveHeroProgress(heroId, {
     level: Math.max(1, toSafeInt(state.player.level, 1)),
     xp: Math.max(0, toSafeInt(state.player.xp, 0)),
-    skillPoints: clamp(toSafeInt(state.player.skillPoints, 0), 0, 99),
-    perks: sanitizePerkIds(state.player.perks ?? state.player.perkIds, heroId),
     spells: Array.isArray(state.player.spells) ? state.player.spells : [],
     items: sanitizeItemCounts(state.player.items),
     gear: sanitizeGearCounts(state.player.gear),
@@ -5523,18 +4323,10 @@ function persistPlayerProgress() {
     state.player.equipSlots = sanitizeEquipSlots(state.player.equipSlots ?? state.player.equip, state.player.gear);
     const bonus = gearBonusesFromSlots(state.player.equipSlots);
 
-    // Perks (skill points) bonuses.
-    state.player.perks = sanitizePerkIds(state.player.perks ?? state.player.perkIds, hero.id);
-    state.player.skillPoints = clamp(toSafeInt(state.player.skillPoints, 0), 0, 99);
-    const perkBonus = perkBonusesFromIds(hero.id, state.player.perks);
-
-    const newMax = scaled.maxHp + bonus.hpBonus + perkBonus.hpBonus;
-    const newFocusMax = scaled.focusMax + bonus.focusBonus + perkBonus.focusBonus;
-    const powerPct = clamp(bonus.powerPct + perkBonus.powerPct, 0, 0.75);
-    const healPct = clamp(bonus.healPct + perkBonus.healPct, 0, 0.75);
-    const drPct = clamp(bonus.drPct + perkBonus.drPct, 0, 0.75);
-    const newPowerMult = scaled.powerMult * (1 + powerPct);
-    const newHealMult = scaled.healMult * (1 + healPct);
+    const newMax = scaled.maxHp + bonus.hpBonus;
+    const newFocusMax = scaled.focusMax + bonus.focusBonus;
+    const newPowerMult = scaled.powerMult * (1 + bonus.powerPct);
+    const newHealMult = scaled.healMult * (1 + bonus.healPct);
 
     const oldMax = toSafeInt(state.player.max, newMax);
     const oldFocusMax = toSafeInt(state.player.focusMax, newFocusMax);
@@ -5543,8 +4335,7 @@ function persistPlayerProgress() {
     state.player.focusMax = newFocusMax;
     state.player.powerMult = newPowerMult;
     state.player.healMult = newHealMult;
-    state.player.equipDR = drPct;
-    state.player.xpMult = 1 + clamp(perkBonus.xpPct, 0, 0.50);
+    state.player.equipDR = bonus.drPct;
     state.player.xpToNext = xpToNext(lvl);
     state.player.baseMaxHp = hero.maxHp;
     state.player.baseFocusMax = hero.focusMax;
@@ -5570,26 +4361,18 @@ function persistPlayerProgress() {
 
   /** @param {number} amount */
   function gainXp(amount) {
-    const base = Math.max(0, toSafeInt(amount, 0));
-    const xpMult = clamp(Number(state.player.xpMult ?? 1), 1, 1.50);
-    const add = Math.max(0, Math.round(base * xpMult));
-    if (add <= 0) return { xpAdded: 0, leveled: false, levelsGained: 0, levelBefore: Math.max(1, toSafeInt(state.player.level, 1)), levelAfter: Math.max(1, toSafeInt(state.player.level, 1)), spGained: 0, pendingSpellChoices: 0 };
+    const add = Math.max(0, toSafeInt(amount, 0));
+    if (add <= 0) return;
 
     state.player.xp = Math.max(0, toSafeInt(state.player.xp, 0) + add);
     addLog(`✨ You gain ${add} XP.`);
 
     let leveled = false;
     let pendingAdded = 0;
-    let spGained = 0;
-    let levelsGained = 0;
-    const levelBefore = Math.max(1, toSafeInt(state.player.level, 1));
 
     while (state.player.xp >= state.player.xpToNext) {
       state.player.xp -= state.player.xpToNext;
       state.player.level = Math.max(1, toSafeInt(state.player.level, 1) + 1);
-      levelsGained += 1;
-      state.player.skillPoints = clamp(toSafeInt(state.player.skillPoints, 0) + 1, 0, 99);
-      spGained += 1;
       state.player.xpToNext = xpToNext(state.player.level);
       syncPlayerLevel(true);
 
@@ -5598,13 +4381,9 @@ function persistPlayerProgress() {
 
       leveled = true;
       addLog(`🌟 Level up! You are now Lv ${state.player.level}.`);
-      addLog(`✨ You earned 1 skill point.`);
     }
 
     if (leveled) {
-      if (spGained > 0) {
-        addLog(`🧠 You earned ${spGained} skill point${spGained === 1 ? "" : "s"}. Open Perks to spend them.`);
-      }
       // A little celebration without interrupting flow.
       showMoveBanner("Level Up", "Sight");
 
@@ -5616,16 +4395,6 @@ function persistPlayerProgress() {
 
     persistPlayerProgress();
     render();
-
-    return {
-      xpAdded: add,
-      leveled,
-      levelsGained,
-      levelBefore,
-      levelAfter: Math.max(1, toSafeInt(state.player.level, 1)),
-      spGained,
-      pendingSpellChoices: pendingAdded,
-    };
   }
 
   /** @param {number} base */
@@ -5883,7 +4652,7 @@ function persistPlayerProgress() {
 
     const typed = computeTypedDamage("enemy", "player", intent.base, intent.type);
     const badge = typed.note ? `, ${typed.note}` : "";
-    els.enemyIntentText.textContent = `Intent: ${intent.name} (${intent.type}${badge})`;
+    els.enemyIntentText.textContent = `Intent: ${intent.name} (${intent.type} x${fmtMult(typed.eff)}${badge})`;
   }
 
   // --------------------
@@ -6062,7 +4831,7 @@ function persistPlayerProgress() {
     setText(els.playerName, state.player.name);
     const enemyLv = typeof state.enemy.level === "number" ? state.enemy.level : 1;
     const isBossWave = Array.isArray(state.enemySet) && state.enemySet.length >= 3 && state.wave === state.enemySet.length - 1;
-    setEnemyHeader(els.enemyName, state.enemy.name, enemyLv, state.wave + 1, state.enemySet.length, isBossWave);
+    setText(els.enemyName, `${state.enemy.name} Lv ${enemyLv} (Wave ${state.wave + 1}/${state.enemySet.length}${isBossWave ? " • BOSS" : ""})`);
     setTypeLine(els.playerTypeText, state.player.types);
     setTypeLine(els.enemyTypeText, state.enemy.types);
 
@@ -6081,7 +4850,6 @@ function persistPlayerProgress() {
       els.playerEquipText.textContent = `Equipment: ${parts.join(" • ")}`;
     }
     updateSpellPickButtonUI();
-    updatePerkButtonUI();
 
     // Focus + intent
     if (els.playerFocusText instanceof HTMLElement) {
@@ -6172,7 +4940,7 @@ function persistPlayerProgress() {
       // Add a small type icon next to the Attack button label.
       const atkIcon = typeIcon(atkType);
       els.attackBtn.classList.add("hasTypeIcon");
-      els.attackBtn.innerHTML = `<span class="btnTypeIcon" aria-hidden="true">${atkIcon}</span><span class="btnTypeText">Attack (${atkLabel} | +1 Mana)</span>`;
+      els.attackBtn.innerHTML = `<span class="btnTypeIcon" aria-hidden="true">${atkIcon}</span><span class="btnTypeText">Attack (${atkLabel} x${fmtMult(atkPrev.overall)} | +1 Mana)</span>`;
       els.attackBtn.dataset.type = atkType;
     }
     // Spells unlock on level-up and are rendered dynamically.
@@ -6373,7 +5141,7 @@ function persistPlayerProgress() {
 
     addLog(defeatMessage);
     // Award XP for the defeated enemy (before swapping to the next wave).
-    const xpRes = gainXp(xpForEnemy(state.enemy));
+    gainXp(xpForEnemy(state.enemy));
 
     // Play the badge-unlock SFX when you clear Wave 1.
     if (state.wave === 0) playWaveClearSfx();
@@ -6413,31 +5181,25 @@ function persistPlayerProgress() {
       }
     }
 
-    // Lock controls and show the victory/loot screen until the player continues.
+    // Lock controls and show a brief victory/loot screen for ~3 seconds.
     setPhase("loot");
     const title = isFinal ? "Victory!" : `Wave ${state.wave + 1} cleared!`;
     const subtitle = isFinal ? "You collect your spoils." : "You collect your spoils.";
-    const summary = [];
-    if (xpRes && xpRes.xpAdded) summary.push({ kind: "xp", text: `✨ XP +${xpRes.xpAdded}` });
-    if (xpRes && xpRes.leveled && xpRes.levelsGained > 0) {
-      summary.push({ kind: "lvl", text: `🌟 Level ${xpRes.levelBefore} → ${xpRes.levelAfter}` });
-    }
-    if (xpRes && xpRes.spGained > 0) {
-      const n = xpRes.spGained;
-      summary.push({ kind: "sp", text: n === 1 ? "🧠 +1 Skill Point" : `🧠 +${n} Skill Points` });
-    }
-    if (xpRes && xpRes.pendingSpellChoices > 0) {
-      const n = xpRes.pendingSpellChoices;
-      summary.push({ kind: "spell", text: n === 1 ? "📜 New spell choice" : `📜 ${n} new spell choices` });
-    }
-
-    openLootScreen(title, subtitle, lootLine(), summary);
+    openLootScreen(title, subtitle, lootLine());
     render();
 
     const myBattle = state.battleId;
 
-    // Remember what should happen after the loot screen closes (Continue button).
+    // Remember what should happen after the loot screen closes (timer or Escape).
     lootResolve = { battleId: myBattle, isFinal, nextIndex };
+
+    if (lootTimer) window.clearTimeout(lootTimer);
+    lootTimer = window.setTimeout(() => {
+      // If the player started a new battle, do nothing.
+      if (!state || state.battleId !== myBattle) return;
+      closeLootScreen();
+      lootTimer = 0;
+    }, 3000);
   }
 
 
@@ -6722,7 +5484,7 @@ function persistPlayerProgress() {
 
     addLog(`${e.name} uses ${intent.name} for ${afterDef} damage.`);
     if (typed.note) addLog(typed.note);
-    setEffectBanner(`${typed.tierLabel}`, typed.bannerTone);
+    setEffectBanner(`${typed.tierLabel} (x${fmtMult(typed.eff)})`, typed.bannerTone);
     playAnim(els.playerSprite, "rpgAnim-hit");
     spawnFloat(`-${afterDef}`, "player", "dmg", typed.eff);
 
@@ -6849,7 +5611,7 @@ function persistPlayerProgress() {
     state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
     addLog(`You strike ${state.enemy.name} for ${def.final} damage.`);
     if (typed.note) addLog(typed.note);
-    setEffectBanner(`${typed.tierLabel}`, typed.bannerTone);
+    setEffectBanner(`${typed.tierLabel} (x${fmtMult(typed.eff)})`, typed.bannerTone);
     playAnim(els.enemySprite, "rpgAnim-hit");
     spawnFx(fxKindForType(atkType), "enemy");
     spawnFloat(`-${def.final}`, "enemy", "dmg", typed.eff);
@@ -6955,7 +5717,7 @@ function persistPlayerProgress() {
 
     addLog(`You cast ${spell.name} for ${def.final} damage.`);
     if (typed.note) addLog(typed.note);
-    setEffectBanner(`${typed.tierLabel}`, typed.bannerTone);
+    setEffectBanner(`${typed.tierLabel} (x${fmtMult(typed.eff)})`, typed.bannerTone);
 
     playAnim(els.enemySprite, "rpgAnim-hit");
     spawnFx(fxKindForType(spell.type), "enemy");
@@ -7088,7 +5850,7 @@ function persistPlayerProgress() {
     state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
     addLog(`You send a wind blade for ${def.final} damage.`);
     if (typed.note) addLog(typed.note);
-    setEffectBanner(`${typed.tierLabel}`, typed.bannerTone);
+    setEffectBanner(`${typed.tierLabel} (x${fmtMult(typed.eff)})`, typed.bannerTone);
     playAnim(els.enemySprite, "rpgAnim-hit");
 
     spawnFx("wind", "enemy");
@@ -7170,7 +5932,7 @@ function persistPlayerProgress() {
     state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
     addLog(`You crash water onto ${state.enemy.name} for ${def.final} damage.`);
     if (typed.note) addLog(typed.note);
-    setEffectBanner(`${typed.tierLabel}`, typed.bannerTone);
+    setEffectBanner(`${typed.tierLabel} (x${fmtMult(typed.eff)})`, typed.bannerTone);
     playAnim(els.enemySprite, "rpgAnim-hit");
     spawnFx("water", "enemy");
     spawnFloat(`-${def.final}`, "enemy", "dmg", typed.eff);
@@ -7261,7 +6023,7 @@ function persistPlayerProgress() {
     state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
     addLog(`You unleash a sonic burst for ${def.final} damage.`);
     if (typed.note) addLog(typed.note);
-    setEffectBanner(`${typed.tierLabel}`, typed.bannerTone);
+    setEffectBanner(`${typed.tierLabel} (x${fmtMult(typed.eff)})`, typed.bannerTone);
     playAnim(els.enemySprite, "rpgAnim-hit");
     spawnFx("sound", "enemy");
     spawnFloat(`-${def.final}`, "enemy", "dmg", typed.eff);
@@ -7335,7 +6097,7 @@ function playerSmellTasteAttack() {
   state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
   addLog(`You release an aroma hex for ${def.final} damage.`);
   if (typed.note) addLog(typed.note);
-  setEffectBanner(`${typed.tierLabel}`, typed.bannerTone);
+  setEffectBanner(`${typed.tierLabel} (x${fmtMult(typed.eff)})`, typed.bannerTone);
   playAnim(els.enemySprite, "rpgAnim-hit");
   spawnFx("smell", "enemy");
   spawnFloat(`-${def.final}`, "enemy", "dmg", typed.eff);
@@ -7411,7 +6173,7 @@ function playerFireAttack() {
     state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
     addLog(`You hurl flame for ${def.final} damage.`);
     if (typed.note) addLog(typed.note);
-    setEffectBanner(`${typed.tierLabel}`, typed.bannerTone);
+    setEffectBanner(`${typed.tierLabel} (x${fmtMult(typed.eff)})`, typed.bannerTone);
     playAnim(els.enemySprite, "rpgAnim-hit");
     spawnFx("fire", "enemy");
     spawnFloat(`-${def.final}`, "enemy", "dmg", typed.eff);
@@ -7520,7 +6282,7 @@ function playerFireAttack() {
     state.enemy.hp = clamp(state.enemy.hp - def.final, 0, state.enemy.max);
     addLog(`You channel ${label} magic for ${def.final} damage.`);
     if (typed.note) addLog(typed.note);
-    setEffectBanner(`${typed.tierLabel}`, typed.bannerTone);
+    setEffectBanner(`${typed.tierLabel} (x${fmtMult(typed.eff)})`, typed.bannerTone);
     playAnim(els.enemySprite, "rpgAnim-hit");
     spawnFx(fxKindForType(t), "enemy");
     spawnFloat(`-${def.final}`, "enemy", "dmg", typed.eff);
@@ -7856,7 +6618,6 @@ function playerFireAttack() {
 
 
   function restartToHeroSelect() {
-    __exitBossMusic();
     closeMagicMenu();
     closeInventoryMenu();
     closeHeroPicker();
@@ -7876,7 +6637,6 @@ function playerFireAttack() {
   }
 
   function restart() {
-    __exitBossMusic();
     closeMagicMenu();
     closeInventoryMenu();
     closeHeroPicker();

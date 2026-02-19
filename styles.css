@@ -2475,6 +2475,15 @@ body.isEditingShopProduct {
   transition: width 180ms ease;
 }
 
+/* XP mini bar: slimmer + different hue than Mana (still uses the same component) */
+.rpgMiniBar--xp{
+  height: 6px;
+  margin-top: 6px;
+}
+.rpgMiniBarFill--xp{
+  background: linear-gradient(90deg, var(--xp-1, rgb(255 110 210)), var(--xp-2, rgb(190 120 255)));
+}
+
 /* Always-visible tactical hint line */
 .rpgHint {
   flex-basis: 100%;
@@ -2518,6 +2527,45 @@ body.isEditingShopProduct {
   font-size: 1.3rem;
 }
 
+
+/* Enemy header: make name / level / wave visually distinct */
+.rpgEnemyName{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:baseline;
+  gap:10px;
+  line-height:1.15;
+}
+.rpgEnemyName .enemyTitle{
+  font-weight:900;
+  font-size:clamp(1.25rem, 2.1vw, 1.65rem);
+  letter-spacing:-0.4px;
+}
+.rpgEnemyName .enemyBadge{
+  font-family:var(--font);
+  font-size:0.78rem;
+  font-weight:800;
+  letter-spacing:0.25px;
+  padding:5px 10px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background: color-mix(in srgb, var(--panel2) 78%, transparent);
+  color: color-mix(in srgb, var(--text) 92%, var(--muted));
+  white-space:nowrap;
+}
+.rpgEnemyName .enemyBadge--lv{
+  border-color: color-mix(in srgb, var(--accent2) 55%, var(--border));
+  background: color-mix(in srgb, var(--accent2) 18%, var(--panel2));
+}
+.rpgEnemyName .enemyBadge--wave{
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+  background: color-mix(in srgb, var(--accent) 16%, var(--panel2));
+}
+.rpgEnemyName .enemyBadge--boss{
+  border-color: color-mix(in srgb, #ffd24a 70%, var(--border));
+  background: color-mix(in srgb, #ffd24a 24%, var(--panel2));
+  color: color-mix(in srgb, var(--text) 96%, #ffd24a);
+}
 .rpgTypeLine {
   margin: 2px 0 0;
   opacity: 0.92;
@@ -2586,6 +2634,10 @@ body.gamePage {
   --hp-red-2: rgb(255 170 110);
   --focus-1: rgb(85 205 255);
   --focus-2: rgb(80 170 255);
+
+  /* XP bar (kept distinct from Mana) */
+  --xp-1: rgb(255 110 210);
+  --xp-2: rgb(190 120 255);
 
   /* Type palette (intuitive + readable) */
   --type-wind: rgb(80 170 255);
@@ -3026,7 +3078,7 @@ html[data-theme="light"] .rpgCodexTag{border-color:rgba(0,0,0,0.14);background:r
 }
 
 
-/* Wave clear loot screen (auto closes) */
+/* Wave clear loot screen (manual continue) */
 .rpgLootInner {
   width: min(520px, 100%);
   max-height: none;
@@ -3040,7 +3092,15 @@ html[data-theme="light"] .rpgCodexTag{border-color:rgba(0,0,0,0.14);background:r
 
 .rpgLootBody {
   text-align: center;
-  gap: 10px;
+  gap: 8px;
+}
+
+.rpgLootFoot{
+  justify-content: center;
+}
+
+.rpgLootFoot .btn{
+  min-width: 160px;
 }
 
 .rpgLootLine {
@@ -3056,6 +3116,37 @@ html[data-theme="light"] .rpgCodexTag{border-color:rgba(0,0,0,0.14);background:r
 html[data-theme="light"] .rpgLootLine {
   background: rgba(0, 0, 0, 0.04);
   border-color: rgba(0, 0, 0, 0.10);
+}
+
+.rpgLootSummary{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  justify-content:center;
+  margin: 2px 0 0;
+}
+
+.rpgLootChip{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size: 0.92rem;
+  font-weight: 850;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.14);
+  white-space: nowrap;
+}
+
+.rpgLootChip--xp{ border-color: color-mix(in srgb, var(--accent2) 45%, rgba(255,255,255,0.14)); }
+.rpgLootChip--lvl{ border-color: color-mix(in srgb, var(--accent) 55%, rgba(255,255,255,0.14)); }
+.rpgLootChip--sp{ border-color: color-mix(in srgb, #ff9ad6 55%, rgba(255,255,255,0.14)); }
+.rpgLootChip--spell{ border-color: color-mix(in srgb, #9ad7ff 55%, rgba(255,255,255,0.14)); }
+
+html[data-theme="light"] .rpgLootChip{
+  background: rgba(0,0,0,0.035);
+  border-color: rgba(0,0,0,0.10);
 }
 
 /* Defeat screen (player HP hits 0) */
@@ -3540,6 +3631,174 @@ html[data-theme="light"] .rpgTileAvatar{
   margin-top: 10px;
 }
 
+/* Perks / Skill points */
+.rpgPerkInner{
+  width: min(760px, 100%);
+}
+
+.rpgPerkSection{
+  margin-top: 14px;
+}
+
+.rpgPerkSection:first-child{
+  margin-top: 0;
+}
+
+.rpgPerkSectionHead{
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.rpgPerkSectionTitle{
+  margin: 0;
+  font-weight: 950;
+  letter-spacing: 0.2px;
+  font-size: 0.98rem;
+}
+
+.rpgPerkSectionNote{
+  font-size: 12px;
+  opacity: 0.78;
+  white-space: nowrap;
+}
+
+.rpgPerkPill{
+  width: fit-content;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: color-mix(in srgb, var(--panel2) 82%, transparent);
+}
+
+.rpgPerkPill.isUnlocked{
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border) 45%);
+  background: color-mix(in srgb, var(--accent) 18%, var(--panel2) 82%);
+}
+
+.rpgPerkPill.isNeed{
+  opacity: 0.85;
+}
+
+.rpgPerkMetaRow{
+  display: grid;
+  gap: 8px;
+}
+
+@media (min-width: 640px){
+  .rpgPerkMetaRow{
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 12px;
+  }
+}
+
+.rpgPerkPoints{
+  width: fit-content;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 900;
+  letter-spacing: 0.2px;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: color-mix(in srgb, var(--panel2) 82%, transparent);
+}
+
+.rpgPerkGrid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+@media (max-width: 640px){
+  .rpgPerkGrid{ grid-template-columns: 1fr; }
+}
+
+.rpgPerkCard{
+  padding: 12px 14px;
+  text-align: left;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: color-mix(in srgb, var(--panel2) 85%, transparent);
+  display: grid;
+  gap: 8px;
+  transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+}
+
+.rpgPerkCard:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.22);
+}
+
+.rpgPerkCard.isUnlocked{
+  outline: 2px solid color-mix(in srgb, var(--accent) 58%, white 42%);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.10) inset, 0 12px 30px rgba(0,0,0,0.28);
+}
+
+.rpgPerkTop{
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.rpgPerkTitleRow{
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.rpgPerkIcon{
+  flex: 0 0 auto;
+}
+
+.rpgPerkTitle{
+  font-weight: 900;
+  letter-spacing: 0.2px;
+  line-height: 1.1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rpgPerkDesc{
+  opacity: 0.88;
+  font-size: 0.92rem;
+}
+
+.rpgPerkFoot{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.rpgPerkHint{
+  font-size: 12px;
+  opacity: 0.82;
+}
+
+.rpgPerkCard.isLocked{
+  opacity: 0.72;
+}
+
+.rpgPerkState{
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.rpgPerkCard.isUnlocked .rpgPerkState{
+  opacity: 0.95;
+  font-weight: 800;
+}
+
 
 .rpgFormula {
   margin: 0;
@@ -3791,6 +4050,40 @@ html[data-theme="light"] .rpgTileAvatar{
   20%{ opacity: 1; }
   100%{ transform: translateY(-22px) scale(1); opacity: 0; }
 }
+
+/* Center toast (e.g., Skill Point gained) */
+.rpgCenterToast{
+  position: absolute;
+  left: 50%;
+  top: 60%;
+  transform: translate(-50%, -50%);
+  z-index: 7;
+  pointer-events: none;
+  font-weight: 950;
+  letter-spacing: 0.2px;
+  font-size: 1.02rem;
+  padding: 8px 12px;
+  border-radius: 999px;
+  color: rgba(255,255,255,0.98);
+  background: rgba(12, 10, 20, 0.95);
+  border: 1px solid color-mix(in srgb, var(--accent2) 55%, rgba(255,255,255,0.18));
+  box-shadow: 0 16px 30px rgba(0,0,0,0.28);
+  text-shadow: 0 1px 0 rgba(0,0,0,0.45);
+  opacity: 0;
+  animation: rpg-center-toast 760ms ease-out 1 forwards;
+}
+
+.rpgCenterToast--sp{
+  border-color: color-mix(in srgb, var(--accent) 55%, rgba(255,255,255,0.20));
+}
+
+@keyframes rpg-center-toast{
+  0%{ transform: translate(-50%, -45%) scale(0.985); opacity: 0; filter: blur(0.35px); }
+  18%{ opacity: 1; transform: translate(-50%, -50%) scale(1); filter: blur(0px); }
+  78%{ opacity: 1; }
+  100%{ opacity: 0; transform: translate(-50%, -62%) scale(1.02); }
+}
+
 
 /* Camera shake for heavy earth moves */
 .rpgStageInner.isShaking{
@@ -6589,3 +6882,160 @@ html[data-theme="light"] .rarity--legendary{background:rgba(255,206,107,0.22)}
 .rpgInvCountPill{font-size:10px;padding:2px 7px;border-radius:999px;border:1px solid rgba(255,255,255,0.18);opacity:.95;white-space:nowrap}
 .rpgInvItemSub{grid-column:1 / span 2;font-size:11px;opacity:.82}
 
+
+/* --- Perks: compact skill-tree layout --- */
+.rpgPerkTree{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:10px;
+}
+
+.rpgPerkLineRow{
+  display:grid;
+  grid-template-columns: 150px 1fr;
+  gap:10px;
+  align-items:start;
+  padding:8px;
+  border:1px solid rgba(255,255,255,0.10);
+  border-radius:14px;
+  background: rgba(0,0,0,0.22);
+}
+
+.rpgPerkLineLabel{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  padding-top:2px;
+}
+
+.rpgPerkLineName{
+  font-weight:900;
+  letter-spacing:0.2px;
+}
+
+.rpgPerkLineNodes{
+  display:flex;
+  align-items:flex-start;
+  gap:8px;
+  flex-wrap:wrap;
+  overflow: visible;
+  padding-bottom:0;
+}
+
+.rpgPerkArrow{
+  align-self:center;
+  opacity:0.35;
+  font-weight:900;
+  margin:0 2px;
+  user-select:none;
+}
+
+.rpgPerkNode{
+  appearance:none;
+  -webkit-appearance:none;
+  flex: 1 1 190px;
+  min-width: 165px;
+  max-width: 270px;
+  border:1px solid rgba(255,255,255,0.10);
+  border-radius:14px;
+  background: rgba(0,0,0,0.28);
+  padding:8px 10px;
+  display:grid;
+  grid-template-columns: auto 1fr auto;
+  gap:8px;
+  align-items:center;
+  text-align:left;
+  cursor:pointer;
+  color: inherit;
+}
+
+.rpgPerkNode:focus-visible{
+  outline: 2px solid color-mix(in srgb, var(--accent) 60%, white 40%);
+  outline-offset: 2px;
+}
+
+.rpgPerkNode.isSelected{
+  outline: 2px solid color-mix(in srgb, var(--accent) 55%, white 45%);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.10) inset, 0 10px 22px rgba(0,0,0,0.22);
+}
+
+.rpgPerkNode.isLocked{
+  opacity:0.70;
+}
+
+.rpgPerkNodeTopText{min-width:0;display:flex;flex-direction:column;gap:2px;}
+
+.rpgPerkNodeTitle{
+  font-weight:900;
+  line-height:1.12;
+  /* Let short names display fully; allow up to 2 lines for longer names */
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: clip;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: break-word;
+}
+
+.rpgPerkNodeTier{
+  margin-top:2px;
+}
+
+.rpgPerkNode .rpgPerkPill{
+  font-size: 11px;
+  padding: 3px 7px;
+}
+
+
+/* Node no longer shows long text; details pane handles descriptions. */
+
+.rpgPerkDetails{
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 16px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, rgba(0,0,0,0.70) 70%, var(--panel2) 30%);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.36);
+  display: grid;
+  gap: 8px;
+}
+
+.rpgPerkDetailsTop{
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.rpgPerkDetailsTitle{display:flex;align-items:flex-start;gap:10px;min-width:0;}
+.rpgPerkDetailsIcon{font-size: 1.05rem;line-height:1.1;transform: translateY(1px);}
+.rpgPerkDetailsTitleText{min-width:0;display:flex;flex-direction:column;gap:2px;}
+.rpgPerkDetailsName{font-weight: 950;letter-spacing:0.2px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rpgPerkDetailsDesc{opacity:0.90;font-size: 0.92rem;line-height:1.2;}
+.rpgPerkFx{display:flex;flex-wrap:wrap;gap:6px;}
+.rpgPerkFx .pill{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size: 11px;
+  padding: 3px 8px;
+  opacity:0.96;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.14);
+}
+.rpgPerkDetailsBtn{white-space:nowrap;}
+
+@media (max-width: 640px){
+  .rpgPerkLineRow{
+    grid-template-columns: 110px 1fr;
+  }
+  .rpgPerkNode{
+    min-width: 165px;
+    max-width: 270px;
+  }
+}
