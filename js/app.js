@@ -423,7 +423,7 @@ async function handleLogin(event) {
   updateAuthVisibility(true, typeof email === "string" ? email : "your account");
   loginForm.reset();
   setTimeout(() => {
-    window.location.assign("./posts.html");
+    window.location.assign("./crown-quill.html");
   }, LOGIN_REDIRECT_DELAY_MS);
 }
 

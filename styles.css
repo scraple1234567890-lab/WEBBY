@@ -7623,3 +7623,58 @@ html[data-theme="light"] .rpgShopRow{
 html[data-theme="light"] .rpgLootChip--coin{
   border-color: color-mix(in srgb, #c69311 55%, rgba(0,0,0,0.10));
 }
+
+
+/* =========================
+   Crown & Quill (Gazette)
+   ========================= */
+.crownQuillPage .crownMasthead {
+  padding: 1.25rem 1.1rem;
+  margin-bottom: 1rem;
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  background: color-mix(in srgb, var(--panel) 88%, transparent);
+  border-radius: var(--radius2);
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+
+.crownQuillPage .crownMasthead::before,
+.crownQuillPage .crownMasthead::after {
+  content: "";
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--border) 65%, transparent), transparent);
+  opacity: 0.9;
+}
+
+.crownQuillPage .crownMasthead::before { top: 14px; }
+.crownQuillPage .crownMasthead::after { bottom: 14px; }
+
+.crownQuillPage .crownMastheadInner { max-width: 64ch; margin: 0 auto; }
+.crownQuillPage .crownKicker { letter-spacing: 0.32em; text-transform: uppercase; margin: 0; }
+.crownQuillPage .crownTitle { margin: 0.35rem 0 0.2rem; }
+.crownQuillPage .crownTagline { margin: 0.25rem 0 0; }
+
+.crownQuillPage .crownQuillTop { margin-bottom: 1rem; }
+.crownQuillPage .crownTopActions .btn { white-space: nowrap; }
+
+.crownQuillPage .crownQuillGrid { margin-top: 1rem; }
+
+@media (min-width: 900px) {
+  .crownQuillPage .crownQuillGrid { grid-template-columns: minmax(280px, 380px) 1fr; }
+  .crownQuillPage .crownColumn--wire { position: relative; }
+  .crownQuillPage .crownColumn--wire::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: -8px;
+    width: 1px;
+    height: 100%;
+    background: color-mix(in srgb, var(--border) 75%, transparent);
+  }
+}
+
+.crownQuillPage .articlesCard .loreTitleWrap .loreSigil { opacity: 0.9; }
