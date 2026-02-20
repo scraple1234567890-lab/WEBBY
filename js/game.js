@@ -106,6 +106,7 @@ if (root) {
     locationChoices: document.getElementById("locationChoices"),
     overworldHint: document.getElementById("overworldHint"),
     overworldBattleBtn: document.getElementById("overworldBattleBtn"),
+    overworldShopBtn: document.getElementById("overworldShopBtn"),
     overworldBackBtn: document.getElementById("overworldBackBtn"),
     overworldPos: document.getElementById("overworldPos"),
     owUp: document.getElementById("owUp"),
@@ -113,12 +114,20 @@ if (root) {
     owLeft: document.getElementById("owLeft"),
     owRight: document.getElementById("owRight"),
 
+    // Shop
+    shopModal: document.getElementById("shopModal"),
+    shopCoins: document.getElementById("shopCoins"),
+    shopList: document.getElementById("shopList"),
+    shopCloseBtn: document.getElementById("shopCloseBtn"),
+    shopXBtn: document.getElementById("shopXBtn"),
+
     // Loot / Victory screen (auto after wave clear)
     lootModal: document.getElementById("lootModal"),
     lootTitle: document.getElementById("lootTitle"),
     lootSubtitle: document.getElementById("lootSubtitle"),
     lootSummary: document.getElementById("lootSummary"),
     lootLine: document.getElementById("lootLine"),
+    lootMapBtn: document.getElementById("lootMapBtn"),
     lootContinueBtn: document.getElementById("lootContinueBtn"),
 
     // Defeat screen (when player HP hits 0)
@@ -365,17 +374,40 @@ if (root) {
     yPct: 52,
     stepPct: 3.5,
     snapRadiusPct: 4.25,
+    // Tooltip UX state
+    hoveredLocId: null,
+    isDragging: false,
   };
 
   // Battle locations used by the RPG.
   const OVERWORLD_BATTLE_IDS = ["arena", "market-central", "fey-forest", "gutterglass"];
+  // Non-battle locations (utility).
+  const OVERWORLD_SHOP_IDS = ["shop"];
+
+  // Overworld-only position overrides (so the site map can keep its own layout).
+  // Percent values are relative to the map image inside the overworld modal.
+  const OVERWORLD_POS_OVERRIDES = {
+    // Keep the shop far from the battle markers *and* within the default visible area
+    // of the overworld modal (so you don't have to scroll to find it).
+    shop: { leftPct: 88.0, topPct: 18.0 },
+  };
 
   const OVERWORLD_LOC_ICONS = {
     "arena": "🏟️",
     "market-central": "🏙️",
     "fey-forest": "🌿",
     "gutterglass": "🪞",
+    // Shop marker: keep it flat (no coin/emoji on the pin).
+    "shop": "",
   };
+
+  function getOverworldPos(id) {
+    const o = OVERWORLD_POS_OVERRIDES && OVERWORLD_POS_OVERRIDES[id];
+    if (o && typeof o.leftPct === 'number' && typeof o.topPct === 'number') return o;
+    const m = getMapLocationData(id);
+    if (!m) return null;
+    return { leftPct: toSafeNum(m.leftPct, 50), topPct: toSafeNum(m.topPct, 50) };
+  }
 
   function getMapLocationData(id) {
     const data = window.MAP_LOCATIONS_DATA;
@@ -394,7 +426,7 @@ if (root) {
     let bestDist = Infinity;
 
     for (const id of OVERWORLD_BATTLE_IDS) {
-      const m = getMapLocationData(id);
+      const m = getOverworldPos(id);
       if (!m) continue;
       const dx = (OVERWORLD.xPct - toSafeNum(m.leftPct, 0));
       const dy = (OVERWORLD.yPct - toSafeNum(m.topPct, 0));
@@ -409,7 +441,46 @@ if (root) {
     return null;
   }
 
-  function currentLocId() {
+  
+  function nearestShopLocation() {
+    let bestId = null;
+    let bestDist = Infinity;
+
+    for (const id of OVERWORLD_SHOP_IDS) {
+      const m = getOverworldPos(id);
+      if (!m) continue;
+      const dx = (OVERWORLD.xPct - toSafeNum(m.leftPct, 0));
+      const dy = (OVERWORLD.yPct - toSafeNum(m.topPct, 0));
+      const d = Math.hypot(dx, dy);
+      if (d < bestDist) { bestDist = d; bestId = id; }
+    }
+
+    if (bestId && bestDist <= OVERWORLD.snapRadiusPct) return bestId;
+    return null;
+  }
+
+  function getNearestOverworldSpot() {
+    // Pick the closest "interactive" spot (battle or shop).
+    const bId = nearestBattleLocation();
+    const sId = nearestShopLocation();
+
+    const distTo = (id) => {
+      const m = id ? getOverworldPos(id) : null;
+      if (!m) return Infinity;
+      const dx = (OVERWORLD.xPct - toSafeNum(m.leftPct, 0));
+      const dy = (OVERWORLD.yPct - toSafeNum(m.topPct, 0));
+      return Math.hypot(dx, dy);
+    };
+
+    const bd = bId ? distTo(bId) : Infinity;
+    const sd = sId ? distTo(sId) : Infinity;
+
+    if (!bId && !sId) return null;
+    // Tie-break in favor of shop so you can reliably open it when markers overlap.
+    if (sId && sd <= bd) return { kind: "shop", id: sId };
+    return { kind: "battle", id: bId };
+  }
+function currentLocId() {
     return nearestBattleLocation();
   }
 
@@ -437,8 +508,8 @@ if (root) {
       playerEl.style.top = `${OVERWORLD.yPct}%`;
     }
 
-    const nearLoc = getBattleableOverworldLocation();
-    const nearId = nearLoc ? nearLoc.id : null;
+    const spot = getNearestOverworldSpot();
+    const nearId = spot ? spot.id : null;
     const pins = els.locationChoices.querySelectorAll('button.rpgOverworldPin[data-ow-loc]');
     pins.forEach((pin) => {
       if (!(pin instanceof HTMLElement)) return;
@@ -450,31 +521,169 @@ if (root) {
     if (playerEl instanceof HTMLElement) {
       playerEl.classList.toggle('isNearLocation', !!nearId);
     }
+
+    // Tooltip sync:
+    // - If you're hovering/focusing a marker, show that marker's name.
+    // - Otherwise, if the player is standing on/near a marker, show that marker's name.
+    // - Suppress while dragging the map.
+    const frameEl = els.locationChoices.querySelector('#owFrame');
+    const tooltipEl = els.locationChoices.querySelector('#owTooltip');
+    if (frameEl instanceof HTMLElement && tooltipEl instanceof HTMLElement) {
+      const hide = () => {
+        tooltipEl.setAttribute('hidden','');
+        tooltipEl.setAttribute('aria-hidden','true');
+      };
+
+      if (OVERWORLD.isDragging) {
+        hide();
+        return;
+      }
+
+      const targetId = (OVERWORLD.hoveredLocId || nearId);
+      if (!targetId) { hide(); return; }
+      const pin = els.locationChoices.querySelector(`button.rpgOverworldPin[data-ow-loc="${targetId}"]`);
+      if (!(pin instanceof HTMLElement)) { hide(); return; }
+      const raw = (pin.getAttribute('data-ow-name') || '').trim();
+      if (!raw) { hide(); return; }
+
+      tooltipEl.textContent = raw;
+      tooltipEl.removeAttribute('hidden');
+      tooltipEl.setAttribute('aria-hidden','false');
+
+      const fr = frameEl.getBoundingClientRect();
+      // Default: anchor tooltip to the marker center.
+      let x = 0;
+      let y = 0;
+      let place = "top";
+
+      const pr = pin.getBoundingClientRect();
+      x = (pr.left - fr.left) + (pr.width / 2);
+      y = (pr.top - fr.top) + (pr.height / 2);
+
+      // If the action bubble is visible for this same marker, anchor the tooltip to the bubble
+      // so the name + button feel like one tidy stack (and don't overlap).
+      const bubble = els.locationChoices.querySelector('#owBubble');
+      if (bubble instanceof HTMLElement && !bubble.hasAttribute('hidden')) {
+        const bubbleId = (bubble.getAttribute('data-ow-loc') || '').trim();
+        if (bubbleId && bubbleId === targetId) {
+          const br = bubble.getBoundingClientRect();
+          x = (br.left - fr.left) + (br.width / 2);
+
+          // Prefer above the bubble; if that would clip, flip below.
+          const topY = (br.top - fr.top);
+          const bottomY = (br.bottom - fr.top);
+          if (topY < 64) {
+            y = bottomY;
+            place = "bottom";
+          } else {
+            y = topY;
+            place = "top";
+          }
+        }
+      }
+
+      const pad = 12;
+      const cx = clamp(x, pad, Math.max(pad, fr.width - pad));
+      const cy = clamp(y, pad, Math.max(pad, fr.height - pad));
+      tooltipEl.style.left = `${cx}px`;
+      tooltipEl.style.top = `${cy}px`;
+      tooltipEl.setAttribute('data-place', (place === "bottom") ? 'bottom' : 'top');
+    }
   }
 
   function updateOverworldUI() {
-    const loc = getBattleableOverworldLocation();
+    const battleLoc = getBattleableOverworldLocation();
+    const shopId = nearestShopLocation();
+    const shopMeta = shopId ? getMapLocationData(shopId) : null;
+    const shopTitle = shopMeta?.title || shopMeta?.name || "Shop";
+    const isAtShop = !!shopId;
+    const loc = battleLoc;
+
+    // Bubble UI: show the actionable button anchored next to the nearby marker.
+    const bubble = (els.locationChoices instanceof HTMLElement)
+      ? els.locationChoices.querySelector('#owBubble')
+      : null;
+    const bubbleBattleBtn = (bubble instanceof HTMLElement)
+      ? bubble.querySelector('button[data-ow-action="battle"]')
+      : null;
+    const bubbleShopBtn = (bubble instanceof HTMLElement)
+      ? bubble.querySelector('button[data-ow-action="shop"]')
+      : null;
+    const activeId = loc ? loc.id : (isAtShop ? shopId : null);
+    const activeKind = loc ? 'battle' : (isAtShop ? 'shop' : null);
 
     if (els.overworldPos instanceof HTMLElement) {
       els.overworldPos.textContent = `Position: ${OVERWORLD.xPct.toFixed(1)}%, ${OVERWORLD.yPct.toFixed(1)}%`;
     }
 
-    if (els.overworldHint instanceof HTMLElement) {
-      els.overworldHint.textContent = loc
-        ? `You arrive at ${loc.name}. Press Battle (or Enter).`
-        : "You wander the city. No battle marker nearby.";
+    // If the bubble UI exists, we prefer it over the row of buttons under the map.
+    // (Keeps the UI tight: action appears right next to the marker you’re standing on.)
+    const actionRow =
+      ((els.overworldBattleBtn instanceof HTMLElement) ? els.overworldBattleBtn.closest('.rpgOverworldActionRow') : null)
+      || ((els.overworldShopBtn instanceof HTMLElement) ? els.overworldShopBtn.closest('.rpgOverworldActionRow') : null);
+    if (actionRow instanceof HTMLElement) {
+      actionRow.toggleAttribute('hidden', true);
+    }
+
+    if (bubble instanceof HTMLElement) {
+      if (!activeId || !activeKind || !(els.locationChoices instanceof HTMLElement)) {
+        bubble.setAttribute('hidden', '');
+        bubble.setAttribute('aria-hidden', 'true');
+        bubble.removeAttribute('data-ow-loc');
+        bubble.removeAttribute('data-side');
+      } else {
+        const pin = els.locationChoices.querySelector(`button.rpgOverworldPin[data-ow-loc="${activeId}"]`);
+        if (pin instanceof HTMLElement) {
+          // Anchor the bubble to the pin and pick a side to avoid clipping.
+          const leftStr = pin.style.left || '50%';
+          const topStr = pin.style.top || '50%';
+          bubble.style.left = leftStr;
+          bubble.style.top = topStr;
+          const leftPct = parseFloat(String(leftStr).replace('%',''));
+          bubble.setAttribute('data-side', (Number.isFinite(leftPct) && leftPct > 75) ? 'left' : 'right');
+          bubble.setAttribute('data-ow-loc', String(activeId));
+
+          bubble.removeAttribute('hidden');
+          bubble.setAttribute('aria-hidden', 'false');
+        } else {
+          bubble.setAttribute('hidden', '');
+          bubble.setAttribute('aria-hidden', 'true');
+          bubble.removeAttribute('data-ow-loc');
+          bubble.removeAttribute('data-side');
+        }
+      }
+
+      // Configure bubble buttons.
+      if (bubbleBattleBtn instanceof HTMLButtonElement) {
+        bubbleBattleBtn.toggleAttribute('hidden', !loc);
+        bubbleBattleBtn.disabled = !loc;
+        bubbleBattleBtn.title = loc ? `Battle: ${loc.name || loc.id}` : 'Battle';
+      }
+      if (bubbleShopBtn instanceof HTMLButtonElement) {
+        const showShop = !loc && isAtShop;
+        bubbleShopBtn.toggleAttribute('hidden', !showShop);
+        bubbleShopBtn.disabled = !showShop;
+        bubbleShopBtn.title = `Shop: ${shopTitle}`;
+      }
     }
 
     if (els.overworldBattleBtn instanceof HTMLButtonElement) {
       // Only show the battle button when you're actually at a battle-ready location.
       // (Otherwise it clutters the UI and implies you can fight anywhere.)
-      const actionRow = els.overworldBattleBtn.closest('.rpgOverworldActionRow');
-      if (actionRow instanceof HTMLElement) {
-        actionRow.toggleAttribute('hidden', !loc);
-      }
       els.overworldBattleBtn.toggleAttribute('hidden', !loc);
       els.overworldBattleBtn.disabled = !loc;
       els.overworldBattleBtn.textContent = loc ? `Battle: ${loc.name || loc.id}` : "Battle here";
+    }
+
+    if (els.overworldShopBtn instanceof HTMLButtonElement) {
+      const showShop = !loc && isAtShop;
+      els.overworldShopBtn.disabled = !showShop;
+      if (showShop) {
+        els.overworldShopBtn.removeAttribute('hidden');
+        els.overworldShopBtn.textContent = `Shop: ${shopTitle}`;
+      } else {
+        els.overworldShopBtn.setAttribute('hidden','');
+      }
     }
   }
 
@@ -485,8 +694,8 @@ if (root) {
     if (nx === OVERWORLD.xPct && ny === OVERWORLD.yPct) return;
     OVERWORLD.xPct = nx;
     OVERWORLD.yPct = ny;
-    renderOverworldPositions();
     updateOverworldUI();
+    renderOverworldPositions();
   }
 
 
@@ -2764,7 +2973,7 @@ function closeDefeatScreen() {
 }
 
 function updateBodyModalOpen() {
-  const any = isExplainOpen() || isCodexOpen() || isPerkOpen() || isHeroOpen() || isLocationOpen() || isSpellPickOpen() || isLootOpen() || isDefeatOpen();
+  const any = isExplainOpen() || isCodexOpen() || isPerkOpen() || isHeroOpen() || isLocationOpen() || isSpellPickOpen() || isLootOpen() || isDefeatOpen() || isShopOpen();
   document.body.classList.toggle("modalOpen", any);
 }
 
@@ -2872,17 +3081,23 @@ function renderLocationChoices() {
   const mapUrlRaw = (data && data.image && typeof data.image.url === "string") ? data.image.url : "assets/images/city-map.png";
   const mapUrl = (mapUrlRaw.startsWith(".") || mapUrlRaw.startsWith("/")) ? mapUrlRaw : `./${mapUrlRaw}`;
 
-  const pinHtml = OVERWORLD_BATTLE_IDS.map((id) => {
+  const pinIds = [...OVERWORLD_BATTLE_IDS, ...OVERWORLD_SHOP_IDS];
+  const pinHtml = pinIds.map((id) => {
     const m = getMapLocationData(id);
-    const loc = getLocationById(id);
-    const left = toSafeNum(m?.leftPct, 50);
-    const top = toSafeNum(m?.topPct, 50);
-    const icon = OVERWORLD_LOC_ICONS[id] || "✦";
-    const title = (loc?.name || id);
+    const isShop = OVERWORLD_SHOP_IDS.includes(id);
+    // IMPORTANT: getLocationById() can fall back to a default when an ID is missing.
+    // The shop is not a battle location, so we must NOT use that fallback or the shop
+    // pin can inherit the wrong name (e.g., "Arena").
+    const loc = isShop ? null : getLocationById(id);
+    const pos = getOverworldPos(id);
+    const left = toSafeNum(pos?.leftPct, toSafeNum(m?.leftPct, 50));
+    const top = toSafeNum(pos?.topPct, toSafeNum(m?.topPct, 50));
+    // Prefer the map metadata title first (matches the main site map), then battle-location name.
+    const title = (m?.title || loc?.name || id);
+    const kindLabel = isShop ? "Shop" : (OVERWORLD_BATTLE_IDS.includes(id) ? "Battle marker" : "Location");
     return `
-      <button type="button" class="rpgOverworldPin" data-ow-loc="${id}" style="left:${left}%; top:${top}%;" title="${title}" aria-label="Battle marker: ${title}">
-        <span class="srOnly">${title}</span>
-        <span class="rpgOverworldPinEmoji" aria-hidden="true">${icon}</span>
+      <button type="button" class="rpgOverworldPin${isShop ? " rpgOverworldPin--shop" : ""}" data-ow-loc="${id}" data-ow-kind="${isShop ? "shop" : "battle"}" data-ow-name="${escapeHtml(title)}" style="left:${left}%; top:${top}%;" aria-label="${escapeHtml(kindLabel)}: ${escapeHtml(title)}">
+        <span class="srOnly">${escapeHtml(title)}</span>
       </button>
     `;
   }).join("");
@@ -2894,11 +3109,22 @@ function renderLocationChoices() {
       <div class="rpgOverworldPins" id="owPins" role="group" aria-label="Battle markers">
         ${pinHtml}
       </div>
+      <div class="rpgOverworldTooltip" id="owTooltip" hidden aria-hidden="true"></div>
+      <div class="rpgOverworldBubble" id="owBubble" hidden aria-hidden="true">
+        <button type="button" class="btn primary magentaGlow rpgOverworldBubbleBtn" data-ow-action="battle">Battle</button>
+        <button type="button" class="btn primary magentaGlow rpgOverworldBubbleBtn" data-ow-action="shop" hidden>Shop</button>
+      </div>
       <div class="rpgOverworldPlayer" id="owPlayer" aria-hidden="true" data-hero="${hero?.id || "hero"}">
         <div class="rpgOverworldAvatar" aria-hidden="true">
           <img class="rpgOverworldAvatarImg" src="${heroSprite}" alt="" draggable="false" loading="eager" onerror="this.remove()" />
         </div>
         <div class="rpgOverworldFoot" aria-hidden="true"></div>
+      </div>
+      <div class="rpgOverworldLegend rpgOverworldLegend--overlay" aria-label="Overworld legend">
+        <div class="rpgLegendPills" role="list">
+          <span class="rpgLegendChip rpgLegendChip--loc" role="listitem"><span class="rpgLegendDot" aria-hidden="true"></span>Battle marker</span>
+          <span class="rpgLegendChip rpgLegendChip--shop" role="listitem"><span class="rpgLegendDot rpgLegendDot--shop" aria-hidden="true"></span>Shop</span>
+        </div>
       </div>
     </div>
   `;
@@ -2908,6 +3134,62 @@ function renderLocationChoices() {
   if (frameEl instanceof HTMLElement) {
     // Prevent scroll-jank while dragging inside the modal.
     frameEl.style.touchAction = 'none';
+
+    // Tooltip: show the location name when hovering/focusing a marker.
+    const tooltipEl = els.locationChoices.querySelector('#owTooltip');
+    const hideTooltip = () => {
+      if (!(tooltipEl instanceof HTMLElement)) return;
+      tooltipEl.setAttribute('hidden','');
+      tooltipEl.setAttribute('aria-hidden','true');
+    };
+    const showTooltip = (pinEl) => {
+      if (!(tooltipEl instanceof HTMLElement)) return;
+      if (!(pinEl instanceof HTMLElement)) return;
+      const raw = (pinEl.getAttribute('data-ow-name') || '').trim();
+      if (!raw) { hideTooltip(); return; }
+      tooltipEl.textContent = raw;
+      tooltipEl.removeAttribute('hidden');
+      tooltipEl.setAttribute('aria-hidden','false');
+
+      const fr = frameEl.getBoundingClientRect();
+      let x = 0;
+      let y = 0;
+      let place = "top";
+
+      const pr = pinEl.getBoundingClientRect();
+      x = (pr.left - fr.left) + (pr.width / 2);
+      y = (pr.top - fr.top) + (pr.height / 2);
+
+      // If the action bubble is visible for this same marker, anchor the tooltip to the bubble
+      // so the label doesn't collide with the action button.
+      const bubble = els.locationChoices.querySelector('#owBubble');
+      if (bubble instanceof HTMLElement && !bubble.hasAttribute('hidden')) {
+        const bubbleId = (bubble.getAttribute('data-ow-loc') || '').trim();
+        const pinId = (pinEl.getAttribute('data-ow-loc') || '').trim();
+        if (bubbleId && pinId && bubbleId === pinId) {
+          const br = bubble.getBoundingClientRect();
+          x = (br.left - fr.left) + (br.width / 2);
+
+          const topY = (br.top - fr.top);
+          const bottomY = (br.bottom - fr.top);
+          if (topY < 64) {
+            y = bottomY;
+            place = "bottom";
+          } else {
+            y = topY;
+            place = "top";
+          }
+        }
+      }
+
+      const pad = 12;
+      const cx = clamp(x, pad, Math.max(pad, fr.width - pad));
+      const cy = clamp(y, pad, Math.max(pad, fr.height - pad));
+      tooltipEl.style.left = `${cx}px`;
+      tooltipEl.style.top = `${cy}px`;
+
+      tooltipEl.setAttribute('data-place', (place === "bottom") ? 'bottom' : 'top');
+    };
 
     let dragging = false;
     let activePointerId = null;
@@ -2925,45 +3207,105 @@ function renderLocationChoices() {
     const onDown = (ev) => {
       // If you clicked a pin, let the pin handler handle it.
       const t = ev.target;
-      if (t && t instanceof HTMLElement && t.closest('button.rpgOverworldPin')) return;
+      if (
+        t &&
+        t instanceof HTMLElement &&
+        (t.closest('button.rpgOverworldPin') || t.closest('#owBubble') || t.closest('button[data-ow-action]'))
+      ) return;
       if (!isLocationOpen()) return;
+      OVERWORLD.isDragging = true;
+      OVERWORLD.hoveredLocId = null;
+      hideTooltip();
       dragging = true;
       activePointerId = ev.pointerId;
       try { frameEl.setPointerCapture(ev.pointerId); } catch {}
       ev.preventDefault();
       const { xPct, yPct } = eventToPct(ev);
       setOwPos(xPct, yPct);
-      renderOverworldPositions();
       updateOverworldUI();
+    renderOverworldPositions();
     };
 
     const onMove = (ev) => {
       if (!dragging) return;
       if (activePointerId !== null && ev.pointerId !== activePointerId) return;
+      OVERWORLD.isDragging = true;
       ev.preventDefault();
       const { xPct, yPct } = eventToPct(ev);
       setOwPos(xPct, yPct);
-      renderOverworldPositions();
       updateOverworldUI();
+    renderOverworldPositions();
     };
 
     const onUp = (ev) => {
       if (activePointerId !== null && ev.pointerId !== activePointerId) return;
       dragging = false;
       activePointerId = null;
+      OVERWORLD.isDragging = false;
       try { frameEl.releasePointerCapture(ev.pointerId); } catch {}
+      // If we're parked on a marker after dragging, show the tooltip again.
+      renderOverworldPositions();
     };
 
     frameEl.addEventListener('pointerdown', onDown);
     frameEl.addEventListener('pointermove', onMove);
     frameEl.addEventListener('pointerup', onUp);
     frameEl.addEventListener('pointercancel', onUp);
-    frameEl.addEventListener('lostpointercapture', () => { dragging = false; activePointerId = null; });
+    frameEl.addEventListener('lostpointercapture', () => { dragging = false; activePointerId = null; OVERWORLD.isDragging = false; renderOverworldPositions(); });
+
+    // Hover/focus handlers for tooltips.
+    frameEl.addEventListener('pointerover', (ev) => {
+      const t = ev.target;
+      if (!(t instanceof HTMLElement)) return;
+      const pin = t.closest('button.rpgOverworldPin');
+      if (pin instanceof HTMLElement) {
+        OVERWORLD.hoveredLocId = pin.getAttribute('data-ow-loc') || null;
+        showTooltip(pin);
+      }
+    });
+    frameEl.addEventListener('pointerout', (ev) => {
+      const t = ev.target;
+      if (!(t instanceof HTMLElement)) return;
+      const fromPin = t.closest('button.rpgOverworldPin');
+      if (!(fromPin instanceof HTMLElement)) return;
+      const rt = ev.relatedTarget;
+      if (rt && rt instanceof HTMLElement) {
+        const toPin = rt.closest('button.rpgOverworldPin');
+        if (toPin) return;
+      }
+      OVERWORLD.hoveredLocId = null;
+      hideTooltip();
+      // If the player is parked on a marker, bring the tooltip back for that marker.
+      renderOverworldPositions();
+    });
+    frameEl.addEventListener('pointerleave', () => {
+      OVERWORLD.hoveredLocId = null;
+      hideTooltip();
+      renderOverworldPositions();
+    });
+    frameEl.addEventListener('focusin', (ev) => {
+      const t = ev.target;
+      if (!(t instanceof HTMLElement)) return;
+      const pin = t.closest('button.rpgOverworldPin');
+      if (pin instanceof HTMLElement) {
+        OVERWORLD.hoveredLocId = pin.getAttribute('data-ow-loc') || null;
+        showTooltip(pin);
+      }
+    });
+    frameEl.addEventListener('focusout', () => {
+      window.setTimeout(() => {
+        const a = document.activeElement;
+        if (a && a instanceof HTMLElement && a.closest('button.rpgOverworldPin')) return;
+        OVERWORLD.hoveredLocId = null;
+        hideTooltip();
+        renderOverworldPositions();
+      }, 0);
+    });
   }
 
   // Position player + highlight nearby marker.
-  renderOverworldPositions();
   updateOverworldUI();
+    renderOverworldPositions();
 }
 
 
@@ -2977,19 +3319,38 @@ function openLocationPicker() {
   locationLastFocus = document.activeElement;
   updateBodyModalOpen();
 
+  // Ensure the overworld opens scrolled to the top.
+  // Focusing a button lower in the modal can cause the browser to auto-scroll.
+  const modalInner = els.locationModal.querySelector('.rpgModalInner');
+  const modalBody = els.locationModal.querySelector('.rpgModalBody');
+  if (modalInner instanceof HTMLElement) {
+    // Make the container focusable for keyboard users without scrolling.
+    if (!modalInner.hasAttribute('tabindex')) modalInner.setAttribute('tabindex', '-1');
+    modalInner.scrollTop = 0;
+  }
+  if (modalBody instanceof HTMLElement) modalBody.scrollTop = 0;
+  els.locationModal.scrollTop = 0;
+
   setPhase("select");
   renderIntent(null);
   setEffectBanner("—", "neutral");
   render();
 
-  // Focus the first choice for keyboard users.
-  const preferred = (els.overworldBattleBtn instanceof HTMLButtonElement) ? els.overworldBattleBtn : null;
-  if (preferred && !preferred.hasAttribute('hidden') && !preferred.disabled) {
-    preferred.focus();
+  // Keep focus at the top so the modal doesn't open scrolled down.
+  // Movement + Enter still work via the document key handler.
+  if (modalInner instanceof HTMLElement) {
+    modalInner.focus({ preventScroll: true });
   } else {
-    const first = els.locationModal.querySelector("button[data-ow-loc]");
-    if (first instanceof HTMLButtonElement) first.focus();
+    const title = els.locationModal.querySelector('#locationTitle');
+    if (title instanceof HTMLElement && typeof title.focus === 'function') title.focus({ preventScroll: true });
   }
+
+  // In case any late layout shifts happen (fonts/images), re-pin scroll to top.
+  window.setTimeout(() => {
+    if (modalInner instanceof HTMLElement) modalInner.scrollTop = 0;
+    if (modalBody instanceof HTMLElement) modalBody.scrollTop = 0;
+    if (els.locationModal instanceof HTMLElement) els.locationModal.scrollTop = 0;
+  }, 0);
 }
 
 function closeLocationPicker() {
@@ -3084,6 +3445,13 @@ function startBattleWithLocation(locId) {
   }
 
   // Loot/Victory wiring (manual continue)
+  if (els.lootMapBtn instanceof HTMLButtonElement) {
+    els.lootMapBtn.addEventListener("click", () => {
+      // Exit the battle flow and return to the overworld map.
+      // Rewards (coins/items/xp) are already granted before this screen opens.
+      restart();
+    });
+  }
   if (els.lootContinueBtn instanceof HTMLButtonElement) {
     els.lootContinueBtn.addEventListener("click", () => {
       // Only close if the modal is currently open.
@@ -4059,7 +4427,7 @@ function renderCodex() {
     const list = Array.isArray(ENEMIES) ? ENEMIES : [];
     list.forEach((e, idx) => {
       const isBoss = idx === (typeof BOSS_ENEMY_INDEX === 'number' ? BOSS_ENEMY_INDEX : -1);
-      const icon = isBoss ? '👑' : '⚔️';
+      const icon = isBoss ? '🪙' : '⚔️';
       const r = rates.get(idx);
       const appear = isBoss
         ? 'Appears: Wave 3 100%'
@@ -4674,12 +5042,14 @@ function loadHeroProgress(heroId) {
       gear: { ...STARTING_GEAR },
       equipSlots: { weapon: null, armor: null, trinket: "apprentice_ring" },
       bossUniques: {},
+      coins: 0,
     };
   }
   try {
     const obj = JSON.parse(raw);
     const level = clamp(toSafeInt(obj?.level, 1), 1, 99);
     const xp = Math.max(0, toSafeInt(obj?.xp, 0));
+    const coins = Math.max(0, toSafeInt((obj?.coins ?? obj?.crowns), 0));
     const spells = Array.isArray(obj?.spells)
       ? obj.spells.filter((id) => typeof id === "string" && !!SPELLS_BY_ID[id])
       : undefined;
@@ -4706,7 +5076,7 @@ function loadHeroProgress(heroId) {
       skillPoints = clamp(Math.max(0, (level - 1) - spent), 0, 99);
     }
 
-    return { level, xp, skillPoints, perks, spells, items, gear, equipSlots, bossUniques };
+    return { level, xp, skillPoints, perks, spells, items, gear, equipSlots, bossUniques, coins };
   } catch {
     return {
       level: 1,
@@ -4718,6 +5088,7 @@ function loadHeroProgress(heroId) {
       gear: { ...STARTING_GEAR },
       equipSlots: { weapon: null, armor: null, trinket: "apprentice_ring" },
       bossUniques: {},
+      coins: 0,
     };
   }
 }
@@ -4733,6 +5104,10 @@ function saveHeroProgress(heroId, prog) {
       level: Math.max(1, toSafeInt(prog.level, 1)),
       xp: Math.max(0, toSafeInt(prog.xp, 0)),
     };
+
+    payload.coins = Math.max(0, toSafeInt((prog?.coins ?? prog?.crowns), 0));
+    // Back-compat for older builds
+    payload.crowns = payload.coins;
 
     // Perks + skill points are hero-specific.
     payload.skillPoints = clamp(toSafeInt(prog?.skillPoints, 0), 0, 99);
@@ -5342,6 +5717,7 @@ function setActiveLocation(id) {
       // progression
       level: prog.level,
       xp: prog.xp,
+      coins: Math.max(0, toSafeInt((prog.coins ?? prog.crowns), 0)),
       xpToNext: xpToNext(prog.level),
       powerMult: scaled.powerMult * (1 + powerPct),
       healMult: scaled.healMult * (1 + healPct),
@@ -5544,6 +5920,7 @@ function persistPlayerProgress() {
   saveHeroProgress(heroId, {
     level: Math.max(1, toSafeInt(state.player.level, 1)),
     xp: Math.max(0, toSafeInt(state.player.xp, 0)),
+    coins: Math.max(0, toSafeInt(state.player.coins, 0)),
     skillPoints: clamp(toSafeInt(state.player.skillPoints, 0), 0, 99),
     perks: sanitizePerkIds(state.player.perks ?? state.player.perkIds, heroId),
     spells: Array.isArray(state.player.spells) ? state.player.spells : [],
@@ -6323,7 +6700,91 @@ function persistPlayerProgress() {
   // --------------------
 
   /** @param {string} itemId @param {number} count */
-  function gainItem(itemId, count = 1) {
+  
+  function awardCoins(amount, silent=false) {
+    const n = Math.max(0, toSafeInt(amount, 0));
+    if (!n || !state?.player) return 0;
+    const prev = Math.max(0, toSafeInt(state.player.coins, 0));
+    state.player.coins = clamp(prev + n, 0, 999999);
+    if (!silent) addLog(`🪙 +${n} Coins.`);
+    persistPlayerProgress();
+    return n;
+  }
+
+  const SHOP_STOCK = [
+    { id: "potion", cost: 8, label: "Heal up" },
+    { id: "ether", cost: 10, label: "Mana refill" },
+    { id: "cleanse", cost: 14, label: "Status clear" },
+    { id: "bomb", cost: 18, label: "Big hit" },
+  ];
+
+  function isShopOpen() {
+    return (els.shopModal instanceof HTMLElement) && !els.shopModal.hasAttribute("hidden");
+  }
+
+  function renderShop() {
+    if (!(els.shopList instanceof HTMLElement)) return;
+    const coins = Math.max(0, toSafeInt(state?.player?.coins, 0));
+    if (els.shopCoins instanceof HTMLElement) {
+      els.shopCoins.textContent = `🪙 ${coins} Coins`;
+    }
+    els.shopList.innerHTML = "";
+    for (const it of SHOP_STOCK) {
+      const def = ITEM_DEFS[it.id];
+      if (!def) continue;
+      const owned = Math.max(0, toSafeInt(state?.player?.items?.[it.id], 0));
+      const canBuy = coins >= it.cost;
+      const row = document.createElement("div");
+      row.className = "rpgShopRow";
+      row.setAttribute("role", "listitem");
+      row.innerHTML = `
+        <div class="rpgShopInfo">
+          <div class="rpgShopName">${def.icon} ${def.name}</div>
+          <div class="rpgShopDesc muted small">${def.desc}</div>
+        </div>
+        <div class="rpgShopMeta">
+          <div class="rpgShopOwned muted tiny">Owned: ${owned}</div>
+          <button type="button" class="btn rpgShopBuy ${canBuy ? 'primary' : 'ghost'}" ${canBuy ? '' : 'disabled'} data-buy="${it.id}">
+            Buy <span class="rpgShopPrice">🪙 ${it.cost}</span>
+          </button>
+        </div>
+      `;
+      els.shopList.appendChild(row);
+    }
+  }
+
+  function openShop() {
+    if (!(els.shopModal instanceof HTMLElement)) return;
+    closeMagicMenu();
+    closeInventoryMenu();
+    els.shopModal.removeAttribute("hidden");
+    updateBodyModalOpen();
+    renderShop();
+    // Focus close button for keyboard users.
+    if (els.shopCloseBtn instanceof HTMLButtonElement) els.shopCloseBtn.focus();
+  }
+
+  function closeShop() {
+    if (!(els.shopModal instanceof HTMLElement)) return;
+    els.shopModal.setAttribute("hidden", "");
+    updateBodyModalOpen();
+  }
+
+  function buyFromShop(itemId) {
+    const def = ITEM_DEFS[itemId];
+    const entry = SHOP_STOCK.find((s) => s.id === itemId);
+    if (!def || !entry) return;
+    const coins = Math.max(0, toSafeInt(state?.player?.coins, 0));
+    if (coins < entry.cost) return;
+    state.player.coins = coins - entry.cost;
+    gainItem(itemId, 1);
+    addLog(`🛍️ Bought: ${def.icon} ${def.name} for 🪙 ${entry.cost}.`);
+    persistPlayerProgress();
+    renderShop();
+    render();
+  }
+
+function gainItem(itemId, count = 1) {
     if (!ITEM_DEFS[itemId]) return;
     if (!state.player.items || typeof state.player.items !== "object") state.player.items = {};
     const prev = Math.max(0, toSafeInt(state.player.items[itemId], 0));
@@ -6423,7 +6884,10 @@ function persistPlayerProgress() {
     // Play the badge-unlock SFX when you clear Wave 1.
     if (state.wave === 0) playWaveClearSfx();
 
-        // Loot: random consumable and (rarer) gear.
+    // Coins (shop currency)
+    const coinsEarned = awardCoins(state.wave >= 2 ? 18 : (state.wave === 1 ? 10 : 8), true);
+
+    // Loot: random consumable and (rarer) gear.
     const loot = lootForWave(state.wave);
     const parts = [];
     if (loot?.itemId) {
@@ -6439,6 +6903,10 @@ function persistPlayerProgress() {
         gainGear(loot.gearId, 1);
         parts.push(`${g.icon} ${g.name} [${rarityLabel(g.rarity)}] (Gear)`);
       }
+    }
+
+    if (coinsEarned > 0) {
+      parts.push(`🪙 ${coinsEarned} Coins`);
     }
 
     const lootLine = () => parts.length ? `Picked up: ${parts.join(' + ')}` : 'No loot this time.';
@@ -6465,6 +6933,9 @@ function persistPlayerProgress() {
     const summary = [];
     if (xpRes && xpRes.leveled && xpRes.levelsGained > 0) {
       summary.push({ kind: "lvl", text: `🌟 Level ${xpRes.levelBefore} → ${xpRes.levelAfter}` });
+    }
+    if (coinsEarned > 0) {
+      summary.push({ kind: "coin", text: `🪙 +${coinsEarned} Coins` });
     }
     if (xpRes && xpRes.spGained > 0) {
       const n = xpRes.spGained;
@@ -7963,15 +8434,39 @@ function playerFireAttack() {
     els.locationChoices.addEventListener('click', (e) => {
       const t = e.target;
       if (!(t instanceof HTMLElement)) return;
+
+      // Bubble actions (Battle / Shop) live inside the map frame.
+      const actionBtn = t.closest('button[data-ow-action]');
+      if (actionBtn instanceof HTMLButtonElement) {
+        const action = actionBtn.getAttribute('data-ow-action');
+        if (action === 'battle') {
+          const loc = getBattleableOverworldLocation();
+          if (!loc) return;
+          e.preventDefault();
+          e.stopPropagation();
+          startBattleWithLocation(loc.id);
+          return;
+        }
+        if (action === 'shop') {
+          const loc = getBattleableOverworldLocation();
+          const shopId = nearestShopLocation();
+          if (loc || !shopId) return;
+          e.preventDefault();
+          e.stopPropagation();
+          openShop();
+          return;
+        }
+      }
+
       const btn = t.closest('button[data-ow-loc]');
       if (!(btn instanceof HTMLButtonElement)) return;
       const id = btn.getAttribute('data-ow-loc');
       if (!id) return;
-      const m = getMapLocationData(id);
-      if (m) {
-        setOwPos(m.leftPct, m.topPct);
-        renderOverworldPositions();
+      const pos = getOverworldPos(id);
+      if (pos) {
+        setOwPos(pos.leftPct, pos.topPct);
         updateOverworldUI();
+        renderOverworldPositions();
       }
     });
   }
@@ -7980,6 +8475,17 @@ function playerFireAttack() {
       const loc = getBattleableOverworldLocation();
       if (!loc) return;
       startBattleWithLocation(loc.id);
+    });
+  }
+
+  // Open the shop when standing on the shop marker.
+  if (els.overworldShopBtn instanceof HTMLButtonElement) {
+    els.overworldShopBtn.addEventListener("click", () => {
+      const loc = getBattleableOverworldLocation();
+      const shopId = nearestShopLocation();
+      // Keep precedence consistent with the UI: battle wins if available.
+      if (loc || !shopId) return;
+      openShop();
     });
   }
 
@@ -8003,16 +8509,14 @@ function playerFireAttack() {
   // Keyboard traversal while the overworld modal is open.
   document.addEventListener("keydown", (e) => {
     if (!isLocationOpen()) return;
+    if (isShopOpen()) return;
     // Don't steal keys if you're typing in a field.
     const t = e.target;
     if (t && (t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement)) return;
 
     const k = e.key;
     const map = {
-      "ArrowUp": [0, -1],
-      "ArrowDown": [0, 1],
-      "ArrowLeft": [-1, 0],
-      "ArrowRight": [1, 0],
+      // WASD + Arrow Keys
       "w": [0, -1],
       "s": [0, 1],
       "a": [-1, 0],
@@ -8021,13 +8525,22 @@ function playerFireAttack() {
       "S": [0, 1],
       "A": [-1, 0],
       "D": [1, 0],
+
+      "ArrowUp": [0, -1],
+      "ArrowDown": [0, 1],
+      "ArrowLeft": [-1, 0],
+      "ArrowRight": [1, 0],
     };
 
     if (k === "Enter") {
       const loc = getBattleableOverworldLocation();
+      const shopId = nearestShopLocation();
       if (loc) {
         e.preventDefault();
         startBattleWithLocation(loc.id);
+      } else if (shopId) {
+        e.preventDefault();
+        openShop();
       }
       return;
     }
@@ -8037,6 +8550,55 @@ function playerFireAttack() {
     e.preventDefault();
     moveOverworld(step[0], step[1]);
   });
+
+  // Shop modal bindings
+  const returnFocusToOverworld = () => {
+    if (els.locationModal instanceof HTMLElement && !els.locationModal.hasAttribute("hidden")) {
+      // Return focus to an overworld control (prefer the on-map bubble buttons).
+      const bubble = (els.locationChoices instanceof HTMLElement)
+        ? els.locationChoices.querySelector('#owBubble')
+        : null;
+      const bubbleShop = (bubble instanceof HTMLElement)
+        ? bubble.querySelector('button[data-ow-action="shop"]:not([hidden])')
+        : null;
+      const bubbleBattle = (bubble instanceof HTMLElement)
+        ? bubble.querySelector('button[data-ow-action="battle"]:not([hidden])')
+        : null;
+
+      if (bubbleShop instanceof HTMLButtonElement) bubbleShop.focus({ preventScroll: true });
+      else if (bubbleBattle instanceof HTMLButtonElement) bubbleBattle.focus({ preventScroll: true });
+      else {
+        const modalInner = els.locationModal.querySelector('.rpgModalInner');
+        if (modalInner instanceof HTMLElement) modalInner.focus({ preventScroll: true });
+      }
+    }
+  };
+
+  if (els.shopCloseBtn instanceof HTMLButtonElement) {
+    els.shopCloseBtn.addEventListener("click", () => {
+      closeShop();
+      returnFocusToOverworld();
+    });
+  }
+
+  if (els.shopXBtn instanceof HTMLButtonElement) {
+    els.shopXBtn.addEventListener("click", () => {
+      closeShop();
+      returnFocusToOverworld();
+    });
+  }
+
+  if (els.shopList instanceof HTMLElement) {
+    els.shopList.addEventListener("click", (e) => {
+      const t = e.target;
+      if (!(t instanceof HTMLElement)) return;
+      const btn = t.closest("button[data-buy]");
+      if (!(btn instanceof HTMLButtonElement)) return;
+      const id = btn.getAttribute("data-buy");
+      if (!id) return;
+      buyFromShop(id);
+    });
+  }
 
 
   // Inventory menu: tabs + items + gear actions

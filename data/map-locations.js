@@ -263,6 +263,14 @@ window.MAP_LOCATIONS_DATA = {
       "href": "locations/x-site.html",
       "leftPct": 84.6142,
       "topPct": 96.7877
+    },
+    {
+      "id": "shop",
+      "title": "Shop",
+      "blurb": "Trade your hard-won Coins for supplies.",
+      "href": "#",
+      "leftPct": 88.0,
+      "topPct": 18.0
     }
   ]
 };

@@ -256,6 +256,7 @@
       <div class="rpgLootLine" id="lootLine">No items.</div>
     </div>
     <div class="rpgModalFoot rpgLootFoot">
+      <button class="btn ghost" id="lootMapBtn" type="button">Back to map</button>
       <button class="btn primary" id="lootContinueBtn" type="button">Continue</button>
     </div>
   </div>
@@ -333,36 +334,17 @@
 <div aria-hidden="false" aria-labelledby="locationTitle" aria-modal="true" class="rpgModal" hidden="" id="locationModal" role="dialog">
 <div class="post rpgModalInner" role="document">
 <div class="rpgModalHead">
-<h2 class="rpgLogTitle" id="locationTitle">Overworld</h2>
+<h2 class="rpgLogTitle srOnly" id="locationTitle">Overworld</h2>
 </div>
 <div class="rpgModalBody">
-<div class="rpgOverworldTop">
-  <p class="muted" id="overworldHint" style="margin:0">Use the arrow keys or buttons to travel. Move near a glowing battle marker, then battle.</p>
-</div>
-
 <div class="rpgOverworldMapStage" id="locationChoices" role="group" aria-label="Overworld map"></div>
 
 <div class="rpgOverworldActionRow" aria-label="Overworld actions">
   <button class="btn primary" id="overworldBattleBtn" type="button" disabled>Battle here</button>
+  <button class="btn" id="overworldShopBtn" type="button" hidden>Open shop</button>
 </div>
 
-<div class="rpgOverworldLegend" aria-label="Overworld legend">
-  <div class="rpgLegendPills" role="list">
-    <span class="rpgLegendChip rpgLegendChip--loc" role="listitem"><span class="rpgLegendDot" aria-hidden="true"></span>Battle marker</span>
-  </div>
-</div>
 
-<div class="rpgOverworldBottom">
-  <div class="rpgDpad" role="group" aria-label="Move">
-    <button class="btn ghost rpgDpadBtn" id="owUp" type="button" aria-label="Move up">↑</button>
-    <div class="rpgDpadMid">
-      <button class="btn ghost rpgDpadBtn" id="owLeft" type="button" aria-label="Move left">←</button>
-      <span class="rpgDpadCenter" aria-hidden="true">✦</span>
-      <button class="btn ghost rpgDpadBtn" id="owRight" type="button" aria-label="Move right">→</button>
-    </div>
-    <button class="btn ghost rpgDpadBtn" id="owDown" type="button" aria-label="Move down">↓</button>
-  </div>
-</div>
 </div>
 </div>
 </div>
@@ -392,6 +374,33 @@
 </div>
 </div>
 </footer>
+
+<div aria-labelledby="shopTitle" aria-modal="true" class="rpgModal" hidden="" id="shopModal" role="dialog">
+  <div class="post rpgModalInner rpgShopInner" role="document" tabindex="-1">
+    <div class="rpgModalHead rpgShopHead">
+      <h2 class="rpgLogTitle" id="shopTitle">Shop</h2>
+      <button aria-label="Close shop" class="iconBtn" id="shopXBtn" type="button">✕</button>
+    </div>
+
+    <div class="rpgModalBody rpgShopBody">
+      <div class="rpgShopHeader">
+        <p class="muted small rpgShopNote" style="margin:0">Spend your Coins on supplies. Inventory updates instantly.</p>
+        <div class="rpgShopBalance" aria-label="Coin balance">
+          <span class="muted tiny rpgShopBalanceLabel">Balance</span>
+          <span class="rpgLootChip rpgLootChip--coin" id="shopCoins">🪙 0 Coins</span>
+        </div>
+      </div>
+
+      <div class="rpgShopList" id="shopList" role="list"></div>
+    </div>
+
+    <div class="rpgModalFoot rpgShopFoot">
+      <button class="btn primary" id="shopCloseBtn" type="button">Back to map</button>
+    </div>
+  </div>
+</div>
+
+
 <script defer="" src="./script.js"></script>
 <script src="./js/app.js" type="module"></script>
 <script src="./data/characters-data.js?v=2026-02-16"></script>
