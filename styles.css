@@ -7628,11 +7628,51 @@ html[data-theme="light"] .rpgLootChip--coin{
 /* =========================
    Crown & Quill (Gazette)
    ========================= */
+
+/* Crown & Quill page should be opaque for readability */
+body.crownQuillPage {
+  --bg: #0c0820;
+  --panel: #140d29;
+  --panel2: #1b1236;
+  --border: #2f2450;
+  --shadow: 0 18px 42px rgba(0, 0, 0, 0.38);
+  background-color: var(--bg);
+  background-image: none;
+}
+body.crownQuillPage::before,
+body.crownQuillPage::after { display: none; }
+.crownQuillPage .section,
+.crownQuillPage .crownQuillPageMain { background: var(--bg); }
+.crownQuillPage .section.alt { background: var(--bg); border-top-color: var(--border); border-bottom-color: var(--border); }
+.crownQuillPage .section.alt::before { content: none; }
+.crownQuillPage .header {
+  backdrop-filter: none;
+  background: var(--bg);
+  border-bottom-color: var(--border);
+}
+.crownQuillPage .navLinks,
+.crownQuillPage .profileMenuList,
+.crownQuillPage .articleSearchPanel,
+.crownQuillPage .articleImagePreview,
+.crownQuillPage .richEditorShell,
+.crownQuillPage .richToolbar,
+.crownQuillPage .sectionHead h2,
+.crownQuillPage .sectionHead p {
+  background: var(--panel);
+  border-color: var(--border);
+  box-shadow: var(--shadow);
+}
+.crownQuillPage .tagChip,
+.crownQuillPage .tagPill {
+  background: var(--panel2);
+  border-color: var(--border);
+}
+
 .crownQuillPage .crownMasthead {
   padding: 1.25rem 1.1rem;
   margin-bottom: 1rem;
-  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
-  background: color-mix(in srgb, var(--panel) 88%, transparent);
+  border: 1px solid var(--border);
+  background: var(--panel);
   border-radius: var(--radius2);
   position: relative;
   overflow: hidden;
