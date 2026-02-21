@@ -164,7 +164,7 @@ function renderRumors(rumors) {
     list.appendChild(li);
   }
 
-  if (meta) meta.textContent = formatEditionStamp();
+  if (meta) { meta.textContent = ""; meta.hidden = true; }
 }
 
 function loadCachedRumors() {

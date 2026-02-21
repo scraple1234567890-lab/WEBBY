@@ -350,7 +350,7 @@ header, main, footer {
   display: none;
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: 12px;
   padding: 10px 12px;
   box-shadow: var(--shadow);
   cursor: pointer;
@@ -619,7 +619,7 @@ h1 {
   top: 12px;
   right: 12px;
   padding: 10px 14px;
-  border-radius: 14px;
+  border-radius: 12px;
   background: color-mix(in srgb, var(--panel) 80%, transparent);
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
@@ -687,7 +687,7 @@ h1 {
   letter-spacing: -0.3px;
   display: inline-block;
   padding: 8px 14px;
-  border-radius: 14px;
+  border-radius: 12px;
   background: linear-gradient(120deg, color-mix(in srgb, var(--panel2) 70%, transparent), color-mix(in srgb, var(--panel) 60%, transparent));
   border: 1px solid color-mix(in srgb, var(--border) 80%, var(--accent) 10%);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.24);
@@ -1189,7 +1189,7 @@ h1 {
 .composerCard select {
   width: 100%;
   padding: 12px 12px;
-  border-radius: 14px;
+  border-radius: 12px;
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--panel2) 70%, transparent);
   color: var(--text);
@@ -1243,7 +1243,7 @@ h1 {
 
 .socialRow { display: flex; gap: 10px; flex-wrap: wrap; }
 .chip {
-  padding: 8px 10px;
+  padding: 6px 8px;
   border-radius: 999px;
   border: 1px solid var(--border);
   color: var(--muted);
@@ -1256,7 +1256,7 @@ label { display: block; margin-bottom: 6px; color: var(--muted); }
 input, textarea {
   width: 100%;
   padding: 12px 12px;
-  border-radius: 14px;
+  border-radius: 12px;
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--panel2) 70%, transparent);
   color: var(--text);
@@ -2131,7 +2131,7 @@ input:focus, textarea:focus {
 .shopControls select {
   width: 100%;
   padding: 12px;
-  border-radius: 14px;
+  border-radius: 12px;
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--panel2) 70%, transparent);
   color: var(--text);
@@ -2144,7 +2144,7 @@ input:focus, textarea:focus {
   align-items: center;
   gap: 10px;
   padding: 12px 14px;
-  border-radius: 14px;
+  border-radius: 12px;
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--panel2) 60%, transparent);
   color: var(--muted);
@@ -2357,7 +2357,7 @@ body.isEditingShopProduct {
 
 .shopAdminCard {
   width: min(860px, 100%);
-  border-radius: 14px;
+  border-radius: 12px;
   padding: 16px;
   border: 1px solid color-mix(in srgb, var(--border) 80%, var(--accent3) 10%);
   background: linear-gradient(150deg, color-mix(in srgb, var(--panel) 88%, transparent), color-mix(in srgb, var(--panel2) 70%, transparent));
@@ -2420,7 +2420,7 @@ body.isEditingShopProduct {
 .rpgTitle {
   display: inline-block;
   padding: 6px 12px;
-  border-radius: 14px;
+  border-radius: 12px;
   background: rgba(0,0,0,0.55);
   backdrop-filter: blur(4px);
   box-shadow: 0 10px 30px rgba(0,0,0,0.25);
@@ -2488,8 +2488,8 @@ body.isEditingShopProduct {
 .rpgHint {
   flex-basis: 100%;
   margin-top: 6px;
-  padding: 8px 10px;
-  border-radius: 14px;
+  padding: 6px 8px;
+  border-radius: 12px;
   border: 1px dashed color-mix(in srgb, var(--border) 70%, transparent);
   background: color-mix(in srgb, var(--panel) 88%, transparent);
   font-size: 0.92rem;
@@ -2888,8 +2888,8 @@ body.gamePage #restartBtn{
   gap: 6px 10px;
   align-items: center;
   justify-content: flex-start;
-  padding: 8px 10px;
-  border-radius: 14px;
+  padding: 6px 8px;
+  border-radius: 12px;
   --pvGlow: rgba(255,255,255,0);
   background: var(--pvBg, rgb(10 10 18));
   border: 1px solid rgba(255,255,255,0.16);
@@ -3049,8 +3049,8 @@ body.modalOpen {
   display:flex;
   gap:10px;
   align-items:flex-start;
-  padding: 8px 10px;
-  border-radius: 14px;
+  padding: 6px 8px;
+  border-radius: 12px;
   border: 1px solid rgba(255,255,255,0.12);
   background: rgba(255,255,255,0.04);
 }
@@ -3065,7 +3065,7 @@ body.modalOpen {
   line-height:1.1;
   margin-top:1px;
   overflow: hidden;
-  border-radius: 14px;
+  border-radius: 12px;
 }
 .rpgCodexSprite{
   width:44px;
@@ -3104,7 +3104,7 @@ html[data-theme="light"] .rpgCodexTag{border-color:rgba(0,0,0,0.14);background:r
 
 /* Compendium (Codex): make expanded lists more space-efficient */
 .rpgCodexDetails[open]{
-  padding: 8px 10px;
+  padding: 6px 8px;
 }
 .rpgCodexDetails[open] > summary{
   margin-bottom: 6px;
@@ -3254,7 +3254,7 @@ html[data-theme="light"] .rpgLootChip{
 .rpgLocChoice {
   padding: 12px 14px;
   text-align: left;
-  border-radius: 14px;
+  border-radius: 12px;
 }
 
 .rpgLocTitle {
@@ -3308,8 +3308,8 @@ html[data-theme="light"] .rpgLootChip{
   bottom: 12px;
   z-index: 9;
   margin-top: 0;
-  padding: 8px 10px;
-  border-radius: 14px;
+  padding: 6px 8px;
+  border-radius: 12px;
   /* Darker for readability (force dark even if the site theme is "light") */
   background: rgba(2,6,23,0.82);
   border: 1px solid rgba(255,255,255,0.18);
@@ -3437,7 +3437,7 @@ html[data-theme="light"] .rpgOverworldGrid{
   appearance: none;
   border: 1px solid rgba(255,255,255,0.12);
   background: rgba(255,255,255,0.03);
-  border-radius: 14px;
+  border-radius: 12px;
   padding: 0;
   min-height: 44px;
   aspect-ratio: 1 / 1;
@@ -3571,7 +3571,7 @@ html[data-theme="light"] .rpgTileAvatar{
 .rpgDpadBtn{
   width: 44px;
   height: 44px;
-  border-radius: 14px;
+  border-radius: 12px;
   padding: 0;
   display:flex;
   align-items:center;
@@ -3609,7 +3609,7 @@ html[data-theme="light"] .rpgTileAvatar{
 .rpgCharChoice{
   padding: 12px 14px;
   text-align: left;
-  border-radius: 14px;
+  border-radius: 12px;
   display: grid;
   grid-template-columns: 64px 1fr;
   gap: 12px;
@@ -3631,7 +3631,7 @@ html[data-theme="light"] .rpgTileAvatar{
 .rpgCharSprite{
   width: 64px;
   height: 64px;
-  border-radius: 14px;
+  border-radius: 12px;
   background: rgba(0,0,0,0.25);
   border: 1px solid rgba(255,255,255,0.10);
   display: grid;
@@ -3689,7 +3689,7 @@ html[data-theme="light"] .rpgTileAvatar{
 .rpgSpellChoice{
   padding: 12px 14px;
   text-align: left;
-  border-radius: 14px;
+  border-radius: 12px;
   border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
   background: color-mix(in srgb, var(--panel2) 85%, transparent);
   display: grid;
@@ -3834,7 +3834,7 @@ html[data-theme="light"] .rpgTileAvatar{
 .rpgPerkCard{
   padding: 12px 14px;
   text-align: left;
-  border-radius: 14px;
+  border-radius: 12px;
   border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
   background: color-mix(in srgb, var(--panel2) 85%, transparent);
   display: grid;
@@ -3914,7 +3914,7 @@ html[data-theme="light"] .rpgTileAvatar{
 .rpgFormula {
   margin: 0;
   padding: 10px 12px;
-  border-radius: 14px;
+  border-radius: 12px;
   border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
   background: color-mix(in srgb, var(--panel2) 85%, transparent);
 }
@@ -3922,7 +3922,7 @@ html[data-theme="light"] .rpgTileAvatar{
 .rpgMiniChart {
   margin-top: 4px;
   padding: 10px 12px;
-  border-radius: 14px;
+  border-radius: 12px;
   border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
   background: color-mix(in srgb, var(--panel2) 85%, transparent);
   display: grid;
@@ -4014,7 +4014,7 @@ html[data-theme="light"] .rpgTileAvatar{
 .rpgLog li {
   border: 1px solid color-mix(in srgb, var(--border) 72%, rgba(255, 255, 255, 0.1));
   background: color-mix(in srgb, var(--panel2) 84%, transparent);
-  border-radius: 14px;
+  border-radius: 12px;
   padding: 10px 12px;
   color: color-mix(in srgb, var(--text) 92%, var(--muted) 8%);
   font-size: 0.98rem;
@@ -5061,7 +5061,7 @@ html[data-theme="light"] .rpgTileAvatar{
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--panel) 60%, transparent);
   color: var(--text);
-  padding: 8px 10px;
+  padding: 6px 8px;
   border-radius: 999px;
   font-size: 13px;
   cursor: pointer;
@@ -5367,7 +5367,7 @@ body.searchPage details.searchResult[open]{
 .badgeToastIcon{
   width: 40px;
   height: 40px;
-  border-radius: 14px;
+  border-radius: 12px;
   display: grid;
   place-items: center;
   background: linear-gradient(135deg, rgba(241, 155, 255, 0.22), rgba(113, 200, 255, 0.16));
@@ -5801,7 +5801,7 @@ body.homePage .landing{
 .homeServiceIcon{
   width: 44px;
   height: 44px;
-  border-radius: 14px;
+  border-radius: 12px;
   display: grid;
   place-items: center;
   font-size: 22px;
@@ -6102,7 +6102,7 @@ body.homePage #contact .sectionHead p.muted{
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 8px 10px;
+  padding: 6px 8px;
   border-radius: 12px;
   border: 1px solid rgba(255,255,255,0.16);
   background: rgba(0,0,0,0.55);
@@ -6161,7 +6161,7 @@ body.homePage #contact .sectionHead p.muted{
 .rpgTypeDetails{
   margin-top: 10px;
   padding: 10px 12px;
-  border-radius: 14px;
+  border-radius: 12px;
   border: 1px solid rgba(255,255,255,0.14);
   background: rgba(0,0,0,0.45);
 
@@ -6244,7 +6244,7 @@ body.homePage #contact .sectionHead p.muted{
   overflow: auto;
   -webkit-overflow-scrolling: touch;
   padding: 6px;
-  border-radius: 14px;
+  border-radius: 12px;
   border: 1px solid rgba(255,255,255,0.14);
   background: rgba(0,0,0,0.35);
 }
@@ -6257,7 +6257,7 @@ body.homePage #contact .sectionHead p.muted{
 
 .rpgTypeMatrix th,
 .rpgTypeMatrix td{
-  padding: 8px 10px;
+  padding: 6px 8px;
   border-radius: 12px;
   border: 1px solid rgba(255,255,255,0.12);
   background: rgba(0,0,0,0.55);
@@ -6746,7 +6746,7 @@ html[data-theme="light"] .rpgOverworldMapStage{
   position: relative;
   width: 100%;
   aspect-ratio: 2048 / 1432;
-  border-radius: 14px;
+  border-radius: 12px;
   overflow: hidden;
   border: 1px solid rgba(255,255,255,0.14);
   background: rgba(0,0,0,0.18);
@@ -7900,49 +7900,78 @@ body.crownQuillPage {
   justify-items: end;
 }
 
+/* Center the masthead title block on wide screens while keeping utilities on the right */
+@media (min-width: 821px){
+  .crownQuillPage .cqMastheadGrid{
+    grid-template-columns: minmax(220px, 0.85fr) minmax(0, 1.55fr) minmax(220px, 0.85fr);
+    align-items: center;
+  }
+  .crownQuillPage .cqMastheadLeft{
+    grid-column: 2;
+    justify-self: center;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+  }
+  .crownQuillPage .cqMastheadTitles{ text-align: center; }
+  .crownQuillPage .cqMastheadRight{ grid-column: 3; }
+  .crownQuillPage .cqMastheadActions{ justify-items: end; }
+}
+
 /* Today's snapshot (Weather + Moon) */
 .crownQuillPage .cqSnapshot{
   justify-self: end;
-  width: min(340px, 100%);
-  padding: 8px 10px;
-  border-radius: 14px;
+  width: min(300px, 100%);
+  padding: 6px 8px;
+  border-radius: 12px;
   background: color-mix(in srgb, var(--panel2) 82%, transparent);
   border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
-  box-shadow: 0 12px 28px rgba(0,0,0,0.22);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.18);
 }
 .crownQuillPage .cqSnapshotTitle{
-  margin: 0 0 6px;
-  letter-spacing: 0.08em;
+  margin: 0 0 4px;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
 
   /* .kicker is inline-block by default; force this to truly center */
   display: block;
   width: 100%;
   text-align: center;
+  padding: 6px 10px;
+  font-size: 0.7rem;
 }
 .crownQuillPage .cqSnapshotRow{
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 8px;
-  justify-content: flex-end;
-  flex-wrap: wrap;
+  align-items: stretch;
 }
 .crownQuillPage .cqSnapshotChip{
-  display: grid;
-  gap: 2px;
-  padding: 6px 8px;
-  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 12px;
   background: color-mix(in srgb, rgba(255, 211, 106, 0.12) 35%, var(--panel2));
   border: 1px solid color-mix(in srgb, rgba(255, 211, 106, 0.18) 65%, var(--border));
-  min-width: 130px;
+  min-width: 0;
 }
+.crownQuillPage .cqSnapshotChip > *{ min-width: 0; }
 .crownQuillPage .cqSnapshotLabel{
-  font-size: 0.74rem;
-  opacity: 0.85;
+  font-size: 0.72rem;
+  opacity: 0.82;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 .crownQuillPage .cqSnapshotValue{
-  font-size: 0.94rem;
+  font-size: 0.9rem;
   font-weight: 650;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
 }
 .crownQuillPage .cqActionRow{
   display: flex;
@@ -7952,6 +7981,11 @@ body.crownQuillPage {
   align-items: center;
 }
 
+
+@media (max-width: 520px){
+  .crownQuillPage .cqSnapshot{ width: min(340px, 100%); }
+  .crownQuillPage .cqSnapshotRow{ grid-template-columns: 1fr; }
+}
 /* Center the Front Page header title while keeping tools (Search) on the right */
 .crownQuillPage .articlesCard .articlesHeader .articlesTopRow{
   display: grid;
@@ -8054,6 +8088,13 @@ body.crownQuillPage {
   object-fit: contain;
   filter: drop-shadow(0 12px 22px rgba(0,0,0,0.55)) drop-shadow(0 0 18px rgba(255, 211, 106, 0.08));
   opacity: 0.99;
+}
+
+@media (min-width: 821px){
+  .crownQuillPage .cqMastheadMark{
+    width: clamp(96px, 8.5vw, 132px);
+    height: clamp(96px, 8.5vw, 132px);
+  }
 }
 
 /* Timestamp pill */
