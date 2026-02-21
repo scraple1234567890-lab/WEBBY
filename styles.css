@@ -7889,6 +7889,7 @@ body.crownQuillPage {
   grid-area: left;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 14px;
   min-width: 0;
 }
@@ -7897,7 +7898,7 @@ body.crownQuillPage {
   display: flex;
   justify-content: flex-end;
 }
-.crownQuillPage .cqMastheadTitles{ min-width: 0; }
+.crownQuillPage .cqMastheadTitles{ min-width: 0; text-align: center; }
 .crownQuillPage .cqMastheadRight{
   grid-area: right;
   display: grid;
@@ -8292,6 +8293,10 @@ body.crownQuillPage {
   gap: 0.45rem;
   white-space: nowrap;
 }
+.crownQuillPage .cqRumors .cqRumorRefreshInline{
+  margin-left: 0.25rem;
+  transform: translateY(-1px);
+}
 .crownQuillPage .cqRumors .cqRumorSubhead{
   margin: 0;
   /* Keep the tagline compact so it doesn't bully the layout */
@@ -8340,6 +8345,15 @@ body.crownQuillPage {
   padding-bottom: 6px;
   scroll-snap-type: x mandatory;
 }
+/* Hide horizontal scrollbar under Rumor Ledger (keep swipe/scroll) */
+.crownQuillPage .cqRumorList{
+  scrollbar-width: none;      /* Firefox */
+  -ms-overflow-style: none;   /* IE/Edge legacy */
+}
+.crownQuillPage .cqRumorList::-webkit-scrollbar{
+  height: 0px;
+}
+
 .crownQuillPage .cqRumorItem{
   display: grid;
   grid-template-columns: auto 1fr;
@@ -8562,7 +8576,7 @@ body.crownQuillPage {
     justify-content: center;
     gap: 14px;
   }
-  .crownQuillPage .cqMastheadTitles{ text-align: left; }
+  .crownQuillPage .cqMastheadTitles{ text-align: center; }
   .crownQuillPage .cqMastheadMark{
     width: clamp(78px, 6.6vw, 104px);
     height: clamp(78px, 6.6vw, 104px);
