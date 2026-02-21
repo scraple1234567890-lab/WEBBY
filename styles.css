@@ -7629,49 +7629,95 @@ html[data-theme="light"] .rpgLootChip--coin{
    Crown & Quill (Gazette)
    ========================= */
 
-/* Crown & Quill page should be opaque for readability */
+/* Keep the site background, but put fully opaque panels behind every block of text. */
 body.crownQuillPage {
-  --bg: #0c0820;
+  /* Override panels to be solid for readability on the newspaper page only */
   --panel: #140d29;
   --panel2: #1b1236;
-  --border: #2f2450;
+  --border: rgba(255, 255, 255, 0.18);
   --shadow: 0 18px 42px rgba(0, 0, 0, 0.38);
-  background-color: var(--bg);
-  background-image: none;
 }
-body.crownQuillPage::before,
-body.crownQuillPage::after { display: none; }
-.crownQuillPage .section,
-.crownQuillPage .crownQuillPageMain { background: var(--bg); }
-.crownQuillPage .section.alt { background: var(--bg); border-top-color: var(--border); border-bottom-color: var(--border); }
-.crownQuillPage .section.alt::before { content: none; }
+
+/* Generic card shell used across the Crown & Quill page */
+.crownQuillPage .card {
+  border: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
+  border-radius: var(--radius2);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  padding: 18px;
+}
+
+/* The pinned note + actions bar */
+.crownQuillPage .crownQuillTop {
+  margin-bottom: 1rem;
+  border: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
+  border-radius: var(--radius2);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  padding: 12px 14px;
+}
+
+.crownQuillPage .crownTopActions .btn { white-space: nowrap; }
+
+/* Header/nav should be readable without changing the global background */
 .crownQuillPage .header {
   backdrop-filter: none;
-  background: var(--bg);
-  border-bottom-color: var(--border);
+  background: color-mix(in srgb, var(--panel) 96%, #05030f 4%);
+  border-bottom-color: color-mix(in srgb, var(--border) 78%, transparent);
 }
-.crownQuillPage .navLinks,
-.crownQuillPage .profileMenuList,
+.crownQuillPage .profileMenuList {
+  background: var(--panel);
+  border-color: color-mix(in srgb, var(--border) 78%, transparent);
+  box-shadow: var(--shadow);
+  backdrop-filter: none;
+}
+
+@media (max-width: 760px) {
+  .crownQuillPage .navLinks {
+    background: var(--panel);
+    border-color: color-mix(in srgb, var(--border) 78%, transparent);
+    box-shadow: var(--shadow);
+  }
+}
+
+/* Inputs/editor surfaces */
+.crownQuillPage input:not([type="file"]):not([type="checkbox"]):not([type="radio"]),
+.crownQuillPage textarea,
+.crownQuillPage select {
+  background: var(--panel2);
+  border-color: color-mix(in srgb, var(--border) 78%, transparent);
+}
+
 .crownQuillPage .articleSearchPanel,
 .crownQuillPage .articleImagePreview,
 .crownQuillPage .richEditorShell,
-.crownQuillPage .richToolbar,
-.crownQuillPage .sectionHead h2,
-.crownQuillPage .sectionHead p {
+.crownQuillPage .richToolbar {
   background: var(--panel);
-  border-color: var(--border);
+  border-color: color-mix(in srgb, var(--border) 78%, transparent);
   box-shadow: var(--shadow);
 }
+
+/* Solid tag chips */
 .crownQuillPage .tagChip,
 .crownQuillPage .tagPill {
   background: var(--panel2);
-  border-color: var(--border);
+  border-color: color-mix(in srgb, var(--border) 78%, transparent);
 }
 
+/* Ensure section header pills are solid too */
+.crownQuillPage .sectionHead h2,
+.crownQuillPage .sectionHead p {
+  background: var(--panel);
+  border-color: color-mix(in srgb, var(--border) 78%, transparent);
+  box-shadow: var(--shadow);
+  text-shadow: none;
+}
+
+/* Masthead styling */
 .crownQuillPage .crownMasthead {
   padding: 1.25rem 1.1rem;
   margin-bottom: 1rem;
-  border: 1px solid var(--border);
+  border: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
   background: var(--panel);
   border-radius: var(--radius2);
   position: relative;
@@ -7698,9 +7744,6 @@ body.crownQuillPage::after { display: none; }
 .crownQuillPage .crownTitle { margin: 0.35rem 0 0.2rem; }
 .crownQuillPage .crownTagline { margin: 0.25rem 0 0; }
 
-.crownQuillPage .crownQuillTop { margin-bottom: 1rem; }
-.crownQuillPage .crownTopActions .btn { white-space: nowrap; }
-
 .crownQuillPage .crownQuillGrid { margin-top: 1rem; }
 
 @media (min-width: 900px) {
@@ -7718,3 +7761,20 @@ body.crownQuillPage::after { display: none; }
 }
 
 .crownQuillPage .articlesCard .loreTitleWrap .loreSigil { opacity: 0.9; }
+
+/* Front Page article tiles: remove remaining translucency */
+.crownQuillPage .articlesCard .articleItem {
+  background: linear-gradient(180deg, #ffffff, #f4efff);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 0 18px 38px rgba(10, 6, 22, 0.22);
+  color: #1f1831;
+}
+.crownQuillPage .articlesCard .articleItem .tagPill {
+  background: #ffffff;
+}
+.crownQuillPage .articlesCard .articleItem .articleCover {
+  background: #ffffff;
+}
+.crownQuillPage .articlesCard .articleItem .articleFull blockquote {
+  background: #f4efff;
+}
