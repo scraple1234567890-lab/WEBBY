@@ -8162,7 +8162,8 @@ body.crownQuillPage {
 }
 
 @media (min-width: 900px) {
-  .crownQuillPage .crownQuillGrid { grid-template-columns: 1fr minmax(320px, 420px); }
+  /* Layout preference: give the Front Page more room than the Chronicle Wire */
+  .crownQuillPage .crownQuillGrid { grid-template-columns: minmax(320px, 420px) 1fr; }
   .crownQuillPage .crownColumn--wire { position: relative; }
   .crownQuillPage .crownColumn--wire::before {
     content: "✠";
