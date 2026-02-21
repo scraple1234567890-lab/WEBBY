@@ -8073,7 +8073,7 @@ body.crownQuillPage {
 .crownQuillPage .postFeed{ gap: 10px; margin-top: 12px; }
 
 /* Rumor Ledger: compact, readable, on-theme */
-.crownQuillPage .cqRumors{ padding: 12px 14px; }
+.crownQuillPage .cqRumors{ padding: 12px 14px; margin-top: 0.75rem; }
 /* Make Rumor Ledger span the full grid width (like the masthead above) */
 .crownQuillPage .crownQuillGrid > .cqRumors{ grid-column: 1 / -1; }
 
@@ -8162,7 +8162,7 @@ body.crownQuillPage {
 }
 
 @media (min-width: 900px) {
-  .crownQuillPage .crownQuillGrid { grid-template-columns: minmax(280px, 380px) 1fr; }
+  .crownQuillPage .crownQuillGrid { grid-template-columns: 1fr minmax(320px, 420px); }
   .crownQuillPage .crownColumn--wire { position: relative; }
   .crownQuillPage .crownColumn--wire::before {
     content: "✠";
