@@ -8074,6 +8074,9 @@ body.crownQuillPage {
 
 /* Rumor Ledger: compact, readable, on-theme */
 .crownQuillPage .cqRumors{ padding: 12px 14px; }
+/* Make Rumor Ledger span the full grid width (like the masthead above) */
+.crownQuillPage .crownQuillGrid > .cqRumors{ grid-column: 1 / -1; }
+
 .crownQuillPage .cqRumors .sectionHead{ padding-bottom: 6px; }
 .crownQuillPage .cqRumors .articlesTools{ flex-wrap: wrap; justify-content: flex-end; }
 .crownQuillPage .cqRumorMeta{
