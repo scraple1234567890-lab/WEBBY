@@ -7848,7 +7848,7 @@ body.crownQuillPage {
 
 /* Masthead styling */
 .crownQuillPage .crownMasthead {
-  padding: 0.8rem;
+  padding: 0.65rem;
   margin-bottom: 0.6rem;
   border: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
   background: linear-gradient(180deg, color-mix(in srgb, var(--panel) 92%, rgba(255, 255, 255, 0.04)), var(--panel));
@@ -7882,7 +7882,7 @@ body.crownQuillPage {
     "left"
     "aux"
     "right";
-  gap: 12px;
+  gap: 10px;
   align-items: center;
 }
 .crownQuillPage .cqMastheadLeft{
@@ -7901,13 +7901,13 @@ body.crownQuillPage {
 .crownQuillPage .cqMastheadRight{
   grid-area: right;
   display: grid;
-  gap: 8px;
+  gap: 6px;
   justify-items: end;
   align-content: center;
 }
 .crownQuillPage .cqMastheadActions{
   display: grid;
-  gap: 6px;
+  gap: 4px;
   justify-items: end;
 }
 
@@ -8103,8 +8103,8 @@ body.crownQuillPage {
 
 @media (min-width: 821px){
   .crownQuillPage .cqMastheadMark{
-    width: clamp(96px, 8.5vw, 132px);
-    height: clamp(96px, 8.5vw, 132px);
+    width: clamp(88px, 8.2vw, 120px);
+    height: clamp(88px, 8.2vw, 120px);
   }
 }
 
@@ -8115,7 +8115,7 @@ body.crownQuillPage {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.32rem 0.65rem;
+  padding: 0.28rem 0.56rem;
   border-radius: 999px;
   background: color-mix(in srgb, var(--panel2) 82%, #000 18%);
   border: 1px solid rgba(255, 211, 106, 0.22);
@@ -8150,17 +8150,17 @@ body.crownQuillPage {
 }
 
 .crownQuillPage .crownTitle {
-  margin: 0.22rem 0 0.2rem;
+  margin: 0.14rem 0 0.12rem;
   font-family: var(--display);
   font-weight: 800;
   letter-spacing: 0.02em;
   line-height: 1.02;
-  font-size: clamp(2.05rem, 1.4rem + 2.1vw, 3.2rem);
+  font-size: clamp(1.95rem, 1.35rem + 1.9vw, 3.0rem);
   color: #fbf6ff;
   text-shadow: 0 2px 0 rgba(0, 0, 0, 0.45), 0 0 18px rgba(255, 211, 106, 0.10);
   position: relative;
   display: inline-block;
-  padding: 0.03rem 0.28rem 0.46rem;
+  padding: 0.02rem 0.22rem 0.34rem;
 }
 .crownQuillPage .crownTitle .cqTitleIllum {
   font-family: "Cinzel", Georgia, serif;
@@ -8174,7 +8174,7 @@ body.crownQuillPage {
   content: "";
   position: absolute;
   left: 50%;
-  bottom: 0.28rem;
+  bottom: 0.22rem;
   transform: translateX(-50%);
   width: min(520px, 92%);
   height: 2px;
@@ -8194,11 +8194,11 @@ body.crownQuillPage {
 }
 
 .crownQuillPage .crownTagline {
-  margin: 0.25rem 0 0;
+  margin: 0.18rem 0 0;
   font-family: "Crimson Pro", var(--display);
   font-style: italic;
-  font-size: 0.98rem;
-  line-height: 1.35;
+  font-size: 0.90rem;
+  line-height: 1.25;
   color: color-mix(in srgb, var(--muted) 70%, #ffe6c9 30%);
 
   /* keep it informative without pushing the fold */
@@ -8234,13 +8234,13 @@ body.crownQuillPage {
 /* When Rumor Ledger is nested inside the masthead, make it feel like one combined block */
 .crownQuillPage .cqMastheadDivider{
   height: 1px;
-  margin: 10px 2px 8px;
+  margin: 6px 2px 6px;
   background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--border) 65%, transparent), transparent);
   opacity: 0.95;
 }
 
 .crownQuillPage .crownMasthead .cqRumorsInline{
-  padding: 0 2px 2px;
+  padding: 0 2px 0;
   margin-top: 0;
   background: transparent;
   border: none;
@@ -8251,6 +8251,22 @@ body.crownQuillPage {
 }
 .crownQuillPage .crownMasthead .cqRumorsInline .sectionHead::after{ margin-top: 8px; }
 .crownQuillPage .crownMasthead .cqRumorsInline .sectionHead::before{ bottom: -3px; }
+
+/* Inline Rumor Ledger inside masthead: drop the extra rule/flower to keep the masthead short */
+.crownQuillPage .crownMasthead .cqRumorsInline .sectionHead::after,
+.crownQuillPage .crownMasthead .cqRumorsInline .sectionHead::before{
+  content: none !important;
+  display: none !important;
+}
+.crownQuillPage .crownMasthead .cqRumorsInline .sectionHead{
+  margin: 0 0 4px;
+  padding-bottom: 0;
+}
+.crownQuillPage .crownMasthead .cqRumorsInline .sectionHead h2{
+  margin: 0;
+  padding: 5px 10px;
+  font-size: clamp(18px, 1.55vw, 26px);
+}
 .crownQuillPage .crownMasthead .cqRumorsInline .cqRumorList{
   margin-top: 6px;
 }
@@ -8457,4 +8473,142 @@ body.crownQuillPage {
 }
 .crownQuillPage .articlesCard .articleItem .articleFull blockquote {
   background: #f1e3d1;
+}
+
+/* =========================================================
+   Crown & Quill: ultra-compact masthead (real height savings)
+   ========================================================= */
+.crownQuillPage .crownMasthead{
+  padding: 0.55rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Make the snapshot a single-line pill instead of a mini-card */
+.crownQuillPage .cqSnapshot{
+  width: auto;
+  padding: 6px 10px;
+  border-radius: 999px;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.crownQuillPage .cqSnapshotTitle{
+  display: inline-flex;
+  width: auto;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: none;
+  letter-spacing: 0.12em;
+  font-size: 0.68rem;
+  white-space: nowrap;
+  opacity: 0.9;
+}
+.crownQuillPage .cqSnapshotRow{
+  display: inline-flex;
+  grid-template-columns: none;
+  gap: 12px;
+  align-items: center;
+}
+.crownQuillPage .cqSnapshotChip{
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  min-width: 0;
+}
+.crownQuillPage .cqSnapshotLabel{
+  display: none; /* keep it tight: icons + values carry the meaning */
+}
+.crownQuillPage .cqSnapshotValue{
+  font-size: 0.92rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  text-overflow: ellipsis;
+}
+
+/* Reduce title block vertical drag without shrinking it into nothing */
+.crownQuillPage .crownTitle{
+  margin: 0.06rem 0 0.06rem;
+  padding: 0 0.18rem 0.18rem;
+}
+.crownQuillPage .crownTitle::before{ bottom: 0.12rem; }
+.crownQuillPage .crownTitle::after{ bottom: -0.10rem; }
+
+.crownQuillPage .crownTagline{
+  margin-top: 0.10rem;
+  -webkit-line-clamp: 1;
+}
+
+/* Pull the masthead grid closer together */
+.crownQuillPage .cqMastheadGrid{ gap: 8px; }
+@media (min-width: 821px){
+  .crownQuillPage .cqMastheadGrid{
+    align-items: center;
+  }
+  .crownQuillPage .cqMastheadRight{ gap: 4px; }
+}
+
+@media (min-width: 821px){
+  /* Stop stacking the logo above the title (this is the big height win) */
+  .crownQuillPage .cqMastheadLeft{
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+  }
+  .crownQuillPage .cqMastheadTitles{ text-align: left; }
+  .crownQuillPage .cqMastheadMark{
+    width: clamp(78px, 6.6vw, 104px);
+    height: clamp(78px, 6.6vw, 104px);
+  }
+}
+
+
+/* Make the login note a compact single-line hint */
+.crownQuillPage #must-login{
+  max-width: 32ch;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.9;
+}
+
+/* Rumor Ledger inside masthead: convert rumor cards into a slim ticker row */
+.crownQuillPage .crownMasthead .cqRumorsInline .cqRumorList{
+  margin-top: 4px;
+  padding-bottom: 0;
+  gap: 12px;
+}
+.crownQuillPage .crownMasthead .cqRumorsInline .cqRumorItem{
+  flex: 0 0 auto;
+  max-width: none;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  box-shadow: none;
+}
+.crownQuillPage .crownMasthead .cqRumorsInline .cqRumorBadge{
+  padding: 3px 6px;
+  font-size: 0.60rem;
+}
+.crownQuillPage .crownMasthead .cqRumorsInline .cqRumorText{
+  margin: 0;
+  -webkit-line-clamp: 1;
+  font-size: 0.92rem;
+  line-height: 1.15;
+}
+.crownQuillPage .crownMasthead .cqRumorsInline .cqRumorSub{
+  display: none;
+}
+
+/* Slightly tighter divider so it doesn't add height */
+.crownQuillPage .cqMastheadDivider{
+  margin: 4px 2px 4px;
 }
