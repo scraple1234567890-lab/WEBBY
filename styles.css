@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&family=Cinzel:wght@500;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400;1,600&display=swap");
 
 :root {
   --bg: #0a0616;
@@ -7718,7 +7718,7 @@ body.crownQuillPage {
   padding: 1.25rem 1.1rem;
   margin-bottom: 1rem;
   border: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
-  background: var(--panel);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--panel) 92%, rgba(255, 255, 255, 0.04)), var(--panel));
   border-radius: var(--radius2);
   position: relative;
   overflow: hidden;
@@ -7739,10 +7739,101 @@ body.crownQuillPage {
 .crownQuillPage .crownMasthead::before { top: 14px; }
 .crownQuillPage .crownMasthead::after { bottom: 14px; }
 
-.crownQuillPage .crownMastheadInner { max-width: 64ch; margin: 0 auto; }
-.crownQuillPage .crownKicker { letter-spacing: 0.32em; text-transform: uppercase; margin: 0; }
-.crownQuillPage .crownTitle { margin: 0.35rem 0 0.2rem; }
-.crownQuillPage .crownTagline { margin: 0.25rem 0 0; }
+.crownQuillPage .crownMastheadInner { max-width: 64ch; margin: 0 auto; position: relative; }
+.crownQuillPage .crownMastheadInner::before {
+  content: "";
+  position: absolute;
+  inset: -22px -26px -26px;
+  pointer-events: none;
+  background:
+    radial-gradient(420px 210px at 50% 15%, rgba(255, 211, 106, 0.20), transparent 70%),
+    radial-gradient(520px 260px at 50% 70%, rgba(124, 209, 255, 0.10), transparent 70%),
+    conic-gradient(from 180deg at 50% 45%,
+      rgba(255, 211, 106, 0.10),
+      rgba(181, 108, 242, 0.06) 12%,
+      transparent 22%,
+      rgba(255, 211, 106, 0.08) 34%,
+      transparent 45%,
+      rgba(112, 73, 255, 0.08) 56%,
+      transparent 70%,
+      rgba(255, 211, 106, 0.10) 82%,
+      transparent 100%);
+  opacity: 0.45;
+  filter: blur(0.2px) saturate(1.15);
+  mix-blend-mode: screen;
+  z-index: 0;
+}
+.crownQuillPage .crownMastheadInner > * { position: relative; z-index: 1; }
+
+.crownQuillPage .crownKicker {
+  font-family: "Cinzel", var(--display);
+  font-weight: 700;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  margin: 0;
+  color: color-mix(in srgb, var(--text) 76%, #ffd36a 24%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+}
+.crownQuillPage .crownKicker .cqFleur {
+  color: color-mix(in srgb, #ffd36a 75%, var(--accent) 25%);
+  opacity: 0.95;
+  filter: drop-shadow(0 0 10px rgba(255, 211, 106, 0.12));
+}
+
+.crownQuillPage .crownTitle {
+  margin: 0.55rem 0 0.35rem;
+  font-family: var(--display);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1.05;
+  font-size: clamp(2.05rem, 1.4rem + 2.1vw, 3.2rem);
+  color: #fbf6ff;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.45), 0 0 18px rgba(255, 211, 106, 0.10);
+  position: relative;
+  display: inline-block;
+  padding: 0.15rem 0.55rem 0.7rem;
+}
+.crownQuillPage .crownTitle .cqTitleIllum {
+  font-family: "Cinzel", Georgia, serif;
+  font-weight: 700;
+  font-size: 0.72em;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--text) 68%, #ffd36a 32%);
+}
+.crownQuillPage .crownTitle::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0.36rem;
+  transform: translateX(-50%);
+  width: min(520px, 92%);
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 211, 106, 0.65), transparent);
+  opacity: 0.9;
+}
+.crownQuillPage .crownTitle::after {
+  content: "❦";
+  position: absolute;
+  left: 50%;
+  bottom: 0.02rem;
+  transform: translateX(-50%);
+  color: color-mix(in srgb, #ffd36a 70%, var(--accent) 30%);
+  font-size: 1.05rem;
+  opacity: 0.95;
+  text-shadow: 0 0 16px rgba(255, 211, 106, 0.14);
+}
+
+.crownQuillPage .crownTagline {
+  margin: 0.35rem 0 0;
+  font-family: "Crimson Pro", var(--display);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: color-mix(in srgb, var(--muted) 70%, #ffe6c9 30%);
+}
 
 .crownQuillPage .crownQuillGrid { margin-top: 1rem; }
 
@@ -7761,6 +7852,18 @@ body.crownQuillPage {
 }
 
 .crownQuillPage .articlesCard .loreTitleWrap .loreSigil { opacity: 0.9; }
+
+/* Section headings: academia + cathedral ink */
+.crownQuillPage .sectionHead .loreTitle {
+  font-family: "Cinzel", var(--display);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.crownQuillPage .sectionHead .loreSigil {
+  color: color-mix(in srgb, #ffd36a 62%, var(--accent) 38%);
+  filter: drop-shadow(0 0 12px rgba(255, 211, 106, 0.10));
+}
+
 
 /* Front Page article tiles: remove remaining translucency */
 .crownQuillPage .articlesCard .articleItem {
