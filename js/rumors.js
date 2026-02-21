@@ -165,6 +165,82 @@ function renderRumors(rumors) {
   }
 
   if (meta) { meta.textContent = ""; meta.hidden = true; }
+
+  // After rendering, enable the continuous left-scroll ticker.
+  // (Respects prefers-reduced-motion, and restarts cleanly on reroll/resizes.)
+  setupRumorMarquee();
+}
+
+// --- Marquee (continuous left scroll) --------------------------------------
+// We duplicate the rumor cards once and then auto-advance scrollLeft.
+// When we reach the end of the first set, we wrap seamlessly.
+let cqRumorMarquee = { raf: null, lastTs: 0, paused: false };
+
+function stopRumorMarquee() {
+  if (cqRumorMarquee.raf) {
+    cancelAnimationFrame(cqRumorMarquee.raf);
+    cqRumorMarquee.raf = null;
+  }
+  cqRumorMarquee.lastTs = 0;
+}
+
+function setupRumorMarquee() {
+  const list = $("#cq-rumors");
+  if (!list) return;
+
+  // Respect reduced motion.
+  const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+  if (reduce) {
+    stopRumorMarquee();
+    list.classList.remove("cqMarquee");
+    return;
+  }
+
+  // Remove any prior clones from a previous run.
+  stopRumorMarquee();
+  list.querySelectorAll("[data-cq-clone='1']").forEach((n) => n.remove());
+
+  const originals = Array.from(list.children);
+  if (originals.length < 2) return; // nothing meaningful to scroll
+
+  const frag = document.createDocumentFragment();
+  for (const li of originals) {
+    const clone = li.cloneNode(true);
+    clone.dataset.cqClone = "1";
+    clone.setAttribute("aria-hidden", "true");
+    frag.appendChild(clone);
+  }
+  list.appendChild(frag);
+
+  list.classList.add("cqMarquee");
+  list.scrollLeft = 0;
+
+  // Pause on hover/focus so users can read.
+  const onEnter = () => (cqRumorMarquee.paused = true);
+  const onLeave = () => (cqRumorMarquee.paused = false);
+  list.onmouseenter = onEnter;
+  list.onmouseleave = onLeave;
+  list.onfocusin = onEnter;
+  list.onfocusout = onLeave;
+
+  const pxPerSecond = 38; // speed tuning
+  const step = (ts) => {
+    if (!cqRumorMarquee.lastTs) cqRumorMarquee.lastTs = ts;
+    const dt = ts - cqRumorMarquee.lastTs;
+    cqRumorMarquee.lastTs = ts;
+
+    if (!cqRumorMarquee.paused) {
+      const resetAt = list.scrollWidth / 2;
+      list.scrollLeft += (dt * pxPerSecond) / 1000;
+      if (list.scrollLeft >= resetAt) {
+        list.scrollLeft -= resetAt;
+      }
+    }
+
+    cqRumorMarquee.raf = requestAnimationFrame(step);
+  };
+
+  cqRumorMarquee.raf = requestAnimationFrame(step);
 }
 
 function loadCachedRumors() {

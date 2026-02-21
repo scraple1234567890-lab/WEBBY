@@ -8385,6 +8385,17 @@ body.crownQuillPage {
   padding-bottom: 6px;
   scroll-snap-type: x mandatory;
 }
+
+/* Continuous ticker mode (JS adds .cqMarquee) */
+.crownQuillPage .cqRumorList.cqMarquee{
+  overflow-x: hidden;
+  scroll-snap-type: none;
+  overscroll-behavior-x: none;
+  -webkit-overflow-scrolling: auto;
+  /* subtle edge fade so the loop feels smoother */
+  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+}
 /* Hide horizontal scrollbar under Rumor Ledger (keep swipe/scroll) */
 .crownQuillPage .cqRumorList{
   scrollbar-width: none;      /* Firefox */
