@@ -50,22 +50,35 @@
 </header>
 <main class="section crownQuillPageMain" id="main">
 <div class="container postLayout">
-<div class="card crownMasthead">
-<div class="crownMastheadInner">
-<p class="kicker crownKicker"><span aria-hidden="true" class="cqFleur">❦</span> Crown &amp; Quill <span aria-hidden="true" class="cqFleur">❦</span></p>
-<h1 class="crownTitle">Crown &amp; Quill <span class="cqTitleIllum">Chronicle</span></h1>
-<p class="muted crownTagline">An ink-and-starlight newsroom for Dragonstone. Dispatches below, stories to the right.</p>
-</div>
-</div>
-<div class="postHeader crownQuillTop cqOrnate">
-<div class="crownTopLeft">
-<p class="muted small" style="margin:0;">Pinned: keep it in-universe, keep it kind. 🕯️</p>
-</div>
-<div class="actions crownTopActions" style="gap: 0.5rem; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
-<p aria-live="polite" class="muted" id="must-login" style="margin: 0">You must be logged in to publish dispatches or stories.</p>
-<button aria-expanded="false" class="btn cqDispatchBtn" id="share-post-btn" type="button"><span aria-hidden="true" class="cqBtnIcon">✒︎</span> New dispatch</button>
-<button aria-expanded="false" class="btn cqSecondaryBtn btnSm" id="share-article-btn" type="button"><span aria-hidden="true" class="cqBtnIcon">✦</span> Write a story</button>
-</div>
+<div class="card crownMasthead cqOrnate">
+  <div class="crownMastheadInner">
+    <div class="cqMastheadGrid">
+      <div class="cqMastheadLeft">
+        <div class="cqMastheadMark" aria-hidden="true">
+          <img src="./assets/images/crown-quill-logo.png" alt="" loading="lazy"/>
+        </div>
+        <div class="cqMastheadTitles">
+          <p class="kicker crownKicker"><span aria-hidden="true" class="cqFleur">❦</span> Crown &amp; Quill <span aria-hidden="true" class="cqFleur">❦</span></p>
+          <h1 class="crownTitle">Crown &amp; Quill <span class="cqTitleIllum">Chronicle</span></h1>
+          <p class="muted crownTagline">An ink-and-starlight newsroom for Dragonstone. Dispatches on the Wire, stories on the Front Page.</p>
+        </div>
+      </div>
+      <div class="cqMastheadRight">
+        <p class="cqTimestamp"><span aria-hidden="true">⟡</span> <span id="cqTimestamp" aria-label="Current date and time">Loading time…</span> <span aria-hidden="true">⟡</span></p>
+        <div class="cqMastheadActions">
+          <p aria-live="polite" class="muted small" id="must-login" style="margin: 0">You must be logged in to publish dispatches or stories.</p>
+          <div class="actions cqActionRow">
+            <button aria-expanded="false" class="btn cqDispatchBtn" id="share-post-btn" type="button"><span aria-hidden="true" class="cqBtnIcon">✒︎</span> New dispatch</button>
+            <button aria-expanded="false" class="btn cqSecondaryBtn btnSm" id="share-article-btn" type="button"><span aria-hidden="true" class="cqBtnIcon">✦</span> Write a story</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cqMastheadFooter">
+      <p class="muted small cqPinned" style="margin:0;">Pinned: keep it in-universe, keep it kind. 🕯️</p>
+      <a class="muted small cqJump" href="#frontpage">Front Page ↓</a>
+    </div>
+  </div>
 </div>
 <section class="card cqOrnate" hidden="" id="composer-card">
 <div class="postComposerHeader">
@@ -215,5 +228,29 @@
 <script src="./js/app.js" type="module"></script>
 <script src="./js/posts.js" type="module"></script>
 <script src="./js/articles.js" type="module"></script>
+<script type="module">
+  const el = document.getElementById("cqTimestamp");
+  if (el) {
+    const dateFmt = new Intl.DateTimeFormat(undefined, {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    });
+    const timeFmt = new Intl.DateTimeFormat(undefined, {
+      hour: "numeric",
+      minute: "2-digit",
+      second: "2-digit"
+    });
+
+    const tick = () => {
+      const now = new Date();
+      el.textContent = dateFmt.format(now) + " · " + timeFmt.format(now);
+    };
+
+    tick();
+    setInterval(tick, 1000);
+  }
+</script>
 </body>
 </html>
