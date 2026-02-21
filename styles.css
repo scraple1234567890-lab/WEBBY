@@ -7917,17 +7917,21 @@ body.crownQuillPage {
 /* Wide layout: snapshot left, title centered, utilities right */
 @media (min-width: 821px){
   .crownQuillPage .cqMastheadGrid{
-    grid-template-columns: minmax(240px, 0.85fr) minmax(0, 1.55fr) minmax(240px, 0.85fr);
+    /* Prevent the center crest/title column from collapsing at smaller desktop widths
+       (which can cause the crest to overlap the Snapshot/Rumor controls). */
+    grid-template-columns: minmax(240px, 0.9fr) minmax(320px, 1.8fr) minmax(240px, 0.9fr);
     grid-template-areas: "aux left right";
     align-items: start;
   }
-  .crownQuillPage .cqMastheadAux{ justify-content: flex-start; padding-top: 4px; align-items: flex-start; }
+  .crownQuillPage .cqMastheadAux{ justify-content: flex-start; padding-top: 4px; align-items: flex-start; position: relative; z-index: 3; }
   .crownQuillPage .cqMastheadLeft{
     justify-self: center;
     flex-direction: column;
     align-items: center;
     text-align: center;
     gap: 10px;
+    position: relative;
+    z-index: 1;
   }
   .crownQuillPage .cqMastheadTitles{ text-align: center; }
   .crownQuillPage .cqMastheadRight{ justify-self: end; }
