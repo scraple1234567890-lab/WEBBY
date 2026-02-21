@@ -7899,6 +7899,8 @@ body.crownQuillPage {
   flex-direction: column;
   gap: 10px;
   align-items: center;
+  /* Critical: allow this column to shrink without its children overflowing into the title/crest column */
+  min-width: 0;
 }
 .crownQuillPage .cqMastheadTitles{ min-width: 0; text-align: center; }
 .crownQuillPage .cqMastheadRight{
@@ -7939,7 +7941,9 @@ body.crownQuillPage {
 
 /* Rumor Ledger header docked under Today's Snapshot */
 .crownQuillPage .cqRumorDockedHead{
-  width: min(300px, 100%);
+  /* Never exceed the grid column width (prevents overlap with the crest) */
+  width: 100%;
+  max-width: 340px;
   margin: 0;
   padding-bottom: 0;
 }
@@ -7959,7 +7963,10 @@ body.crownQuillPage {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  white-space: nowrap;
+  /* Allow wrapping at tighter widths so controls never spill into the crest/title column */
+  flex-wrap: wrap;
+  white-space: normal;
+  max-width: 100%;
 }
 .crownQuillPage .cqRumorDockedHead h2{
   margin: 0;
@@ -7977,7 +7984,9 @@ body.crownQuillPage {
 /* Today's snapshot (Weather + Moon) */
 .crownQuillPage .cqSnapshot{
   justify-self: end;
-  width: min(300px, 100%);
+  /* Never exceed the grid column width (prevents overlap with the crest) */
+  width: 100%;
+  max-width: 340px;
   padding: 6px 8px;
   border-radius: 12px;
   background: color-mix(in srgb, var(--panel2) 82%, transparent);
@@ -8554,7 +8563,9 @@ body.crownQuillPage {
 
 /* Make the snapshot a single-line pill instead of a mini-card */
 .crownQuillPage .cqSnapshot{
-  width: auto;
+  /* Keep it pill-shaped, but never let it overflow into the crest/title column */
+  width: 100%;
+  max-width: 340px;
   padding: 6px 10px;
   border-radius: 999px;
   box-shadow: none;
@@ -8614,27 +8625,52 @@ body.crownQuillPage {
   -webkit-line-clamp: 1;
 }
 
-/* Pull the masthead grid closer together */
-.crownQuillPage .cqMastheadGrid{ gap: 8px; }
+/* Pull the masthead grid closer together (keep vertical tight, add horizontal breathing room
+   so the crest drop-shadow never visually collides with Snapshot/Rumor controls). */
+.crownQuillPage .cqMastheadGrid{ row-gap: 8px; column-gap: 18px; }
 @media (min-width: 821px){
   .crownQuillPage .cqMastheadGrid{
     align-items: center;
+    column-gap: 22px;
   }
   .crownQuillPage .cqMastheadRight{ gap: 4px; }
 }
 
-@media (min-width: 821px){
-  /* Stop stacking the logo above the title (this is the big height win) */
+/*
+  IMPORTANT: Prevent crest overlap at tighter desktop widths.
+  The 3-column masthead can get cramped around ~820–1150px, and a horizontal
+  logo+title row can spill into the Snapshot/Rumor area.
+
+  Fix: keep the title stack (logo above title) until the viewport is truly wide.
+*/
+@media (min-width: 1180px){
+  /* On wide desktop, we can safely place the crest beside the title. */
   .crownQuillPage .cqMastheadLeft{
     flex-direction: row;
     align-items: center;
     justify-content: center;
     gap: 14px;
+    max-width: 100%;
   }
   .crownQuillPage .cqMastheadTitles{ text-align: center; }
   .crownQuillPage .cqMastheadMark{
     width: clamp(96px, 7.5vw, 140px);
     height: clamp(96px, 7.5vw, 140px);
+    flex: 0 0 auto;
+  }
+}
+
+@media (min-width: 821px) and (max-width: 1179px){
+  /* Mid desktop: stack the crest so it never collides with controls. */
+  .crownQuillPage .cqMastheadLeft{
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .crownQuillPage .cqMastheadMark{
+    width: clamp(90px, 7.5vw, 128px);
+    height: clamp(90px, 7.5vw, 128px);
   }
 }
 
