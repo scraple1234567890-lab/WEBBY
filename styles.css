@@ -8075,7 +8075,18 @@ body.crownQuillPage {
 /* Rumor Ledger: compact, readable, on-theme */
 .crownQuillPage .cqRumors{ padding: 12px 14px; }
 .crownQuillPage .cqRumors .sectionHead{ padding-bottom: 6px; }
-.crownQuillPage .cqRumorMeta{ text-align: right; opacity: 0.95; }
+.crownQuillPage .cqRumors .articlesTools{ flex-wrap: wrap; justify-content: flex-end; }
+.crownQuillPage .cqRumorMeta{
+  opacity: 0.95;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--panel2) 82%, #000 18%);
+  border: 1px solid rgba(255, 211, 106, 0.18);
+  color: color-mix(in srgb, var(--text) 78%, var(--cq-parchment) 22%);
+  white-space: nowrap;
+}
 .crownQuillPage .cqRumorRefresh{
   border-color: rgba(255, 211, 106, 0.24);
   background: color-mix(in srgb, var(--panel2) 78%, #000 22%);
@@ -8085,20 +8096,28 @@ body.crownQuillPage {
 .crownQuillPage .cqRumorList{
   list-style: none;
   padding: 0;
-  margin: 12px 0 0;
-  display: grid;
-  gap: 10px;
+  margin: 10px 0 0;
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8px;
+  scroll-snap-type: x mandatory;
 }
 .crownQuillPage .cqRumorItem{
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 10px;
   align-items: start;
-  padding: 10px 12px;
+  padding: 8px 10px;
   border-radius: 16px;
   background: var(--panel2);
   border: 1px solid color-mix(in srgb, rgba(255, 211, 106, 0.18) 46%, var(--border));
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+  flex: 0 0 340px;
+  max-width: 340px;
+  scroll-snap-align: start;
 }
 .crownQuillPage .cqRumorBadge{
   font-family: "Cinzel", var(--display);
@@ -8116,13 +8135,25 @@ body.crownQuillPage {
   margin: 0;
   line-height: 1.25;
   font-family: "Crimson Pro", var(--display);
-  font-size: 1.02rem;
+  font-size: 0.98rem;
   color: color-mix(in srgb, var(--text) 86%, #ffe6c9 14%);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .crownQuillPage .cqRumorSub{ margin: 6px 0 0; }
 
+/* Tighten the sub-line too so the whole card stays short */
+.crownQuillPage .cqRumorSub{
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 @media (max-width: 520px){
-  .crownQuillPage .cqRumorItem{ grid-template-columns: 1fr; }
+  .crownQuillPage .cqRumorItem{ grid-template-columns: 1fr; flex-basis: 280px; max-width: 280px; }
   .crownQuillPage .cqRumorBadge{ justify-self: start; }
   .crownQuillPage .cqRumorMeta{ text-align: left; }
 }
