@@ -8072,6 +8072,61 @@ body.crownQuillPage {
 /* Slightly tighter feeds on this page to keep the content above the fold */
 .crownQuillPage .postFeed{ gap: 10px; margin-top: 12px; }
 
+/* Rumor Ledger: compact, readable, on-theme */
+.crownQuillPage .cqRumors{ padding: 12px 14px; }
+.crownQuillPage .cqRumors .sectionHead{ padding-bottom: 6px; }
+.crownQuillPage .cqRumorMeta{ text-align: right; opacity: 0.95; }
+.crownQuillPage .cqRumorRefresh{
+  border-color: rgba(255, 211, 106, 0.24);
+  background: color-mix(in srgb, var(--panel2) 78%, #000 22%);
+}
+.crownQuillPage .cqRumorRefresh:hover{ filter: brightness(1.06); }
+
+.crownQuillPage .cqRumorList{
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  display: grid;
+  gap: 10px;
+}
+.crownQuillPage .cqRumorItem{
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: start;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: var(--panel2);
+  border: 1px solid color-mix(in srgb, rgba(255, 211, 106, 0.18) 46%, var(--border));
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+}
+.crownQuillPage .cqRumorBadge{
+  font-family: "Cinzel", var(--display);
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 6px 8px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255, 211, 106, 0.20), rgba(255, 255, 255, 0.06));
+  border: 1px solid rgba(255, 211, 106, 0.22);
+  color: color-mix(in srgb, var(--text) 70%, var(--cq-parchment) 30%);
+  white-space: nowrap;
+}
+.crownQuillPage .cqRumorText{
+  margin: 0;
+  line-height: 1.25;
+  font-family: "Crimson Pro", var(--display);
+  font-size: 1.02rem;
+  color: color-mix(in srgb, var(--text) 86%, #ffe6c9 14%);
+}
+.crownQuillPage .cqRumorSub{ margin: 6px 0 0; }
+
+@media (max-width: 520px){
+  .crownQuillPage .cqRumorItem{ grid-template-columns: 1fr; }
+  .crownQuillPage .cqRumorBadge{ justify-self: start; }
+  .crownQuillPage .cqRumorMeta{ text-align: left; }
+}
+
 @media (min-width: 900px) {
   .crownQuillPage .crownQuillGrid { grid-template-columns: minmax(280px, 380px) 1fr; }
   .crownQuillPage .crownColumn--wire { position: relative; }

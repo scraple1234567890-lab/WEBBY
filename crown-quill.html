@@ -157,6 +157,25 @@
 </section>
 <div class="postGrid crownQuillGrid">
 <div class="crownColumn crownColumn--wire"><div class="anchor" id="wire"></div>
+
+<section aria-label="Rumor Ledger" class="card cqOrnate cqRumors">
+  <div class="sectionHead loreBoardHeader rumorsHeader">
+    <div class="articlesTopRow">
+      <div class="loreTitleWrap">
+        <span aria-hidden="true" class="loreSigil">✦</span>
+        <h2 class="loreTitle">Rumor Ledger</h2>
+        <span aria-hidden="true" class="loreSigil">✦</span>
+      </div>
+      <div class="articlesTools">
+        <button aria-label="Generate new rumors" class="btn ghost btnSm cqRumorRefresh" id="cq-reroll-rumors" type="button">Reroll</button>
+      </div>
+    </div>
+    <p class="muted small" style="margin: 0.35rem 0 0;">Whispers in the margins. Treat as unverified.</p>
+    <p class="muted small cqRumorMeta" id="cq-rumor-meta" style="margin: 8px 0 0;"></p>
+  </div>
+  <ul class="cqRumorList" id="cq-rumors" role="list"></ul>
+</section>
+
 <section aria-live="polite" class="card cqOrnate">
 <div class="sectionHead loreBoardHeader">
 <div class="loreTitleWrap">
@@ -228,6 +247,7 @@
 <script src="./js/app.js" type="module"></script>
 <script src="./js/posts.js" type="module"></script>
 <script src="./js/articles.js" type="module"></script>
+<script src="./js/rumors.js" type="module"></script>
 <script type="module">
   const el = document.getElementById("cqTimestamp");
   if (el) {
