@@ -7896,7 +7896,9 @@ body.crownQuillPage {
 .crownQuillPage .cqMastheadAux{
   grid-area: aux;
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
 }
 .crownQuillPage .cqMastheadTitles{ min-width: 0; text-align: center; }
 .crownQuillPage .cqMastheadRight{
@@ -7919,7 +7921,7 @@ body.crownQuillPage {
     grid-template-areas: "aux left right";
     align-items: start;
   }
-  .crownQuillPage .cqMastheadAux{ justify-content: flex-start; padding-top: 4px; }
+  .crownQuillPage .cqMastheadAux{ justify-content: flex-start; padding-top: 4px; align-items: flex-start; }
   .crownQuillPage .cqMastheadLeft{
     justify-self: center;
     flex-direction: column;
@@ -7929,6 +7931,43 @@ body.crownQuillPage {
   }
   .crownQuillPage .cqMastheadTitles{ text-align: center; }
   .crownQuillPage .cqMastheadRight{ justify-self: end; }
+}
+
+/* Rumor Ledger header docked under Today's Snapshot */
+.crownQuillPage .cqRumorDockedHead{
+  width: min(300px, 100%);
+  margin: 0;
+  padding-bottom: 0;
+}
+.crownQuillPage .cqRumorDockedHead::after,
+.crownQuillPage .cqRumorDockedHead::before{
+  content: none !important;
+  display: none !important;
+}
+.crownQuillPage .cqRumorDockedHead .articlesTopRow{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.crownQuillPage .cqRumorDockedHead .loreTitleWrap{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  white-space: nowrap;
+}
+.crownQuillPage .cqRumorDockedHead h2{
+  margin: 0;
+  padding: 5px 10px;
+  font-size: clamp(18px, 1.25vw, 24px);
+}
+.crownQuillPage .cqRumorDockedHead .cqRumorMeta{
+  padding: 5px 10px;
+}
+.crownQuillPage .cqRumorDockedHead .cqRumorRefreshInline{
+  margin-left: 0.25rem;
+  transform: translateY(-1px);
 }
 
 /* Today's snapshot (Weather + Moon) */
@@ -8082,8 +8121,9 @@ body.crownQuillPage {
 
 /* Masthead mark: Crown + Quill seal */
 .crownQuillPage .cqMastheadMark{
-  width: clamp(76px, 7.5vw, 104px);
-  height: clamp(76px, 7.5vw, 104px);
+  /* Slightly larger seal so the masthead reads more "newspaper crest" than "favicon" */
+  width: clamp(88px, 9vw, 126px);
+  height: clamp(88px, 9vw, 126px);
   margin: 0;
   display: grid;
   place-items: center;
@@ -8104,8 +8144,8 @@ body.crownQuillPage {
 
 @media (min-width: 821px){
   .crownQuillPage .cqMastheadMark{
-    width: clamp(88px, 8.2vw, 120px);
-    height: clamp(88px, 8.2vw, 120px);
+    width: clamp(96px, 8.5vw, 140px);
+    height: clamp(96px, 8.5vw, 140px);
   }
 }
 
@@ -8578,8 +8618,8 @@ body.crownQuillPage {
   }
   .crownQuillPage .cqMastheadTitles{ text-align: center; }
   .crownQuillPage .cqMastheadMark{
-    width: clamp(78px, 6.6vw, 104px);
-    height: clamp(78px, 6.6vw, 104px);
+    width: clamp(96px, 7.5vw, 140px);
+    height: clamp(96px, 7.5vw, 140px);
   }
 }
 

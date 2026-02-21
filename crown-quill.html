@@ -8,7 +8,7 @@
 <link href="./favicon.ico" rel="icon" sizes="any"/>
 <link href="./favicon.png" rel="icon" type="image/png"/>
 <!-- Cache-bust for quick visual verification after updates -->
-<link href="./styles.css?v=cq-20260221u" rel="stylesheet"/>
+<link href="./styles.css?v=cq-20260221v" rel="stylesheet"/>
 <meta content="Crown &amp; Quill: fantastical dispatches and long-form reports from the Dragonstone community." name="description"/></head>
 <body class="postsPage crownQuillPage">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -77,6 +77,23 @@
                     </div>
                   </div>
                 </div>
+
+        <!-- Rumor Ledger heading + reroll: docked directly under Today's Snapshot -->
+        <div class="sectionHead cqRumorDockedHead" aria-label="Rumor Ledger controls">
+          <div class="articlesTopRow">
+            <div class="rumorHeadLeft">
+              <div class="loreTitleWrap">
+                <span aria-hidden="true" class="loreSigil">✦</span>
+                <h2 class="loreTitle">Rumor Ledger</h2>
+                <span aria-hidden="true" class="loreSigil">✦</span>
+                <button aria-label="Generate new rumors" class="btn ghost btnSm cqRumorRefresh cqRumorRefreshInline" id="cq-reroll-rumors" type="button">Reroll</button>
+              </div>
+            </div>
+            <div class="articlesTools">
+              <span class="muted small cqRumorMeta" id="cq-rumor-meta"></span>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="cqMastheadRight">
         <p class="cqTimestamp"><span aria-hidden="true">⟡</span> <span id="cqTimestamp" aria-label="Current date and time">Loading time…</span> <span aria-hidden="true">⟡</span></p>
@@ -90,26 +107,13 @@
       </div>
     </div>
 
+    <!-- Rumor Ledger: directly beneath Today's Snapshot (still full-width) -->
     <div class="cqMastheadDivider" aria-hidden="true"></div>
 
-<section aria-label="Rumor Ledger" class="cqRumors cqRumorsInline">
-  <div class="sectionHead loreBoardHeader rumorsHeader">
-    <div class="articlesTopRow">
-      <div class="rumorHeadLeft">
-        <div class="loreTitleWrap">
-        <span aria-hidden="true" class="loreSigil">✦</span>
-        <h2 class="loreTitle">Rumor Ledger</h2>
-        <span aria-hidden="true" class="loreSigil">✦</span>
-        <button aria-label="Generate new rumors" class="btn ghost btnSm cqRumorRefresh cqRumorRefreshInline" id="cq-reroll-rumors" type="button">Reroll</button>
-      </div>
-      </div>
-      <div class="articlesTools">
-        <span class="muted small cqRumorMeta" id="cq-rumor-meta"></span>
-      </div>
-    </div>
-  </div>
-  <ul class="cqRumorList" id="cq-rumors" role="list"></ul>
-</section>
+    <section aria-label="Rumor Ledger" class="cqRumors cqRumorsInline">
+      <h2 class="srOnly">Rumor Ledger</h2>
+      <ul class="cqRumorList" id="cq-rumors" role="list"></ul>
+    </section>
 
   </div>
 </div>
