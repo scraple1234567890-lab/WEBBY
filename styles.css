@@ -6571,9 +6571,6 @@ body.gamePage .rpgFoe{
   /* Lift sprites up a touch (less empty space above their heads) */
   bottom: 28px;
 }
-@media (min-width: 860px){
-  body.gamePage .rpgStageInner{ height: 320px; }
-}
 body.gamePage .rpgActions{
   padding: 10px;
   gap: 8px;
@@ -8078,7 +8075,43 @@ body.crownQuillPage {
 .crownQuillPage .crownQuillGrid > .cqRumors{ grid-column: 1 / -1; }
 
 .crownQuillPage .cqRumors .sectionHead{ padding-bottom: 6px; }
-.crownQuillPage .cqRumors .articlesTools{ flex-wrap: wrap; justify-content: flex-end; }
+.crownQuillPage .cqRumors .articlesTools{ flex-wrap: wrap; justify-content: flex-end;  margin-left: auto; }
+
+/* Rumor Ledger header: Title | tagline | reroll (single row when space allows) */
+.crownQuillPage .cqRumors .sectionHead{ max-width: none; margin: 0 0 6px; text-align: left; }
+.crownQuillPage .cqRumors .articlesTopRow{ justify-content: space-between; gap: 0.9rem; }
+.crownQuillPage .cqRumors .rumorHeadLeft{
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.crownQuillPage .cqRumors .loreTitleWrap{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  white-space: nowrap;
+}
+.crownQuillPage .cqRumors .cqRumorSubhead{
+  margin: 0;
+  /* Keep the tagline compact so it doesn't bully the layout */
+  flex: 0 1 38ch;
+  min-width: 0;
+  max-width: 42ch;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+  font-size: 0.78rem;
+}
+
+
+@media (max-width: 720px){
+  .crownQuillPage .cqRumors .rumorHeadLeft{ flex-wrap: wrap; }
+  .crownQuillPage .cqRumors .cqRumorSubhead{ flex: 1 1 auto; max-width: none; white-space: normal; font-size: 0.75rem; }
+}
 .crownQuillPage .cqRumorMeta{
   opacity: 0.95;
   display: inline-flex;
@@ -8161,9 +8194,14 @@ body.crownQuillPage {
   .crownQuillPage .cqRumorMeta{ text-align: left; }
 }
 
-@media (min-width: 900px) {
-  /* Layout preference: give the Front Page more room than the Chronicle Wire */
-  .crownQuillPage .crownQuillGrid { grid-template-columns: minmax(320px, 420px) 1fr; }
+@media (min-width: 860px) {
+  /* Crown & Quill layout: make Chronicle Wire narrower and Front Page wider.
+     This also overrides the global breakpoint that stacks .postGrid at <= 980px,
+     so you can still see both columns on a desktop window.
+  */
+  .crownQuillPage .crownQuillGrid{
+    grid-template-columns: clamp(240px, 26vw, 320px) minmax(0, 1fr) !important;
+  }
   .crownQuillPage .crownColumn--wire { position: relative; }
   .crownQuillPage .crownColumn--wire::before {
     content: "✠";

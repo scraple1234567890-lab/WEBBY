@@ -7,7 +7,8 @@
 <title>Dragonstone | Crown &amp; Quill Chronicle</title>
 <link href="./favicon.ico" rel="icon" sizes="any"/>
 <link href="./favicon.png" rel="icon" type="image/png"/>
-<link href="./styles.css" rel="stylesheet"/>
+<!-- Cache-bust for quick visual verification after updates -->
+<link href="./styles.css?v=cq-20260221f" rel="stylesheet"/>
 <meta content="Crown &amp; Quill: fantastical dispatches and long-form reports from the Dragonstone community." name="description"/></head>
 <body class="postsPage crownQuillPage">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -73,10 +74,6 @@
           </div>
         </div>
       </div>
-    </div>
-    <div class="cqMastheadFooter">
-      <p class="muted small cqPinned" style="margin:0;">Pinned: keep it in-universe, keep it kind. 🕯️</p>
-      <a class="muted small cqJump" href="#frontpage">Front Page ↓</a>
     </div>
   </div>
 </div>
@@ -158,17 +155,19 @@
 <section aria-label="Rumor Ledger" class="card cqOrnate cqRumors">
   <div class="sectionHead loreBoardHeader rumorsHeader">
     <div class="articlesTopRow">
-      <div class="loreTitleWrap">
+      <div class="rumorHeadLeft">
+        <div class="loreTitleWrap">
         <span aria-hidden="true" class="loreSigil">✦</span>
         <h2 class="loreTitle">Rumor Ledger</h2>
         <span aria-hidden="true" class="loreSigil">✦</span>
+      </div>
+        <p class="muted small cqRumorSubhead">Whispers in the margins. Treat as unverified.</p>
       </div>
       <div class="articlesTools">
         <span class="muted small cqRumorMeta" id="cq-rumor-meta"></span>
         <button aria-label="Generate new rumors" class="btn ghost btnSm cqRumorRefresh" id="cq-reroll-rumors" type="button">Reroll</button>
       </div>
     </div>
-    <p class="muted small" style="margin: 0.35rem 0 0;">Whispers in the margins. Treat as unverified.</p>
   </div>
   <ul class="cqRumorList" id="cq-rumors" role="list"></ul>
 </section>
