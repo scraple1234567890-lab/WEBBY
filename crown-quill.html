@@ -8,7 +8,7 @@
 <link href="./favicon.ico" rel="icon" sizes="any"/>
 <link href="./favicon.png" rel="icon" type="image/png"/>
 <!-- Cache-bust for quick visual verification after updates -->
-<link href="./styles.css?v=cq-20260221f" rel="stylesheet"/>
+<link href="./styles.css?v=cq-20260221m" rel="stylesheet"/>
 <meta content="Crown &amp; Quill: fantastical dispatches and long-form reports from the Dragonstone community." name="description"/></head>
 <body class="postsPage crownQuillPage">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -59,22 +59,56 @@
           <img src="./assets/images/crown-quill-logo.png" alt="" loading="lazy"/>
         </div>
         <div class="cqMastheadTitles">
-          <p class="kicker crownKicker"><span aria-hidden="true" class="cqFleur">❦</span> Crown &amp; Quill <span aria-hidden="true" class="cqFleur">❦</span></p>
           <h1 class="crownTitle">Crown &amp; Quill <span class="cqTitleIllum">Chronicle</span></h1>
           <p class="muted crownTagline">An ink-and-starlight newsroom for Dragonstone. Dispatches on the Wire, stories on the Front Page.</p>
         </div>
       </div>
       <div class="cqMastheadRight">
         <p class="cqTimestamp"><span aria-hidden="true">⟡</span> <span id="cqTimestamp" aria-label="Current date and time">Loading time…</span> <span aria-hidden="true">⟡</span></p>
+        <div class="cqSnapshot" aria-label="Today's snapshot">
+          <p class="kicker cqSnapshotTitle">Today's snapshot</p>
+          <div class="cqSnapshotRow" role="list">
+            <div class="cqSnapshotChip" role="listitem">
+              <span class="cqSnapshotLabel">Weather</span>
+              <span class="cqSnapshotValue" id="cqWeather"><span aria-hidden="true">❄︎</span> 32°F</span>
+            </div>
+            <div class="cqSnapshotChip" role="listitem">
+              <span class="cqSnapshotLabel">Moon phase</span>
+              <span class="cqSnapshotValue" id="cqMoonPhase">Loading…</span>
+            </div>
+          </div>
+        </div>
         <div class="cqMastheadActions">
           <p aria-live="polite" class="muted small" id="must-login" style="margin: 0">You must be logged in to publish dispatches or stories.</p>
           <div class="actions cqActionRow">
-            <button aria-expanded="false" class="btn cqDispatchBtn" id="share-post-btn" type="button"><span aria-hidden="true" class="cqBtnIcon">✒︎</span> New dispatch</button>
+            <button aria-expanded="false" class="btn btnSm cqDispatchBtn" id="share-post-btn" type="button"><span aria-hidden="true" class="cqBtnIcon">✒︎</span> New dispatch</button>
             <button aria-expanded="false" class="btn cqSecondaryBtn btnSm" id="share-article-btn" type="button"><span aria-hidden="true" class="cqBtnIcon">✦</span> Write a story</button>
           </div>
         </div>
       </div>
     </div>
+
+    <div class="cqMastheadDivider" aria-hidden="true"></div>
+
+<section aria-label="Rumor Ledger" class="cqRumors cqRumorsInline">
+  <div class="sectionHead loreBoardHeader rumorsHeader">
+    <div class="articlesTopRow">
+      <div class="rumorHeadLeft">
+        <div class="loreTitleWrap">
+        <span aria-hidden="true" class="loreSigil">✦</span>
+        <h2 class="loreTitle">Rumor Ledger</h2>
+        <span aria-hidden="true" class="loreSigil">✦</span>
+      </div>
+      </div>
+      <div class="articlesTools">
+        <span class="muted small cqRumorMeta" id="cq-rumor-meta"></span>
+        <button aria-label="Generate new rumors" class="btn ghost btnSm cqRumorRefresh" id="cq-reroll-rumors" type="button">Reroll</button>
+      </div>
+    </div>
+  </div>
+  <ul class="cqRumorList" id="cq-rumors" role="list"></ul>
+</section>
+
   </div>
 </div>
 <section class="card cqOrnate" hidden="" id="composer-card">
@@ -152,27 +186,6 @@
 <p aria-live="polite" class="muted small" id="article-status"></p>
 </form>
 </section>
-<section aria-label="Rumor Ledger" class="card cqOrnate cqRumors">
-  <div class="sectionHead loreBoardHeader rumorsHeader">
-    <div class="articlesTopRow">
-      <div class="rumorHeadLeft">
-        <div class="loreTitleWrap">
-        <span aria-hidden="true" class="loreSigil">✦</span>
-        <h2 class="loreTitle">Rumor Ledger</h2>
-        <span aria-hidden="true" class="loreSigil">✦</span>
-      </div>
-        <p class="muted small cqRumorSubhead">Whispers in the margins. Treat as unverified.</p>
-      </div>
-      <div class="articlesTools">
-        <span class="muted small cqRumorMeta" id="cq-rumor-meta"></span>
-        <button aria-label="Generate new rumors" class="btn ghost btnSm cqRumorRefresh" id="cq-reroll-rumors" type="button">Reroll</button>
-      </div>
-    </div>
-  </div>
-  <ul class="cqRumorList" id="cq-rumors" role="list"></ul>
-</section>
-
-
 <div class="postGrid crownQuillGrid">
 <div class="crownColumn crownColumn--wire"><div class="anchor" id="wire"></div>
 
@@ -185,7 +198,7 @@
 <h2 class="loreTitle">Chronicle Wire</h2>
 <span aria-hidden="true" class="loreSigil">✶</span>
 </div>
-<p class="muted small" style="margin: 0.4rem 0 0;">Fast dispatches, rumors, and sightings from around the city.</p></div>
+</div>
 <div class="postFeed" id="posts"></div>
 </section>
 </div>
@@ -204,7 +217,6 @@
                 </button>
 </div>
 </div>
-<p class="muted small" style="margin: 0;">Feature stories, investigations, and editorials.</p>
 <div class="articleSearchPanel" hidden="" id="article-search-panel">
 <div class="articleSearchRow">
 <label class="srOnly" for="article-search">Search articles</label>
@@ -252,6 +264,7 @@
 <script src="./js/rumors.js" type="module"></script>
 <script type="module">
   const el = document.getElementById("cqTimestamp");
+  const moonEl = document.getElementById("cqMoonPhase");
   if (el) {
     const dateFmt = new Intl.DateTimeFormat(undefined, {
       weekday: "long",
@@ -268,6 +281,29 @@
     const tick = () => {
       const now = new Date();
       el.textContent = dateFmt.format(now) + " · " + timeFmt.format(now);
+
+      if (moonEl) {
+        const synodicMonth = 29.530588853;
+        const knownNewMoonUTC = Date.UTC(2000, 0, 6, 18, 14, 0);
+        const daysSince = (now.getTime() - knownNewMoonUTC) / 86400000;
+        const age = ((daysSince % synodicMonth) + synodicMonth) % synodicMonth;
+        const frac = age / synodicMonth;
+        const idx = Math.floor(frac * 8 + 0.5) % 8;
+
+        const names = [
+          "New Moon",
+          "Waxing Crescent",
+          "First Quarter",
+          "Waxing Gibbous",
+          "Full Moon",
+          "Waning Gibbous",
+          "Last Quarter",
+          "Waning Crescent"
+        ];
+        const emojis = ["🌑", "🌒", "🌓", "🌔", "🌕", "🌖", "🌗", "🌘"];
+
+        moonEl.textContent = `${emojis[idx]} ${names[idx]}`;
+      }
     };
 
     tick();

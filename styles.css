@@ -7637,13 +7637,18 @@ body.crownQuillPage {
   --cq-parchment: #f3e6d5;
 }
 
+/* More space-efficient page padding for the Chronicle */
+.crownQuillPage .section.crownQuillPageMain{
+  padding: 36px 0 46px;
+}
+
 /* Generic card shell used across the Crown & Quill page */
 .crownQuillPage .card {
   border: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
   border-radius: var(--radius2);
   background: var(--panel);
   box-shadow: var(--shadow);
-  padding: 14px;
+  padding: 12px;
 }
 
 /* The pinned note + actions bar */
@@ -7739,22 +7744,28 @@ body.crownQuillPage {
 .crownQuillPage .cqOrnate::after {
   content: "";
   position: absolute;
-  inset: 10px;
-  border-radius: calc(var(--radius2) - 10px);
+  inset: 8px;
+  border-radius: calc(var(--radius2) - 8px);
   border: 1px solid rgba(255, 211, 106, 0.22);
   pointer-events: none;
   opacity: 0.55;
 }
 .crownQuillPage .cqOrnate > * { position: relative; z-index: 1; }
 
-/* Section heads: add a gilded rule + tiny fleuron */
-.crownQuillPage .sectionHead { position: relative; padding-bottom: 10px; }
+/* Section heads: keep the ornamentation, but tighten it */
+.crownQuillPage .sectionHead {
+  position: relative;
+  padding-bottom: 6px;
+  text-align: left;
+  max-width: none;
+  margin: 0 0 14px;
+}
 .crownQuillPage .sectionHead::after {
   content: "";
   display: block;
   height: 2px;
   width: min(420px, 92%);
-  margin: 14px auto 0;
+  margin: 10px auto 0;
   border-radius: 999px;
   background: linear-gradient(90deg, transparent, rgba(255, 211, 106, 0.55), transparent);
   opacity: 0.9;
@@ -7763,12 +7774,22 @@ body.crownQuillPage {
   content: "❦";
   position: absolute;
   left: 50%;
-  bottom: -6px;
+  bottom: -4px;
   transform: translateX(-50%);
   color: color-mix(in srgb, var(--cq-gold) 70%, var(--accent) 30%);
   font-size: 1.05rem;
   opacity: 0.92;
   text-shadow: 0 0 16px rgba(255, 211, 106, 0.14);
+}
+
+/* Smaller pills inside card headers (keeps above-the-fold content tighter) */
+.crownQuillPage .sectionHead h2{
+  margin: 0 0 6px;
+  padding: 6px 12px;
+  font-size: clamp(20px, 1.7vw, 30px);
+}
+.crownQuillPage .sectionHead p{
+  padding: 5px 10px;
 }
 
 /* Header/nav should be readable without changing the global background */
@@ -7827,8 +7848,8 @@ body.crownQuillPage {
 
 /* Masthead styling */
 .crownQuillPage .crownMasthead {
-  padding: 0.95rem;
-  margin-bottom: 0.75rem;
+  padding: 0.8rem;
+  margin-bottom: 0.6rem;
   border: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
   background: linear-gradient(180deg, color-mix(in srgb, var(--panel) 92%, rgba(255, 255, 255, 0.04)), var(--panel));
   border-radius: var(--radius2);
@@ -7857,7 +7878,7 @@ body.crownQuillPage {
 .crownQuillPage .cqMastheadGrid{
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(240px, 0.75fr);
-  gap: 14px;
+  gap: 12px;
   align-items: center;
 }
 .crownQuillPage .cqMastheadLeft{
@@ -7869,21 +7890,93 @@ body.crownQuillPage {
 .crownQuillPage .cqMastheadTitles{ min-width: 0; }
 .crownQuillPage .cqMastheadRight{
   display: grid;
-  gap: 10px;
+  gap: 8px;
   justify-items: end;
   align-content: center;
 }
 .crownQuillPage .cqMastheadActions{
   display: grid;
-  gap: 8px;
+  gap: 6px;
   justify-items: end;
+}
+
+/* Today's snapshot (Weather + Moon) */
+.crownQuillPage .cqSnapshot{
+  justify-self: end;
+  width: min(340px, 100%);
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--panel2) 82%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.22);
+}
+.crownQuillPage .cqSnapshotTitle{
+  margin: 0 0 6px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  /* .kicker is inline-block by default; force this to truly center */
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+.crownQuillPage .cqSnapshotRow{
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+.crownQuillPage .cqSnapshotChip{
+  display: grid;
+  gap: 2px;
+  padding: 6px 8px;
+  border-radius: 14px;
+  background: color-mix(in srgb, rgba(255, 211, 106, 0.12) 35%, var(--panel2));
+  border: 1px solid color-mix(in srgb, rgba(255, 211, 106, 0.18) 65%, var(--border));
+  min-width: 130px;
+}
+.crownQuillPage .cqSnapshotLabel{
+  font-size: 0.74rem;
+  opacity: 0.85;
+}
+.crownQuillPage .cqSnapshotValue{
+  font-size: 0.94rem;
+  font-weight: 650;
+  white-space: nowrap;
 }
 .crownQuillPage .cqActionRow{
   display: flex;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
   justify-content: flex-end;
   align-items: center;
+}
+
+/* Center the Front Page header title while keeping tools (Search) on the right */
+.crownQuillPage .articlesCard .articlesHeader .articlesTopRow{
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+.crownQuillPage .articlesCard .articlesHeader .loreTitleWrap{
+  grid-column: 2;
+  justify-self: center;
+}
+.crownQuillPage .articlesCard .articlesHeader .articlesTools{
+  grid-column: 3;
+  justify-self: end;
+}
+
+@media (max-width: 560px){
+  .crownQuillPage .articlesCard .articlesHeader .articlesTopRow{
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .crownQuillPage .articlesCard .articlesHeader .loreTitleWrap,
+  .crownQuillPage .articlesCard .articlesHeader .articlesTools{
+    grid-column: 1;
+    justify-self: center;
+  }
 }
 .crownQuillPage .cqMastheadFooter{
   margin-top: 12px;
@@ -7911,6 +8004,8 @@ body.crownQuillPage {
   .crownQuillPage .cqMastheadLeft{ flex-direction: column; }
   .crownQuillPage .cqMastheadRight,
   .crownQuillPage .cqMastheadActions{ justify-items: center; }
+  .crownQuillPage .cqSnapshot{ justify-self: center; }
+  .crownQuillPage .cqSnapshotRow{ justify-content: center; }
   .crownQuillPage .cqActionRow{ justify-content: center; }
   .crownQuillPage .cqMastheadFooter{ justify-content: center; }
 }
@@ -7941,34 +8036,24 @@ body.crownQuillPage {
 
 /* Masthead mark: Crown + Quill seal */
 .crownQuillPage .cqMastheadMark{
-  width: 76px;
-  height: 76px;
+  width: clamp(76px, 7.5vw, 104px);
+  height: clamp(76px, 7.5vw, 104px);
   margin: 0;
   display: grid;
   place-items: center;
-  border-radius: 999px;
-  background:
-    radial-gradient(circle at 30% 30%, rgba(255, 211, 106, 0.22), transparent 62%),
-    radial-gradient(circle at 70% 70%, rgba(124, 209, 255, 0.10), transparent 60%),
-    linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0));
-  border: 1px solid rgba(255, 211, 106, 0.26);
-  box-shadow: 0 18px 44px rgba(0,0,0,0.44), inset 0 0 18px rgba(255,255,255,0.05);
+  background: none;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
   position: relative;
 }
-.crownQuillPage .cqMastheadMark::after{
-  content: "";
-  position: absolute;
-  inset: 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 211, 106, 0.18);
-  opacity: 0.75;
-}
+.crownQuillPage .cqMastheadMark::after{ content: none; }
 .crownQuillPage .cqMastheadMark img{
-  width: 52px;
-  height: 52px;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 10px 18px rgba(0,0,0,0.55)) drop-shadow(0 0 16px rgba(255, 211, 106, 0.10));
-  opacity: 0.98;
+  filter: drop-shadow(0 12px 22px rgba(0,0,0,0.55)) drop-shadow(0 0 18px rgba(255, 211, 106, 0.08));
+  opacity: 0.99;
 }
 
 /* Timestamp pill */
@@ -7978,7 +8063,7 @@ body.crownQuillPage {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.4rem 0.75rem;
+  padding: 0.32rem 0.65rem;
   border-radius: 999px;
   background: color-mix(in srgb, var(--panel2) 82%, #000 18%);
   border: 1px solid rgba(255, 211, 106, 0.22);
@@ -7986,7 +8071,7 @@ body.crownQuillPage {
   font-family: "Cinzel", var(--display);
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   box-shadow: 0 14px 34px rgba(0,0,0,0.32);
 }
 .crownQuillPage .cqTimestamp span[aria-hidden="true"]{
@@ -8013,17 +8098,17 @@ body.crownQuillPage {
 }
 
 .crownQuillPage .crownTitle {
-  margin: 0.35rem 0 0.25rem;
+  margin: 0.22rem 0 0.2rem;
   font-family: var(--display);
   font-weight: 800;
   letter-spacing: 0.02em;
-  line-height: 1.05;
+  line-height: 1.02;
   font-size: clamp(2.05rem, 1.4rem + 2.1vw, 3.2rem);
   color: #fbf6ff;
   text-shadow: 0 2px 0 rgba(0, 0, 0, 0.45), 0 0 18px rgba(255, 211, 106, 0.10);
   position: relative;
   display: inline-block;
-  padding: 0.05rem 0.35rem 0.55rem;
+  padding: 0.03rem 0.28rem 0.46rem;
 }
 .crownQuillPage .crownTitle .cqTitleIllum {
   font-family: "Cinzel", Georgia, serif;
@@ -8037,7 +8122,7 @@ body.crownQuillPage {
   content: "";
   position: absolute;
   left: 50%;
-  bottom: 0.36rem;
+  bottom: 0.28rem;
   transform: translateX(-50%);
   width: min(520px, 92%);
   height: 2px;
@@ -8048,7 +8133,7 @@ body.crownQuillPage {
   content: "❦";
   position: absolute;
   left: 50%;
-  bottom: 0.02rem;
+  bottom: 0.00rem;
   transform: translateX(-50%);
   color: color-mix(in srgb, #ffd36a 70%, var(--accent) 30%);
   font-size: 1.05rem;
@@ -8057,20 +8142,66 @@ body.crownQuillPage {
 }
 
 .crownQuillPage .crownTagline {
-  margin: 0.35rem 0 0;
+  margin: 0.25rem 0 0;
   font-family: "Crimson Pro", var(--display);
   font-style: italic;
-  font-size: 1.05rem;
+  font-size: 0.98rem;
+  line-height: 1.35;
   color: color-mix(in srgb, var(--muted) 70%, #ffe6c9 30%);
+
+  /* keep it informative without pushing the fold */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.crownQuillPage .crownQuillGrid { margin-top: 0.75rem; }
+.crownQuillPage .crownQuillGrid { margin-top: 0.6rem; }
 
-/* Slightly tighter feeds on this page to keep the content above the fold */
-.crownQuillPage .postFeed{ gap: 10px; margin-top: 12px; }
+/* Tighter feeds on this page to keep the content above the fold */
+.crownQuillPage .postFeed{ gap: 9px; margin-top: 10px; }
+
+/* Dispatch cards: slightly tighter while staying readable */
+.crownQuillPage .post{
+  padding: 12px;
+  gap: 6px;
+}
+.crownQuillPage .postBody{ line-height: 1.55; }
+
+/* Front Page tiles: reduce padding a touch so more headlines fit */
+.crownQuillPage .articleItem{ padding: 1rem; }
+.crownQuillPage .articleCover{ margin-top: 0.7rem; }
+.crownQuillPage .articleBody{ margin-top: 0.75rem; }
+
+/* Tighter grid rhythm */
+.crownQuillPage .postGrid{ gap: 12px; }
 
 /* Rumor Ledger: compact, readable, on-theme */
-.crownQuillPage .cqRumors{ padding: 12px 14px; margin-top: 0.75rem; }
+.crownQuillPage .cqRumors{ padding: 10px 12px; margin-top: 0.6rem; }
+
+/* When Rumor Ledger is nested inside the masthead, make it feel like one combined block */
+.crownQuillPage .cqMastheadDivider{
+  height: 1px;
+  margin: 10px 2px 8px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--border) 65%, transparent), transparent);
+  opacity: 0.95;
+}
+
+.crownQuillPage .crownMasthead .cqRumorsInline{
+  padding: 0 2px 2px;
+  margin-top: 0;
+  background: transparent;
+  border: none;
+}
+.crownQuillPage .crownMasthead .cqRumorsInline .sectionHead{
+  margin: 0 0 6px;
+  padding-bottom: 4px;
+}
+.crownQuillPage .crownMasthead .cqRumorsInline .sectionHead::after{ margin-top: 8px; }
+.crownQuillPage .crownMasthead .cqRumorsInline .sectionHead::before{ bottom: -3px; }
+.crownQuillPage .crownMasthead .cqRumorsInline .cqRumorList{
+  margin-top: 6px;
+}
 /* Make Rumor Ledger span the full grid width (like the masthead above) */
 .crownQuillPage .crownQuillGrid > .cqRumors{ grid-column: 1 / -1; }
 
@@ -8132,35 +8263,35 @@ body.crownQuillPage {
 .crownQuillPage .cqRumorList{
   list-style: none;
   padding: 0;
-  margin: 10px 0 0;
+  margin: 8px 0 0;
   display: flex;
-  gap: 12px;
+  gap: 10px;
   overflow-x: auto;
   overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: 8px;
+  padding-bottom: 6px;
   scroll-snap-type: x mandatory;
 }
 .crownQuillPage .cqRumorItem{
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 10px;
+  gap: 9px;
   align-items: start;
-  padding: 8px 10px;
+  padding: 7px 9px;
   border-radius: 16px;
   background: var(--panel2);
   border: 1px solid color-mix(in srgb, rgba(255, 211, 106, 0.18) 46%, var(--border));
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
-  flex: 0 0 340px;
-  max-width: 340px;
+  flex: 0 0 320px;
+  max-width: 320px;
   scroll-snap-align: start;
 }
 .crownQuillPage .cqRumorBadge{
   font-family: "Cinzel", var(--display);
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  padding: 6px 8px;
+  padding: 5px 7px;
   border-radius: 999px;
   background: linear-gradient(135deg, rgba(255, 211, 106, 0.20), rgba(255, 255, 255, 0.06));
   border: 1px solid rgba(255, 211, 106, 0.22);
@@ -8232,6 +8363,20 @@ body.crownQuillPage {
 }
 
 .crownQuillPage .articlesCard .loreTitleWrap .loreSigil { opacity: 0.9; }
+
+/* Title wrappers: keep sigils on either side of the header pill */
+.crownQuillPage .loreTitleWrap{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  max-width: 100%;
+}
+
+/* Center the Chronicle Wire header title like Front Page (no tools on the right) */
+.crownQuillPage .crownColumn--wire .sectionHead{ text-align: center; }
+.crownQuillPage .crownColumn--wire .sectionHead::after{ margin-left: auto; margin-right: auto; }
+
 
 /* Section headings: academia + cathedral ink */
 .crownQuillPage .sectionHead .loreTitle {
