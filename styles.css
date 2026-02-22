@@ -8744,6 +8744,10 @@ body.crownQuillPage {
 
   .crownQuillPage .cqMastheadAux{
     grid-area: aux;
+    width: fit-content;
+    max-width: min(44vw, 420px);
+    width: fit-content;
+    max-width: min(44vw, 420px);
   }
 
   .crownQuillPage .cqMastheadMark{
@@ -8762,9 +8766,75 @@ body.crownQuillPage {
 
   .crownQuillPage .cqMastheadRight{
     grid-area: right;
+    width: fit-content;
+    max-width: min(44vw, 460px);
+    width: fit-content;
+    max-width: min(44vw, 460px);
     /* Keep utilities anchored to the far right so the centered title stays visually centered */
     justify-items: end;
     justify-self: end;
+  }
+}
+
+/*
+  v18 Masthead layout (clarified):
+  Put Today's Snapshot and the timestamp on either side of the crest/logo
+  on the TOP ROW, with the "Crown & Quill Chronicle" title centered
+  directly UNDER the crest.
+
+  This applies starting at desktop widths so the layout is consistent even
+  on mid-sized screens where the previous 1180px-only rules didn't kick in.
+*/
+@media (min-width: 821px){
+  .crownQuillPage .cqMastheadGrid{
+    grid-template-columns: max-content minmax(0, max-content) max-content;
+    grid-template-areas:
+      "aux mark right"
+      "titles titles titles";
+    justify-content: center;
+    align-items: center;
+    column-gap: clamp(14px, 2.6vw, 36px);
+    row-gap: 10px;
+  }
+
+  /* Flatten the wrapper so the crest and title can live in different rows */
+  .crownQuillPage .cqMastheadLeft{ display: contents; }
+
+  /* Left: Snapshot hugs the crest */
+  .crownQuillPage .cqMastheadAux{
+    grid-area: aux;
+    justify-self: end;
+    align-self: center;
+    padding-top: 0;
+    padding-right: 0;
+    align-items: flex-end;
+  }
+
+  /* Center: Crest */
+  .crownQuillPage .cqMastheadMark{
+    grid-area: mark;
+    justify-self: center;
+    align-self: center;
+    width: clamp(84px, 7vw, 140px);
+    height: clamp(84px, 7vw, 140px);
+  }
+
+  /* Row 2: Title centered under the crest */
+  .crownQuillPage .cqMastheadTitles{
+    grid-area: titles;
+    justify-self: center;
+    text-align: center;
+    max-width: min(760px, 60vw);
+    min-width: 0;
+  }
+
+  /* Right: Timestamp hugs the crest */
+  .crownQuillPage .cqMastheadRight{
+    grid-area: right;
+    justify-self: start;
+    align-self: center;
+    justify-items: start;
+    align-content: start;
   }
 }
 
@@ -8876,4 +8946,58 @@ body.crownQuillPage {
   }
 
   .crownQuillPage .crownTitle{ width: 100%; max-width: 100%; overflow-wrap: anywhere; }
+}
+
+/*
+  v16 Masthead layout tweak (per request):
+  Put Today's Snapshot to the LEFT of the crest/logo,
+  and the timestamp block to the RIGHT of the crest/logo.
+  Title stays centered below the crest.
+*/
+@media (min-width: 1180px){
+  .crownQuillPage .cqMastheadGrid{
+    grid-template-columns: max-content minmax(0, max-content) max-content;
+    grid-template-areas:
+      "aux mark right"
+      "titles titles titles";
+    justify-content: center;
+    align-items: center;
+    column-gap: clamp(14px, 2.6vw, 36px);
+    row-gap: 10px;
+  }
+
+  /* Left: Today's Snapshot */
+  .crownQuillPage .cqMastheadAux{
+    grid-area: aux;
+    /* Align toward the crest within the left 1fr column */
+    justify-self: end;
+    align-self: center;
+    padding-top: 0;
+    padding-right: 0;
+  }
+
+  /* Center: Crest */
+  .crownQuillPage .cqMastheadMark{
+    grid-area: mark;
+    justify-self: center;
+    align-self: center;
+  }
+
+  /* Center (row 2): Title */
+  .crownQuillPage .cqMastheadTitles{
+    grid-area: titles;
+    justify-self: center;
+    text-align: center;
+  }
+
+  /* Right: Timestamp */
+  .crownQuillPage .cqMastheadRight{
+    grid-area: right;
+    /* Align toward the crest within the right 1fr column */
+    justify-self: start;
+    align-self: center;
+    justify-items: start;
+    /* Critical: keep the timestamp up near the crest instead of vertically centering across both rows */
+    align-content: start;
+  }
 }
