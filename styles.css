@@ -7925,7 +7925,7 @@ body.crownQuillPage {
     grid-template-areas: "aux left right";
     align-items: start;
   }
-  .crownQuillPage .cqMastheadAux{ justify-content: flex-start; padding-top: 4px; align-items: flex-start; position: relative; z-index: 3; }
+  .crownQuillPage .cqMastheadAux{ justify-content: flex-start; padding-top: 4px; padding-right: 14px; align-items: flex-start; position: relative; z-index: 3; }
   .crownQuillPage .cqMastheadLeft{
     justify-self: center;
     flex-direction: column;
@@ -7940,6 +7940,10 @@ body.crownQuillPage {
 }
 
 /* Rumor Ledger header docked under Today's Snapshot */
+/* Ensure docked Rumor controls always sit above the masthead crest */
+.crownQuillPage .cqRumorDockedHead{ position: relative; z-index: 4; }
+.crownQuillPage .cqRumorDockedHead .cqRumorRefreshInline{ position: relative; z-index: 5; }
+
 .crownQuillPage .cqRumorDockedHead{
   /* Never exceed the grid column width (prevents overlap with the crest) */
   width: 100%;
@@ -7959,13 +7963,21 @@ body.crownQuillPage {
   gap: 10px;
   flex-wrap: wrap;
 }
+.crownQuillPage .cqRumorDockedHead .rumorHeadRow{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 100%;
+  /* Keep the button visually to the right of the title at desktop widths */
+  flex-wrap: nowrap;
+}
 .crownQuillPage .cqRumorDockedHead .loreTitleWrap{
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  /* Allow wrapping at tighter widths so controls never spill into the crest/title column */
-  flex-wrap: wrap;
-  white-space: normal;
+  /* Keep title tidy; let the whole row wrap on small screens instead of splitting mid-title */
+  flex-wrap: nowrap;
+  white-space: nowrap;
   max-width: 100%;
 }
 .crownQuillPage .cqRumorDockedHead h2{
@@ -7977,8 +7989,21 @@ body.crownQuillPage {
   padding: 5px 10px;
 }
 .crownQuillPage .cqRumorDockedHead .cqRumorRefreshInline{
-  margin-left: 0.25rem;
+  margin-left: 0;
   transform: translateY(-1px);
+  flex: 0 0 auto;
+}
+
+/* Keep Rumor Ledger title + reroll on one line (shrink styling instead of stacking) */
+@media (max-width: 520px){
+  .crownQuillPage .cqRumorDockedHead{ max-width: none; }
+  .crownQuillPage .cqRumorDockedHead .articlesTopRow{ flex-wrap: nowrap; }
+  .crownQuillPage .cqRumorDockedHead .rumorHeadRow{ flex-wrap: nowrap !important; gap: 8px; }
+  .crownQuillPage .cqRumorDockedHead .loreTitleWrap{ gap: 0.35rem; }
+  .crownQuillPage .cqRumorDockedHead h2{ font-size: 0.98rem; padding: 4px 8px; }
+  .crownQuillPage .cqRumorDockedHead .cqRumorRefreshInline{ padding: 0.45rem 0.75rem; font-size: 0.92rem; }
+  /* Save width so the button doesn't get forced under the crest */
+  .crownQuillPage .cqRumorDockedHead .loreSigil{ display: none; }
 }
 
 /* Today's snapshot (Weather + Moon) */
@@ -8053,12 +8078,15 @@ body.crownQuillPage {
 /* Center the Front Page header title while keeping tools (Search) on the right */
 .crownQuillPage .articlesCard .articlesHeader .articlesTopRow{
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
 }
 .crownQuillPage .articlesCard .articlesHeader .loreTitleWrap{
   grid-column: 2;
   justify-self: center;
+}
+.crownQuillPage .articlesCard .articlesHeader .loreTitle{
+  text-align: center;
 }
 .crownQuillPage .articlesCard .articlesHeader .articlesTools{
   grid-column: 3;
@@ -8561,18 +8589,31 @@ body.crownQuillPage {
   margin-bottom: 0.5rem;
 }
 
+/* Keep the decorative hairlines away from content blocks */
+.crownQuillPage .crownMasthead::before{ top: 8px; opacity: 0.55; }
+.crownQuillPage .crownMasthead::after{ bottom: 8px; opacity: 0.55; }
+
 /* Make the snapshot a single-line pill instead of a mini-card */
 .crownQuillPage .cqSnapshot{
-  /* Keep it pill-shaped, but never let it overflow into the crest/title column */
+  /* Pill snapshot: fully opaque so masthead ornaments never show through */
   width: 100%;
   max-width: 340px;
-  padding: 6px 10px;
+  margin-top: 6px;
+  padding: 8px 12px;
   border-radius: 999px;
-  box-shadow: none;
+  background: var(--panel);
+  border: 1px solid color-mix(in srgb, rgba(255, 211, 106, 0.24) 65%, var(--border));
+  box-shadow: 0 10px 22px rgba(0,0,0,0.16);
+
   display: flex;
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
+
+  position: relative;
+  z-index: 2;
+  isolation: isolate;
+  overflow: hidden;
 }
 .crownQuillPage .cqSnapshotTitle{
   display: inline-flex;
@@ -8591,6 +8632,9 @@ body.crownQuillPage {
   grid-template-columns: none;
   gap: 12px;
   align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  justify-content: flex-start;
 }
 .crownQuillPage .cqSnapshotChip{
   display: inline-flex;
@@ -8610,6 +8654,7 @@ body.crownQuillPage {
   font-weight: 650;
   letter-spacing: 0.01em;
   text-overflow: ellipsis;
+  max-width: 22ch;
 }
 
 /* Reduce title block vertical drag without shrinking it into nothing */
@@ -8632,7 +8677,7 @@ body.crownQuillPage {
 @media (min-width: 821px){
   .crownQuillPage .cqMastheadGrid{
     align-items: center;
-    column-gap: 22px;
+    column-gap: clamp(22px, 3.2vw, 44px);
   }
   .crownQuillPage .cqMastheadRight{ gap: 4px; }
 }
@@ -8661,6 +8706,53 @@ body.crownQuillPage {
   }
 }
 
+
+/*
+  Wide desktop centering fix:
+  Center the crest/logo in the *available space* between the left controls (Reroll)
+  and the Crown & Quill title, instead of having the crest glued to the title.
+
+  Technique: flatten .cqMastheadLeft so its children become grid items, then
+  lay out the row as: [aux][flex space with centered mark][title].
+*/
+@media (min-width: 1180px){
+  .crownQuillPage .cqMastheadGrid{
+    grid-template-columns: max-content 1fr max-content;
+    grid-template-areas:
+      "aux mark titles"
+      "aux . right";
+    align-items: center;
+  }
+
+  /* Turn wrapper into a pass-through so its children can be placed on the grid */
+  .crownQuillPage .cqMastheadLeft{
+    display: contents;
+  }
+
+  .crownQuillPage .cqMastheadAux{
+    grid-area: aux;
+  }
+
+  .crownQuillPage .cqMastheadMark{
+    grid-area: mark;
+    justify-self: center;
+    align-self: center;
+  }
+
+  .crownQuillPage .cqMastheadTitles{
+    grid-area: titles;
+    justify-self: start;
+    text-align: left;
+    min-width: 0;
+  }
+
+  .crownQuillPage .cqMastheadRight{
+    grid-area: right;
+    justify-items: start;
+    justify-self: start;
+  }
+}
+
 @media (min-width: 821px) and (max-width: 1179px){
   /* Mid desktop: stack the crest so it never collides with controls. */
   .crownQuillPage .cqMastheadLeft{
@@ -8670,8 +8762,8 @@ body.crownQuillPage {
     gap: 10px;
   }
   .crownQuillPage .cqMastheadMark{
-    width: clamp(90px, 7.5vw, 128px);
-    height: clamp(90px, 7.5vw, 128px);
+    width: clamp(84px, 7vw, 118px);
+    height: clamp(84px, 7vw, 118px);
   }
 }
 
