@@ -23,6 +23,74 @@
   --display: "Playfair Display", Georgia, serif;
 }
 
+/*
+  v24 Masthead title placement (per request):
+  Ensure the "Crown & Quill Chronicle" title is ALWAYS above the other masthead widgets
+  (crest/logo, Today's Snapshot, timestamp).
+*/
+.crownQuillPage .cqMastheadTitleRow{
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  margin-bottom: 10px;
+}
+.crownQuillPage .cqMastheadTitleRow .crownTitle{
+  width: 100%;
+}
+
+/* Remove the now-empty second row that previously held the title INSIDE the grid on wide desktop */
+@media (min-width: 1180px){
+  .crownQuillPage .cqMastheadGrid{
+    grid-template-areas: "aux mark right";
+  }
+}
+
+/* =========================================================
+   v23 Masthead: Title ABOVE the other masthead elements
+   Request: "Crown & Quill Chronicle" should sit on top of its section.
+   ========================================================= */
+@media (min-width: 821px){
+  .crownQuillPage .cqMastheadGrid{
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    grid-template-areas:
+      "titles titles titles"
+      "aux    mark   right";
+    row-gap: 10px;
+    column-gap: clamp(14px, 2.6vw, 36px);
+    align-items: center;
+  }
+
+  /* Ensure the title can be placed independently from the crest */
+  .crownQuillPage .cqMastheadLeft{ display: contents; }
+
+  .crownQuillPage .cqMastheadTitles{
+    grid-area: titles;
+    justify-self: center;
+    text-align: center;
+    margin: 0 0 4px;
+    max-width: min(760px, 78vw);
+  }
+
+  .crownQuillPage .cqMastheadAux{
+    grid-area: aux;
+    justify-self: end;
+    align-items: flex-end;
+  }
+
+  .crownQuillPage .cqMastheadMark{
+    grid-area: mark;
+    justify-self: center;
+    align-self: center;
+  }
+
+  .crownQuillPage .cqMastheadRight{
+    grid-area: right;
+    justify-self: start;
+    justify-items: start;
+    align-content: start;
+  }
+}
+
 /* =========================================================
    v21 Snapshot: show full moon phase (no ellipsis)
    ========================================================= */
@@ -8240,6 +8308,19 @@ body.crownQuillPage {
 .crownQuillPage .cqTimestamp span[aria-hidden="true"]{
   color: color-mix(in srgb, var(--cq-gold) 70%, var(--accent) 30%);
   opacity: 0.95;
+}
+
+/* Timestamp chip: match the look of Today's Snapshot chips (Weather + Moon phase) */
+.crownQuillPage .cqTimestampChip{
+  width: 100%;
+  max-width: 340px;
+  align-items: flex-start;
+}
+.crownQuillPage .cqTimestampChip .cqSnapshotValue{
+  /* Timestamp is long; allow it to wrap instead of truncating */
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
 }
 
 .crownQuillPage .crownKicker {

@@ -8,7 +8,7 @@
 <link href="./favicon.ico" rel="icon" sizes="any"/>
 <link href="./favicon.png" rel="icon" type="image/png"/>
 <!-- Cache-bust for quick visual verification after updates -->
-<link href="./styles.css?v=cq-20260222v21-logo-center-searchleft" rel="stylesheet"/>
+<link href="./styles.css?v=cq-20260222v25-timestamp-chip" rel="stylesheet"/>
 <meta content="Crown &amp; Quill: fantastical dispatches and long-form reports from the Dragonstone community." name="description"/></head>
 <body class="postsPage crownQuillPage">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -53,14 +53,14 @@
 <div class="container postLayout">
 <div class="card crownMasthead cqOrnate">
   <div class="crownMastheadInner">
+    <!-- Title row: always sits ABOVE the masthead widgets (crest/snapshot/timestamp) -->
+    <div class="cqMastheadTitleRow">
+      <h1 class="crownTitle">Crown &amp; Quill <span class="cqTitleIllum">Chronicle</span></h1>
+    </div>
     <div class="cqMastheadGrid">
       <div class="cqMastheadLeft">
         <div class="cqMastheadMark" aria-hidden="true">
           <img src="./assets/images/crown-quill-logo.png" alt="" loading="lazy"/>
-        </div>
-        <div class="cqMastheadTitles">
-          <h1 class="crownTitle">Crown &amp; Quill <span class="cqTitleIllum">Chronicle</span></h1>
-          <!-- Tagline removed per request -->
         </div>
       </div>
       <div class="cqMastheadAux">
@@ -81,7 +81,11 @@
         <!-- Rumor Ledger controls removed per request (no visible heading / reroll button) -->
       </div>
       <div class="cqMastheadRight">
-        <p class="cqTimestamp"><span aria-hidden="true">⟡</span> <span id="cqTimestamp" aria-label="Current date and time">Loading time…</span> <span aria-hidden="true">⟡</span></p>
+        <!-- Timestamp styled to match Today's Snapshot chips (Weather + Moon phase) -->
+        <div class="cqTimestampChip cqSnapshotChip" aria-label="Current date and time">
+          <span class="cqSnapshotLabel">Timestamp</span>
+          <span class="cqSnapshotValue" id="cqTimestamp">Loading time…</span>
+        </div>
         <p aria-live="polite" class="muted small cqLoginNote" id="must-login" style="margin: 0">You must be logged in to publish dispatches or stories.</p>
       </div>
     </div>
