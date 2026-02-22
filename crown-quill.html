@@ -97,7 +97,13 @@
       </div>
       <div class="cqMastheadRight">
         <p class="cqTimestamp"><span aria-hidden="true">⟡</span> <span id="cqTimestamp" aria-label="Current date and time">Loading time…</span> <span aria-hidden="true">⟡</span></p>
-        <p aria-live="polite" class="muted small cqLoginNote" id="must-login" style="margin: 0">You must be logged in to publish dispatches or stories.</p>
+        <div class="cqMastheadActions">
+          <p aria-live="polite" class="muted small" id="must-login" style="margin: 0">You must be logged in to publish dispatches or stories.</p>
+          <div class="actions cqActionRow">
+            <button aria-expanded="false" class="btn btnSm cqDispatchBtn" id="share-post-btn" type="button"><span aria-hidden="true" class="cqBtnIcon">✒︎</span> New dispatch</button>
+            <button aria-expanded="false" class="btn cqSecondaryBtn btnSm" id="share-article-btn" type="button"><span aria-hidden="true" class="cqBtnIcon">✦</span> Write a story</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -193,15 +199,10 @@
 
 <section aria-live="polite" class="card cqOrnate">
 <div class="sectionHead loreBoardHeader">
-<div class="articlesTopRow">
 <div class="loreTitleWrap">
 <span aria-hidden="true" class="loreSigil">✶</span>
 <h2 class="loreTitle">Chronicle Wire</h2>
 <span aria-hidden="true" class="loreSigil">✶</span>
-</div>
-<div class="articlesTools">
-  <button aria-expanded="false" class="btn btnSm cqDispatchBtn" id="share-post-btn" type="button"><span aria-hidden="true" class="cqBtnIcon">✒︎</span> New dispatch</button>
-</div>
 </div>
 </div>
 <div class="postFeed" id="posts"></div>
@@ -217,8 +218,7 @@
 <span aria-hidden="true" class="loreSigil">✷</span>
 </div>
 <div class="articlesTools">
-<button aria-expanded="false" class="btn cqSecondaryBtn btnSm" id="share-article-btn" type="button"><span aria-hidden="true" class="cqBtnIcon">✦</span> Write a story</button>
-                <button aria-controls="article-search-panel" aria-expanded="false" class="btn ghost btnSm" id="article-search-toggle" type="button">
+<button aria-controls="article-search-panel" aria-expanded="false" class="btn ghost btnSm" id="article-search-toggle" type="button">
                   Search
                 </button>
 </div>
