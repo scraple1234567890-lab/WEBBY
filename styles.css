@@ -23,6 +23,16 @@
   --display: "Playfair Display", Georgia, serif;
 }
 
+/* =========================================================
+   v26: Make the Rumor ticker lane only as wide as the masthead title
+   (prevents the marquee's huge scrollWidth from forcing the masthead card wider).
+   ========================================================= */
+.crownQuillPage .cqMastheadTitleRow .crownTitle{
+  width: auto !important;
+  display: inline-block !important;
+}
+
+
 /*
   v24 Masthead title placement (per request):
   Ensure the "Crown & Quill Chronicle" title is ALWAYS above the other masthead widgets
@@ -35,7 +45,10 @@
   margin-bottom: 10px;
 }
 .crownQuillPage .cqMastheadTitleRow .crownTitle{
-  width: 100%;
+  /* Let the title define its own visual width (so other elements can match it). */
+  width: auto;
+  display: inline-block;
+  max-width: min(92vw, 860px);
 }
 
 /* Remove the now-empty second row that previously held the title INSIDE the grid on wide desktop */
@@ -9013,6 +9026,10 @@ body.crownQuillPage {
   margin-top: 4px;
   padding-bottom: 0;
   gap: 12px;
+  /* Center the ticker lane and allow it to be capped (JS sets max-width to match the title). */
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 100%;
 }
 .crownQuillPage .crownMasthead .cqRumorsInline .cqRumorItem{
   flex: 0 0 auto;

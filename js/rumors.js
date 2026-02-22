@@ -22,6 +22,36 @@ const uniq = (n, make) => {
 
 const titleCase = (s) => s.replace(/\b\w/g, (m) => m.toUpperCase());
 
+// --- Layout sync -----------------------------------------------------------
+// Request: make the scrolling rumor lane only as wide as the masthead title.
+// This also prevents the marquee (which duplicates items) from forcing the masthead
+// card to expand to the full container width.
+const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+
+function syncRumorLaneToTitle() {
+  const list = $("#cq-rumors");
+  const title = document.querySelector(".cqMastheadTitleRow .crownTitle");
+  if (!list || !title) return;
+
+  const titleW = Math.ceil(title.getBoundingClientRect().width);
+  if (!titleW || titleW < 140) return;
+
+  // Cap to the viewport so we never cause horizontal overflow.
+  const viewportCap = Math.floor(window.innerWidth - 24);
+  const finalW = clamp(titleW, 240, viewportCap);
+
+  list.style.maxWidth = `${finalW}px`;
+  list.style.marginLeft = "auto";
+  list.style.marginRight = "auto";
+}
+
+let cqRumorLaneBound = false;
+let cqRumorLaneTimer = null;
+function queueRumorLaneSync() {
+  clearTimeout(cqRumorLaneTimer);
+  cqRumorLaneTimer = setTimeout(syncRumorLaneToTitle, 90);
+}
+
 function buildRumor() {
   const places = [
     "Lantern-Leaf Harbor",
@@ -188,6 +218,9 @@ function setupRumorMarquee() {
   const list = $("#cq-rumors");
   if (!list) return;
 
+  // Always keep the lane sized to the title (even if marquee is disabled).
+  syncRumorLaneToTitle();
+
   // Respect reduced motion.
   const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
   if (reduce) {
@@ -279,12 +312,22 @@ function initRumors() {
   const host = $("#cq-rumors");
   if (!host) return; // not on this page
 
+  // Bind a single resize listener to keep the rumor lane matched to the title.
+  if (!cqRumorLaneBound) {
+    cqRumorLaneBound = true;
+    window.addEventListener("resize", queueRumorLaneSync, { passive: true });
+    window.addEventListener("orientationchange", queueRumorLaneSync, { passive: true });
+  }
+
   const cached = loadCachedRumors();
   if (cached) {
     renderRumors(cached);
   } else {
     generateAndRender();
   }
+
+  // Ensure initial sizing occurs even before the marquee kicks in.
+  syncRumorLaneToTitle();
 
   const btn = $("#cq-reroll-rumors");
   if (btn) {
