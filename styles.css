@@ -23,6 +23,31 @@
   --display: "Playfair Display", Georgia, serif;
 }
 
+/* =========================================================
+   v21 Snapshot: show full moon phase (no ellipsis)
+   ========================================================= */
+.crownQuillPage .cqSnapshotValue,
+.crownQuillPage #cqMoonPhase{
+  max-width: none !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+  white-space: nowrap !important;
+}
+
+/* Let the Snapshot pill expand to fit its content (so the value can display fully) */
+.crownQuillPage .cqSnapshot{
+  width: max-content !important;
+  max-width: none !important;
+}
+
+/* On very small screens, allow wrapping to avoid horizontal overflow */
+@media (max-width: 420px){
+  .crownQuillPage .cqSnapshotValue,
+  .crownQuillPage #cqMoonPhase{
+    white-space: normal !important;
+  }
+}
+
 [data-theme="light"] {
   --bg: #0b0718;
   --panel: rgba(255, 255, 255, 0.06);
@@ -8075,7 +8100,7 @@ body.crownQuillPage {
   .crownQuillPage .cqSnapshot{ width: min(340px, 100%); }
   .crownQuillPage .cqSnapshotRow{ grid-template-columns: 1fr; }
 }
-/* Center the Front Page header title while keeping tools (Search) on the right */
+/* Center the Front Page header title while placing Search on the left */
 .crownQuillPage .articlesCard .articlesHeader .articlesTopRow{
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
@@ -8088,7 +8113,11 @@ body.crownQuillPage {
 .crownQuillPage .articlesCard .articlesHeader .loreTitle{
   text-align: center;
 }
-.crownQuillPage .articlesCard .articlesHeader .articlesTools{
+.crownQuillPage .articlesCard .articlesHeader .articlesToolsLeft{
+  grid-column: 1;
+  justify-self: start;
+}
+.crownQuillPage .articlesCard .articlesHeader .articlesToolsRight{
   grid-column: 3;
   justify-self: end;
 }
@@ -8706,6 +8735,14 @@ body.crownQuillPage {
   }
 }
 
+/* v22: bring masthead edges in to hug the title block */
+.crownQuillPage .crownMasthead{
+  width: fit-content;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 
 /*
   Wide desktop centering fix:
@@ -8776,6 +8813,33 @@ body.crownQuillPage {
   }
 }
 
+/* =========================================================
+   v20 Snapshot: more space-efficient (tighter + no extra label)
+   ========================================================= */
+@media (min-width: 821px){
+  /* The card already has aria-label; hide the extra header text to save height */
+  .crownQuillPage .cqSnapshotTitle{ display: none; }
+}
+
+.crownQuillPage .cqSnapshot{
+  margin-top: 0;
+  padding: 6px 10px;
+  gap: 10px;
+  flex-wrap: nowrap;
+  width: fit-content;
+  max-width: 300px;
+}
+
+.crownQuillPage .cqSnapshotRow{
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+.crownQuillPage .cqSnapshotValue{
+  font-size: 0.88rem;
+  max-width: 14ch;
+}
+
 /*
   v18 Masthead layout (clarified):
   Put Today's Snapshot and the timestamp on either side of the crest/logo
@@ -8787,11 +8851,12 @@ body.crownQuillPage {
 */
 @media (min-width: 821px){
   .crownQuillPage .cqMastheadGrid{
-    grid-template-columns: max-content minmax(0, max-content) max-content;
+    /* True-centering: keep the crest/logo pinned to the exact horizontal center
+       even if the Snapshot (left) and Timestamp (right) columns are different widths. */
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     grid-template-areas:
       "aux mark right"
       "titles titles titles";
-    justify-content: center;
     align-items: center;
     column-gap: clamp(14px, 2.6vw, 36px);
     row-gap: 10px;
@@ -8956,11 +9021,12 @@ body.crownQuillPage {
 */
 @media (min-width: 1180px){
   .crownQuillPage .cqMastheadGrid{
-    grid-template-columns: max-content minmax(0, max-content) max-content;
+    /* True-centering: keep the crest/logo pinned to the exact horizontal center
+       even if the Snapshot (left) and Timestamp (right) columns are different widths. */
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     grid-template-areas:
       "aux mark right"
       "titles titles titles";
-    justify-content: center;
     align-items: center;
     column-gap: clamp(14px, 2.6vw, 36px);
     row-gap: 10px;
