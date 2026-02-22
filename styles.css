@@ -8717,12 +8717,25 @@ body.crownQuillPage {
 */
 @media (min-width: 1180px){
   .crownQuillPage .cqMastheadGrid{
-    grid-template-columns: max-content 1fr max-content;
+    /*
+      Use a flexible title column so long words (like CHRONICLE) can wrap
+      instead of forcing a max-content column that gets clipped by the
+      rounded masthead container.
+    */
+    grid-template-columns: max-content minmax(180px, 1fr) minmax(0, 1fr);
     grid-template-areas:
       "aux mark titles"
       "aux . right";
     align-items: center;
   }
+
+  /* Keep the title from being clipped by the rounded masthead container.
+     Give the right side a bit more breathing room and cap the title width so it can wrap.
+     This preserves the "crest centered between controls and title" behavior. */
+  .crownQuillPage .crownMastheadInner{ padding-right: clamp(10px, 1.4vw, 18px); }
+  .crownQuillPage .cqMastheadTitles{ max-width: 100%; min-width: 0; }
+  .crownQuillPage .crownTitle{ display: block; width: 100%; max-width: 100%; overflow-wrap: anywhere; }
+  .crownQuillPage .crownTitle .cqTitleIllum{ letter-spacing: clamp(0.10em, 0.18em, 0.18em); }
 
   /* Turn wrapper into a pass-through so its children can be placed on the grid */
   .crownQuillPage .cqMastheadLeft{
@@ -8741,15 +8754,17 @@ body.crownQuillPage {
 
   .crownQuillPage .cqMastheadTitles{
     grid-area: titles;
-    justify-self: start;
-    text-align: left;
+    /* Center the title within its masthead section */
+    justify-self: center;
+    text-align: center;
     min-width: 0;
   }
 
   .crownQuillPage .cqMastheadRight{
     grid-area: right;
-    justify-items: start;
-    justify-self: start;
+    /* Keep utilities anchored to the far right so the centered title stays visually centered */
+    justify-items: end;
+    justify-self: end;
   }
 }
 
@@ -8809,4 +8824,56 @@ body.crownQuillPage {
 /* Slightly tighter divider so it doesn't add height */
 .crownQuillPage .cqMastheadDivider{
   margin: 4px 2px 4px;
+}
+
+/*
+  v14 Masthead alignment:
+  Center the "Crown & Quill Chronicle" title stack in the masthead card itself.
+  Layout on wide desktop becomes: [left widgets] [center logo+title] [right utilities].
+*/
+@media (min-width: 1180px){
+  .crownQuillPage .cqMastheadGrid{
+    grid-template-columns: minmax(0, 1fr) minmax(0, max-content) minmax(0, 1fr);
+    grid-template-areas:
+      "aux mark right"
+      "aux titles right";
+    align-items: center;
+    column-gap: clamp(18px, 3vw, 44px);
+  }
+
+  /* Flatten so aux/mark/titles can be placed on the grid */
+  .crownQuillPage .cqMastheadLeft{ display: contents; }
+
+  .crownQuillPage .cqMastheadAux{ grid-area: aux; justify-self: start; }
+
+  .crownQuillPage .cqMastheadMark{
+    grid-area: mark;
+    justify-self: center;
+    align-self: end;
+    width: clamp(96px, 7.5vw, 140px);
+    height: clamp(96px, 7.5vw, 140px);
+    flex: 0 0 auto;
+  }
+
+  .crownQuillPage .cqMastheadTitles{
+    grid-area: titles;
+    justify-self: center;
+    text-align: center;
+    max-width: min(760px, 60vw);
+    min-width: 0;
+  }
+
+  .crownQuillPage .cqMastheadRight{
+    grid-area: right;
+    justify-self: end;
+    justify-items: end;
+  }
+
+  /* Balanced padding so long title text never gets clipped by rounded corners */
+  .crownQuillPage .crownMastheadInner{
+    padding-left: clamp(10px, 1.4vw, 18px);
+    padding-right: clamp(10px, 1.4vw, 18px);
+  }
+
+  .crownQuillPage .crownTitle{ width: 100%; max-width: 100%; overflow-wrap: anywhere; }
 }
