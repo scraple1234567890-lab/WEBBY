@@ -8615,10 +8615,11 @@ body.crownQuillPage {
 /* Reduce title block vertical drag without shrinking it into nothing */
 .crownQuillPage .crownTitle{
   margin: 0.06rem 0 0.06rem;
-  padding: 0 0.18rem 0.18rem;
+  /* Extra bottom room so the fleur ornament never overlaps the word Chronicle */
+  padding: 0 0.18rem 0.64rem;
 }
-.crownQuillPage .crownTitle::before{ bottom: 0.12rem; }
-.crownQuillPage .crownTitle::after{ bottom: -0.10rem; }
+.crownQuillPage .crownTitle::before{ bottom: 0.34rem; }
+.crownQuillPage .crownTitle::after{ bottom: 0.10rem; }
 
 .crownQuillPage .crownTagline{
   margin-top: 0.10rem;
