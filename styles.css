@@ -8334,6 +8334,13 @@ body.crownQuillPage {
   white-space: normal;
   overflow: visible;
   text-overflow: clip;
+
+  /* Stack date over time, right-aligned, to mirror Snapshot chip rhythm */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  line-height: 1.12;
 }
 
 .crownQuillPage .crownKicker {
