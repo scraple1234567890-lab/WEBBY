@@ -193,12 +193,36 @@ function renderRoyalDecreeShelf(allArticles) {
 
   decreeWrap.hidden = false;
 
+  let openDecreeId = "";
+
+  const collapseAllExcept = (keepId = "") => {
+    decreeContainer.querySelectorAll(".cqDecreeCard[data-id]").forEach((node) => {
+      if (!(node instanceof HTMLElement)) return;
+      const shouldOpen = keepId && node.dataset.id === keepId;
+      node.classList.toggle("isExpanded", shouldOpen);
+
+      const panel = node.querySelector(".cqDecreePanel");
+      if (panel instanceof HTMLElement) {
+        panel.hidden = !shouldOpen;
+      }
+
+      const trigger = node.querySelector(".cqDecreeTrigger");
+      if (trigger instanceof HTMLButtonElement) {
+        trigger.setAttribute("aria-expanded", shouldOpen ? "true" : "false");
+      }
+    });
+  };
+
   decrees.forEach((article) => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "cqFeaturedCard cqDecreeCard";
-    btn.dataset.id = article.id;
-    btn.addEventListener("click", () => jumpToArticle(article.id));
+    const card = document.createElement("article");
+    card.className = "cqFeaturedCard cqDecreeCard";
+    card.dataset.id = article.id;
+
+    const trigger = document.createElement("button");
+    trigger.type = "button";
+    trigger.className = "cqDecreeTrigger";
+    trigger.setAttribute("aria-expanded", "false");
+    trigger.setAttribute("aria-label", `Expand royal decree: ${article.title || "Untitled decree"}`);
 
     const coverUrl = article.cover_image_url || article.cover_url || article.image_url || article.image;
     if (coverUrl) {
@@ -211,7 +235,7 @@ function renderRoyalDecreeShelf(allArticles) {
       img.src = coverUrl;
 
       cover.appendChild(img);
-      btn.appendChild(cover);
+      trigger.appendChild(cover);
     }
 
     const body = document.createElement("div");
@@ -250,8 +274,48 @@ function renderRoyalDecreeShelf(allArticles) {
     body.append(kicker, title, meta);
     if (excerpt.textContent) body.appendChild(excerpt);
 
-    btn.appendChild(body);
-    decreeContainer.appendChild(btn);
+    trigger.appendChild(body);
+
+    const panel = document.createElement("div");
+    panel.className = "cqDecreePanel";
+    panel.hidden = true;
+
+    const panelMeta = document.createElement("div");
+    panelMeta.className = "cqDecreePanelMeta";
+
+    const panelAuthor = document.createElement("p");
+    panelAuthor.className = "muted small";
+    panelAuthor.textContent = `By ${authorName}`;
+
+    const panelDate = document.createElement("p");
+    panelDate.className = "muted small";
+    panelDate.textContent = formatDateOnly(article.created_at);
+
+    panelMeta.append(panelAuthor, panelDate);
+
+    const panelExcerpt = document.createElement("p");
+    panelExcerpt.className = "cqDecreePanelExcerpt";
+    panelExcerpt.textContent = makeExcerptFromHtml(article.content || "", 240);
+
+    const panelBody = document.createElement("div");
+    panelBody.className = "cqDecreePanelBody articleFull";
+    panelBody.innerHTML = formatArticleContent(article.content || "");
+
+    panel.append(panelMeta);
+    if (panelExcerpt.textContent) panel.append(panelExcerpt);
+    panel.append(panelBody);
+
+    trigger.addEventListener("click", () => {
+      const willOpen = openDecreeId !== article.id;
+      openDecreeId = willOpen ? article.id : "";
+      collapseAllExcept(openDecreeId);
+      if (willOpen) {
+        card.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+      }
+    });
+
+    card.append(trigger, panel);
+    decreeContainer.appendChild(card);
   });
 }
 

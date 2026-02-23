@@ -9811,3 +9811,123 @@ body.crownQuillPage {
     max-width: 300px;
   }
 }
+
+/* =========================================================
+   v40: Expandable Royal Decree notices (compact bar + reveal)
+   ========================================================= */
+.crownQuillPage .cqDecreeCard{
+  overflow: hidden;
+}
+
+.crownQuillPage .cqDecreeTrigger{
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  position: relative;
+}
+
+.crownQuillPage .cqDecreeTrigger:focus-visible{
+  outline: 2px solid rgba(240,214,163,0.6);
+  outline-offset: 2px;
+  border-radius: 14px;
+}
+
+.crownQuillPage .cqDecreeTrigger::after{
+  content: "▾";
+  position: absolute;
+  right: 10px;
+  top: 9px;
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.82);
+  pointer-events: none;
+  transition: transform 180ms ease;
+}
+
+.crownQuillPage .cqDecreeCard.isExpanded .cqDecreeTrigger::after{
+  content: "▴";
+}
+
+.crownQuillPage .cqDecreeCard .cqFeaturedTitleText{
+  padding-right: 20px;
+}
+
+.crownQuillPage .cqDecreeCard.isExpanded{
+  flex-basis: min(760px, 100%);
+  max-width: min(760px, 100%);
+  border-color: rgba(216,181,122,0.35);
+  box-shadow:
+    0 14px 28px rgba(0,0,0,0.28),
+    inset 0 0 0 1px rgba(216,181,122,0.07);
+}
+
+.crownQuillPage .cqDecreePanel{
+  padding: 0 10px 10px;
+  border-top: 1px solid rgba(216,181,122,0.14);
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0));
+}
+
+.crownQuillPage .cqDecreePanelMeta{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px 14px;
+  margin: 8px 0 6px;
+}
+
+.crownQuillPage .cqDecreePanelMeta .muted{
+  color: rgba(255,255,255,0.8) !important;
+  margin: 0;
+}
+
+.crownQuillPage .cqDecreePanelExcerpt{
+  margin: 0 0 8px;
+  color: rgba(255,255,255,0.93);
+  font-size: 0.94rem;
+  line-height: 1.45;
+}
+
+.crownQuillPage .cqDecreePanelBody{
+  margin: 0;
+  max-height: 260px;
+  overflow: auto;
+  padding-right: 3px;
+}
+
+.crownQuillPage .cqDecreePanelBody,
+.crownQuillPage .cqDecreePanelBody *{
+  color: #fff !important;
+}
+
+.crownQuillPage .cqDecreePanelBody a{
+  color: color-mix(in srgb, #fff 78%, #d8b57a 22%) !important;
+  text-decoration-color: rgba(216,181,122,0.6);
+}
+
+.crownQuillPage .cqDecreePanelBody h1,
+.crownQuillPage .cqDecreePanelBody h2,
+.crownQuillPage .cqDecreePanelBody h3,
+.crownQuillPage .cqDecreePanelBody h4,
+.crownQuillPage .cqDecreePanelBody h5,
+.crownQuillPage .cqDecreePanelBody h6{
+  margin-top: 0.2rem;
+}
+
+@media (max-width: 820px){
+  .crownQuillPage .cqDecreeCard{
+    flex-basis: min(92vw, 360px);
+    max-width: min(92vw, 360px);
+  }
+  .crownQuillPage .cqDecreeCard.isExpanded{
+    flex-basis: min(94vw, 620px);
+    max-width: min(94vw, 620px);
+  }
+  .crownQuillPage .cqDecreePanelBody{
+    max-height: 220px;
+  }
+}
