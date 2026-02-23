@@ -403,14 +403,14 @@ function renderArticles(articles) {
 
   articles.forEach((article) => {
     const card = document.createElement("article");
-    card.className = "card articleItem";
+    card.className = "card articleItem cqArticleCard";
     card.dataset.id = article.id;
 
     const coverUrl = article.cover_image_url || article.cover_url || article.image_url || article.image;
     let cover = null;
     if (coverUrl) {
       cover = document.createElement("div");
-      cover.className = "articleCover";
+      cover.className = "articleCover cqFeaturedCover";
 
       const img = document.createElement("img");
       img.loading = "lazy";
@@ -420,8 +420,15 @@ function renderArticles(articles) {
       cover.appendChild(img);
     }
 
+    const shell = document.createElement("div");
+    shell.className = "articleCardShell cqFeaturedBody";
+
+    const kicker = document.createElement("p");
+    kicker.className = "cqFeaturedKicker articleKicker";
+    kicker.textContent = isFeaturedArticle(article) ? "Featured Story" : "Story";
+
     const title = document.createElement("h3");
-    title.className = "articleTitle";
+    title.className = "articleTitle cqFeaturedTitleText";
     title.textContent = article.title || "Untitled article";
 
     if (isFeaturedArticle(article)) {
@@ -433,7 +440,7 @@ function renderArticles(articles) {
     }
 
     const meta = document.createElement("div");
-    meta.className = "articleMetaRow";
+    meta.className = "articleMetaRow cqFeaturedMeta";
 
     const author = document.createElement("p");
     author.className = "muted small";
@@ -449,6 +456,10 @@ function renderArticles(articles) {
     date.textContent = formatDateOnly(article.created_at);
 
     meta.append(author, date);
+
+    const excerpt = document.createElement("p");
+    excerpt.className = "articleExcerpt cqFeaturedExcerpt";
+    excerpt.textContent = makeExcerptFromHtml(article.content || "", 190);
 
     const tags = normalizeTags(article.tags);
     const tagList = tags.length ? createTagList(tags) : null;
@@ -468,17 +479,20 @@ function renderArticles(articles) {
     toggle.addEventListener("click", () => {
       const expanded = card.classList.toggle("isExpanded");
       fullEl.hidden = !expanded;
+      if (excerpt.textContent) excerpt.hidden = expanded;
       toggle.textContent = expanded ? "Show less" : "Read more";
     });
 
     fullEl.hidden = true;
 
+    shell.append(kicker, title, meta);
+    if (excerpt.textContent) shell.appendChild(excerpt);
+    if (tagList) shell.appendChild(tagList);
     body.append(fullEl, toggle);
+    shell.appendChild(body);
 
     if (cover) card.appendChild(cover);
-    card.append(title, meta);
-    if (tagList) card.appendChild(tagList);
-    card.appendChild(body);
+    card.appendChild(shell);
 
     articlesContainer.appendChild(card);
   });

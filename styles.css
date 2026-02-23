@@ -9368,3 +9368,76 @@ body.crownQuillPage {
   padding-top: 0.2rem;
 }
 
+
+/* Make All Stories article cards visually match the Featured shelf cards */
+.crownQuillPage .articlesCard .articleItem.cqArticleCard{
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--panel) 92%, transparent), color-mix(in srgb, var(--panel) 76%, transparent));
+  box-shadow: 0 14px 28px rgba(10, 6, 22, 0.18);
+  color: inherit;
+}
+
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleCover{
+  margin-top: 0;
+  border: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
+  border-radius: 0;
+  background: color-mix(in srgb, var(--panel) 90%, transparent);
+}
+
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleCover img{
+  display: block;
+  width: 100%;
+  height: 150px;
+  max-height: none;
+  object-fit: cover;
+}
+
+.crownQuillPage .articlesCard .articleItem.cqArticleCard.isExpanded .articleCover img{
+  height: auto;
+  max-height: 560px;
+}
+
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleCardShell{
+  padding: 0.85rem 0.95rem 0.95rem;
+}
+
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleTitle{
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.25;
+  color: color-mix(in srgb, var(--text) 92%, #1a122b 8%);
+}
+
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleMetaRow{
+  margin: 0.45rem 0 0.55rem;
+}
+
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .tagList{
+  margin-top: 0.7rem;
+}
+
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleBody{
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+}
+
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleToggle{
+  width: auto;
+}
+
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleFull{
+  margin-bottom: 0.75rem;
+}
+
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleFull blockquote{
+  background: color-mix(in srgb, var(--panel) 92%, transparent);
+}
+
+@media (max-width: 560px){
+  .crownQuillPage .articlesCard .articleItem.cqArticleCard .articleCover img{ height: 130px; }
+}
+
