@@ -9506,3 +9506,28 @@ body.crownQuillPage {
   border-color: rgba(255, 90, 209, 0.34);
   background: rgba(255, 90, 209, 0.18);
 }
+
+
+/* v35 hard readability override: force bright article body text even if pasted content has inline colors */
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleTitle,
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleExcerpt,
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleExcerpt *,
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleFull,
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleFull *{
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleMetaRow,
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleMetaRow *,
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleKicker,
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .cqFeaturedKicker{
+  color: rgba(255,255,255,0.88) !important;
+  -webkit-text-fill-color: rgba(255,255,255,0.88) !important;
+}
+
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleFull a,
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleExcerpt a{
+  color: #ffffff !important;
+  text-decoration-color: rgba(255,255,255,0.7) !important;
+}
