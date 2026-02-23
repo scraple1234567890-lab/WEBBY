@@ -9257,6 +9257,21 @@ body.crownQuillPage {
   opacity: 0.95;
 }
 
+.crownQuillPage .cqAllStoriesHead{
+  margin-top: 0.75rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+}
+
+.crownQuillPage .cqAllStoriesTitleWrap{
+  margin: 0;
+}
+
+.crownQuillPage .cqAllStoriesHint{
+  margin: 0;
+  opacity: 0.95;
+}
+
 .crownQuillPage .cqFeaturedGrid{
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
