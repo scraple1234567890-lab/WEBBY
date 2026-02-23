@@ -9450,3 +9450,59 @@ body.crownQuillPage {
 .crownQuillPage .articlesCard .articleItem.cqArticleCard.cqFeaturedCard:focus-visible{
   outline: none;
 }
+
+
+/* v34 readability pass: make Crown & Quill article text bright for easier reading */
+.crownQuillPage .articlesCard .articleItem.cqArticleCard{
+  color: #ffffff;
+}
+
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleTitle,
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleExcerpt,
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleFull,
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleFull p,
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleFull li,
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleFull h1,
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleFull h2,
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleFull h3,
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleFull h4,
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleFull h5,
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleFull h6,
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleFull strong{
+  color: #ffffff;
+}
+
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleMetaRow .muted,
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleMetaRow p,
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleKicker,
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .cqFeaturedKicker{
+  color: rgba(255,255,255,0.86);
+}
+
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleFull a,
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleExcerpt a{
+  color: #ffffff;
+  text-decoration-color: rgba(255,255,255,0.65);
+}
+
+.crownQuillPage .articlesCard .articleItem.cqArticleCard .articleFull blockquote{
+  color: #ffffff;
+  border-left-color: rgba(255,255,255,0.35);
+}
+
+/* Optional parity: keep featured shelf card copy bright too */
+.crownQuillPage .cqFeaturedCard .cqFeaturedTitleText,
+.crownQuillPage .cqFeaturedCard .cqFeaturedExcerpt{
+  color: #ffffff;
+}
+
+.crownQuillPage .cqFeaturedCard .cqFeaturedMeta .muted,
+.crownQuillPage .cqFeaturedCard .cqFeaturedKicker{
+  color: rgba(255,255,255,0.86);
+}
+
+.crownQuillPage .cqBadgeFeatured{
+  color: #ffffff;
+  border-color: rgba(255, 90, 209, 0.34);
+  background: rgba(255, 90, 209, 0.18);
+}
