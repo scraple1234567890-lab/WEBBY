@@ -29,6 +29,8 @@ const searchMeta = document.getElementById("article-search-meta");
 const tagShelf = document.getElementById("article-tag-shelf");
 const tagChips = document.getElementById("article-tag-chips");
 
+const decreeWrap = document.getElementById("cq-decree-wrap");
+const decreeContainer = document.getElementById("cq-decrees");
 const featuredWrap = document.getElementById("cq-featured-wrap");
 const featuredContainer = document.getElementById("cq-featured");
 const featuredBreak = document.getElementById("cq-featured-break");
@@ -116,6 +118,18 @@ function isFeaturedArticle(article) {
   return tags.some((t) => String(t || "").trim().toLowerCase() === "featured");
 }
 
+function isRoyalDecreeArticle(article) {
+  const tags = normalizeTags(article?.tags).map((t) => String(t || "").trim().toLowerCase());
+  return tags.some((t) => (
+    t === "royal decree" ||
+    t === "royal decrees" ||
+    t === "decree" ||
+    t === "decrees" ||
+    t === "royal office" ||
+    t === "crown decree"
+  ));
+}
+
 function makeExcerptFromHtml(html, maxLen = 170) {
   const text = stripHtml(String(html || ""));
   if (!text) return "";
@@ -135,6 +149,110 @@ function jumpToArticle(id) {
     const expanded = target.classList.contains("isExpanded");
     if (!expanded) toggle.click();
   }
+}
+
+function renderRoyalDecreeShelf(allArticles) {
+  if (!(decreeWrap instanceof HTMLElement) || !(decreeContainer instanceof HTMLElement)) return;
+
+  // Keep search mode focused on results.
+  if (((activeQuery || "").trim()) || ((activeTag || "").trim())) {
+    decreeWrap.hidden = true;
+    decreeContainer.innerHTML = "";
+    return;
+  }
+
+  const decrees = (allArticles || []).filter(isRoyalDecreeArticle).slice(0, 4);
+  decreeContainer.innerHTML = "";
+
+  if (!decrees.length) {
+    decreeWrap.hidden = false;
+    const empty = document.createElement("div");
+    empty.className = "cqFeaturedCard cqDecreeCard cqDecreeEmpty";
+    empty.setAttribute("role", "note");
+
+    const body = document.createElement("div");
+    body.className = "cqFeaturedBody";
+
+    const kicker = document.createElement("p");
+    kicker.className = "cqFeaturedKicker";
+    kicker.textContent = "Royal Decree";
+
+    const title = document.createElement("p");
+    title.className = "cqFeaturedTitleText";
+    title.textContent = "No decrees posted yet";
+
+    const note = document.createElement("p");
+    note.className = "cqFeaturedExcerpt";
+    note.textContent = "When the Crown issues an announcement, it will appear here. Use the tag ‘Royal Decree’ on an article to test the display.";
+
+    body.append(kicker, title, note);
+    empty.appendChild(body);
+    decreeContainer.appendChild(empty);
+    return;
+  }
+
+  decreeWrap.hidden = false;
+
+  decrees.forEach((article) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "cqFeaturedCard cqDecreeCard";
+    btn.dataset.id = article.id;
+    btn.addEventListener("click", () => jumpToArticle(article.id));
+
+    const coverUrl = article.cover_image_url || article.cover_url || article.image_url || article.image;
+    if (coverUrl) {
+      const cover = document.createElement("div");
+      cover.className = "cqFeaturedCover";
+
+      const img = document.createElement("img");
+      img.loading = "lazy";
+      img.alt = "";
+      img.src = coverUrl;
+
+      cover.appendChild(img);
+      btn.appendChild(cover);
+    }
+
+    const body = document.createElement("div");
+    body.className = "cqFeaturedBody";
+
+    const kicker = document.createElement("p");
+    kicker.className = "cqFeaturedKicker";
+    kicker.textContent = "Royal Decree";
+
+    const title = document.createElement("p");
+    title.className = "cqFeaturedTitleText";
+    title.textContent = article.title || "Untitled decree";
+
+    const meta = document.createElement("div");
+    meta.className = "cqFeaturedMeta";
+
+    const author = document.createElement("p");
+    author.className = "muted small";
+    const authorName =
+      article.author_display_name ||
+      article.author ||
+      (currentUser && article.user_id === currentUser.id ? getDisplayNameFromUser(currentUser) : "") ||
+      "Royal Office";
+    author.textContent = `By ${authorName}`;
+
+    const date = document.createElement("p");
+    date.className = "muted small";
+    date.textContent = formatDateOnly(article.created_at);
+
+    meta.append(author, date);
+
+    const excerpt = document.createElement("p");
+    excerpt.className = "cqFeaturedExcerpt";
+    excerpt.textContent = makeExcerptFromHtml(article.content || "", 190);
+
+    body.append(kicker, title, meta);
+    if (excerpt.textContent) body.appendChild(excerpt);
+
+    btn.appendChild(body);
+    decreeContainer.appendChild(btn);
+  });
 }
 
 function renderFeaturedShelf(allArticles) {
@@ -308,6 +426,7 @@ function applyFiltersAndRender() {
   } else {
     setSearchMeta("");
   }
+  renderRoyalDecreeShelf(articlesCache);
   renderFeaturedShelf(articlesCache);
   renderArticles(filtered);
   buildTagShelf(articlesCache);
@@ -425,13 +544,23 @@ function renderArticles(articles) {
 
     const kicker = document.createElement("p");
     kicker.className = "cqFeaturedKicker articleKicker";
-    kicker.textContent = isFeaturedArticle(article) ? "Featured" : "Story";
+    const isDecree = isRoyalDecreeArticle(article);
+    const isFeatured = isFeaturedArticle(article);
+    kicker.textContent = isDecree ? "Royal Decree" : (isFeatured ? "Featured" : "Story");
 
     const title = document.createElement("h3");
     title.className = "articleTitle cqFeaturedTitleText";
     title.textContent = article.title || "Untitled article";
 
-    if (isFeaturedArticle(article)) {
+    if (isDecree) {
+      const badge = document.createElement("span");
+      badge.className = "cqBadgeDecree";
+      badge.textContent = "Royal Decree";
+      title.append(" ");
+      title.appendChild(badge);
+    }
+
+    if (isFeatured) {
       const badge = document.createElement("span");
       badge.className = "cqBadgeFeatured";
       badge.textContent = "Featured";
