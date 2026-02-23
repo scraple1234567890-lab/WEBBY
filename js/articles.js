@@ -403,7 +403,7 @@ function renderArticles(articles) {
 
   articles.forEach((article) => {
     const card = document.createElement("article");
-    card.className = "card articleItem cqArticleCard";
+    card.className = "card articleItem cqArticleCard cqFeaturedCard";
     card.dataset.id = article.id;
 
     const coverUrl = article.cover_image_url || article.cover_url || article.image_url || article.image;
@@ -425,7 +425,7 @@ function renderArticles(articles) {
 
     const kicker = document.createElement("p");
     kicker.className = "cqFeaturedKicker articleKicker";
-    kicker.textContent = isFeaturedArticle(article) ? "Featured Story" : "Story";
+    kicker.textContent = isFeaturedArticle(article) ? "Featured" : "Story";
 
     const title = document.createElement("h3");
     title.className = "articleTitle cqFeaturedTitleText";

@@ -9441,3 +9441,12 @@ body.crownQuillPage {
   .crownQuillPage .articlesCard .articleItem.cqArticleCard .articleCover img{ height: 130px; }
 }
 
+
+/* v33 cache-bust + exact visual parity hooks for All Stories cards */
+.crownQuillPage .articlesCard .articleItem.cqArticleCard.cqFeaturedCard{
+  cursor: default;
+}
+
+.crownQuillPage .articlesCard .articleItem.cqArticleCard.cqFeaturedCard:focus-visible{
+  outline: none;
+}
