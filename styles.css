@@ -9531,3 +9531,66 @@ body.crownQuillPage {
   color: #ffffff !important;
   text-decoration-color: rgba(255,255,255,0.7) !important;
 }
+
+/* =========================================================
+   v36: Shorter masthead height (tighter top block per request)
+   ========================================================= */
+.crownQuillPage .crownMasthead{
+  padding-top: 0.42rem;
+  padding-bottom: 0.42rem;
+}
+.crownQuillPage .cqMastheadTitleRow{
+  margin-bottom: 4px;
+}
+.crownQuillPage .crownTitle{
+  margin: 0.02rem 0 0.02rem;
+  padding-bottom: 0.48rem;
+}
+.crownQuillPage .crownTitle::before{ bottom: 0.24rem; }
+.crownQuillPage .crownTitle::after{ bottom: 0.05rem; }
+.crownQuillPage .cqMastheadGrid{
+  row-gap: 5px;
+}
+.crownQuillPage .cqSnapshot{
+  margin-top: 2px;
+  padding: 6px 10px;
+}
+.crownQuillPage .cqMastheadDivider{
+  margin-top: 3px;
+  margin-bottom: 4px;
+}
+.crownQuillPage .crownMasthead .cqRumorsInline .cqRumorList{
+  margin-top: 4px;
+}
+.crownQuillPage .cqRumorItem{
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+/* Main height win: make crest a bit smaller so the masthead row collapses */
+.crownQuillPage .cqMastheadMark{
+  width: clamp(72px, 7.2vw, 104px);
+  height: clamp(72px, 7.2vw, 104px);
+}
+@media (min-width: 821px){
+  .crownQuillPage .cqMastheadGrid{
+    row-gap: 4px;
+    column-gap: clamp(16px, 2.4vw, 34px);
+  }
+  .crownQuillPage .cqMastheadMark{
+    width: clamp(76px, 6.4vw, 108px);
+    height: clamp(76px, 6.4vw, 108px);
+  }
+  .crownQuillPage .cqMastheadAux{
+    padding-top: 0;
+  }
+  .crownQuillPage .cqMastheadRight{
+    gap: 2px;
+  }
+}
+@media (min-width: 1180px){
+  .crownQuillPage .cqMastheadMark{
+    width: clamp(84px, 6.2vw, 116px);
+    height: clamp(84px, 6.2vw, 116px);
+  }
+}
