@@ -9199,6 +9199,46 @@ body.crownQuillPage {
   background: color-mix(in srgb, var(--panel) 88%, transparent);
 }
 
+.crownQuillPage .cqSectionBreak{
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.95rem 0 0.35rem;
+  padding: 0.1rem 0;
+}
+
+.crownQuillPage .cqSectionBreakLine{
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--border) 82%, transparent), transparent);
+  opacity: 0.95;
+}
+
+.crownQuillPage .cqSectionBreakText{
+  margin: 0;
+  padding: 0.22rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
+  background: color-mix(in srgb, var(--panel) 90%, transparent);
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--muted) 72%, var(--text) 28%);
+}
+
+.crownQuillPage .cqSectionBreakText::before{
+  content: "✶";
+  margin-right: 0.45rem;
+  opacity: 0.8;
+}
+
+.crownQuillPage .cqSectionBreakText::after{
+  content: "✶";
+  margin-left: 0.45rem;
+  opacity: 0.8;
+}
+
+
 .crownQuillPage .cqFeaturedHead{
   display: flex;
   align-items: baseline;
@@ -9308,3 +9348,8 @@ body.crownQuillPage {
 @media (max-width: 560px){
   .crownQuillPage .cqFeaturedCover img{ height: 130px; }
 }
+
+.crownQuillPage #cq-featured-break:not([hidden]) + #articles{
+  padding-top: 0.2rem;
+}
+

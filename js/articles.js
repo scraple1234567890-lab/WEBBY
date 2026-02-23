@@ -31,6 +31,7 @@ const tagChips = document.getElementById("article-tag-chips");
 
 const featuredWrap = document.getElementById("cq-featured-wrap");
 const featuredContainer = document.getElementById("cq-featured");
+const featuredBreak = document.getElementById("cq-featured-break");
 const featuredCheckbox = document.getElementById("article-featured");
 
 let currentUser = null;
@@ -140,8 +141,9 @@ function renderFeaturedShelf(allArticles) {
   if (!(featuredWrap instanceof HTMLElement) || !(featuredContainer instanceof HTMLElement)) return;
 
   // Hide the shelf during active searches so the results feel clean and focused.
-  if ((activeQuery || "").trim() || (activeTag || "").trim()) {
+  if (((activeQuery || "").trim()) || ((activeTag || "").trim())) {
     featuredWrap.hidden = true;
+    if (featuredBreak instanceof HTMLElement) featuredBreak.hidden = true;
     featuredContainer.innerHTML = "";
     return;
   }
@@ -151,10 +153,12 @@ function renderFeaturedShelf(allArticles) {
 
   if (!featured.length) {
     featuredWrap.hidden = true;
+    if (featuredBreak instanceof HTMLElement) featuredBreak.hidden = true;
     return;
   }
 
   featuredWrap.hidden = false;
+  if (featuredBreak instanceof HTMLElement) featuredBreak.hidden = false;
 
   featured.forEach((article) => {
     const btn = document.createElement("button");
