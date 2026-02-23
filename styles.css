@@ -9172,3 +9172,139 @@ body.crownQuillPage {
     align-content: start;
   }
 }
+
+/* ------------------------------------------------------------
+   Crown & Quill: Featured shelf
+   How it works: tag an article with "Featured" (case-insensitive)
+   and it will appear in the Spotlight shelf above the Front Page.
+------------------------------------------------------------ */
+
+.crownQuillPage .cqInlineCheck{
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0.55rem 0 0.25rem;
+}
+.crownQuillPage .cqInlineCheck input[type="checkbox"]{
+  width: 18px;
+  height: 18px;
+  accent-color: color-mix(in srgb, var(--accent) 70%, #ff5ad1 30%);
+}
+
+.crownQuillPage .cqFeaturedWrap{
+  margin: 1rem 0 0.6rem;
+  padding: 0.95rem;
+  border-radius: var(--radius2);
+  border: 1px dashed color-mix(in srgb, var(--border) 70%, transparent);
+  background: color-mix(in srgb, var(--panel) 88%, transparent);
+}
+
+.crownQuillPage .cqFeaturedHead{
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.crownQuillPage .cqFeaturedTitleWrap{
+  margin: 0;
+}
+
+.crownQuillPage .cqFeaturedHint{
+  margin: 0;
+  opacity: 0.95;
+}
+
+.crownQuillPage .cqFeaturedGrid{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.85rem;
+}
+
+.crownQuillPage .cqFeaturedCard{
+  appearance: none;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--panel) 92%, transparent), color-mix(in srgb, var(--panel) 76%, transparent));
+  border-radius: var(--radius2);
+  text-align: left;
+  padding: 0;
+  cursor: pointer;
+  box-shadow: 0 14px 28px rgba(10, 6, 22, 0.18);
+  overflow: hidden;
+}
+
+.crownQuillPage .cqFeaturedCard:focus-visible{
+  outline: 3px solid color-mix(in srgb, var(--accent) 35%, #ff5ad1 65%);
+  outline-offset: 2px;
+}
+
+.crownQuillPage .cqFeaturedCover{
+  background: color-mix(in srgb, var(--panel) 90%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
+}
+
+.crownQuillPage .cqFeaturedCover img{
+  display: block;
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+.crownQuillPage .cqFeaturedBody{
+  padding: 0.85rem 0.95rem 0.95rem;
+}
+
+.crownQuillPage .cqFeaturedKicker{
+  margin: 0 0 0.25rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--muted) 70%, var(--text) 30%);
+}
+
+.crownQuillPage .cqFeaturedTitleText{
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.25;
+  color: color-mix(in srgb, var(--text) 92%, #1a122b 8%);
+}
+
+.crownQuillPage .cqFeaturedMeta{
+  display: flex;
+  justify-content: space-between;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  margin: 0.45rem 0 0.55rem;
+}
+
+.crownQuillPage .cqFeaturedExcerpt{
+  margin: 0;
+  line-height: 1.55;
+  color: color-mix(in srgb, var(--text) 86%, var(--muted) 14%);
+}
+
+.crownQuillPage .cqBadgeFeatured{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 90, 209, 0.28);
+  background: rgba(255, 90, 209, 0.12);
+  color: rgba(43, 33, 66, 0.92);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.crownQuillPage .cqBadgeFeatured::before{
+  content: "✦";
+  font-size: 0.85em;
+  opacity: 0.9;
+}
+
+@media (max-width: 560px){
+  .crownQuillPage .cqFeaturedCover img{ height: 130px; }
+}

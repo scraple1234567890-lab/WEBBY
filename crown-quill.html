@@ -133,7 +133,12 @@
 <p class="muted small" id="article-tags-help" style="margin: -6px 0 0;">
               Comma-separated. Use a few keywords people might search.
             </p>
-<label class="muted small" for="article-editor">Article</label>
+            <div class="cqInlineCheck">
+              <input id="article-featured" type="checkbox"/>
+              <label class="muted small" for="article-featured">Mark as Featured (pins it to the Featured shelf)</label>
+            </div>
+
+            <label class="muted small" for="article-editor">Article</label>
 <div class="richEditorShell">
 <div aria-label="Article formatting toolbar" class="richToolbar" id="article-toolbar" role="toolbar">
 <button aria-label="Bold" class="btn ghost btnSm" data-cmd="bold" type="button"><strong>B</strong></button>
@@ -227,6 +232,19 @@
 <p class="muted small" id="article-search-meta" style="margin: 8px 0 0;"></p>
 </div>
 </div>
+
+<div class="cqFeaturedWrap" hidden="" id="cq-featured-wrap">
+  <div class="cqFeaturedHead">
+    <div class="loreTitleWrap cqFeaturedTitleWrap">
+      <span aria-hidden="true" class="loreSigil">✦</span>
+      <h3 class="loreTitle cqFeaturedTitle">Featured</h3>
+      <span aria-hidden="true" class="loreSigil">✦</span>
+    </div>
+    <p class="muted small cqFeaturedHint">Tag an article with <strong>Featured</strong> to pin it here.</p>
+  </div>
+  <div class="cqFeaturedGrid" id="cq-featured"></div>
+</div>
+
 <div class="postFeed" id="articles"></div>
 </section>
 </div>

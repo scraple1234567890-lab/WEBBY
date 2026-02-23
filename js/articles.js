@@ -29,6 +29,10 @@ const searchMeta = document.getElementById("article-search-meta");
 const tagShelf = document.getElementById("article-tag-shelf");
 const tagChips = document.getElementById("article-tag-chips");
 
+const featuredWrap = document.getElementById("cq-featured-wrap");
+const featuredContainer = document.getElementById("cq-featured");
+const featuredCheckbox = document.getElementById("article-featured");
+
 let currentUser = null;
 let articlesCache = [];
 let activeQuery = "";
@@ -68,6 +72,7 @@ function openArticleComposer() {
   if (!(articleComposerCard instanceof HTMLElement)) return;
   articleComposerCard.hidden = false;
   shareArticleBtn?.setAttribute("aria-expanded", "true");
+  syncFeaturedCheckboxFromTags();
   articleTitleInput?.focus();
 }
 
@@ -103,6 +108,114 @@ function normalizeTags(tagsValue) {
     .map((t) => t.trim())
     .filter(Boolean)
     .slice(0, 40);
+}
+
+function isFeaturedArticle(article) {
+  const tags = normalizeTags(article?.tags);
+  return tags.some((t) => String(t || "").trim().toLowerCase() === "featured");
+}
+
+function makeExcerptFromHtml(html, maxLen = 170) {
+  const text = stripHtml(String(html || ""));
+  if (!text) return "";
+  if (text.length <= maxLen) return text;
+  return text.slice(0, maxLen).replace(/\s+\S*$/, "").trim() + "…";
+}
+
+function jumpToArticle(id) {
+  if (!id) return;
+  const target = articlesContainer?.querySelector?.(`.articleItem[data-id="${id}"]`);
+  if (!(target instanceof HTMLElement)) return;
+
+  target.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  const toggle = target.querySelector?.(".articleToggle");
+  if (toggle instanceof HTMLButtonElement) {
+    const expanded = target.classList.contains("isExpanded");
+    if (!expanded) toggle.click();
+  }
+}
+
+function renderFeaturedShelf(allArticles) {
+  if (!(featuredWrap instanceof HTMLElement) || !(featuredContainer instanceof HTMLElement)) return;
+
+  // Hide the shelf during active searches so the results feel clean and focused.
+  if ((activeQuery || "").trim() || (activeTag || "").trim()) {
+    featuredWrap.hidden = true;
+    featuredContainer.innerHTML = "";
+    return;
+  }
+
+  const featured = (allArticles || []).filter(isFeaturedArticle).slice(0, 6);
+  featuredContainer.innerHTML = "";
+
+  if (!featured.length) {
+    featuredWrap.hidden = true;
+    return;
+  }
+
+  featuredWrap.hidden = false;
+
+  featured.forEach((article) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "cqFeaturedCard";
+    btn.dataset.id = article.id;
+    btn.addEventListener("click", () => jumpToArticle(article.id));
+
+    const coverUrl = article.cover_image_url || article.cover_url || article.image_url || article.image;
+    if (coverUrl) {
+      const cover = document.createElement("div");
+      cover.className = "cqFeaturedCover";
+
+      const img = document.createElement("img");
+      img.loading = "lazy";
+      img.alt = "";
+      img.src = coverUrl;
+
+      cover.appendChild(img);
+      btn.appendChild(cover);
+    }
+
+    const body = document.createElement("div");
+    body.className = "cqFeaturedBody";
+
+    const kicker = document.createElement("p");
+    kicker.className = "cqFeaturedKicker";
+    kicker.textContent = "Featured";
+
+    const title = document.createElement("p");
+    title.className = "cqFeaturedTitleText";
+    title.textContent = article.title || "Untitled article";
+
+    const meta = document.createElement("div");
+    meta.className = "cqFeaturedMeta";
+
+    const author = document.createElement("p");
+    author.className = "muted small";
+    const authorName =
+      article.author_display_name ||
+      article.author ||
+      (currentUser && article.user_id === currentUser.id ? getDisplayNameFromUser(currentUser) : "") ||
+      "Unknown author";
+    author.textContent = `By ${authorName}`;
+
+    const date = document.createElement("p");
+    date.className = "muted small";
+    date.textContent = formatDateOnly(article.created_at);
+
+    meta.append(author, date);
+
+    const excerpt = document.createElement("p");
+    excerpt.className = "cqFeaturedExcerpt";
+    excerpt.textContent = makeExcerptFromHtml(article.content || "", 190);
+
+    body.append(kicker, title, meta);
+    if (excerpt.textContent) body.appendChild(excerpt);
+
+    btn.appendChild(body);
+    featuredContainer.appendChild(btn);
+  });
 }
 
 function tagMatches(tag, query) {
@@ -191,7 +304,7 @@ function applyFiltersAndRender() {
   } else {
     setSearchMeta("");
   }
-
+  renderFeaturedShelf(articlesCache);
   renderArticles(filtered);
   buildTagShelf(articlesCache);
 }
@@ -306,6 +419,14 @@ function renderArticles(articles) {
     const title = document.createElement("h3");
     title.className = "articleTitle";
     title.textContent = article.title || "Untitled article";
+
+    if (isFeaturedArticle(article)) {
+      const badge = document.createElement("span");
+      badge.className = "cqBadgeFeatured";
+      badge.textContent = "Featured";
+      title.append(" ");
+      title.appendChild(badge);
+    }
 
     const meta = document.createElement("div");
     meta.className = "articleMetaRow";
@@ -683,6 +804,7 @@ async function handlePublish(event) {
     // Reset form
     if (articleTitleInput instanceof HTMLInputElement) articleTitleInput.value = "";
     if (articleTagsInput instanceof HTMLInputElement) articleTagsInput.value = "";
+    if (featuredCheckbox instanceof HTMLInputElement) featuredCheckbox.checked = false;
     if (articleEditor instanceof HTMLElement) articleEditor.innerHTML = "";
     if (articleContentField instanceof HTMLTextAreaElement) articleContentField.value = "";
     resetCoverPreview();
@@ -798,6 +920,38 @@ function initCoverUI() {
   });
 }
 
+function syncFeaturedCheckboxFromTags() {
+  if (!(featuredCheckbox instanceof HTMLInputElement)) return;
+  const has = normalizeTags(articleTagsInput?.value || "").some((t) => String(t || "").toLowerCase() === "featured");
+  featuredCheckbox.checked = has;
+}
+
+function applyFeaturedTagFromCheckbox() {
+  if (!(featuredCheckbox instanceof HTMLInputElement) || !(articleTagsInput instanceof HTMLInputElement)) return;
+
+  let tags = normalizeTags(articleTagsInput.value || "");
+  const has = tags.some((t) => String(t || "").toLowerCase() === "featured");
+
+  if (featuredCheckbox.checked && !has) {
+    tags = ["Featured", ...tags];
+  }
+  if (!featuredCheckbox.checked && has) {
+    tags = tags.filter((t) => String(t || "").toLowerCase() !== "featured");
+  }
+
+  articleTagsInput.value = tags.join(", ");
+}
+
+function initFeaturedUI() {
+  if (featuredCheckbox instanceof HTMLInputElement) {
+    featuredCheckbox.addEventListener("change", applyFeaturedTagFromCheckbox);
+  }
+  if (articleTagsInput instanceof HTMLInputElement) {
+    articleTagsInput.addEventListener("input", syncFeaturedCheckboxFromTags);
+  }
+}
+
+
 function initComposerUI() {
   shareArticleBtn?.addEventListener("click", () => {
     if (shareArticleBtn.disabled) return;
@@ -813,6 +967,7 @@ async function init() {
   initSearchUI();
   initEditorUI();
   initCoverUI();
+  initFeaturedUI();
 
   if (articleForm) {
     articleForm.addEventListener("submit", handlePublish);
