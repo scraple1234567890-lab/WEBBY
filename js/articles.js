@@ -415,6 +415,7 @@ function applyFiltersAndRender() {
   const filtered = articlesCache
     .filter((a) => articleMatchesQuery(a, activeQuery))
     .filter((a) => articleMatchesTag(a, activeTag));
+  const visibleInAllStories = filtered.filter((a) => !isRoyalDecreeArticle(a));
 
   if (searchClear instanceof HTMLButtonElement) {
     const hasQuery = Boolean((activeQuery || "").trim());
@@ -422,13 +423,13 @@ function applyFiltersAndRender() {
   }
 
   if (activeQuery || activeTag) {
-    setSearchMeta(`${filtered.length} result${filtered.length === 1 ? "" : "s"} found`);
+    setSearchMeta(`${visibleInAllStories.length} result${visibleInAllStories.length === 1 ? "" : "s"} found`);
   } else {
     setSearchMeta("");
   }
   renderRoyalDecreeShelf(articlesCache);
   renderFeaturedShelf(articlesCache);
-  renderArticles(filtered);
+  renderArticles(visibleInAllStories);
   buildTagShelf(articlesCache);
 }
 
