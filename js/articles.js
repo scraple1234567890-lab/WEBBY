@@ -35,6 +35,7 @@ const featuredWrap = document.getElementById("cq-featured-wrap");
 const featuredContainer = document.getElementById("cq-featured");
 const featuredBreak = document.getElementById("cq-featured-break");
 const featuredCheckbox = document.getElementById("article-featured");
+const royalDecreeCheckbox = document.getElementById("article-royal-decree");
 
 let currentUser = null;
 let articlesCache = [];
@@ -75,7 +76,7 @@ function openArticleComposer() {
   if (!(articleComposerCard instanceof HTMLElement)) return;
   articleComposerCard.hidden = false;
   shareArticleBtn?.setAttribute("aria-expanded", "true");
-  syncFeaturedCheckboxFromTags();
+  syncFeaturedCheckboxesFromTags();
   articleTitleInput?.focus();
 }
 
@@ -113,21 +114,25 @@ function normalizeTags(tagsValue) {
     .slice(0, 40);
 }
 
-function isFeaturedArticle(article) {
-  const tags = normalizeTags(article?.tags);
-  return tags.some((t) => String(t || "").trim().toLowerCase() === "featured");
-}
-
-function isRoyalDecreeArticle(article) {
-  const tags = normalizeTags(article?.tags).map((t) => String(t || "").trim().toLowerCase());
-  return tags.some((t) => (
+function isRoyalDecreeTag(tag) {
+  const t = String(tag || "").trim().toLowerCase();
+  return (
     t === "royal decree" ||
     t === "royal decrees" ||
     t === "decree" ||
     t === "decrees" ||
     t === "royal office" ||
     t === "crown decree"
-  ));
+  );
+}
+
+function isFeaturedArticle(article) {
+  const tags = normalizeTags(article?.tags);
+  return tags.some((t) => String(t || "").trim().toLowerCase() === "featured");
+}
+
+function isRoyalDecreeArticle(article) {
+  return normalizeTags(article?.tags).some(isRoyalDecreeTag);
 }
 
 function makeExcerptFromHtml(html, maxLen = 170) {
@@ -1017,6 +1022,7 @@ async function handlePublish(event) {
     if (articleTitleInput instanceof HTMLInputElement) articleTitleInput.value = "";
     if (articleTagsInput instanceof HTMLInputElement) articleTagsInput.value = "";
     if (featuredCheckbox instanceof HTMLInputElement) featuredCheckbox.checked = false;
+    if (royalDecreeCheckbox instanceof HTMLInputElement) royalDecreeCheckbox.checked = false;
     if (articleEditor instanceof HTMLElement) articleEditor.innerHTML = "";
     if (articleContentField instanceof HTMLTextAreaElement) articleContentField.value = "";
     resetCoverPreview();
@@ -1132,10 +1138,16 @@ function initCoverUI() {
   });
 }
 
-function syncFeaturedCheckboxFromTags() {
-  if (!(featuredCheckbox instanceof HTMLInputElement)) return;
-  const has = normalizeTags(articleTagsInput?.value || "").some((t) => String(t || "").toLowerCase() === "featured");
-  featuredCheckbox.checked = has;
+function syncFeaturedCheckboxesFromTags() {
+  const tags = normalizeTags(articleTagsInput?.value || "");
+
+  if (featuredCheckbox instanceof HTMLInputElement) {
+    featuredCheckbox.checked = tags.some((t) => String(t || "").trim().toLowerCase() === "featured");
+  }
+
+  if (royalDecreeCheckbox instanceof HTMLInputElement) {
+    royalDecreeCheckbox.checked = tags.some(isRoyalDecreeTag);
+  }
 }
 
 function applyFeaturedTagFromCheckbox() {
@@ -1152,14 +1164,36 @@ function applyFeaturedTagFromCheckbox() {
   }
 
   articleTagsInput.value = tags.join(", ");
+  syncFeaturedCheckboxesFromTags();
+}
+
+function applyRoyalDecreeTagFromCheckbox() {
+  if (!(royalDecreeCheckbox instanceof HTMLInputElement) || !(articleTagsInput instanceof HTMLInputElement)) return;
+
+  let tags = normalizeTags(articleTagsInput.value || "");
+  const has = tags.some(isRoyalDecreeTag);
+
+  if (royalDecreeCheckbox.checked && !has) {
+    tags = ["Royal Decree", ...tags];
+  }
+
+  if (!royalDecreeCheckbox.checked && has) {
+    tags = tags.filter((t) => !isRoyalDecreeTag(t));
+  }
+
+  articleTagsInput.value = tags.join(", ");
+  syncFeaturedCheckboxesFromTags();
 }
 
 function initFeaturedUI() {
   if (featuredCheckbox instanceof HTMLInputElement) {
     featuredCheckbox.addEventListener("change", applyFeaturedTagFromCheckbox);
   }
+  if (royalDecreeCheckbox instanceof HTMLInputElement) {
+    royalDecreeCheckbox.addEventListener("change", applyRoyalDecreeTagFromCheckbox);
+  }
   if (articleTagsInput instanceof HTMLInputElement) {
-    articleTagsInput.addEventListener("input", syncFeaturedCheckboxFromTags);
+    articleTagsInput.addEventListener("input", syncFeaturedCheckboxesFromTags);
   }
 }
 

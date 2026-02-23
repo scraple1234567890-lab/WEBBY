@@ -8,7 +8,7 @@
 <link href="./favicon.ico" rel="icon" sizes="any"/>
 <link href="./favicon.png" rel="icon" type="image/png"/>
 <!-- Cache-bust for quick visual verification after updates -->
-<link href="./styles.css?v=cq-20260223v40-expandable-royal-decrees" rel="stylesheet"/>
+<link href="./styles.css?v=cq-20260223v41-royal-decree-checkbox" rel="stylesheet"/>
 <meta content="Crown &amp; Quill: fantastical dispatches and long-form reports from the Dragonstone community." name="description"/></head>
 <body class="postsPage crownQuillPage">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -136,6 +136,10 @@
             <div class="cqInlineCheck">
               <input id="article-featured" type="checkbox"/>
               <label class="muted small" for="article-featured">Mark as Featured (pins it to the Featured shelf)</label>
+            </div>
+            <div class="cqInlineCheck">
+              <input id="article-royal-decree" type="checkbox"/>
+              <label class="muted small" for="article-royal-decree">Mark as Royal Decree (shows it in the Royal Decree bar)</label>
             </div>
 
             <label class="muted small" for="article-editor">Article</label>
@@ -296,7 +300,7 @@
 <script defer="" src="./script.js"></script>
 <script src="./js/app.js?v=cq-20260223v33" type="module"></script>
 <script src="./js/posts.js?v=cq-20260223v33" type="module"></script>
-<script src="./js/articles.js?v=cq-20260223v40-expandable-royal-decrees" type="module"></script>
+<script src="./js/articles.js?v=cq-20260223v41-royal-decree-checkbox" type="module"></script>
 <script src="./js/rumors.js?v=cq-20260223v33" type="module"></script>
 <script type="module">
   const el = document.getElementById("cqTimestamp");
