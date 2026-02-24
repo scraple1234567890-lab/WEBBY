@@ -9931,3 +9931,17 @@ body.crownQuillPage {
     max-height: 220px;
   }
 }
+
+
+/* =========================================================
+   v42: Masthead title top spacing polish (move top lines away from title)
+   ========================================================= */
+.crownQuillPage .crownMasthead.cqOrnate::after{
+  top: 6px; /* lift inner decorative frame slightly */
+}
+.crownQuillPage .crownMasthead::before{
+  top: 4px; /* lift top hairline away from masthead title text */
+}
+.crownQuillPage .cqMastheadTitleRow{
+  margin-top: 3px; /* small breathing room under the top decorative rules */
+}
