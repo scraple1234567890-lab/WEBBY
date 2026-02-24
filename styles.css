@@ -9934,14 +9934,25 @@ body.crownQuillPage {
 
 
 /* =========================================================
-   v42: Masthead title top spacing polish (move top lines away from title)
+   v42-v43: Masthead title ornament spacing polish
+   - move top decorative lines a touch farther from the title
+   - add more breathing room between title text and bottom gold rule/fleur
    ========================================================= */
-.crownQuillPage .crownMasthead.cqOrnate::after{
-  top: 6px; /* lift inner decorative frame slightly */
-}
 .crownQuillPage .crownMasthead::before{
-  top: 4px; /* lift top hairline away from masthead title text */
+  top: 4px;
+}
+.crownQuillPage .crownMastheadInner{
+  padding-top: 2px;
 }
 .crownQuillPage .cqMastheadTitleRow{
-  margin-top: 3px; /* small breathing room under the top decorative rules */
+  margin-top: 2px;
+}
+.crownQuillPage .crownTitle{
+  padding-bottom: 0.66rem;
+}
+.crownQuillPage .crownTitle::before{
+  bottom: 0.22rem;
+}
+.crownQuillPage .crownTitle::after{
+  bottom: 0.02rem;
 }
