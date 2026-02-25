@@ -9956,3 +9956,20 @@ body.crownQuillPage {
 .crownQuillPage .crownTitle::after{
   bottom: 0.02rem;
 }
+
+
+/* =========================================================
+   v44: Royal Decree bar item without inner label pill
+   ========================================================= */
+.crownQuillPage .cqDecreeCard .cqFeaturedKicker{
+  display: none !important;
+}
+
+.crownQuillPage .cqDecreeCard .cqFeaturedBody{
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+.crownQuillPage .cqDecreeEmpty .cqFeaturedBody{
+  grid-template-columns: 1fr;
+}
