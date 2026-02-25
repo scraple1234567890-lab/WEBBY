@@ -7858,6 +7858,16 @@ body.crownQuillPage {
 }
 .crownQuillPage .cqOrnate > * { position: relative; z-index: 1; }
 
+/* Crown & Quill main columns: fill panel interiors with a newspaper/parchment tone
+   so the space inside the inner frame reads like a printed page instead of dark wood. */
+.crownQuillPage .crownQuillGrid > .crownColumn > .card.cqOrnate{
+  background:
+    radial-gradient(140% 80% at 12% 0%, rgba(255,255,255,0.36), transparent 55%),
+    radial-gradient(120% 90% at 100% 100%, rgba(196, 149, 90, 0.10), transparent 60%),
+    linear-gradient(180deg, #f4e6d2 0%, #ead6bd 100%);
+  border-color: color-mix(in srgb, var(--cq-parchment) 70%, rgba(89, 58, 34, 0.28));
+}
+
 /* Crown & Quill feed cards: make the inner frame read more like newspaper parchment */
 .crownQuillPage .feedCard.cqOrnate::after {
   border-color: color-mix(in srgb, var(--cq-parchment) 82%, rgba(255, 255, 255, 0.18));
