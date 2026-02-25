@@ -9973,3 +9973,78 @@ body.crownQuillPage {
 .crownQuillPage .cqDecreeEmpty .cqFeaturedBody{
   grid-template-columns: 1fr;
 }
+
+
+/* =========================================================
+   v46: Chronicle Wire posts compact by default, expand on click
+   ========================================================= */
+.crownQuillPage .cqWirePost{
+  cursor: pointer;
+  padding: 10px 12px;
+  gap: 6px;
+  transition: border-color 140ms ease, box-shadow 140ms ease, background 140ms ease;
+}
+
+.crownQuillPage .cqWirePost:focus-visible{
+  outline: 2px solid rgba(235, 202, 154, 0.6);
+  outline-offset: 2px;
+}
+
+.crownQuillPage .cqWirePost:hover{
+  border-color: color-mix(in srgb, var(--border) 65%, rgba(255,255,255,0.2));
+}
+
+.crownQuillPage .cqWirePostMetaRow{
+  display: grid;
+  grid-template-columns: auto minmax(0,1fr) auto;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.crownQuillPage .cqWirePost .postMetaText{
+  min-width: 0;
+}
+
+.crownQuillPage .cqWirePost .postMetaText .muted{
+  color: rgba(255,255,255,0.82);
+}
+
+.crownQuillPage .cqWirePostChevron{
+  color: rgba(255,255,255,0.88);
+  font-size: 0.95rem;
+  line-height: 1;
+  transition: transform 160ms ease, opacity 160ms ease;
+  opacity: 0.9;
+}
+
+.crownQuillPage .cqWirePost.isExpanded .cqWirePostChevron{
+  transform: rotate(180deg);
+}
+
+.crownQuillPage .cqWirePostPreview{
+  margin: 0;
+  color: #ffffff;
+  line-height: 1.42;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.crownQuillPage .cqWirePostExpanded{
+  margin-top: 2px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255,255,255,0.12);
+}
+
+.crownQuillPage .cqWirePostFull{
+  margin: 0;
+  color: #ffffff;
+  line-height: 1.55;
+}
+
+.crownQuillPage .cqWirePost.isExpanded{
+  box-shadow: var(--shadow), 0 14px 34px rgba(0,0,0,0.32);
+}

@@ -152,13 +152,42 @@ function renderPosts(posts) {
     return;
   }
 
+  let expandedCard = null;
+
+  const collapseCard = (card) => {
+    if (!(card instanceof HTMLElement)) return;
+    card.classList.remove("isExpanded");
+    card.setAttribute("aria-expanded", "false");
+    const panel = card.querySelector(":scope .cqWirePostExpanded");
+    if (panel instanceof HTMLElement) panel.hidden = true;
+    const preview = card.querySelector(":scope .cqWirePostPreview");
+    if (preview instanceof HTMLElement) preview.hidden = false;
+  };
+
+  const expandCard = (card) => {
+    if (!(card instanceof HTMLElement)) return;
+    if (expandedCard && expandedCard !== card) {
+      collapseCard(expandedCard);
+    }
+    card.classList.add("isExpanded");
+    card.setAttribute("aria-expanded", "true");
+    const panel = card.querySelector(":scope .cqWirePostExpanded");
+    if (panel instanceof HTMLElement) panel.hidden = false;
+    const preview = card.querySelector(":scope .cqWirePostPreview");
+    if (preview instanceof HTMLElement) preview.hidden = true;
+    expandedCard = card;
+  };
+
   posts.forEach((post) => {
     const article = document.createElement("article");
-    article.className = "card";
+    article.className = "post cqWirePost";
     article.dataset.id = post.id;
+    article.tabIndex = 0;
+    article.setAttribute("role", "button");
+    article.setAttribute("aria-expanded", "false");
 
     const metaRow = document.createElement("div");
-    metaRow.className = "postMetaRow";
+    metaRow.className = "postMetaRow cqWirePostMetaRow";
 
     const avatar = createAvatarElement(post.user_id);
 
@@ -171,14 +200,56 @@ function renderPosts(posts) {
     metaTextWrapper.className = "postMetaText";
     metaTextWrapper.appendChild(metaText);
 
-    metaRow.append(avatar, metaTextWrapper);
+    const chevron = document.createElement("span");
+    chevron.className = "cqWirePostChevron";
+    chevron.setAttribute("aria-hidden", "true");
+    chevron.textContent = "▾";
 
-    const content = document.createElement("p");
-    content.className = "post-content";
-    content.style.whiteSpace = "pre-wrap";
-    content.textContent = post.content || "";
+    metaRow.append(avatar, metaTextWrapper, chevron);
 
-    article.append(metaRow, content);
+    const rawContent = String(post.content || "");
+    const compactText = rawContent.replace(/\s+/g, " ").trim();
+
+    const preview = document.createElement("p");
+    preview.className = "postBody cqWirePostPreview";
+    preview.textContent = compactText || "(No text)";
+
+    const expanded = document.createElement("div");
+    expanded.className = "cqWirePostExpanded";
+    expanded.hidden = true;
+
+    const full = document.createElement("p");
+    full.className = "postBody post-content cqWirePostFull";
+    full.style.whiteSpace = "pre-wrap";
+    full.textContent = rawContent;
+
+    expanded.appendChild(full);
+
+    const toggleCard = () => {
+      const isExpanded = article.classList.contains("isExpanded");
+      if (isExpanded) {
+        collapseCard(article);
+        if (expandedCard === article) expandedCard = null;
+      } else {
+        expandCard(article);
+      }
+    };
+
+    article.addEventListener("click", (event) => {
+      if (event.target instanceof Element && event.target.closest("a, button, input, textarea, select, label")) {
+        return;
+      }
+      toggleCard();
+    });
+
+    article.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        toggleCard();
+      }
+    });
+
+    article.append(metaRow, preview, expanded);
     postsContainer.appendChild(article);
   });
 }
