@@ -7858,6 +7858,12 @@ body.crownQuillPage {
 }
 .crownQuillPage .cqOrnate > * { position: relative; z-index: 1; }
 
+/* Crown & Quill feed cards: make the inner frame read more like newspaper parchment */
+.crownQuillPage .feedCard.cqOrnate::after {
+  border-color: color-mix(in srgb, var(--cq-parchment) 82%, rgba(255, 255, 255, 0.18));
+  opacity: 0.9;
+}
+
 /* Section heads: keep the ornamentation, but tighten it */
 .crownQuillPage .sectionHead {
   position: relative;
