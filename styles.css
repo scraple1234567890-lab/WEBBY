@@ -7858,16 +7858,6 @@ body.crownQuillPage {
 }
 .crownQuillPage .cqOrnate > * { position: relative; z-index: 1; }
 
-/* Crown & Quill main columns: fill panel interiors with a newspaper/parchment tone
-   so the space inside the inner frame reads like a printed page instead of dark wood. */
-.crownQuillPage .crownQuillGrid > .crownColumn > .card.cqOrnate{
-  background:
-    radial-gradient(140% 80% at 12% 0%, rgba(255,255,255,0.36), transparent 55%),
-    radial-gradient(120% 90% at 100% 100%, rgba(196, 149, 90, 0.10), transparent 60%),
-    linear-gradient(180deg, #f4e6d2 0%, #ead6bd 100%);
-  border-color: color-mix(in srgb, var(--cq-parchment) 70%, rgba(89, 58, 34, 0.28));
-}
-
 /* Crown & Quill feed cards: make the inner frame read more like newspaper parchment */
 .crownQuillPage .feedCard.cqOrnate::after {
   border-color: color-mix(in srgb, var(--cq-parchment) 82%, rgba(255, 255, 255, 0.18));
@@ -10063,4 +10053,42 @@ body.crownQuillPage {
 
 .crownQuillPage .cqWirePost.isExpanded{
   box-shadow: var(--shadow), 0 14px 34px rgba(0,0,0,0.32);
+}
+
+
+/* =========================================================
+   v49: Notebook cover + newspaper page interior for Front Page / Chronicle Wire
+   Keep the outer brown shell, but fill the inset "page" area with parchment.
+   ========================================================= */
+.crownQuillPage {
+  --cq-newsprint: #f1e3cf;
+  --cq-newsprint-ink: #261a14;
+}
+
+/* Apply the notebook/page look to the two main Chronicle panels */
+.crownQuillPage .crownQuillGrid > .crownColumn > .card.cqOrnate {
+  background: var(--panel);
+  box-shadow:
+    var(--shadow),
+    inset 0 0 0 999px color-mix(in srgb, var(--cq-newsprint) 96%, #fff 4%),
+    inset 0 0 0 8px color-mix(in srgb, var(--panel) 94%, #000 6%);
+}
+
+/* Match the inset frame line to the newspaper page tone on both panels */
+.crownQuillPage .crownQuillGrid > .crownColumn > .card.cqOrnate::after {
+  border-color: rgba(235, 202, 154, 0.62);
+  opacity: 0.95;
+}
+
+/* Keep section body text readable on the lighter page background where it inherits muted colors */
+.crownQuillPage .crownQuillGrid > .crownColumn > .card.cqOrnate .muted {
+  color: color-mix(in srgb, var(--cq-newsprint-ink) 62%, #5b4638 38%);
+}
+
+/* Preserve the brown mini-card look for interactive controls/header pills inside the page */
+.crownQuillPage .crownQuillGrid > .crownColumn > .card.cqOrnate .articlesHeader,
+.crownQuillPage .crownQuillGrid > .crownColumn > .card.cqOrnate .sectionHead h2,
+.crownQuillPage .crownQuillGrid > .crownColumn > .card.cqOrnate .sectionHead p {
+  position: relative;
+  z-index: 1;
 }
