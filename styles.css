@@ -10429,6 +10429,13 @@ body.crownQuillPage {
   filter: grayscale(70%) contrast(1.06) brightness(1.02);
 }
 
+/* Expanded stories: also widen the card for easier reading */
+.crownQuillPage .crownQuillGrid .articlesCard .postFeed .articleItem.isExpanded{
+  grid-column: 1 / -1;
+  position: relative;
+  z-index: 2;
+}
+
 /* Expanded stories: switch to columns on wide screens */
 @media (min-width: 980px){
   .crownQuillPage .crownQuillGrid .articlesCard .articleItem.isExpanded .articleFull{
