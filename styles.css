@@ -10306,3 +10306,153 @@ body.crownQuillPage {
     background: color-mix(in srgb, rgba(235,202,154,0.82) 65%, transparent);
   }
 }
+
+/* =========================================================
+   v51: Make Chronicle Wire + Front Page feel more like a newspaper
+   - Sharper “printed” typography
+   - Newsprint texture + hairline rules
+   - Justified copy + optional multi-column body when expanded
+   - Newspaper-style photo treatment (grayscale)
+   Scope: ONLY the Crown & Quill grid (the section in the screenshot)
+   ========================================================= */
+
+.crownQuillPage .crownQuillGrid{
+  /* A more newspaper-ish reading font for the grid content */
+  font-family: Georgia, "Times New Roman", Times, serif;
+  letter-spacing: 0;
+}
+
+/* Tone down the ornate glow inside the grid so it reads more “printed” */
+.crownQuillPage .crownQuillGrid > .crownColumn > .card.cqOrnate::before{
+  opacity: 0.18;
+  mix-blend-mode: normal;
+}
+
+/* Header pills: less “button”, more “headline plate” */
+.crownQuillPage .crownQuillGrid .sectionHead h2,
+.crownQuillPage .crownQuillGrid .sectionHead p{
+  background: var(--cqSwapLight);
+  border-color: rgba(36,22,15,0.22);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.22);
+}
+
+/* Buttons inside the grid: flatter + inkier */
+.crownQuillPage .crownQuillGrid .btn.ghost,
+.crownQuillPage .crownQuillGrid .cqDispatchBtn,
+.crownQuillPage .crownQuillGrid .cqSecondaryBtn{
+  background: var(--cqSwapLight);
+  border-color: rgba(36,22,15,0.18);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.22);
+}
+
+/* Shared “newsprint” texture for all parchment blocks inside the grid */
+.crownQuillPage .crownQuillGrid .post.cqWirePost,
+.crownQuillPage .crownQuillGrid .cqDecreeWrap,
+.crownQuillPage .crownQuillGrid .cqFeaturedWrap,
+.crownQuillPage .crownQuillGrid .cqFeaturedCard,
+.crownQuillPage .crownQuillGrid .cqDecreeCard,
+.crownQuillPage .crownQuillGrid .articlesCard .articleItem{
+  background:
+    /* faint horizontal “press lines” */
+    repeating-linear-gradient(
+      0deg,
+      rgba(36,22,15,0.030) 0px,
+      rgba(36,22,15,0.030) 1px,
+      transparent 1px,
+      transparent 7px
+    ),
+    /* subtle speckle / pulp */
+    radial-gradient(240px 180px at 12% 18%, rgba(36,22,15,0.030), transparent 60%),
+    radial-gradient(300px 220px at 84% 78%, rgba(36,22,15,0.022), transparent 62%),
+    /* base paper */
+    linear-gradient(180deg, var(--cqSwapLightHi), var(--cqSwapLight));
+  border-radius: 10px;
+}
+
+/* Chronicle Wire posts: add a “column bar” and tighten copy rhythm */
+.crownQuillPage .crownQuillGrid .post.cqWirePost{
+  border-left: 3px solid rgba(36,22,15,0.22);
+}
+
+.crownQuillPage .crownQuillGrid .post.cqWirePost .postBody,
+.crownQuillPage .crownQuillGrid .post.cqWirePost .cqWirePostPreview,
+.crownQuillPage .crownQuillGrid .post.cqWirePost .cqWirePostFull,
+.crownQuillPage .crownQuillGrid .articlesCard .articleExcerpt,
+.crownQuillPage .crownQuillGrid .articlesCard .articleFull{
+  text-align: justify;
+  hyphens: auto;
+}
+
+/* Headline style: more “front page” */
+.crownQuillPage .crownQuillGrid .articlesCard .articleTitle{
+  font-family: Georgia, "Times New Roman", Times, serif;
+  letter-spacing: 0.01em;
+  line-height: 1.05;
+}
+
+/* Kicker/badges: small caps vibe */
+.crownQuillPage .crownQuillGrid .articleKicker,
+.crownQuillPage .crownQuillGrid .cqFeaturedKicker,
+.crownQuillPage .crownQuillGrid .cqDecreeCard .cqFeaturedKicker{
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.70rem;
+}
+
+/* Hairline separators to mimic newspaper rules */
+.crownQuillPage .crownQuillGrid .articlesCard .articleMetaRow{
+  padding-top: 6px;
+  margin-top: 8px;
+  border-top: 1px solid rgba(36,22,15,0.14);
+}
+
+.crownQuillPage .crownQuillGrid .post.cqWirePost + .post.cqWirePost{
+  position: relative;
+}
+.crownQuillPage .crownQuillGrid .post.cqWirePost + .post.cqWirePost::before{
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 10px;
+  right: 10px;
+  height: 1px;
+  background: rgba(36,22,15,0.12);
+}
+
+/* Newspaper photo treatment: grayscale + slightly higher contrast */
+.crownQuillPage .crownQuillGrid .cqFeaturedCover img,
+.crownQuillPage .crownQuillGrid .articlesCard .articleCover img{
+  filter: grayscale(92%) contrast(1.10) brightness(1.02);
+}
+.crownQuillPage .crownQuillGrid .cqFeaturedCard:hover .cqFeaturedCover img,
+.crownQuillPage .crownQuillGrid .articlesCard .articleItem:hover .articleCover img{
+  filter: grayscale(70%) contrast(1.06) brightness(1.02);
+}
+
+/* Expanded stories: switch to columns on wide screens */
+@media (min-width: 980px){
+  .crownQuillPage .crownQuillGrid .articlesCard .articleItem.isExpanded .articleFull{
+    column-count: 2;
+    column-gap: 2.2rem;
+    column-rule: 1px solid rgba(36,22,15,0.16);
+  }
+
+  /* Avoid awkward breaks */
+  .crownQuillPage .crownQuillGrid .articlesCard .articleItem.isExpanded .articleFull img,
+  .crownQuillPage .crownQuillGrid .articlesCard .articleItem.isExpanded .articleFull blockquote,
+  .crownQuillPage .crownQuillGrid .articlesCard .articleItem.isExpanded .articleFull h2,
+  .crownQuillPage .crownQuillGrid .articlesCard .articleItem.isExpanded .articleFull h3{
+    break-inside: avoid;
+  }
+
+  /* A little “drop cap” flair for the first paragraph */
+  .crownQuillPage .crownQuillGrid .articlesCard .articleItem.isExpanded .articleFull > p:first-of-type::first-letter{
+    float: left;
+    font-family: "Cinzel", Georgia, serif;
+    font-weight: 800;
+    font-size: 3.2em;
+    line-height: 0.92;
+    padding: 0.04em 0.10em 0 0;
+    color: rgba(36,22,15,0.92);
+  }
+}
