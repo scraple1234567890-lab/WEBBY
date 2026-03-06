@@ -10422,11 +10422,11 @@ body.crownQuillPage {
 /* Newspaper photo treatment: grayscale + slightly higher contrast */
 .crownQuillPage .crownQuillGrid .cqFeaturedCover img,
 .crownQuillPage .crownQuillGrid .articlesCard .articleCover img{
-  filter: grayscale(92%) contrast(1.10) brightness(1.02);
+  filter: none;
 }
 .crownQuillPage .crownQuillGrid .cqFeaturedCard:hover .cqFeaturedCover img,
 .crownQuillPage .crownQuillGrid .articlesCard .articleItem:hover .articleCover img{
-  filter: grayscale(70%) contrast(1.06) brightness(1.02);
+  filter: none;
 }
 
 /* Expanded stories: also widen the card for easier reading */
