@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dragonstone: Aegis Defense</title>
+<style>
+:root{--bg:#08110f;--panel:#10201b;--panel2:#172b24;--ink:#f1ead8;--muted:#a9b8ae;--gold:#e8bd5c;--teal:#57d6b5;--red:#ff6b6b;--blue:#70b7ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#173126,#07100d 58%);color:var(--ink);font:15px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+button{font:inherit}.shell{width:min(1180px,96vw);margin:auto;padding:22px 0 36px}.topbar{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:14px}.title h1{font-family:Georgia,serif;margin:0;font-size:clamp(24px,4vw,42px);letter-spacing:.03em}.title p{margin:3px 0 0;color:var(--muted)}.home{color:var(--ink);text-decoration:none;border:1px solid #426655;padding:8px 12px;border-radius:999px;background:#0e1d18}
+.hud{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px}.stat{background:#0c1a16cc;border:1px solid #315444;border-radius:12px;padding:9px 12px}.stat b{display:block;font-size:18px}.stat span{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.1em}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:12px}.board{position:relative;background:#07120d;border:1px solid #315444;border-radius:16px;overflow:hidden;box-shadow:0 18px 55px #0008}.board canvas{display:block;width:100%;height:auto;touch-action:none}.toast{position:absolute;left:50%;top:14px;transform:translateX(-50%);background:#09150feF;border:1px solid #4f806a;padding:8px 13px;border-radius:999px;opacity:0;pointer-events:none;transition:.2s;white-space:nowrap}.toast.show{opacity:1}
+.side{background:#0d1c17df;border:1px solid #315444;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:13px}.side h2,.side h3{font-family:Georgia,serif;margin:0}.tower-list{display:grid;gap:8px}.tower{width:100%;text-align:left;border:1px solid #355a4a;background:#13271f;color:var(--ink);padding:10px;border-radius:12px;cursor:pointer}.tower:hover,.tower.selected{border-color:var(--gold);background:#1a3128}.tower strong{display:flex;justify-content:space-between}.tower small{display:block;color:var(--muted);margin-top:3px}.controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}.btn{border:1px solid #426655;background:#193027;color:var(--ink);border-radius:10px;padding:9px;cursor:pointer}.btn.primary{background:#805d18;border-color:#c89d42}.btn.danger{border-color:#76433d}.btn:disabled{opacity:.45;cursor:not-allowed}.selected-box{border-top:1px solid #315444;padding-top:12px;min-height:138px}.selected-box p{color:var(--muted);margin:6px 0}.tip{font-size:12px;color:var(--muted);margin:0}.legend{display:flex;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--muted)}.dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:4px}
+.overlay{position:absolute;inset:0;display:none;place-items:center;background:#06100dcc;backdrop-filter:blur(4px)}.overlay.show{display:grid}.card{background:#102019;border:1px solid #4d7562;border-radius:18px;padding:24px;text-align:center;width:min(420px,88%)}.card h2{font-family:Georgia,serif;font-size:32px;margin:0 0 8px}.card p{color:var(--muted)}
+@media(max-width:840px){.layout{grid-template-columns:1fr}.side{order:2}.hud{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <div class="title"><h1>Dragonstone: Aegis Defense</h1><p>Hold the ward. Break the eclipse.</p></div>
+    <a class="home" href="./index.html">← Dragonstone</a>
+  </div>
+  <div class="hud">
+    <div class="stat"><span>Ward</span><b id="lives">20</b></div>
+    <div class="stat"><span>Gold</span><b id="gold">160</b></div>
+    <div class="stat"><span>Wave</span><b id="wave">0 / 12</b></div>
+    <div class="stat"><span>Enemies</span><b id="enemies">0</b></div>
+    <div class="stat"><span>Score</span><b id="score">0</b></div>
+  </div>
+  <div class="layout">
+    <div class="board" id="board">
+      <canvas id="game" width="900" height="600" aria-label="Tower defense game board"></canvas>
+      <div class="toast" id="toast"></div>
+      <div class="overlay" id="overlay"><div class="card"><h2 id="endTitle"></h2><p id="endText"></p><button class="btn primary" id="restart">Play again</button></div></div>
+    </div>
+    <aside class="side">
+      <div><h2>Spell Towers</h2><p class="tip">Choose a tower, then click open ground. You cannot build on the enemy path.</p></div>
+      <div class="tower-list" id="towerList"></div>
+      <div class="controls">
+        <button class="btn primary" id="nextWave">Start wave</button>
+        <button class="btn" id="pause">Pause</button>
+        <button class="btn" id="speed">Speed ×1</button>
+        <button class="btn" id="cancel">Cancel build</button>
+      </div>
+      <div class="selected-box" id="selectedBox"><h3>No tower selected</h3><p>Click a placed tower to inspect, upgrade, or sell it.</p></div>
+      <div class="legend"><span><i class="dot" style="background:#ffcf5a"></i>Spark</span><span><i class="dot" style="background:#78c7ff"></i>Frost</span><span><i class="dot" style="background:#d68cff"></i>Arcane</span></div>
+    </aside>
+  </div>
+</div>
+<script>
+(() => {
+const c=document.getElementById('game'),ctx=c.getContext('2d');
+const ui={lives:$('#lives'),gold:$('#gold'),wave:$('#wave'),enemies:$('#enemies'),score:$('#score'),next:$('#nextWave'),pause:$('#pause'),speed:$('#speed'),cancel:$('#cancel'),box:$('#selectedBox'),list:$('#towerList'),toast:$('#toast'),overlay:$('#overlay'),endTitle:$('#endTitle'),endText:$('#endText')};
+function $(s){return document.querySelector(s)}
+const PATH=[[-35,470],[105,470],[105,365],[255,365],[255,500],[430,500],[430,290],[610,290],[610,125],[780,125],[780,235],[940,235]];
+const TYPES={
+ spark:{name:'Spark Spire',cost:55,range:116,rate:.58,damage:18,color:'#ffcf5a',desc:'Fast bolts. Reliable single-target damage.'},
+ frost:{name:'Frost Lantern',cost:75,range:108,rate:.92,damage:12,color:'#78c7ff',slow:.55,desc:'Slows enemies with every icy hit.'},
+ arcane:{name:'Arcane Prism',cost:110,range:145,rate:1.25,damage:34,color:'#d68cff',splash:46,desc:'Heavy magic damage with a small blast.'}
+};
+let towers=[],enemies=[],shots=[],particles=[],lives,gold,wave,score,building=null,selected=null,waveActive=false,paused=false,speed=1,spawnLeft=0,spawnTimer=0,last=performance.now(),over=false;
+Object.entries(TYPES).forEach(([k,t])=>{const b=document.createElement('button');b.className='tower';b.dataset.type=k;b.innerHTML='<strong><span>'+t.name+'</span><span>'+t.cost+'g</span></strong><small>'+t.desc+'</small>';b.onclick=()=>{building=k;selected=null;renderTowerButtons();renderSelected();toast('Placing '+t.name)};ui.list.appendChild(b)});
+function reset(){towers=[];enemies=[];shots=[];particles=[];lives=20;gold=160;wave=0;score=0;building=null;selected=null;waveActive=false;paused=false;speed=1;over=false;ui.overlay.classList.remove('show');ui.pause.textContent='Pause';ui.speed.textContent='Speed ×1';sync();renderSelected()}
+function sync(){ui.lives.textContent=lives;ui.gold.textContent=gold;ui.wave.textContent=wave+' / 12';ui.enemies.textContent=enemies.length+(spawnLeft?' +'+spawnLeft:'');ui.score.textContent=score;ui.next.disabled=waveActive||wave>=12||over}
+function toast(msg){ui.toast.textContent=msg;ui.toast.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>ui.toast.classList.remove('show'),1000)}
+function renderTowerButtons(){[...ui.list.children].forEach(b=>b.classList.toggle('selected',b.dataset.type===building))}
+function pathDistance(x,y){let m=1e9;for(let i=0;i<PATH.length-1;i++){const [ax,ay]=PATH[i],[bx,by]=PATH[i+1],dx=bx-ax,dy=by-ay,l2=dx*dx+dy*dy;let t=((x-ax)*dx+(y-ay)*dy)/l2;t=Math.max(0,Math.min(1,t));m=Math.min(m,Math.hypot(x-(ax+t*dx),y-(ay+t*dy)))}return m}
+function canBuild(x,y){return x>26&&x<c.width-26&&y>26&&y<c.height-26&&pathDistance(x,y)>48&&!towers.some(t=>Math.hypot(t.x-x,t.y-y)<48)}
+c.addEventListener('pointerdown',e=>{if(over)return;const r=c.getBoundingClientRect(),x=(e.clientX-r.left)*c.width/r.width,y=(e.clientY-r.top)*c.height/r.height;
+ if(building){const d=TYPES[building];if(gold<d.cost)return toast('Not enough gold');if(!canBuild(x,y))return toast('That ground is blocked');gold-=d.cost;towers.push({x,y,type:building,level:1,cool:0,kills:0});building=null;renderTowerButtons();sync();toast('Tower placed');return}
+ selected=null;for(const t of towers)if(Math.hypot(t.x-x,t.y-y)<23){selected=t;break}renderSelected()
+});
+function renderSelected(){if(!selected){ui.box.innerHTML='<h3>No tower selected</h3><p>Click a placed tower to inspect, upgrade, or sell it.</p>';return}
+ const d=TYPES[selected.type],up=upgradeCost(selected),sell=Math.floor(totalSpent(selected)*.7);
+ ui.box.innerHTML='<h3>'+d.name+' · Lv '+selected.level+'</h3><p>Damage '+Math.round(d.damage*(1+.42*(selected.level-1)))+' · Range '+Math.round(d.range*(1+.08*(selected.level-1)))+' · Kills '+selected.kills+'</p><div class="controls"><button class="btn primary" id="upgrade">Upgrade '+up+'g</button><button class="btn danger" id="sell">Sell '+sell+'g</button></div>';
+ $('#upgrade').disabled=selected.level>=4||gold<up;$('#upgrade').onclick=()=>{if(selected.level>=4||gold<up)return;gold-=up;selected.level++;sync();renderSelected();toast('Tower upgraded')};$('#sell').onclick=()=>{gold+=sell;towers=towers.filter(t=>t!==selected);selected=null;sync();renderSelected();toast('Tower sold')}
+}
+function upgradeCost(t){return Math.round(TYPES[t.type].cost*(.7+.35*t.level))}
+function totalSpent(t){let n=TYPES[t.type].cost;for(let l=1;l<t.level;l++)n+=Math.round(TYPES[t.type].cost*(.7+.35*l));return n}
+function startWave(){if(waveActive||wave>=12||over)return;wave++;waveActive=true;spawnLeft=7+wave*2+Math.floor(wave/3);spawnTimer=.2;ui.next.disabled=true;toast('Wave '+wave+' begins')}
+function spawnEnemy(){const elite=wave>=4&&Math.random()<Math.min(.1+wave*.02,.32),runner=wave>=3&&Math.random()<.18;let hp=60+wave*20,s=54+wave*2,reward=9;
+ if(elite){hp*=2.2;s*=.72;reward=20} if(runner){hp*=.65;s*=1.48;reward=11}
+ enemies.push({x:PATH[0][0],y:PATH[0][1],seg:0,hp,max:hp,speed:s,reward,slow:1,slowTime:0,r:elite?17:runner?10:13,elite,runner})
+}
+function update(dt){if(paused||over)return;dt*=speed;
+ if(waveActive&&spawnLeft>0){spawnTimer-=dt;if(spawnTimer<=0){spawnEnemy();spawnLeft--;spawnTimer=Math.max(.22,.72-wave*.025)}}
+ for(const e of enemies){if(e.slowTime>0)e.slowTime-=dt;else e.slow=1;let dist=e.speed*e.slow*dt;while(dist>0&&e.seg<PATH.length-1){const [tx,ty]=PATH[e.seg+1],dx=tx-e.x,dy=ty-e.y,d=Math.hypot(dx,dy);if(d<=dist){e.x=tx;e.y=ty;e.seg++;dist-=d}else{e.x+=dx/d*dist;e.y+=dy/d*dist;dist=0}}}
+ for(const e of [...enemies])if(e.seg>=PATH.length-1){enemies.splice(enemies.indexOf(e),1);lives--;burst(e.x,e.y,'#ff6b6b');if(lives<=0)finish(false)}
+ for(const t of towers){t.cool-=dt;const d=TYPES[t.type],range=d.range*(1+.08*(t.level-1));if(t.cool<=0){let target=null,progress=-1;for(const e of enemies){const dis=Math.hypot(e.x-t.x,e.y-t.y);if(dis<=range){const p=e.seg*1000-Math.hypot(PATH[e.seg+1]?.[0]-e.x||0,PATH[e.seg+1]?.[1]-e.y||0);if(p>progress){progress=p;target=e}}}if(target){const rate=d.rate*(1-.08*(t.level-1));t.cool=rate;shots.push({x:t.x,y:t.y,target,tower:t,type:t.type,speed:430})}}}
+ for(const s of [...shots]){if(!enemies.includes(s.target)){shots.splice(shots.indexOf(s),1);continue}const dx=s.target.x-s.x,dy=s.target.y-s.y,d=Math.hypot(dx,dy),step=s.speed*dt;if(d<=step+4){hit(s);shots.splice(shots.indexOf(s),1)}else{s.x+=dx/d*step;s.y+=dy/d*step}}
+ for(const p of [...particles]){p.life-=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;if(p.life<=0)particles.splice(particles.indexOf(p),1)}
+ if(waveActive&&spawnLeft===0&&enemies.length===0){waveActive=false;gold+=20+wave*2;toast('Wave cleared · bonus gold');if(wave===12)finish(true)}
+ sync()
+}
+function hit(s){const d=TYPES[s.type],mult=1+.42*(s.tower.level-1),damage=d.damage*mult;let victims=d.splash?enemies.filter(e=>Math.hypot(e.x-s.target.x,e.y-s.target.y)<=d.splash):[s.target];
+ for(const e of victims){e.hp-=damage;if(d.slow){e.slow=d.slow;e.slowTime=1.45}burst(e.x,e.y,d.color,5);if(e.hp<=0&&enemies.includes(e)){enemies.splice(enemies.indexOf(e),1);gold+=e.reward;score+=e.elite?30:e.runner?18:12;s.tower.kills++}}
+}
+function burst(x,y,color,n=9){for(let i=0;i<n;i++)particles.push({x,y,vx:(Math.random()-.5)*90,vy:(Math.random()-.5)*90,life:.35+Math.random()*.25,color})}
+function finish(win){over=true;waveActive=false;ui.endTitle.textContent=win?'Ward held!':'The ward shattered';ui.endText.textContent=win?'You survived all 12 waves with '+lives+' ward strength remaining. Score: '+score+'.':'The Eclipse host breached Dragonstone on wave '+wave+'. Score: '+score+'.';ui.overlay.classList.add('show')}
+function draw(){
+ ctx.clearRect(0,0,c.width,c.height);const g=ctx.createLinearGradient(0,0,0,c.height);g.addColorStop(0,'#18352a');g.addColorStop(1,'#0c2119');ctx.fillStyle=g;ctx.fillRect(0,0,c.width,c.height);
+ ctx.globalAlpha=.18;ctx.strokeStyle='#86b59b';ctx.lineWidth=1;for(let x=25;x<c.width;x+=50){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,c.height);ctx.stroke()}for(let y=25;y<c.height;y+=50){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(c.width,y);ctx.stroke()}ctx.globalAlpha=1;
+ ctx.strokeStyle='#5b4a3f';ctx.lineWidth=58;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();PATH.forEach((p,i)=>i?ctx.lineTo(...p):ctx.moveTo(...p));ctx.stroke();ctx.strokeStyle='#8e745d';ctx.lineWidth=42;ctx.stroke();
+ drawGate(PATH[0][0]+38,PATH[0][1],'#a03f59');drawGate(PATH.at(-1)[0]-35,PATH.at(-1)[1],'#58d0b2');
+ if(building){const m=mouse; if(m){const d=TYPES[building];ctx.beginPath();ctx.arc(m.x,m.y,d.range,0,Math.PI*2);ctx.fillStyle=canBuild(m.x,m.y)?'#61d6b31e':'#ff67671e';ctx.fill();ctx.strokeStyle=canBuild(m.x,m.y)?'#61d6b3':'#ff6767';ctx.lineWidth=2;ctx.stroke()}}
+ for(const t of towers)drawTower(t);for(const e of enemies)drawEnemy(e);for(const s of shots){ctx.fillStyle=TYPES[s.type].color;ctx.shadowBlur=12;ctx.shadowColor=ctx.fillStyle;ctx.beginPath();ctx.arc(s.x,s.y,4,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0}
+ for(const p of particles){ctx.globalAlpha=Math.max(0,p.life/.6);ctx.fillStyle=p.color;ctx.fillRect(p.x-2,p.y-2,4,4)}ctx.globalAlpha=1;
+ if(selected){const d=TYPES[selected.type];ctx.strokeStyle=d.color;ctx.globalAlpha=.55;ctx.lineWidth=2;ctx.beginPath();ctx.arc(selected.x,selected.y,d.range*(1+.08*(selected.level-1)),0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1}
+}
+function drawTower(t){const d=TYPES[t.type];ctx.save();ctx.translate(t.x,t.y);ctx.fillStyle='#09140f';ctx.strokeStyle=d.color;ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,0,21,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.rotate(performance.now()/1600);for(let i=0;i<4;i++){ctx.rotate(Math.PI/2);ctx.fillStyle=d.color;ctx.fillRect(13,-3,10,6)}ctx.rotate(-performance.now()/1600);ctx.fillStyle=d.color;ctx.shadowColor=d.color;ctx.shadowBlur=13;ctx.beginPath();ctx.arc(0,0,7+Math.min(t.level,4),0,Math.PI*2);ctx.fill();ctx.restore();ctx.shadowBlur=0}
+function drawEnemy(e){ctx.fillStyle=e.elite?'#b75064':e.runner?'#e2a14f':'#4d2633';ctx.strokeStyle='#f3b7c2';ctx.lineWidth=e.elite?3:1.5;ctx.beginPath();ctx.arc(e.x,e.y,e.r,0,Math.PI*2);ctx.fill();ctx.stroke();const w=e.r*2.2;ctx.fillStyle='#201217';ctx.fillRect(e.x-w/2,e.y-e.r-10,w,4);ctx.fillStyle=e.hp/e.max>.45?'#74dc94':'#ff6b6b';ctx.fillRect(e.x-w/2,e.y-e.r-10,w*Math.max(0,e.hp/e.max),4)}
+function drawGate(x,y,color){ctx.fillStyle='#08110e';ctx.strokeStyle=color;ctx.lineWidth=4;ctx.beginPath();ctx.arc(x,y,24,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.beginPath();ctx.moveTo(x-10,y);ctx.lineTo(x+10,y);ctx.moveTo(x,y-10);ctx.lineTo(x,y+10);ctx.stroke()}
+let mouse=null;c.addEventListener('pointermove',e=>{const r=c.getBoundingClientRect();mouse={x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height}});c.addEventListener('pointerleave',()=>mouse=null);
+ui.next.onclick=startWave;ui.pause.onclick=()=>{paused=!paused;ui.pause.textContent=paused?'Resume':'Pause'};ui.speed.onclick=()=>{speed=speed===1?2:speed===2?3:1;ui.speed.textContent='Speed ×'+speed};ui.cancel.onclick=()=>{building=null;renderTowerButtons()};$('#restart').onclick=reset;
+function loop(now){const dt=Math.min(.035,(now-last)/1000);last=now;update(dt);draw();requestAnimationFrame(loop)}reset();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
